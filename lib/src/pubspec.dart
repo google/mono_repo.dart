@@ -23,7 +23,7 @@ abstract class DependencyData {
 
   factory DependencyData(dynamic data) {
     if (data == null) {
-      return new HostedData(null);
+      return new HostedData(VersionConstraint.any);
     } else if (data is String) {
       return new HostedData(new VersionConstraint.parse(data));
     } else {
