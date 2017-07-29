@@ -53,45 +53,53 @@ void _print(String relativePath, PackageReport report) {
   if (report.version != null) {
     print("    version: ${report.version}");
   }
+  if (report.siblings.isNotEmpty) {
+    print("   siblings:");
+    report.siblings.forEach((k, v) {
+      print("     $k: $v");
+    });
+  }
   print('');
 }
 
 class PackageReport {
   final PackageConfig config;
   final Pubspec pubspec;
+  final Map<String, SiblingReference> siblings;
 
   bool get published => config.published;
 
   String get packageName => pubspec.name;
   Version get version => pubspec.version;
 
-  PackageReport(this.config, this.pubspec);
+  PackageReport(this.config, this.pubspec, this.siblings);
 
   factory PackageReport.create(
       PackageConfig config, Pubspec pubspec, Set<Pubspec> siblings) {
     // TODO(kevmoo): check: if any dependency has a path dependency, it'd better
     // be a sibling – right?
 
-    var references = siblings
-        .map((ps) => new SiblingReference.create(pubspec, ps))
-        .where((sr) => sr != null)
-        .toList();
+    var sibs = <String, SiblingReference>{};
+    for (var sib in siblings) {
+      var ref = new SiblingReference.create(pubspec, sib);
 
-    print("${pubspec.name}: ${references.join(', ')}");
+      if (ref != null) {
+        sibs[sib.name] = ref;
+      }
+    }
 
-    return new PackageReport(config, pubspec);
+    return new PackageReport(config, pubspec, sibs);
   }
 }
 
 enum DependencyType { direct, dev, indirect }
 
 class SiblingReference {
-  final String name;
   final DependencyType type;
   final DependencyData normalData;
   final DependencyData overrideData;
 
-  SiblingReference(this.name, this.type, this.normalData, this.overrideData);
+  SiblingReference(this.type, this.normalData, this.overrideData);
 
   factory SiblingReference.create(Pubspec sourcePubspec, Pubspec sibling) {
     for (var dep in sourcePubspec.dependencies.values) {
@@ -100,7 +108,7 @@ class SiblingReference {
         var override = sourcePubspec.dependencyOverrides.values
             .firstWhere((d) => d.name == dep.name, orElse: () => null);
         return new SiblingReference(
-            dep.name, DependencyType.direct, dep.data, override?.data);
+            DependencyType.direct, dep.data, override?.data);
       }
     }
     for (var dep in sourcePubspec.devDependencies.values) {
@@ -109,13 +117,12 @@ class SiblingReference {
         var override = sourcePubspec.dependencyOverrides.values
             .firstWhere((d) => d.name == dep.name, orElse: () => null);
         return new SiblingReference(
-            dep.name, DependencyType.dev, dep.data, override?.data);
+            DependencyType.dev, dep.data, override?.data);
       }
     }
     for (var dep in sourcePubspec.dependencyOverrides.values) {
       if (dep.name == sibling.name) {
-        return new SiblingReference(
-            dep.name, DependencyType.indirect, null, dep.data);
+        return new SiblingReference(DependencyType.indirect, null, dep.data);
       }
     }
     return null;
@@ -123,16 +130,12 @@ class SiblingReference {
 
   @override
   String toString() {
-    var buffer = new StringBuffer(name);
-
     var items = [type.toString().split('.')[1]];
 
-    if (overrideData != null) {
+    if (normalData != null && overrideData != null) {
       items.add("overridden");
     }
 
-    buffer.write(" (${items.join(', ')})");
-
-    return buffer.toString();
+    return items.join(', ');
   }
 }
