@@ -1,6 +1,5 @@
-```console
-
-$dart --checked ../multi_repo/bin/multi_repo.dart check
+```
+$ dart --checked ../multi_repo/bin/multi_repo.dart check
     ** Report **
 
 _tests: angular (dev, overridden), angular_compiler (indirect, overridden), angular_test (dev, overridden)
