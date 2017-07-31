@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
@@ -39,7 +40,8 @@ Future check() async {
 
   var pubspecValues = pubspecs.values.toSet();
 
-  print("    ** Report **\n");
+  print(styleBold.wrap("    ** REPORT **"));
+  print('');
   packages.forEach((dir, config) {
     var report = new PackageReport.create(config, pubspecs[dir], pubspecValues);
     _print(dir, report);
@@ -51,12 +53,20 @@ void _print(String relativePath, PackageReport report) {
   print("       name: ${report.packageName}");
   print("  published: ${report.published}");
   if (report.version != null) {
-    print("    version: ${report.version}");
+    var value = "    version: ${report.version}";
+    if (report.version.isPreRelease) {
+      value = yellow.wrap(value);
+    }
+    print(value);
   }
   if (report.siblings.isNotEmpty) {
     print("   siblings:");
     report.siblings.forEach((k, v) {
-      print("     $k: $v");
+      var value = "     $k: $v";
+      if (report.published && v.overrideData != null) {
+        value = yellow.wrap(value);
+      }
+      print(value);
     });
   }
   print('');
