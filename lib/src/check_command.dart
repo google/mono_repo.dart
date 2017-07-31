@@ -132,7 +132,7 @@ class SiblingReference {
   String toString() {
     var items = [type.toString().split('.')[1]];
 
-    if (normalData != null && overrideData != null) {
+    if (overrideData != null) {
       items.add("overridden");
     }
 

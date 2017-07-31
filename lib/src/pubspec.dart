@@ -47,6 +47,9 @@ class PathData implements DependencyData {
   final String path;
 
   PathData(this.path);
+
+  @override
+  String toString() => 'PathData: path@$path';
 }
 
 // TODO: support explicit host?
