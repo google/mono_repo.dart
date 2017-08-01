@@ -37,7 +37,7 @@ Future init() async {
 
   var file = new File(packagesFileName);
   var writer = new StringBuffer();
-  writer.writeln('# Created by multi_repo');
+  writer.writeln('# Created by mono_repo');
 
   packages.forEach((k, v) {
     writer.writeln("$k:");
