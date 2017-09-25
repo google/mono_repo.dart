@@ -22,15 +22,14 @@ Future init() async {
 
   if (FileSystemEntity.typeSync(packagesFileName) !=
       FileSystemEntityType.NOT_FOUND) {
-    print('`$packagesFileName` already exists.');
-    return;
+    throw new UserException('`$packagesFileName` already exists.');
   }
 
   var pubspecPath = p.join(p.current, 'pubspec.yaml');
   if (FileSystemEntity.typeSync(pubspecPath) !=
       FileSystemEntityType.NOT_FOUND) {
-    print('Found `pubspec.yaml` in the current directory. Not supported.');
-    return;
+    throw new UserException(
+        'Found `pubspec.yaml` in the current directory. Not supported.');
   }
 
   var packages = getPackageConfig();
