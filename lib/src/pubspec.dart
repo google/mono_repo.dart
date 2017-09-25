@@ -35,7 +35,7 @@ abstract class DependencyData {
       }
 
       throw new ArgumentError.value(
-          data, 'data', "No clue how to deal with `$data`.");
+          data, 'data', 'No clue how to deal with `$data`.');
     }
   }
 }

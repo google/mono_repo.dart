@@ -40,7 +40,7 @@ Future check() async {
 
   var pubspecValues = pubspecs.values.toSet();
 
-  print(styleBold.wrap("    ** REPORT **"));
+  print(styleBold.wrap('    ** REPORT **'));
   print('');
   packages.forEach((dir, config) {
     var report = new PackageReport.create(config, pubspecs[dir], pubspecValues);
@@ -49,20 +49,20 @@ Future check() async {
 }
 
 void _print(String relativePath, PackageReport report) {
-  print("$relativePath/");
-  print("       name: ${report.packageName}");
-  print("  published: ${report.published}");
+  print('$relativePath/');
+  print('       name: ${report.packageName}');
+  print('  published: ${report.published}');
   if (report.version != null) {
-    var value = "    version: ${report.version}";
+    var value = '    version: ${report.version}';
     if (report.version.isPreRelease) {
       value = yellow.wrap(value);
     }
     print(value);
   }
   if (report.siblings.isNotEmpty) {
-    print("   siblings:");
+    print('   siblings:');
     report.siblings.forEach((k, v) {
-      var value = "     $k: $v";
+      var value = '     $k: $v';
       if (report.published && v.overrideData != null) {
         value = yellow.wrap(value);
       }
@@ -143,7 +143,7 @@ class SiblingReference {
     var items = [type.toString().split('.')[1]];
 
     if (overrideData != null) {
-      items.add("overridden");
+      items.add('overridden');
     }
 
     return items.join(', ');

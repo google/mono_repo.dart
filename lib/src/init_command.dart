@@ -22,7 +22,7 @@ Future init() async {
 
   if (FileSystemEntity.typeSync(packagesFileName) !=
       FileSystemEntityType.NOT_FOUND) {
-    print("`$packagesFileName` already exists.");
+    print('`$packagesFileName` already exists.');
     return;
   }
 
@@ -40,8 +40,8 @@ Future init() async {
   writer.writeln('# Created by mono_repo');
 
   packages.forEach((k, v) {
-    writer.writeln("$k:");
-    writer.writeln("  published: ${v.published}");
+    writer.writeln('$k:');
+    writer.writeln('  published: ${v.published}');
   });
 
   file.writeAsStringSync(writer.toString(), mode: FileMode.WRITE_ONLY);

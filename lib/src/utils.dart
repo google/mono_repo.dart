@@ -44,7 +44,7 @@ Map<String, PackageConfig> getPackageConfig() {
       var name = pubspecContent['name'] as String;
       if (name == null) {
         throw new StateError(
-            "No name for the pubspec at `${pubspecFile.path}`.");
+            'No name for the pubspec at `${pubspecFile.path}`.');
       }
 
       var publishedGuess = pubspecContent.containsKey('version');
