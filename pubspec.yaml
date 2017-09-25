@@ -16,3 +16,6 @@ dependencies:
 
 dev_dependencies:
   test: ^0.12.0
+
+executables:
+  mono_repo:
