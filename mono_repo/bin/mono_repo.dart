@@ -20,4 +20,5 @@ main(List<String> arguments) async {
 CommandRunner get _runner => new CommandRunner(
     'mono_repo', 'Manage multiple packages in one source repository.')
   ..addCommand(new InitCommand())
-  ..addCommand(new CheckCommand());
+  ..addCommand(new CheckCommand())
+  ..addCommand(new TravisCommand());

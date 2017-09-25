@@ -1,0 +1,20 @@
+# Created with https://github.com/dart-lang/mono_repo
+language: dart
+
+dart:
+  - dev
+
+env:
+  - PKG=mono_repo TASK=dartanalyzer
+  - PKG=mono_repo TASK=dartfmt
+  - PKG=mono_repo TASK=test
+
+script: ./tool/travis.sh
+
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only: [master]
+
+cache:
+ directories:
+   - $HOME/.pub-cache

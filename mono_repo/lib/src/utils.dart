@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -64,3 +65,6 @@ class UserException implements Exception {
   @override
   String toString() => 'UserException: $message';
 }
+
+String encodeJson(Object input) =>
+    const JsonEncoder.withIndent(' ').convert(input);
