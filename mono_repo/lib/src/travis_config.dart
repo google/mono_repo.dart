@@ -14,9 +14,6 @@ final travisFileName = '.travis.yml';
 @JsonSerializable()
 class TravisConfig extends Object with _$TravisConfigSerializerMixin {
   @override
-  final String package;
-
-  @override
   final List<String> sdks;
 
   @override
@@ -25,21 +22,31 @@ class TravisConfig extends Object with _$TravisConfigSerializerMixin {
   @override
   final List<TravisJob> include, exclude;
 
-  TravisConfig(this.package, this.sdks, this.tasks, this.include, this.exclude);
+  TravisConfig(this.sdks, this.tasks, this.include, this.exclude);
 
-  factory TravisConfig.parse(String package, Map<String, dynamic> travisYaml) {
-    stderr.writeln(styleBold.wrap('package:$package'));
-
-    var ignoredKeys = travisYaml.keys.toSet()..removeAll(_processedKeys);
+  factory TravisConfig.parse(Map<String, dynamic> travisYaml) {
+    var ignoredKeys =
+        (travisYaml.keys.toSet()..removeAll(_processedKeys)).toList()..sort();
 
     if (ignoredKeys.isNotEmpty) {
       stderr.writeln(yellow.wrap('''  Ignoring these keys in `$travisFileName`:
 ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
     }
 
-    var sdks = travisYaml['dart'] as List<String>;
+    var language = travisYaml['language'] as String;
+    if (language == null || language != 'dart') {
+      throw new ArgumentError('"language" must be set to "dart".');
+    }
 
-    var dartTasks = (travisYaml['dart_task'] as List)
+    var sdks = (travisYaml['dart'] as List<String>);
+
+    if (sdks == null || sdks.isEmpty) {
+      throw new ArgumentError(
+          'At least one SDK version is required under "dart".');
+    }
+
+    // FYI: 'test' is default if there are no tasks defined
+    var dartTasks = ((travisYaml['dart_task'] as List) ?? ['test'])
         .map((yamlValue) => new DartTask.parse(yamlValue))
         .toList();
 
@@ -71,7 +78,7 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
       processException(matrix['exclude'] as y.YamlList, exclude);
     }
 
-    return new TravisConfig(package, sdks, dartTasks, include, exclude);
+    return new TravisConfig(sdks, dartTasks, include, exclude);
   }
 
   Iterable<TravisJob> get travisJobs sync* {
@@ -90,7 +97,12 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
   factory TravisConfig.fromJson(Map<String, dynamic> json) =>
       _$TravisConfigFromJson(json);
 
-  static final _processedKeys = const ['dart_task', 'dart', 'matrix'];
+  static final _processedKeys = const [
+    'dart_task',
+    'dart',
+    'matrix',
+    'language'
+  ];
 }
 
 @JsonSerializable()

@@ -7,24 +7,54 @@ import 'package:yaml/yaml.dart' as y;
 
 import 'package:mono_repo/src/utils.dart';
 
+Matcher throwsArgumentErrorWith(String value) =>
+    throwsA((Object e) => (e as ArgumentError).message == value);
+
 void main() {
-  test('sanity', () {
-    var travisYaml = y.loadYaml(_config) as Map<String, dynamic>;
+  group('TravisConfig', () {
+    test('language key required', () {
+      expect(() => new TravisConfig.parse({}),
+          throwsArgumentErrorWith('"language" must be set to "dart".'));
+    });
 
-    var config = new TravisConfig.parse('test', travisYaml);
+    test('sdk is required config is fine', () {
+      expect(
+          () => new TravisConfig.parse({'language': 'dart'}),
+          throwsArgumentErrorWith(
+              'At least one SDK version is required under "dart".'));
+    });
 
-    expect(config.package, 'test');
-    expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
+    test('no tasks - end up with `test`', () {
+      var config = new TravisConfig.parse({
+        'language': 'dart',
+        'dart': ['stable']
+      });
 
-    var jobs = config.travisJobs.toList();
+      var oneJob = config.travisJobs.single;
+      expect(oneJob.sdk, 'stable');
+      expect(oneJob.task.name, 'test');
+      expect(oneJob.task.args, isNull);
+      expect(oneJob.task.config, isNull);
+    });
 
-    expect(jobs, hasLength(15));
+    test('valid example', () {
+      var travisYaml = y.loadYaml(_config) as Map<String, dynamic>;
 
-    expect(encodeJson(jobs), encodeJson(_expectedOutput));
+      var config = new TravisConfig.parse(travisYaml);
+
+      expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
+
+      var jobs = config.travisJobs.toList();
+
+      expect(jobs, hasLength(15));
+
+      expect(encodeJson(jobs), encodeJson(_expectedOutput));
+    });
   });
 }
 
 final _config = r'''
+language: dart
 dart:
  - dev
  - stable

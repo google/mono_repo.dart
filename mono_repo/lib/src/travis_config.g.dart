@@ -8,7 +8,6 @@ part of mono_repo.travis_config;
 
 TravisConfig _$TravisConfigFromJson(Map<String, dynamic> json) =>
     new TravisConfig(
-        json['package'] as String,
         (json['sdks'] as List)?.map((e) => e as String)?.toList(),
         (json['tasks'] as List)
             ?.map((e) => e == null
@@ -27,13 +26,11 @@ TravisConfig _$TravisConfigFromJson(Map<String, dynamic> json) =>
             ?.toList());
 
 abstract class _$TravisConfigSerializerMixin {
-  String get package;
   List<String> get sdks;
   List<DartTask> get tasks;
   List<TravisJob> get include;
   List<TravisJob> get exclude;
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'package': package,
         'sdks': sdks,
         'tasks': tasks,
         'include': include,

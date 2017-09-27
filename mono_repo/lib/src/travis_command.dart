@@ -23,7 +23,7 @@ class TravisCommand extends Command {
 Future _travis() async {
   var packages = getPackageConfig();
 
-  var configs = <TravisConfig>[];
+  var configs = <String, TravisConfig>{};
 
   for (var pkg in packages.keys) {
     var travisPath = _travisPath(pkg);
@@ -33,24 +33,26 @@ Future _travis() async {
       var travisYaml =
           y.loadYaml(travisFile.readAsStringSync(), sourceUrl: travisPath);
 
-      var config =
-          new TravisConfig.parse(pkg, travisYaml as Map<String, dynamic>);
+      stderr.writeln(styleBold.wrap('package:$pkg'));
+      var config = new TravisConfig.parse(travisYaml as Map<String, dynamic>);
 
       if (config.tasks.any((dt) => dt.config != null)) {
         throw new UnsupportedError(
             'Tasks with fancy configuration are not supported.');
       }
 
-      configs.add(config);
+      configs[pkg] = config;
     }
   }
 
-  var sdks = (configs.expand((tc) => tc.sdks).toList()..sort()).toSet();
+  var sdks = (configs.values.expand((tc) => tc.sdks).toList()..sort()).toSet();
 
   var taskToKeyMap = <DartTask, String>{};
 
-  for (var task
-      in configs.expand((tc) => tc.travisJobs).map((tj) => tj.task).toSet()) {
+  for (var task in configs.values
+      .expand((tc) => tc.travisJobs)
+      .map((tj) => tj.task)
+      .toSet()) {
     assert(!taskToKeyMap.containsKey(task));
     var taskKey = task.name;
 
@@ -64,12 +66,12 @@ Future _travis() async {
 
   var environmentVars = new Map<String, Set<String>>();
 
-  for (var config in configs) {
+  configs.forEach((pkg, config) {
     for (var job in config.travisJobs) {
-      var newVar = 'PKG=${config.package} TASK=${taskToKeyMap[job.task]}';
+      var newVar = 'PKG=${pkg} TASK=${taskToKeyMap[job.task]}';
       environmentVars.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
     }
-  }
+  });
 
   var taskEntries = <String>[];
 
