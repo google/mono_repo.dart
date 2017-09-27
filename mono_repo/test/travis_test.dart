@@ -6,6 +6,7 @@ import 'package:test/test.dart';
 import 'package:yaml/yaml.dart' as y;
 
 import 'package:mono_repo/src/utils.dart';
+import 'shared.dart';
 
 Matcher throwsArgumentErrorWith(String value) =>
     throwsA((Object e) => (e as ArgumentError).message == value);
@@ -38,7 +39,7 @@ void main() {
     });
 
     test('valid example', () {
-      var travisYaml = y.loadYaml(_config) as Map<String, dynamic>;
+      var travisYaml = y.loadYaml(testConfig1) as Map<String, dynamic>;
 
       var config = new TravisConfig.parse(travisYaml);
 
@@ -48,48 +49,12 @@ void main() {
 
       expect(jobs, hasLength(15));
 
-      expect(encodeJson(jobs), encodeJson(_expectedOutput));
+      expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
     });
   });
 }
 
-final _config = r'''
-language: dart
-dart:
- - dev
- - stable
- - 1.23.0
-
-env:
- - FORCE_TEST_EXIT=true
-
-# Content shell needs these fonts.
-addons:
-  something: also here for completeness
-
-before_install:
-  - ignored for now
-  - just here for completeness
-
-dart_task:
- - test: --platform dartium
-   install_dartium: true
- - test: --preset travis --total-shards 5 --shard-index 0
-   install_dartium: true
- - test: --preset travis --total-shards 5 --shard-index 1
- - test #no args
- - dartanalyzer
-
-matrix:
-  exclude:
-    - dart: stable
-      dart_task: dartanalyzer
-  include:
-    - dart: dev
-      dart_task: dartfmt
-''';
-
-List get _expectedOutput => [
+List get _testConfig1expectedOutput => [
       {
         "sdk": "dev",
         "task": {
