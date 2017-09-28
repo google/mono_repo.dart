@@ -6,10 +6,12 @@ import 'package:yaml/yaml.dart' as y;
 
 import 'package_config.dart';
 
-String get packagesFileName => p.join(p.current, 'packages.yaml');
+final packageConfigFileName = 'packages.yaml';
 
-Map<String, PackageConfig> openPackageConfig() {
-  var packagesFile = new File(packagesFileName);
+Map<String, PackageConfig> openPackageConfig({String rootDirectory}) {
+  rootDirectory ??= p.current;
+
+  var packagesFile = new File(p.join(rootDirectory, packageConfigFileName));
 
   // TODO: better error if file does not exist
 
@@ -26,21 +28,30 @@ Map<String, PackageConfig> openPackageConfig() {
 }
 
 /// If the file exists, open it – otherwise infer it from the data on disk.
-Map<String, PackageConfig> getPackageConfig() {
-  if (FileSystemEntity.isFileSync(packagesFileName)) {
+Map<String, PackageConfig> getPackageConfig({String rootDirectory}) {
+  rootDirectory ??= p.current;
+
+  var packageFileName = p.join(rootDirectory, packageConfigFileName);
+
+  if (FileSystemEntity.isFileSync(packageFileName)) {
     return openPackageConfig();
   }
 
   var packages = <String, PackageConfig>{};
 
-  for (Directory subdir
-      in Directory.current.listSync().where((fse) => fse is Directory)) {
-    File pubspecFile = subdir.listSync().firstWhere(
-        (fse) => fse is File && p.basename(fse.path) == 'pubspec.yaml',
-        orElse: () => null);
+  for (Directory subdir in new Directory(rootDirectory)
+      .listSync()
+      .where((fse) => fse is Directory)) {
+    File pubspecFile = subdir.listSync().firstWhere((fse) {
+      return fse is File && p.basename(fse.path) == 'pubspec.yaml';
+    }, orElse: () => null);
 
     if (pubspecFile != null) {
       var pubspecContent = y.loadYaml(pubspecFile.readAsStringSync()) as Map;
+      if (pubspecContent == null) {
+        throw new StateError('The pubspec file at '
+            '`${pubspecFile.path}` does not appear valid.');
+      }
 
       var name = pubspecContent['name'] as String;
       if (name == null) {
@@ -50,7 +61,8 @@ Map<String, PackageConfig> getPackageConfig() {
 
       var publishedGuess = pubspecContent.containsKey('version');
 
-      packages[p.relative(subdir.path)] = new PackageConfig(publishedGuess);
+      packages[p.relative(subdir.path, from: rootDirectory)] =
+          new PackageConfig(publishedGuess);
     }
   }
 

@@ -18,6 +18,7 @@ class InitCommand extends Command {
 }
 
 Future init() async {
+  var packagesFileName = p.join(p.current, packageConfigFileName);
   // TODO: check to see if we're in the root of a GIT repo. If not, warn.
 
   if (FileSystemEntity.typeSync(packagesFileName) !=

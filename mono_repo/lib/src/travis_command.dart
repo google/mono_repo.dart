@@ -17,16 +17,22 @@ class TravisCommand extends Command {
   String get description => 'Configure Travis-CI for child packages.';
 
   @override
-  Future run() => _travis();
+  Future run() => generateTravisConfig();
 }
 
-Future _travis() async {
-  var packages = getPackageConfig();
+Future generateTravisConfig({String rootDirectory}) async {
+  rootDirectory ??= p.current;
+
+  var packages = getPackageConfig(rootDirectory: rootDirectory);
+
+  if (packages.isEmpty) {
+    throw new UserException('No nested packages found.');
+  }
 
   var configs = <String, TravisConfig>{};
 
   for (var pkg in packages.keys) {
-    var travisPath = _travisPath(pkg);
+    var travisPath = p.join(rootDirectory, pkg, travisFileName);
     var travisFile = new File(travisPath);
 
     if (travisFile.existsSync()) {
@@ -36,9 +42,13 @@ Future _travis() async {
       stderr.writeln(styleBold.wrap('package:$pkg'));
       var config = new TravisConfig.parse(travisYaml as Map<String, dynamic>);
 
-      if (config.tasks.any((dt) => dt.config != null)) {
-        throw new UnsupportedError(
-            'Tasks with fancy configuration are not supported.');
+      var configuredTasks =
+          config.tasks.where((dt) => dt.config != null).toList();
+
+      if (configuredTasks.isNotEmpty) {
+        throw new UserException(
+            'Tasks with fancy configuration are not supported. '
+            'See `${p.relative(travisPath, from: rootDirectory)}`.');
       }
 
       configs[pkg] = config;
@@ -81,7 +91,11 @@ Future _travis() async {
 
     var buffer = new StringBuffer('$label) ${contentLines.first}\n');
     buffer.writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
-    taskEntries.add(buffer.toString());
+
+    var output = buffer.toString();
+    if (!taskEntries.contains(output)) {
+      taskEntries.add(output);
+    }
   }
 
   taskToKeyMap.forEach((dartTask, taskKey) {
@@ -91,6 +105,11 @@ Future _travis() async {
       dartTask.command
     ]);
   });
+
+  if (taskEntries.isEmpty) {
+    throw new UserException(
+        'No entries created. Check your nested `$travisFileName` files.');
+  }
 
   taskEntries.sort();
 
@@ -121,17 +140,20 @@ Future _travis() async {
     // Ensure there is a trailing newline after the matrix
     matrix.add('');
   }
+
   //
   // Write `.travis.yml`
   //
-  var travisFile = new File(travisFileName);
+  var travisPath = p.join(rootDirectory, travisFileName);
+  var travisFile = new File(travisPath);
   travisFile.writeAsStringSync(_travisYml(sdks, envEntries, matrix.join('\n')));
-  stderr.writeln(styleDim.wrap('Wrote `$travisFileName`.'));
+  stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
 
   //
   // Write `tool/travis.sh`
   //
-  var travisScript = new File(_travisShPath);
+  var travisFilePath = p.join(rootDirectory, _travisShPath);
+  var travisScript = new File(travisFilePath);
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
@@ -142,13 +164,10 @@ Future _travis() async {
 
   travisScript.writeAsStringSync(_travisSh(taskEntries));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
-  stderr.writeln(styleDim.wrap('Wrote `$_travisShPath`.'));
+  stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
 
 final _travisShPath = './tool/travis.sh';
-
-String _travisPath(String pkgName) =>
-    p.join(p.current, pkgName, travisFileName);
 
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');

@@ -3,5 +3,5 @@
 
 export 'src/check_command.dart';
 export 'src/init_command.dart';
-export 'src/travis_command.dart';
+export 'src/travis_command.dart' show TravisCommand;
 export 'src/utils.dart' show UserException;
