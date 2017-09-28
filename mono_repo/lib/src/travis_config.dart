@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
-import 'package:json_serializable/annotations.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:yaml/yaml.dart' as y;
 
 part 'travis_config.g.dart';
