@@ -10,6 +10,7 @@ import 'package:yaml/yaml.dart' as y;
 part 'travis_config.g.dart';
 
 final travisFileName = '.travis.yml';
+final travisShPath = './tool/travis.sh';
 
 @JsonSerializable()
 class TravisConfig extends Object with _$TravisConfigSerializerMixin {

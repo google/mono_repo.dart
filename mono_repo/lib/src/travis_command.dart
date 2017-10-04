@@ -123,22 +123,20 @@ Future generateTravisConfig({String rootDirectory}) async {
   //
   // Write `tool/travis.sh`
   //
-  var travisFilePath = p.join(rootDirectory, _travisShPath);
+  var travisFilePath = p.join(rootDirectory, travisShPath);
   var travisScript = new File(travisFilePath);
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
     stderr.writeln(
-        yellow.wrap('Make sure to mark `$_travisShPath` as executable.'));
-    stderr.writeln(yellow.wrap('  chmod +x $_travisShPath'));
+        yellow.wrap('Make sure to mark `$travisShPath` as executable.'));
+    stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
   travisScript.writeAsStringSync(_travisSh(taskEntries));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
-
-final _travisShPath = './tool/travis.sh';
 
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');
@@ -178,7 +176,7 @@ ${_indentAndJoin(sdks)}
 env:
 ${_indentAndJoin(envs)}
 $matrix
-script: $_travisShPath
+script: $travisShPath
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
