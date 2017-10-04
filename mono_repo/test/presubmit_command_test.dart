@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
@@ -12,48 +11,62 @@ import 'package:mono_repo/src/travis_config.dart';
 import 'shared.dart';
 
 void main() {
-  test('no $travisShPath', () async {
-    await d.dir('pkg_a').create();
+  group('error reporting', () {
+    test('no $travisShPath', () async {
+      await d.dir('pkg_a').create();
 
-    expect(
-        () => presubmit(rootDirectory: d.sandbox),
-        throwsUserExceptionWith(
-            'No $travisShPath file found, please run the `travis` command first.'));
+      expect(
+          () => presubmit(rootDirectory: d.sandbox),
+          throwsUserExceptionWith(
+              'No $travisShPath file found, please run the `travis` command first.'));
+    });
   });
 
   group('golden path', () {
-    setUp(() async {
-      await d.dir('pkg_a', [
-        d.file('.travis.yml', pkgAConfig),
-        d.file('pubspec.yaml', '''
-name: pkg_name
-dev_dependencies:
-  test: any
-      '''),
-        d.dir('test', [
-          d.file('test.dart', basicTest),
-        ]),
-      ]).create();
-      await d.dir('pkg_b', [
-        d.file('.travis.yml', pkgBConfig),
-        d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-      ]).create();
+    String repoPath;
+    String pkgAPath;
+    String pkgBPath;
 
-      await generateTravisConfig(rootDirectory: d.sandbox);
+    setUpAll(() async {
+      repoPath = Directory.systemTemp.createTempSync().path;
+      pkgAPath = p.join(repoPath, 'pkg_a');
+      new Directory(pkgAPath).createSync();
+      pkgBPath = p.join(repoPath, 'pkg_b');
+      new Directory(pkgBPath).createSync();
+
+      new File(p.join(pkgAPath, '.travis.yml'))
+        ..createSync(recursive: true)
+        ..writeAsStringSync(pkgAConfig);
+      new File(p.join(pkgAPath, 'pubspec.yaml'))
+        ..createSync(recursive: true)
+        ..writeAsStringSync(pkgAPubspec);
+      new File(p.join(pkgAPath, 'test', 'test.dart'))
+        ..createSync(recursive: true)
+        ..writeAsStringSync(basicTest);
+
+      new File(p.join(pkgBPath, '.travis.yml'))
+        ..createSync(recursive: true)
+        ..writeAsStringSync(pkgBConfig);
+      new File(p.join(pkgBPath, 'pubspec.yaml'))
+        ..createSync(recursive: true)
+        ..writeAsStringSync('name: pkg_b');
+
+      await generateTravisConfig(rootDirectory: repoPath);
       await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
-          workingDirectory: d.sandbox);
-      await Process.run('pub', ['get'],
-          workingDirectory: p.join(d.sandbox, 'pkg_a'));
+          workingDirectory: repoPath);
+      await Process.run('pub', ['get'], workingDirectory: pkgAPath);
       await Process.run(
           'pub', ['global', 'activate', '-s', 'path', Directory.current.path]);
+    });
+
+    tearDownAll(() {
+      new Directory(repoPath).deleteSync(recursive: true);
     });
 
     test('runs all tasks and packages', () async {
       var result = await Process.run(
           'pub', ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
-          workingDirectory: d.sandbox);
+          workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
       expect(result.stderr, '''
@@ -82,7 +95,7 @@ pkg_b
             '-p',
             'pkg_b'
           ],
-          workingDirectory: d.sandbox);
+          workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
       expect(result.stderr, '''
@@ -104,7 +117,7 @@ pkg_b
             '-t',
             'dartfmt'
           ],
-          workingDirectory: d.sandbox);
+          workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
       expect(result.stderr, '''
@@ -139,6 +152,12 @@ dart:
 
 dart_task:
   - dartfmt
+''';
+
+final pkgAPubspec = '''
+name: pkg_name
+dev_dependencies:
+  test: any
 ''';
 
 final basicTest = '''
