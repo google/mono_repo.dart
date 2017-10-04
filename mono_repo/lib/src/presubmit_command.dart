@@ -28,8 +28,7 @@ class PresubmitCommand extends Command {
     argParser.addOption('sdk',
         help: 'Which sdk to use for match tasks, defaults to current sdk',
         allowMultiple: false,
-        defaultsTo: _currentSdk,
-        allowed: ['dev', 'stable']);
+        defaultsTo: _currentSdk);
   }
 
   @override
@@ -44,6 +43,11 @@ class PresubmitCommand extends Command {
   }
 }
 
+/// TODO: This doesn't actually match what Travis does, just because
+/// you are on a dev release sdk doesn't mean you are on the latest
+/// dev release sdk, but its generally a decent approximation.
+///
+/// This also won't match any exact versions listed in your travis config.
 final _currentSdk =
     new Version.parse(Platform.version.split(' ').first).isPreRelease
         ? 'dev'
