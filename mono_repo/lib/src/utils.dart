@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
 
 import 'package_config.dart';
+import 'travis_config.dart';
 
 final packageConfigFileName = 'packages.yaml';
 
@@ -67,6 +68,42 @@ Map<String, PackageConfig> getPackageConfig({String rootDirectory}) {
   }
 
   return packages;
+}
+
+Map<String, TravisConfig> getTravisConfigs({String rootDirectory}) {
+  rootDirectory ??= p.current;
+
+  var packages = getPackageConfig(rootDirectory: rootDirectory);
+
+  if (packages.isEmpty) {
+    throw new UserException('No nested packages found.');
+  }
+
+  var configs = <String, TravisConfig>{};
+
+  for (var pkg in packages.keys) {
+    var travisPath = p.join(rootDirectory, pkg, travisFileName);
+    var travisFile = new File(travisPath);
+
+    if (travisFile.existsSync()) {
+      var travisYaml =
+          y.loadYaml(travisFile.readAsStringSync(), sourceUrl: travisPath);
+
+      var config = new TravisConfig.parse(travisYaml as Map<String, dynamic>);
+
+      var configuredTasks =
+          config.tasks.where((dt) => dt.config != null).toList();
+
+      if (configuredTasks.isNotEmpty) {
+        throw new UserException(
+            'Tasks with fancy configuration are not supported. '
+            'See `${p.relative(travisPath, from: rootDirectory)}`.');
+      }
+
+      configs[pkg] = config;
+    }
+  }
+  return configs;
 }
 
 class UserException implements Exception {
