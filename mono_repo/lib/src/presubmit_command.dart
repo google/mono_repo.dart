@@ -116,7 +116,7 @@ Future<bool> presubmit(
       if (result.exitCode == 0) {
         stderr.writeln(green.wrap('(success)'));
       } else {
-        tmpDir ??= Directory.systemTemp.createTempSync();
+        tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
         var file = new File(
             p.join(tmpDir.path, '${package}_${job.task.name}_${job.sdk}.txt'));
         await file.create(recursive: true);
