@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
-import 'package:yaml/yaml.dart' as y;
 
 import 'travis_config.dart';
 import 'utils.dart';
@@ -21,38 +20,10 @@ class TravisCommand extends Command {
 }
 
 Future generateTravisConfig({String rootDirectory}) async {
-  rootDirectory ??= p.current;
+  var configs = getTravisConfigs(rootDirectory: rootDirectory);
 
-  var packages = getPackageConfig(rootDirectory: rootDirectory);
-
-  if (packages.isEmpty) {
-    throw new UserException('No nested packages found.');
-  }
-
-  var configs = <String, TravisConfig>{};
-
-  for (var pkg in packages.keys) {
-    var travisPath = p.join(rootDirectory, pkg, travisFileName);
-    var travisFile = new File(travisPath);
-
-    if (travisFile.existsSync()) {
-      var travisYaml =
-          y.loadYaml(travisFile.readAsStringSync(), sourceUrl: travisPath);
-
-      stderr.writeln(styleBold.wrap('package:$pkg'));
-      var config = new TravisConfig.parse(travisYaml as Map<String, dynamic>);
-
-      var configuredTasks =
-          config.tasks.where((dt) => dt.config != null).toList();
-
-      if (configuredTasks.isNotEmpty) {
-        throw new UserException(
-            'Tasks with fancy configuration are not supported. '
-            'See `${p.relative(travisPath, from: rootDirectory)}`.');
-      }
-
-      configs[pkg] = config;
-    }
+  for (var pkg in configs.keys) {
+    stderr.writeln(styleBold.wrap('package:$pkg'));
   }
 
   var sdks = (configs.values.expand((tc) => tc.sdks).toList()..sort()).toSet();
@@ -152,22 +123,20 @@ Future generateTravisConfig({String rootDirectory}) async {
   //
   // Write `tool/travis.sh`
   //
-  var travisFilePath = p.join(rootDirectory, _travisShPath);
+  var travisFilePath = p.join(rootDirectory, travisShPath);
   var travisScript = new File(travisFilePath);
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
     stderr.writeln(
-        yellow.wrap('Make sure to mark `$_travisShPath` as executable.'));
-    stderr.writeln(yellow.wrap('  chmod +x $_travisShPath'));
+        yellow.wrap('Make sure to mark `$travisShPath` as executable.'));
+    stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
   travisScript.writeAsStringSync(_travisSh(taskEntries));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
-
-final _travisShPath = './tool/travis.sh';
 
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');
@@ -207,7 +176,7 @@ ${_indentAndJoin(sdks)}
 env:
 ${_indentAndJoin(envs)}
 $matrix
-script: $_travisShPath
+script: $travisShPath
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
