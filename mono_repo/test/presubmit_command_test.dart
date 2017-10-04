@@ -129,6 +129,48 @@ pkg_b
   Running task dartfmt:stable (skipped, mismatched sdk)
 ''');
     });
+
+    group('failing tasks', () {
+      File failingTestFile;
+      setUp(() {
+        failingTestFile =
+            new File(p.join(pkgAPath, 'test', 'failing_test.dart'))
+              ..createSync()
+              ..writeAsStringSync(failingTest);
+      });
+      tearDown(() {
+        failingTestFile.deleteSync();
+      });
+
+      test('cause an error and are reported', () async {
+        var result = await Process.run(
+            'pub',
+            [
+              'global',
+              'run',
+              'mono_repo',
+              'presubmit',
+              '--sdk=dev',
+              '-t',
+              'test',
+              '-p',
+              'pkg_a',
+            ],
+            workingDirectory: repoPath);
+        expect(result.exitCode, 1,
+            reason: 'Any failing tasks should give a non-zero exit code');
+        expect(result.stderr, startsWith('''
+pkg_a
+  Running task test:dev (failure, '''));
+        var stdErrString = result.stderr as String;
+        var start = stdErrString.indexOf('(failure, ') + 10;
+        var end = stdErrString.indexOf(')');
+        var logPath = stdErrString.substring(start, end);
+        var logFile = new File(logPath);
+        expect(logFile.existsSync(), isTrue);
+        expect(logFile.readAsStringSync(), contains('Some tests failed'));
+      });
+    });
   });
 }
 
@@ -166,6 +208,16 @@ import 'package:test/test.dart';
 main() {
   test('1 == 1', () {
     expect(1, equals(1));
+  });
+}
+''';
+
+final failingTest = '''
+import 'package:test/test.dart';
+
+main() {
+  test('1 == 2', () {
+    expect(1, equals(2));
   });
 }
 ''';
