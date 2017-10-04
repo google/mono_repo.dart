@@ -49,10 +49,6 @@ final _currentSdk =
         ? 'dev'
         : 'stable';
 
-/// A temp dir to dump logs to for errors.
-Directory __tmpDir;
-Directory get _tmpDir => __tmpDir ??= Directory.systemTemp.createTempSync();
-
 Future<bool> presubmit(
     {Iterable<String> packages,
     Iterable<String> tasks,
@@ -61,6 +57,7 @@ Future<bool> presubmit(
   packages ??= <String>[];
   tasks ??= <String>[];
   sdkToRun ??= _currentSdk;
+  Directory tmpDir;
 
   if (!new File(travisShPath).existsSync()) {
     throw new UserException(
@@ -115,8 +112,9 @@ Future<bool> presubmit(
       if (result.exitCode == 0) {
         stderr.writeln(green.wrap('(success)'));
       } else {
+        tmpDir ??= Directory.systemTemp.createTempSync();
         var file = new File(
-            p.join(_tmpDir.path, '${package}_${job.task.name}_${job.sdk}.txt'));
+            p.join(tmpDir.path, '${package}_${job.task.name}_${job.sdk}.txt'));
         await file.create(recursive: true);
         await file.writeAsString(result.stdout as String);
         stderr.writeln(red.wrap('(failure, ${file.path})'));
