@@ -24,6 +24,7 @@ class TravisCommand extends Command {
 }
 
 Future generateTravisConfig({String rootDirectory}) async {
+  rootDirectory ??= p.current;
   var configs = getTravisConfigs(rootDirectory: rootDirectory);
 
   for (var pkg in configs.keys) {
@@ -42,7 +43,7 @@ Future generateTravisConfig({String rootDirectory}) async {
     var taskKey = task.name;
 
     var count = 1;
-    while (taskToKeyMap.containsKey(taskKey)) {
+    while (taskToKeyMap.containsValue(taskKey)) {
       taskKey = '${task.name}_${count++}';
     }
 
