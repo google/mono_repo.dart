@@ -60,6 +60,88 @@ name: pkg_name
     await d.file('.travis.yml', _config2Yaml).validate();
     await d.file('tool/travis.sh', _config2Shell).validate();
   });
+
+  test('two flavors of dartfmt', () async {
+    await d.dir('pkg_a', [
+      d.file('.travis.yml', r'''language: dart
+dart:
+ - dev
+
+dart_task:
+ - dartfmt
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+    ]).create();
+
+    await d.dir('pkg_b', [
+      d.file('.travis.yml', r'''language: dart
+dart:
+ - dev
+
+dart_task:
+ - dartfmt: sdk
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_b
+      ''')
+    ]).create();
+
+    await overrideAnsiOutput(false, () async {
+      await generateTravisConfig(rootDirectory: d.sandbox);
+    });
+
+    await d.file(
+        '.travis.yml', r'''# Created with https://github.com/dart-lang/mono_repo
+language: dart
+
+dart:
+  - dev
+
+env:
+  - PKG=pkg_a TASK=dartfmt
+  - PKG=pkg_b TASK=dartfmt
+
+script: ./tool/travis.sh
+
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only: [master]
+
+cache:
+ directories:
+   - $HOME/.pub-cache
+''').validate();
+
+    await d.file('tool/travis.sh', r'''#!/bin/bash
+# Created with https://github.com/dart-lang/mono_repo
+
+# Fast fail the script on failures.
+set -e
+
+if [ -z "$PKG" ]; then
+  echo -e "PKG environment variable must be set!"
+  exit 1
+elif [ -z "$TASK" ]; then
+  echo -e "TASK environment variable must be set!"
+  exit 1
+fi
+
+pushd $PKG
+pub upgrade
+
+case $TASK in
+dartfmt) echo
+  echo -e "TASK: dartfmt"
+  dartfmt -n --set-exit-if-changed .
+  ;;
+*) echo -e "Not expecting TASK '${TASK}'. Error!"
+  exit 1
+  ;;
+esac
+''').validate();
+  });
 }
 
 final _config2Shell = r'''#!/bin/bash

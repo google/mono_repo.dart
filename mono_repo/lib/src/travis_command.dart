@@ -33,28 +33,29 @@ Future generateTravisConfig({String rootDirectory}) async {
 
   var sdks = (configs.values.expand((tc) => tc.sdks).toList()..sort()).toSet();
 
-  var taskToKeyMap = <DartTask, String>{};
+  var commandsToKeys = <String, String>{};
 
-  for (var task in configs.values
-      .expand((tc) => tc.travisJobs)
-      .map((tj) => tj.task)
-      .toSet()) {
-    assert(!taskToKeyMap.containsKey(task));
+  for (var task
+      in configs.values.expand((tc) => tc.travisJobs).map((tj) => tj.task)) {
+    if (commandsToKeys.containsKey(task.command)) {
+      continue;
+    }
+
     var taskKey = task.name;
 
     var count = 1;
-    while (taskToKeyMap.containsValue(taskKey)) {
+    while (commandsToKeys.containsValue(taskKey)) {
       taskKey = '${task.name}_${count++}';
     }
 
-    taskToKeyMap[task] = taskKey;
+    commandsToKeys[task.command] = taskKey;
   }
 
   var environmentVars = new Map<String, Set<String>>();
 
   configs.forEach((pkg, config) {
     for (var job in config.travisJobs) {
-      var newVar = 'PKG=${pkg} TASK=${taskToKeyMap[job.task]}';
+      var newVar = 'PKG=${pkg} TASK=${commandsToKeys[job.task.command]}';
       environmentVars.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
     }
   });
@@ -74,12 +75,9 @@ Future generateTravisConfig({String rootDirectory}) async {
     }
   }
 
-  taskToKeyMap.forEach((dartTask, taskKey) {
-    addEntry(taskKey, [
-      'echo',
-      'echo -e "${styleBold.wrap("TASK: $taskKey")}"',
-      dartTask.command
-    ]);
+  commandsToKeys.forEach((command, taskKey) {
+    addEntry(taskKey,
+        ['echo', 'echo -e "${styleBold.wrap("TASK: $taskKey")}"', command]);
   });
 
   if (taskEntries.isEmpty) {
