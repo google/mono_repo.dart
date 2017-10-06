@@ -90,19 +90,19 @@ dartfmt) echo
   ;;
 test) echo
   echo -e "TASK: test"
-  pub run test
-  ;;
-test) echo
-  echo -e "TASK: test"
   pub run test --platform dartium
   ;;
-test) echo
-  echo -e "TASK: test"
+test_1) echo
+  echo -e "TASK: test_1"
   pub run test --preset travis --total-shards 5 --shard-index 0
   ;;
-test) echo
-  echo -e "TASK: test"
+test_2) echo
+  echo -e "TASK: test_2"
   pub run test --preset travis --total-shards 5 --shard-index 1
+  ;;
+test_3) echo
+  echo -e "TASK: test_3"
+  pub run test
   ;;
 *) echo -e "Not expecting TASK '${TASK}'. Error!"
   exit 1
@@ -122,6 +122,9 @@ env:
   - PKG=sub_pkg TASK=dartanalyzer
   - PKG=sub_pkg TASK=dartfmt
   - PKG=sub_pkg TASK=test
+  - PKG=sub_pkg TASK=test_1
+  - PKG=sub_pkg TASK=test_2
+  - PKG=sub_pkg TASK=test_3
 
 matrix:
   exclude:
