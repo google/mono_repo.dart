@@ -97,7 +97,10 @@ Future generateTravisConfig({String rootDirectory}) async {
   var envEntries = environmentVars.keys.toList()..sort();
 
   var matrix = [];
-  environmentVars.forEach((envVarEntry, entrySdks) {
+
+  /// Iterate in the already sorted order instead of using `forEach`.
+  for (var envVarEntry in envEntries) {
+    var entrySdks = environmentVars[envVarEntry];
     var excludeSdks = sdks.toSet()..removeAll(entrySdks);
 
     if (excludeSdks.isNotEmpty) {
@@ -110,7 +113,7 @@ Future generateTravisConfig({String rootDirectory}) async {
         matrix.add('      env: $envVarEntry');
       }
     }
-  });
+  }
 
   if (matrix.isNotEmpty) {
     // Ensure there is a trailing newline after the matrix
