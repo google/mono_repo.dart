@@ -2,8 +2,18 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-export 'src/check_command.dart';
-export 'src/init_command.dart';
-export 'src/presubmit_command.dart' show PresubmitCommand;
-export 'src/travis_command.dart' show TravisCommand;
+import 'package:args/command_runner.dart';
+
+import 'src/check_command.dart';
+import 'src/init_command.dart';
+import 'src/presubmit_command.dart';
+import 'src/travis_command.dart';
+
 export 'src/utils.dart' show UserException;
+
+final List<Command> commands = new List<Command>.unmodifiable([
+  new CheckCommand(),
+  new InitCommand(),
+  new PresubmitCommand(),
+  new TravisCommand()
+]);

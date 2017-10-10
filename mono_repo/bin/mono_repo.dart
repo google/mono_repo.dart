@@ -10,17 +10,15 @@ import 'package:io/ansi.dart' as ansi;
 import 'package:io/io.dart';
 
 main(List<String> arguments) async {
+  var runner = new CommandRunner(
+      'mono_repo', 'Manage multiple packages in one source repository.');
+
+  commands.forEach(runner.addCommand);
+
   try {
-    await _runner.run(arguments);
+    await runner.run(arguments);
   } on UserException catch (e) {
     print(ansi.red.wrap(e.message));
     exitCode = ExitCode.config.code;
   }
 }
-
-CommandRunner get _runner => new CommandRunner(
-    'mono_repo', 'Manage multiple packages in one source repository.')
-  ..addCommand(new InitCommand())
-  ..addCommand(new CheckCommand())
-  ..addCommand(new TravisCommand())
-  ..addCommand(new PresubmitCommand());
