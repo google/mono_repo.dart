@@ -25,9 +25,10 @@ class TravisConfig extends Object with _$TravisConfigSerializerMixin {
   final List<DartTask> tasks;
 
   @override
-  final List<TravisJob> include, exclude;
+  final List<TravisJob> include, exclude, allowFailures;
 
-  TravisConfig(this.sdks, this.tasks, this.include, this.exclude);
+  TravisConfig(
+      this.sdks, this.tasks, this.include, this.exclude, this.allowFailures);
 
   factory TravisConfig.parse(Map<String, dynamic> travisYaml) {
     var ignoredKeys =
@@ -57,6 +58,7 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
 
     var include = <TravisJob>[];
     var exclude = <TravisJob>[];
+    var allowFailures = <TravisJob>[];
 
     var matrix = travisYaml['matrix'] as Map;
 
@@ -81,9 +83,10 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
 
       processException(matrix['include'] as y.YamlList, include);
       processException(matrix['exclude'] as y.YamlList, exclude);
+      processException(matrix['allow_failures'] as y.YamlList, allowFailures);
     }
 
-    return new TravisConfig(sdks, dartTasks, include, exclude);
+    return new TravisConfig(sdks, dartTasks, include, exclude, allowFailures);
   }
 
   Iterable<TravisJob> get travisJobs sync* {

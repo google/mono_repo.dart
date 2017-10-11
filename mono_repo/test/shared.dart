@@ -44,6 +44,9 @@ matrix:
   include:
     - dart: dev
       dart_task: dartfmt
+  allow_failures:
+    - dart: stable
+      dart_task: dartfmt
 ''';
 
 final testConfig2 = r'''
@@ -65,6 +68,9 @@ matrix:
     - dart: stable
       dart_task: dartanalyzer
   include:
+    - dart: dev
+      dart_task: dartfmt
+  allow_failures:
     - dart: dev
       dart_task: dartfmt
 ''';

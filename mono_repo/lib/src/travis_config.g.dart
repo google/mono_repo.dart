@@ -27,6 +27,11 @@ TravisConfig _$TravisConfigFromJson(Map<String, dynamic> json) =>
             ?.map((e) => e == null
                 ? null
                 : new TravisJob.fromJson(e as Map<String, dynamic>))
+            ?.toList(),
+        (json['allowFailures'] as List)
+            ?.map((e) => e == null
+                ? null
+                : new TravisJob.fromJson(e as Map<String, dynamic>))
             ?.toList());
 
 abstract class _$TravisConfigSerializerMixin {
@@ -34,11 +39,13 @@ abstract class _$TravisConfigSerializerMixin {
   List<DartTask> get tasks;
   List<TravisJob> get include;
   List<TravisJob> get exclude;
+  List<TravisJob> get allowFailures;
   Map<String, dynamic> toJson() => <String, dynamic>{
         'sdks': sdks,
         'tasks': tasks,
         'include': include,
-        'exclude': exclude
+        'exclude': exclude,
+        'allowFailures': allowFailures
       };
 }
 

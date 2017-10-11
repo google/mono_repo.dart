@@ -53,10 +53,17 @@ Future generateTravisConfig({String rootDirectory}) async {
 
   var environmentVars = new Map<String, Set<String>>();
 
+  // Map from environment variable to SDKs for which failures are allowed
+  var allowFailures = new Map<String, Set<String>>();
+
   configs.forEach((pkg, config) {
     for (var job in config.travisJobs) {
       var newVar = 'PKG=${pkg} TASK=${commandsToKeys[job.task.command]}';
       environmentVars.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
+
+      if (config.allowFailures.contains(job)) {
+        allowFailures.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
+      }
     }
   });
 
@@ -110,6 +117,31 @@ Future generateTravisConfig({String rootDirectory}) async {
         matrix.add('    - dart: $sdk');
         matrix.add('      env: $envVarEntry');
       }
+    }
+  }
+
+  var firstAllow = true;
+  var allowFailuresEntries = allowFailures.keys.toList()..sort();
+  for (var envVarEntry in allowFailuresEntries) {
+    var failureSdks = allowFailures[envVarEntry];
+
+    if (failureSdks == null) {
+      continue;
+    }
+
+    assert(failureSdks.isNotEmpty);
+    if (matrix.isEmpty) {
+      matrix.addAll(['', 'matrix:']);
+    }
+
+    if (firstAllow) {
+      firstAllow = false;
+      matrix.add('  allow_failures:');
+    }
+
+    for (var sdk in failureSdks) {
+      matrix.add('    - dart: $sdk');
+      matrix.add('      env: $envVarEntry');
     }
   }
 

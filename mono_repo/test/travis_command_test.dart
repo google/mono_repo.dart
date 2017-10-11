@@ -216,6 +216,9 @@ matrix:
       env: PKG=sub_pkg TASK=dartfmt
     - dart: stable
       env: PKG=sub_pkg TASK=dartfmt
+  allow_failures:
+    - dart: dev
+      env: PKG=sub_pkg TASK=dartfmt
 
 script: ./tool/travis.sh
 
