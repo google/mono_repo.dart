@@ -65,10 +65,16 @@ name: pkg_name
     await d.dir('pkg_a', [
       d.file('.travis.yml', r'''language: dart
 dart:
+ - stable
  - dev
 
 dart_task:
  - dartfmt
+
+matrix:
+  allow_failures:
+    - dart: dev
+      dart_task: dartfmt
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
@@ -98,10 +104,19 @@ language: dart
 
 dart:
   - dev
+  - stable
 
 env:
   - PKG=pkg_a TASK=dartfmt
   - PKG=pkg_b TASK=dartfmt
+
+matrix:
+  exclude:
+    - dart: stable
+      env: PKG=pkg_b TASK=dartfmt
+  allow_failures:
+    - dart: dev
+      env: PKG=pkg_a TASK=dartfmt
 
 script: ./tool/travis.sh
 
