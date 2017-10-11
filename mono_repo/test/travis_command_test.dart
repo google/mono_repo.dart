@@ -30,7 +30,7 @@ name: pkg_name
             'No entries created. Check your nested `.travis.yml` files.'));
   });
 
-  test('overly complex travis.yml file', () async {
+  test('fails with unsupported configuration', () async {
     await d.dir('sub_pkg', [
       d.file('.travis.yml', testConfig1),
       d.file('pubspec.yaml', '''
@@ -45,7 +45,7 @@ name: pkg_name
             'See `sub_pkg/.travis.yml`.'));
   });
 
-  test('overly complex travis.yml file', () async {
+  test('complex travis.yml file', () async {
     await d.dir('sub_pkg', [
       d.file('.travis.yml', testConfig2),
       d.file('pubspec.yaml', '''
