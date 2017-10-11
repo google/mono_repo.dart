@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:test/test.dart';
 import 'package:test_process/test_process.dart';
 
@@ -10,7 +12,19 @@ void main() {
     var process = await TestProcess.start('pub', ['run', 'mono_repo']);
 
     var output = await process.stdoutStream().join('\n');
-    expect(output, '''Manage multiple packages in one source repository.
+    expect(output, _helpOutput);
+
+    await process.shouldExit(0);
+  });
+
+  test('readme contains latest task output', () {
+    var readme = new File('README.md');
+
+    expect(readme.readAsStringSync(), contains('```\n$_helpOutput\n```'));
+  });
+}
+
+final _helpOutput = '''Manage multiple packages in one source repository.
 
 Usage: mono_repo <command> [arguments]
 
@@ -25,8 +39,4 @@ Available commands:
   pub         Run `pub get` or `pub upgrade` against all packages.
   travis      Configure Travis-CI for child packages.
 
-Run "mono_repo help <command>" for more information about a command.''');
-
-    await process.shouldExit(0);
-  });
-}
+Run "mono_repo help <command>" for more information about a command.''';
