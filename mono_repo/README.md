@@ -22,6 +22,7 @@ Available commands:
   help        Display help information for mono_repo.
   init        Initialize a new repository.
   presubmit   Run the travis presubmits locally.
+  pub         Run `pub get` or `pub upgrade` against all packages.
   travis      Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.
