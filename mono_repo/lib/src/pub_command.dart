@@ -61,7 +61,7 @@ Future pub(String pubCommand, {String rootDirectory}) async {
     // TODO(kevmoo): https://github.com/dart-lang/io/issues/22
     Directory.current = workingDir;
 
-    var proc = await processManager.spawn('pub', arguments: [pubCommand]);
+    var proc = await processManager.spawn('pub', [pubCommand]);
 
     var exit = await proc.exitCode;
 
