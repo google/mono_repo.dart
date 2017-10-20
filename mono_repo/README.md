@@ -2,7 +2,6 @@ Manage multiple [Dart packages] within a single repository.
 
 ### Installation
 
-⚠️ *This will work when mono_repo is published.*
 ```console
 > pub global activate mono_repo
 ```
