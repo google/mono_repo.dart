@@ -38,10 +38,48 @@ abstract class DependencyData {
         return new PathData(path);
       }
 
+      var git = mapData['git'];
+      if (git != null) {
+        return new GitData.fromData(git);
+      }
+
       throw new ArgumentError.value(
           data, 'data', 'No clue how to deal with `$data`.');
     }
   }
+}
+
+class GitData implements DependencyData {
+  @override
+  DependencyType get type => DependencyType.git;
+
+  final Uri url;
+  final String ref;
+  final String path;
+
+  GitData(this.url, this.ref, this.path);
+
+  factory GitData.fromData(Object data) {
+    String url;
+    String path;
+    String ref;
+
+    if (data is String) {
+      url = data;
+    } else if (data is Map<String, dynamic>) {
+      url = data['url'] as String;
+      path = data['path'] as String;
+      ref = data['ref'] as String;
+    } else {
+      throw new ArgumentError.value(
+          data, 'data', 'Does not support provided value.');
+    }
+
+    return new GitData(Uri.parse(url), ref, path);
+  }
+
+  @override
+  String toString() => 'GitData: url@$url';
 }
 
 class PathData implements DependencyData {
