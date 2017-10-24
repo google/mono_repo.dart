@@ -26,12 +26,25 @@ class CheckCommand extends Command {
   Future run() => check();
 }
 
-Future check() async {
-  var packages = getPackageConfig();
+Future check({String rootDirectory}) async {
+  var reports = await getPackageReports(rootDirectory: rootDirectory);
+
+  print(styleBold.wrap('    ** REPORT **'));
+  print('');
+
+  reports.forEach((dir, report) {
+    _print(dir, report);
+  });
+}
+
+Future<Map<String, PackageReport>> getPackageReports(
+    {String rootDirectory}) async {
+  rootDirectory ??= p.current;
+  var packages = getPackageConfig(rootDirectory: rootDirectory);
 
   var pubspecs = <String, Pubspec>{};
   packages.forEach((dir, config) {
-    var pkgPath = p.join(p.current, dir, 'pubspec.yaml');
+    var pkgPath = p.join(rootDirectory, dir, 'pubspec.yaml');
     var pubspecContent = y.loadYaml(new File(pkgPath).readAsStringSync())
         as Map<String, dynamic>;
 
@@ -44,12 +57,14 @@ Future check() async {
 
   var pubspecValues = pubspecs.values.toSet();
 
-  print(styleBold.wrap('    ** REPORT **'));
-  print('');
+  var reports = <String, PackageReport>{};
+
   packages.forEach((dir, config) {
     var report = new PackageReport.create(config, pubspecs[dir], pubspecValues);
-    _print(dir, report);
+    reports[dir] = report;
   });
+
+  return reports;
 }
 
 void _print(String relativePath, PackageReport report) {
