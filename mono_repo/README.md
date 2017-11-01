@@ -19,7 +19,7 @@ Global options:
 Available commands:
   check       Check the state of the repository.
   help        Display help information for mono_repo.
-  init        Initialize a new repository.
+  init        Writes a configuration file that can be user-edited.
   presubmit   Run the travis presubmits locally.
   pub         Run `pub get` or `pub upgrade` against all packages.
   travis      Configure Travis-CI for child packages.

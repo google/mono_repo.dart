@@ -15,7 +15,11 @@ class InitCommand extends Command {
   String get name => 'init';
 
   @override
-  String get description => 'Initialize a new repository.';
+  String get description =>
+      '''Writes a configuration file that can be user-edited.
+
+`mono_repo` uses the `$packageConfigFileName` file, if it exists, to determine
+the packages to target in the current repository.''';
 
   @override
   Future run() => init();

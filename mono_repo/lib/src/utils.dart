@@ -11,7 +11,7 @@ import 'package:yaml/yaml.dart' as y;
 import 'package_config.dart';
 import 'travis_config.dart';
 
-final packageConfigFileName = 'packages.yaml';
+final packageConfigFileName = 'mono_repo.yaml';
 
 Map<String, PackageConfig> openPackageConfig({String rootDirectory}) {
   rootDirectory ??= p.current;
