@@ -9,10 +9,10 @@ import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
-import 'travis_config.dart';
-import 'utils.dart';
+import '../travis_config.dart';
+import '../utils.dart';
 
-class TravisCommand extends Command {
+class TravisCommand extends Command<Null> {
   @override
   String get name => 'travis';
 

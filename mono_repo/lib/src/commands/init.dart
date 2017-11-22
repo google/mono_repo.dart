@@ -8,9 +8,9 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
-import 'utils.dart';
+import '../utils.dart';
 
-class InitCommand extends Command {
+class InitCommand extends Command<Null> {
   @override
   String get name => 'init';
 

@@ -8,8 +8,8 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-import 'package:mono_repo/src/presubmit_command.dart';
-import 'package:mono_repo/src/travis_command.dart';
+import 'package:mono_repo/src/commands/presubmit.dart';
+import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/travis_config.dart';
 
 import 'shared.dart';

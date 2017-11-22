@@ -11,9 +11,9 @@ import 'package:io/io.dart';
 
 import 'package:path/path.dart' as p;
 
-import 'utils.dart';
+import '../utils.dart';
 
-class PubCommand extends Command {
+class PubCommand extends Command<Null> {
   PubCommand() {
     addSubcommand(new _PubSubCommand('get'));
     addSubcommand(new _PubSubCommand('upgrade'));
@@ -27,7 +27,7 @@ class PubCommand extends Command {
       'Run `pub get` or `pub upgrade` against all packages.';
 }
 
-class _PubSubCommand extends Command {
+class _PubSubCommand extends Command<Null> {
   @override
   final String name;
 

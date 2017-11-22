@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:mono_repo/src/check_command.dart';
+import 'package:mono_repo/src/commands/check.dart';
 import 'package:mono_repo/src/pubspec.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
