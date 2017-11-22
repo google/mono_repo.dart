@@ -29,7 +29,8 @@ final _helpOutput = '''Manage multiple packages in one source repository.
 Usage: mono_repo <command> [arguments]
 
 Global options:
--h, --help    Print this usage information.
+-h, --help            Print this usage information.
+-v, --[no-]verbose    Whether to display more logging information.
 
 Available commands:
   check       Check the state of the repository.
