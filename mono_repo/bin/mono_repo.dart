@@ -13,13 +13,13 @@ main(List<String> arguments) async {
   try {
     await run(arguments);
   } on UserException catch (e) {
-    print(ansi.red.wrap(e.message));
+    stderr.writeln(ansi.red.wrap(e.message));
     exitCode = ExitCode.config.code;
   } on UsageException catch (e) {
-    print(ansi.red.wrap(e.message));
+    stderr.writeln(ansi.red.wrap(e.message));
     if (e.usage != null) {
-      print('');
-      print(e.usage);
+      stderr.writeln('');
+      stderr.writeln(e.usage);
     }
     exitCode = ExitCode.usage.code;
   }

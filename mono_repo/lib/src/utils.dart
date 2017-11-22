@@ -2,14 +2,47 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:stack_trace/stack_trace.dart';
 import 'package:yaml/yaml.dart' as y;
 
 import 'package_config.dart';
 import 'travis_config.dart';
+
+/// Whether `assert(...)` is enabled.
+///
+/// Will be `true` in checked mode (i.e. `dart --checked`).
+final bool assertionsEnabled = () {
+  var enabled = false;
+  assert(enabled = true);
+  return enabled;
+}();
+
+/// Execute the [run] function, invoking [onError] for unhandled errors.
+T runGuarded<T>(
+  T Function() run,
+  void Function(Object, Trace) onError, {
+  bool longStackTraces: false,
+}) {
+  void unhandledException(Object error, StackTrace trace) {
+    Trace prettyTrace;
+    if (trace is Trace) {
+      prettyTrace = trace;
+    } else {
+      prettyTrace = new Trace.from(trace);
+    }
+    onError(error, prettyTrace.terse);
+  }
+  if (longStackTraces) {
+    return Chain.capture(run, onError: unhandledException);
+  } else {
+    return runZoned(run, onError: unhandledException);
+  }
+}
 
 final packageConfigFileName = 'mono_repo.yaml';
 
