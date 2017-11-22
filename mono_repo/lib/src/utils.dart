@@ -11,6 +11,7 @@ import 'package:yaml/yaml.dart' as y;
 import 'package_config.dart';
 import 'travis_config.dart';
 
+const recursiveFlag = 'recursive';
 final packageConfigFileName = 'mono_repo.yaml';
 
 Map<String, PackageConfig> openPackageConfig({String rootDirectory}) {
@@ -33,7 +34,8 @@ Map<String, PackageConfig> openPackageConfig({String rootDirectory}) {
 }
 
 /// If the file exists, open it – otherwise infer it from the data on disk.
-Map<String, PackageConfig> getPackageConfig({String rootDirectory}) {
+Map<String, PackageConfig> getPackageConfig(
+    {String rootDirectory, bool recursive: false}) {
   rootDirectory ??= p.current;
 
   var packageFileName = p.join(rootDirectory, packageConfigFileName);
@@ -44,40 +46,47 @@ Map<String, PackageConfig> getPackageConfig({String rootDirectory}) {
 
   var packages = <String, PackageConfig>{};
 
-  for (Directory subdir in new Directory(rootDirectory)
-      .listSync()
-      .where((fse) => fse is Directory)) {
-    File pubspecFile = subdir.listSync().firstWhere((fse) {
-      return fse is File && p.basename(fse.path) == 'pubspec.yaml';
-    }, orElse: () => null);
+  void visitDirectory(Directory directory) {
+    for (Directory subdir
+        in directory.listSync().where((fse) => fse is Directory)) {
+      File pubspecFile = subdir.listSync().firstWhere((fse) {
+        return fse is File && p.basename(fse.path) == 'pubspec.yaml';
+      }, orElse: () => null);
 
-    if (pubspecFile != null) {
-      var pubspecContent = y.loadYaml(pubspecFile.readAsStringSync()) as Map;
-      if (pubspecContent == null) {
-        throw new StateError('The pubspec file at '
-            '`${pubspecFile.path}` does not appear valid.');
+      if (pubspecFile != null) {
+        var pubspecContent = y.loadYaml(pubspecFile.readAsStringSync()) as Map;
+        if (pubspecContent == null) {
+          throw new StateError('The pubspec file at '
+              '`${pubspecFile.path}` does not appear valid.');
+        }
+
+        var name = pubspecContent['name'] as String;
+        if (name == null) {
+          throw new StateError(
+              'No name for the pubspec at `${pubspecFile.path}`.');
+        }
+
+        var publishedGuess = pubspecContent.containsKey('version');
+
+        packages[p.relative(subdir.path, from: rootDirectory)] =
+            new PackageConfig(publishedGuess);
       }
 
-      var name = pubspecContent['name'] as String;
-      if (name == null) {
-        throw new StateError(
-            'No name for the pubspec at `${pubspecFile.path}`.');
-      }
-
-      var publishedGuess = pubspecContent.containsKey('version');
-
-      packages[p.relative(subdir.path, from: rootDirectory)] =
-          new PackageConfig(publishedGuess);
+      if (recursive) visitDirectory(subdir);
     }
   }
+
+  visitDirectory(new Directory(rootDirectory));
 
   return packages;
 }
 
-Map<String, TravisConfig> getTravisConfigs({String rootDirectory}) {
+Map<String, TravisConfig> getTravisConfigs(
+    {String rootDirectory, bool recursive: false}) {
   rootDirectory ??= p.current;
 
-  var packages = getPackageConfig(rootDirectory: rootDirectory);
+  var packages =
+      getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);
 
   if (packages.isEmpty) {
     throw new UserException('No nested packages found.');

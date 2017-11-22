@@ -22,10 +22,10 @@ class InitCommand extends Command<Null> {
 the packages to target in the current repository.''';
 
   @override
-  Future run() => init();
+  Future run() => init(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future init() async {
+Future init({bool recursive: false}) async {
   var packagesFileName = p.join(p.current, packageConfigFileName);
   // TODO: check to see if we're in the root of a GIT repo. If not, warn.
 
@@ -41,7 +41,7 @@ Future init() async {
         'Found `pubspec.yaml` in the current directory. Not supported.');
   }
 
-  var packages = getPackageConfig();
+  var packages = getPackageConfig(recursive: recursive);
 
   var file = new File(packagesFileName);
   var writer = new StringBuffer();

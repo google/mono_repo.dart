@@ -9,11 +9,12 @@ import 'commands/init.dart';
 import 'commands/presubmit.dart';
 import 'commands/pub.dart';
 import 'commands/travis.dart';
+import 'utils.dart';
 
 class MonoRepoRunner extends CommandRunner<Null> {
   MonoRepoRunner()
-      : super(
-            'mono_repo', 'Manage multiple packages in one source repository.') {
+      : super('mono_repo',
+            'Manzage multiple packages in one source repository.') {
     [
       new CheckCommand(),
       new InitCommand(),
@@ -21,5 +22,9 @@ class MonoRepoRunner extends CommandRunner<Null> {
       new PubCommand(),
       new TravisCommand()
     ].forEach(addCommand);
+    argParser.addFlag(recursiveFlag,
+        help:
+            'Whether to recursively walk sub-directorys looking for packages.',
+        defaultsTo: false);
   }
 }

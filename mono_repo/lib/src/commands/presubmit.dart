@@ -40,7 +40,8 @@ class PresubmitCommand extends Command<Null> {
     var passed = await presubmit(
         packages: argResults['package'] as List<String>,
         tasks: argResults['task'] as List<String>,
-        sdkToRun: argResults['sdk'] as String);
+        sdkToRun: argResults['sdk'] as String,
+        recursive: globalResults[recursiveFlag] as bool);
 
     // Set a bad exit code if it failed.
     if (!passed) exitCode = 1;
@@ -61,7 +62,7 @@ Future<bool> presubmit(
     {Iterable<String> packages,
     Iterable<String> tasks,
     String sdkToRun,
-    String rootDirectory}) async {
+    String rootDirectory, bool recursive}) async {
   packages ??= <String>[];
   tasks ??= <String>[];
   sdkToRun ??= _currentSdk;
@@ -72,7 +73,7 @@ Future<bool> presubmit(
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
-  var configs = getTravisConfigs(rootDirectory: rootDirectory);
+  var configs = getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
   // By default, run on all packages.
   if (packages.isEmpty) packages = configs.keys;
   packages = packages.toList()..sort();
