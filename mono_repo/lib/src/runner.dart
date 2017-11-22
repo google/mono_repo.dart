@@ -10,11 +10,10 @@ import 'commands/presubmit.dart';
 import 'commands/pub.dart';
 import 'commands/travis.dart';
 
-const _name = 'mono_repo';
-const _description = 'Manage multiple packages in one source repository.';
-
 class MonoRepoRunner extends CommandRunner<Null> {
-  MonoRepoRunner() : super(_name, _description) {
+  MonoRepoRunner()
+      : super(
+            'mono_repo', 'Manage multiple packages in one source repository.') {
     [
       new CheckCommand(),
       new InitCommand(),

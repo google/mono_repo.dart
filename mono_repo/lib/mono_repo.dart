@@ -6,12 +6,12 @@ import 'dart:async';
 
 import 'package:args/command_runner.dart';
 
-import 'package:mono_repo/src/commands/check.dart';
-import 'package:mono_repo/src/commands/init.dart';
-import 'package:mono_repo/src/commands/presubmit.dart';
-import 'package:mono_repo/src/commands/pub.dart';
-import 'package:mono_repo/src/commands/travis.dart';
-import 'package:mono_repo/src/runner.dart';
+import 'src/commands/check.dart';
+import 'src/commands/init.dart';
+import 'src/commands/presubmit.dart';
+import 'src/commands/pub.dart';
+import 'src/commands/travis.dart';
+import 'src/runner.dart';
 
 export 'src/utils.dart' show UserException;
 
