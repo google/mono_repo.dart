@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:io/ansi.dart';
-import 'package:mono_repo/src/travis_command.dart';
+import 'package:mono_repo/src/commands/travis.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 

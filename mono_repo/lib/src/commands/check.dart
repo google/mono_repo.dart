@@ -11,11 +11,11 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
 
-import 'package_config.dart';
-import 'pubspec.dart';
-import 'utils.dart';
+import '../package_config.dart';
+import '../pubspec.dart';
+import '../utils.dart';
 
-class CheckCommand extends Command {
+class CheckCommand extends Command<Null> {
   @override
   String get name => 'check';
 
