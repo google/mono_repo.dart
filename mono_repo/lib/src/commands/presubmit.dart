@@ -62,7 +62,8 @@ Future<bool> presubmit(
     {Iterable<String> packages,
     Iterable<String> tasks,
     String sdkToRun,
-    String rootDirectory, bool recursive}) async {
+    String rootDirectory,
+    bool recursive}) async {
   packages ??= <String>[];
   tasks ??= <String>[];
   sdkToRun ??= _currentSdk;
@@ -73,7 +74,8 @@ Future<bool> presubmit(
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
-  var configs = getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
+  var configs =
+      getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
   // By default, run on all packages.
   if (packages.isEmpty) packages = configs.keys;
   packages = packages.toList()..sort();
