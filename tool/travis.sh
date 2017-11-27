@@ -4,6 +4,10 @@
 # Fast fail the script on failures.
 set -e
 
+curl -v https://pub.dartlang.org
+
+curl -v https://pub.dartlang.org/api/packages/async
+
 if [ -z "$PKG" ]; then
   echo -e "[31mPKG environment variable must be set![0m"
   exit 1
