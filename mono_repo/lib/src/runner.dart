@@ -13,8 +13,8 @@ import 'utils.dart';
 
 class MonoRepoRunner extends CommandRunner<Null> {
   MonoRepoRunner()
-      : super('mono_repo',
-            'Manzage multiple packages in one source repository.') {
+      : super(
+            'mono_repo', 'Manage multiple packages in one source repository.') {
     [
       new CheckCommand(),
       new InitCommand(),
