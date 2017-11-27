@@ -23,11 +23,12 @@ class CheckCommand extends Command<Null> {
   String get description => 'Check the state of the repository.';
 
   @override
-  Future run() => check();
+  Future run() => check(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future check({String rootDirectory}) async {
-  var reports = await getPackageReports(rootDirectory: rootDirectory);
+Future check({String rootDirectory, bool recursive: false}) async {
+  var reports = await getPackageReports(
+      rootDirectory: rootDirectory, recursive: recursive);
 
   print(styleBold.wrap('    ** REPORT **'));
   print('');
@@ -38,9 +39,10 @@ Future check({String rootDirectory}) async {
 }
 
 Future<Map<String, PackageReport>> getPackageReports(
-    {String rootDirectory}) async {
+    {String rootDirectory, bool recursive: false}) async {
   rootDirectory ??= p.current;
-  var packages = getPackageConfig(rootDirectory: rootDirectory);
+  var packages =
+      getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);
 
   var pubspecs = <String, Pubspec>{};
   packages.forEach((dir, config) {

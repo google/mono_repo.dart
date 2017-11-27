@@ -1,3 +1,5 @@
+* Add `recursive` global flag. When set, we will walk all sub-directories looking for `pubspec.yaml` files.
+
 ## 0.2.0
 
 * Support git dependencies in packages.

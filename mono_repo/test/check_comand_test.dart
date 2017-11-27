@@ -5,7 +5,7 @@ import 'package:mono_repo/src/pubspec.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 main() {
-  test('check', () async {
+  setUp(() async {
     await d.dir('foo', [
       d.file('pubspec.yaml', r'''
 name: foo
@@ -35,9 +35,19 @@ name: baz
 dependencies:
   build:
     git: https://github.com/dart-lang/build.git
-''')
-    ]).create();
+'''),
+      d.dir('recursive', [
+        d.file('pubspec.yaml', r'''
+name: baz.recursive
 
+dependencies:
+  baz: any
+        '''),
+      ]),
+    ]).create();
+  });
+
+  test('check', () async {
     var reports = await getPackageReports(rootDirectory: d.sandbox);
 
     expect(reports, hasLength(3));
@@ -67,5 +77,17 @@ dependencies:
     expect(buildDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
     expect(buildDep.path, isNull);
     expect(buildDep.ref, isNull);
+  });
+
+  test('check recursive', () async {
+    var reports =
+        await getPackageReports(rootDirectory: d.sandbox, recursive: true);
+
+    expect(reports, hasLength(4));
+
+    var recursiveReport = reports['baz/recursive'];
+    expect(recursiveReport.packageName, 'baz.recursive');
+    expect(recursiveReport.published, isFalse);
+    expect(recursiveReport.pubspec.dependencies, hasLength(1));
   });
 }

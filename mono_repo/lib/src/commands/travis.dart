@@ -20,12 +20,15 @@ class TravisCommand extends Command<Null> {
   String get description => 'Configure Travis-CI for child packages.';
 
   @override
-  Future run() => generateTravisConfig();
+  Future run() =>
+      generateTravisConfig(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future generateTravisConfig({String rootDirectory}) async {
+Future generateTravisConfig(
+    {String rootDirectory, bool recursive: false}) async {
   rootDirectory ??= p.current;
-  var configs = getTravisConfigs(rootDirectory: rootDirectory);
+  var configs =
+      getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
 
   for (var pkg in configs.keys) {
     stderr.writeln(styleBold.wrap('package:$pkg'));
