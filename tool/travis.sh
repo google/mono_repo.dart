@@ -3,6 +3,7 @@
 
 # Fast fail the script on failures.
 set -e
+set -x
 
 curl -v https://pub.dartlang.org
 
