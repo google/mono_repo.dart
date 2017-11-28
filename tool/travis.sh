@@ -3,6 +3,11 @@
 
 # Fast fail the script on failures.
 set -e
+set -x
+
+curl -v https://pub.dartlang.org
+
+curl -v https://pub.dartlang.org/api/packages/async
 
 if [ -z "$PKG" ]; then
   echo -e "[31mPKG environment variable must be set![0m"
@@ -13,7 +18,7 @@ elif [ -z "$TASK" ]; then
 fi
 
 pushd $PKG
-pub upgrade
+pub --verbose upgrade
 
 case $TASK in
 dartanalyzer) echo
