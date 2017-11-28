@@ -18,7 +18,7 @@ elif [ -z "$TASK" ]; then
 fi
 
 pushd $PKG
-pub upgrade
+pub --verbose upgrade
 
 case $TASK in
 dartanalyzer) echo
