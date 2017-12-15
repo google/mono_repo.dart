@@ -6,9 +6,7 @@ import 'package:build_runner/build_runner.dart';
 import 'package:json_serializable/json_serializable.dart';
 
 final List<BuildAction> phases = [
-  new BuildAction(
-    jsonPartBuilder(header: _dartCopyright),
-      'mono_repo',
+  new BuildAction(jsonPartBuilder(header: _dartCopyright), 'mono_repo',
       inputs: const ['lib/src/*'])
 ];
 
