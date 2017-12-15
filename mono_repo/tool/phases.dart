@@ -3,14 +3,11 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:build_runner/build_runner.dart';
-import 'package:json_serializable/generators.dart';
-import 'package:source_gen/source_gen.dart';
+import 'package:json_serializable/json_serializable.dart';
 
 final List<BuildAction> phases = [
   new BuildAction(
-      new PartBuilder(const [
-        const JsonSerializableGenerator(),
-      ], header: _dartCopyright),
+    jsonPartBuilder(header: _dartCopyright),
       'mono_repo',
       inputs: const ['lib/src/*'])
 ];
@@ -20,5 +17,5 @@ final _dartCopyright =
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-$defaultFileHeader
+// GENERATED CODE - DO NOT MODIFY BY HAND
 ''';
