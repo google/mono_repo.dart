@@ -187,8 +187,11 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
         assert(args == null || args == 'sdk');
         return 'dartfmt -n --set-exit-if-changed .';
       case 'dartanalyzer':
-        assert(args == null);
-        return 'dartanalyzer .';
+        if (args == null) {
+          return 'dartanalyzer .';
+        }
+        return 'dartanalyzer $args';
+
       case 'test':
         var value = 'pub run test';
         if (args != null) {
