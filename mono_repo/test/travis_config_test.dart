@@ -51,8 +51,6 @@ void main() {
 
       var jobs = config.travisJobs.toList();
 
-      expect(jobs, hasLength(15));
-
       expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
     });
   });
@@ -88,7 +86,10 @@ List get _testConfig1expectedOutput => [
       },
       {
         "sdk": "dev",
-        "task": {"name": "dartanalyzer"}
+        "task": {
+          "name": "dartanalyzer",
+          "args": "--fatal-infos --fatal-warnings ."
+        }
       },
       {
         "sdk": "stable",
@@ -118,6 +119,13 @@ List get _testConfig1expectedOutput => [
         "task": {"name": "test"}
       },
       {
+        "sdk": "stable",
+        "task": {
+          "name": "dartanalyzer",
+          "args": "--fatal-infos --fatal-warnings ."
+        }
+      },
+      {
         "sdk": "1.23.0",
         "task": {
           "name": "test",
@@ -146,7 +154,10 @@ List get _testConfig1expectedOutput => [
       },
       {
         "sdk": "1.23.0",
-        "task": {"name": "dartanalyzer"}
+        "task": {
+          "name": "dartanalyzer",
+          "args": "--fatal-infos --fatal-warnings ."
+        }
       },
       {
         "sdk": "dev",

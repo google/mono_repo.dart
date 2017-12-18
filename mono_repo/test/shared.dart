@@ -35,7 +35,7 @@ dart_task:
    install_dartium: true
  - test: --preset travis --total-shards 5 --shard-index 1
  - test #no args
- - dartanalyzer
+ - dartanalyzer: --fatal-infos --fatal-warnings .
 
 matrix:
   exclude:
