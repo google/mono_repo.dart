@@ -42,15 +42,15 @@ Future generateTravisConfig(
   _calculateEnvironment(
       configs, commandsToKeys, environmentVars, allowFailures);
 
-  var taskEntries = _calculateTaskEntries(commandsToKeys);
-
   var envEntries = environmentVars.keys.toList()..sort();
 
   var matrix =
       _calculateMatrix(envEntries, environmentVars, sdks, allowFailures);
 
   _writeTravisYml(rootDirectory, sdks, envEntries, matrix);
-  _writeTravisScript(rootDirectory, taskEntries);
+
+  _writeTravisScript(rootDirectory, _calculateTaskEntries(commandsToKeys),
+      _calculatePkgEntries(configs));
 }
 
 /// Write `.travis.yml`
@@ -63,7 +63,8 @@ void _writeTravisYml(String rootDirectory, Set<String> sdks,
 }
 
 /// Write `tool/travis.sh
-void _writeTravisScript(String rootDirectory, List<String> taskEntries) {
+void _writeTravisScript(
+    String rootDirectory, List<String> taskEntries, List<String> pkgEntries) {
   var travisFilePath = p.join(rootDirectory, travisShPath);
   var travisScript = new File(travisFilePath);
 
@@ -74,7 +75,7 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries) {
     stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
-  travisScript.writeAsStringSync(_travisSh(taskEntries));
+  travisScript.writeAsStringSync(_travisSh(taskEntries, pkgEntries));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
@@ -164,6 +165,7 @@ List<String> _calculateExcluded(List<String> envEntries,
       }
     }
   }
+  return matrix;
 }
 
 List<String> _calculateTaskEntries(Map<String, String> commandsToKeys) {
@@ -201,6 +203,39 @@ List<String> _calculateTaskEntries(Map<String, String> commandsToKeys) {
   return taskEntries;
 }
 
+List<String> _calculatePkgEntries(Map<String, TravisConfig> configs) {
+  var pkgEntries = <String>[];
+
+  void addEntry(String label, List<String> contentLines) {
+    assert(contentLines.isNotEmpty);
+    contentLines.add(';;');
+
+    var buffer = new StringBuffer('$label) ${contentLines.first}\n');
+    buffer.writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
+
+    var output = buffer.toString();
+    if (!pkgEntries.contains(output)) {
+      pkgEntries.add(output);
+    }
+  }
+
+  for (var pkg in configs.keys) {
+    var config = configs[pkg];
+    if (config.beforeScript != null) {
+      addEntry(pkg, [
+        'echo',
+        'echo -e "${styleBold.wrap("PKG: $pkg")}"',
+        config.beforeScript
+      ]);
+    }
+  }
+
+  addEntry('*', [
+    'echo -e "No before_script specified for PKG \'\${PKG}\'."',
+  ]);
+  return pkgEntries;
+}
+
 Map<String, String> _extractCommands(Map<String, TravisConfig> configs) {
   var commandsToKeys = <String, String>{};
 
@@ -236,7 +271,7 @@ void _logPkgs(Map<String, TravisConfig> configs) {
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');
 
-String _travisSh(Iterable<String> tasks) => '''
+String _travisSh(Iterable<String> tasks, Iterable<String> pkgs) => '''
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
@@ -252,7 +287,11 @@ elif [ -z "\$TASK" ]; then
 fi
 
 pushd \$PKG
-pub upgrade
+# pub upgrade
+
+case \$PKG in
+${pkgs.join('\n')}
+esac
 
 case \$TASK in
 ${tasks.join('\n')}

@@ -27,8 +27,11 @@ class TravisConfig extends Object with _$TravisConfigSerializerMixin {
   @override
   final List<TravisJob> include, exclude, allowFailures;
 
-  TravisConfig(
-      this.sdks, this.tasks, this.include, this.exclude, this.allowFailures);
+  @override
+  final String beforeScript;
+
+  TravisConfig(this.sdks, this.tasks, this.include, this.exclude,
+      this.allowFailures, this.beforeScript);
 
   factory TravisConfig.parse(Map<String, dynamic> travisYaml) {
     var ignoredKeys =
@@ -86,7 +89,10 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
       processException(matrix['allow_failures'] as y.YamlList, allowFailures);
     }
 
-    return new TravisConfig(sdks, dartTasks, include, exclude, allowFailures);
+    var beforeScript = travisYaml['before_script'] as String;
+
+    return new TravisConfig(
+        sdks, dartTasks, include, exclude, allowFailures, beforeScript);
   }
 
   Iterable<TravisJob> get travisJobs sync* {
@@ -109,7 +115,8 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
     'dart_task',
     'dart',
     'matrix',
-    'language'
+    'language',
+    'before_script'
   ];
 }
 
@@ -138,7 +145,12 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
 
 @JsonSerializable(includeIfNull: false)
 class DartTask extends Object with _$DartTaskSerializerMixin {
-  static final _tasks = const ['dartfmt', 'dartanalyzer', 'test'];
+  static final _tasks = const [
+    'dartfmt',
+    'dartanalyzer',
+    'test',
+    'build_and_test',
+  ];
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
   @override
@@ -194,6 +206,13 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
 
       case 'test':
         var value = 'pub run test';
+        if (args != null) {
+          value = '$value $args';
+        }
+        return value;
+
+      case 'build_and_test':
+        var value = 'dart tool/build.dart\n pub run test';
         if (args != null) {
           value = '$value $args';
         }
