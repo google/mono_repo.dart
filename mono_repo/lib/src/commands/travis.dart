@@ -104,44 +104,23 @@ List<String> _calculateMatrix(
     Map<String, Set<String>> allowFailures) {
   var matrix = <String>[];
 
-  matrix.addAll(_calculateExcluded(envEntries, environmentVars, sdks));
-  matrix.addAll(_calculateAllowedFailures(allowFailures));
+  var excluded = _calculateExcluded(envEntries, environmentVars, sdks);
+  if (excluded.isNotEmpty) {
+    matrix.addAll(['', 'matrix:']);
+    matrix.addAll(excluded);
+  }
+  var allowedFailures = _calculateAllowedFailures(allowFailures);
+  if (allowedFailures.isNotEmpty) {
+    if (matrix.isEmpty) {
+      matrix.addAll(['', 'matrix:']);
+    }
+    matrix.addAll(allowedFailures);
+  }
 
   if (matrix.isNotEmpty) {
     // Ensure there is a trailing newline after the matrix
     matrix.add('');
   }
-  return matrix;
-}
-
-List<String> _calculateAllowedFailures(Map<String, Set<String>> allowFailures) {
-  var matrix = <String>[];
-
-  var firstAllow = true;
-  var allowFailuresEntries = allowFailures.keys.toList()..sort();
-  for (var envVarEntry in allowFailuresEntries) {
-    var failureSdks = allowFailures[envVarEntry];
-
-    if (failureSdks == null) {
-      continue;
-    }
-
-    assert(failureSdks.isNotEmpty);
-    if (matrix.isEmpty) {
-      matrix.addAll(['', 'matrix:']);
-    }
-
-    if (firstAllow) {
-      firstAllow = false;
-      matrix.add('  allow_failures:');
-    }
-
-    for (var sdk in failureSdks) {
-      matrix.add('    - dart: $sdk');
-      matrix.add('      env: $envVarEntry');
-    }
-  }
-
   return matrix;
 }
 
@@ -156,7 +135,7 @@ List<String> _calculateExcluded(List<String> envEntries,
 
     if (excludeSdks.isNotEmpty) {
       if (matrix.isEmpty) {
-        matrix.addAll(['', 'matrix:', '  exclude:']);
+        matrix.add('  exclude:');
       }
 
       for (var sdk in excludeSdks) {
@@ -165,6 +144,31 @@ List<String> _calculateExcluded(List<String> envEntries,
       }
     }
   }
+  return matrix;
+}
+
+List<String> _calculateAllowedFailures(Map<String, Set<String>> allowFailures) {
+  var matrix = <String>[];
+
+  var allowFailuresEntries = allowFailures.keys.toList()..sort();
+  for (var envVarEntry in allowFailuresEntries) {
+    var failureSdks = allowFailures[envVarEntry];
+
+    if (failureSdks == null) {
+      continue;
+    }
+
+    assert(failureSdks.isNotEmpty);
+    if (matrix.isEmpty) {
+      matrix.add('  allow_failures:');
+    }
+
+    for (var sdk in failureSdks) {
+      matrix.add('    - dart: $sdk');
+      matrix.add('      env: $envVarEntry');
+    }
+  }
+
   return matrix;
 }
 
@@ -287,7 +291,7 @@ elif [ -z "\$TASK" ]; then
 fi
 
 pushd \$PKG
-# pub upgrade
+pub upgrade
 
 case \$PKG in
 ${pkgs.join('\n')}

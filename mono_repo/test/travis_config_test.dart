@@ -53,6 +53,14 @@ void main() {
 
       expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
     });
+
+    test('before_script', () {
+      var travisYaml = y.loadYaml(testConfig2) as Map<String, dynamic>;
+
+      var config = new TravisConfig.parse(travisYaml);
+
+      expect(config.beforeScript, 'tool/build.sh');
+    });
   });
 }
 
