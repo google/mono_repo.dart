@@ -145,12 +145,7 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
 
 @JsonSerializable(includeIfNull: false)
 class DartTask extends Object with _$DartTaskSerializerMixin {
-  static final _tasks = const [
-    'dartfmt',
-    'dartanalyzer',
-    'test',
-    'build_and_test',
-  ];
+  static final _tasks = const ['dartfmt', 'dartanalyzer', 'test'];
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
   @override
@@ -206,13 +201,6 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
 
       case 'test':
         var value = 'pub run test';
-        if (args != null) {
-          value = '$value $args';
-        }
-        return value;
-
-      case 'build_and_test':
-        var value = 'dart tool/build.dart\n pub run test';
         if (args != null) {
           value = '$value $args';
         }
