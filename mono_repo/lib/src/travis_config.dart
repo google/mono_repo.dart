@@ -27,8 +27,11 @@ class TravisConfig extends Object with _$TravisConfigSerializerMixin {
   @override
   final List<TravisJob> include, exclude, allowFailures;
 
-  TravisConfig(
-      this.sdks, this.tasks, this.include, this.exclude, this.allowFailures);
+  @override
+  final String beforeScript;
+
+  TravisConfig(this.sdks, this.tasks, this.include, this.exclude,
+      this.allowFailures, this.beforeScript);
 
   factory TravisConfig.parse(Map<String, dynamic> travisYaml) {
     var ignoredKeys =
@@ -86,7 +89,10 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
       processException(matrix['allow_failures'] as y.YamlList, allowFailures);
     }
 
-    return new TravisConfig(sdks, dartTasks, include, exclude, allowFailures);
+    var beforeScript = travisYaml['before_script'] as String;
+
+    return new TravisConfig(
+        sdks, dartTasks, include, exclude, allowFailures, beforeScript);
   }
 
   Iterable<TravisJob> get travisJobs sync* {
@@ -109,7 +115,8 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
     'dart_task',
     'dart',
     'matrix',
-    'language'
+    'language',
+    'before_script'
   ];
 }
 

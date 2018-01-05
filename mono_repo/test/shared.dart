@@ -62,6 +62,8 @@ dart_task:
  - test: --preset travis --total-shards 5 --shard-index 1
  - test
  - dartanalyzer
+ 
+before_script: tool/build.sh
 
 matrix:
   exclude:
