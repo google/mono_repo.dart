@@ -33,9 +33,7 @@ Future check({String rootDirectory, bool recursive: false}) async {
   print(styleBold.wrap('    ** REPORT **'));
   print('');
 
-  reports.forEach((dir, report) {
-    _print(dir, report);
-  });
+  reports.forEach(_print);
 }
 
 Future<Map<String, PackageReport>> getPackageReports(

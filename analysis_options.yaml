@@ -37,5 +37,7 @@ linter:
     - test_types_in_equals
     - throw_in_finally
     - type_init_formals
+    - unnecessary_brace_in_string_interps
+    - unnecessary_lambdas
     - unrelated_type_equality_checks
     - valid_regexps

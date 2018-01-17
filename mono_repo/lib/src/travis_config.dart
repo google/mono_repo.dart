@@ -165,7 +165,7 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
     }
 
     if (yamlValue is Map<String, dynamic>) {
-      var taskNames = yamlValue.keys.where((k) => _tasks.contains(k)).toList();
+      var taskNames = yamlValue.keys.where(_tasks.contains).toList();
       if (taskNames.isEmpty || taskNames.length > 1) {
         throw new ArgumentError(
             'Must have one and only one key of $_prettyTaskList.');

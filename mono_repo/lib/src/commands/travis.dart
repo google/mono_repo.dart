@@ -87,7 +87,7 @@ void _calculateEnvironment(
     Map<String, Set<String>> allowFailures) {
   configs.forEach((pkg, config) {
     for (var job in config.travisJobs) {
-      var newVar = 'PKG=${pkg} TASK=${commandsToKeys[job.task.command]}';
+      var newVar = 'PKG=$pkg TASK=${commandsToKeys[job.task.command]}';
       environmentVars.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
 
       if (config.allowFailures.contains(job)) {
