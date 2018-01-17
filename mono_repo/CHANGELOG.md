@@ -1,6 +1,11 @@
-* Add `recursive` global flag. When set, we will walk all sub-directories looking for `pubspec.yaml` files.
-
 ## 0.2.0
+
+* Add `before_script` support to the `travis` command. When that value is set in
+  a `travis.yml` file, we will call the script before running any of the tasks
+  for that package.
+
+* Add `recursive` global flag. When set, we will walk all sub-directories
+  looking for `pubspec.yaml` files.
 
 * Support git dependencies in packages.
 
