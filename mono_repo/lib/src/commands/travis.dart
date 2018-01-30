@@ -20,11 +20,11 @@ class TravisCommand extends Command<Null> {
   String get description => 'Configure Travis-CI for child packages.';
 
   @override
-  Future run() =>
+  Future<Null> run() =>
       generateTravisConfig(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future generateTravisConfig(
+Future<Null> generateTravisConfig(
     {String rootDirectory, bool recursive: false}) async {
   rootDirectory ??= p.current;
   var configs =

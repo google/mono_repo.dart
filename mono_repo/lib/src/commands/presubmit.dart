@@ -36,7 +36,7 @@ class PresubmitCommand extends Command<Null> {
   }
 
   @override
-  Future run() async {
+  Future<Null> run() async {
     var passed = await presubmit(
         packages: argResults['package'] as List<String>,
         tasks: argResults['task'] as List<String>,
