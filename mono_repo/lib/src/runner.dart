@@ -11,17 +11,19 @@ import 'commands/pub.dart';
 import 'commands/travis.dart';
 import 'utils.dart';
 
+final List<Command<Null>> commands = new List<Command<Null>>.unmodifiable([
+  new CheckCommand(),
+  new InitCommand(),
+  new PresubmitCommand(),
+  new PubCommand(),
+  new TravisCommand()
+]);
+
 class MonoRepoRunner extends CommandRunner<Null> {
   MonoRepoRunner()
       : super(
             'mono_repo', 'Manage multiple packages in one source repository.') {
-    [
-      new CheckCommand(),
-      new InitCommand(),
-      new PresubmitCommand(),
-      new PubCommand(),
-      new TravisCommand()
-    ].forEach(addCommand);
+    commands.forEach(addCommand);
     argParser.addFlag(recursiveFlag,
         help:
             'Whether to recursively walk sub-directorys looking for packages.',
