@@ -22,10 +22,10 @@ class InitCommand extends Command<Null> {
 the packages to target in the current repository.''';
 
   @override
-  Future run() => init(recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() => init(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future init({bool recursive: false}) async {
+Future<Null> init({bool recursive: false}) async {
   var packagesFileName = p.join(p.current, packageConfigFileName);
   // TODO: check to see if we're in the root of a GIT repo. If not, warn.
 

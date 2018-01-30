@@ -37,10 +37,11 @@ class _PubSubCommand extends Command<Null> {
   String get description => 'Run `pub $name` against all packages.';
 
   @override
-  Future run() => pub(name, recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() =>
+      pub(name, recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future pub(String pubCommand,
+Future<Null> pub(String pubCommand,
     {String rootDirectory, bool recursive: false}) async {
   rootDirectory ??= p.current;
   var configs =

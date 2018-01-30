@@ -23,10 +23,10 @@ class CheckCommand extends Command<Null> {
   String get description => 'Check the state of the repository.';
 
   @override
-  Future run() => check(recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() => check(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future check({String rootDirectory, bool recursive: false}) async {
+Future<Null> check({String rootDirectory, bool recursive: false}) async {
   var reports = await getPackageReports(
       rootDirectory: rootDirectory, recursive: recursive);
 
