@@ -27,6 +27,7 @@ class TravisCommand extends Command<Null> {
 Future<Null> generateTravisConfig(
     {String rootDirectory, bool recursive: false}) async {
   rootDirectory ??= p.current;
+  recursive ??= false;
   var configs =
       getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
 
