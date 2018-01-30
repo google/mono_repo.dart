@@ -6,8 +6,14 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 import 'package:test_process/test_process.dart';
+import 'package:mono_repo/mono_repo.dart';
 
 void main() {
+  test('commands', () {
+    expect(commands.map((c) => c.name),
+        orderedEquals(['check', 'init', 'presubmit', 'pub', 'travis']));
+  });
+
   test('pub get gets dependencies', () async {
     var process = await TestProcess.start('pub', ['run', 'mono_repo']);
 
