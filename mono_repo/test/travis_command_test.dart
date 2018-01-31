@@ -154,10 +154,10 @@ cache:
 set -e
 
 if [ -z "$PKG" ]; then
-  echo -e 'PKG environment variable must be set!'
+  echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 elif [ -z "$TASK" ]; then
-  echo -e 'TASK environment variable must be set!'
+  echo -e '\033[31mTASK environment variable must be set!\033[0m'
   exit 1
 fi
 
@@ -166,11 +166,11 @@ pub upgrade
 
 case $TASK in
 dartfmt) echo
-  echo -e 'TASK: dartfmt'
+  echo -e '\033[1mTASK: dartfmt\033[22m'
   echo -e 'dartfmt -n --set-exit-if-changed .'
   dartfmt -n --set-exit-if-changed .
   ;;
-*) echo -e "Not expecting TASK '${TASK}'. Error!"
+*) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
   exit 1
   ;;
 esac
@@ -178,17 +178,17 @@ esac
   });
 }
 
-final _config2Shell = r'''#!/bin/bash
+final _config2Shell = r"""#!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
 # Fast fail the script on failures.
 set -e
 
 if [ -z "$PKG" ]; then
-  echo -e 'PKG environment variable must be set!'
+  echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 elif [ -z "$TASK" ]; then
-  echo -e 'TASK environment variable must be set!'
+  echo -e '\033[31mTASK environment variable must be set!\033[0m'
   exit 1
 fi
 
@@ -197,82 +197,82 @@ pub upgrade
 
 case $PKG in
 sub_pkg) echo
-  echo -e 'sub_pkg: before_script'
+  echo -e '\033[1msub_pkg: before_script\033[22m'
   tool/build.sh
   ;;
 esac
 
 case $TASK in
 dartanalyzer) echo
-  echo -e 'TASK: dartanalyzer'
+  echo -e '\033[1mTASK: dartanalyzer\033[22m'
   echo -e 'dartanalyzer .'
   dartanalyzer .
   ;;
 dartfmt) echo
-  echo -e 'TASK: dartfmt'
+  echo -e '\033[1mTASK: dartfmt\033[22m'
   echo -e 'dartfmt -n --set-exit-if-changed .'
   dartfmt -n --set-exit-if-changed .
   ;;
 test_00) echo
-  echo -e 'TASK: test_00'
+  echo -e '\033[1mTASK: test_00\033[22m'
   echo -e 'pub run test --platform dartium'
   pub run test --platform dartium
   ;;
 test_01) echo
-  echo -e 'TASK: test_01'
+  echo -e '\033[1mTASK: test_01\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 0'
   pub run test --preset travis --total-shards 9 --shard-index 0
   ;;
 test_02) echo
-  echo -e 'TASK: test_02'
+  echo -e '\033[1mTASK: test_02\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 1'
   pub run test --preset travis --total-shards 9 --shard-index 1
   ;;
 test_03) echo
-  echo -e 'TASK: test_03'
+  echo -e '\033[1mTASK: test_03\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 2'
   pub run test --preset travis --total-shards 9 --shard-index 2
   ;;
 test_04) echo
-  echo -e 'TASK: test_04'
+  echo -e '\033[1mTASK: test_04\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 3'
   pub run test --preset travis --total-shards 9 --shard-index 3
   ;;
 test_05) echo
-  echo -e 'TASK: test_05'
+  echo -e '\033[1mTASK: test_05\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 4'
   pub run test --preset travis --total-shards 9 --shard-index 4
   ;;
 test_06) echo
-  echo -e 'TASK: test_06'
+  echo -e '\033[1mTASK: test_06\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 5'
   pub run test --preset travis --total-shards 9 --shard-index 5
   ;;
 test_07) echo
-  echo -e 'TASK: test_07'
+  echo -e '\033[1mTASK: test_07\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 6'
   pub run test --preset travis --total-shards 9 --shard-index 6
   ;;
 test_08) echo
-  echo -e 'TASK: test_08'
+  echo -e '\033[1mTASK: test_08\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 7'
   pub run test --preset travis --total-shards 9 --shard-index 7
   ;;
 test_09) echo
-  echo -e 'TASK: test_09'
+  echo -e '\033[1mTASK: test_09\033[22m'
   echo -e 'pub run test --preset travis --total-shards 9 --shard-index 8'
   pub run test --preset travis --total-shards 9 --shard-index 8
   ;;
 test_10) echo
-  echo -e 'TASK: test_10'
+  echo -e '\033[1mTASK: test_10\033[22m'
   echo -e 'pub run test'
   pub run test
   ;;
-*) echo -e "Not expecting TASK '${TASK}'. Error!"
+*) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
   exit 1
   ;;
 esac
-''';
+""";
 
 final _config2Yaml = r'''# Created with https://github.com/dart-lang/mono_repo
 language: dart
