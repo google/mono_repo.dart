@@ -193,49 +193,49 @@ dartfmt) echo
   echo -e "TASK: dartfmt"
   dartfmt -n --set-exit-if-changed .
   ;;
-test) echo
-  echo -e "TASK: test"
+test_00) echo
+  echo -e "TASK: test_00"
   pub run test --platform dartium
   ;;
-test_1) echo
-  echo -e "TASK: test_1"
+test_01) echo
+  echo -e "TASK: test_01"
   pub run test --preset travis --total-shards 9 --shard-index 0
+  ;;
+test_02) echo
+  echo -e "TASK: test_02"
+  pub run test --preset travis --total-shards 9 --shard-index 1
+  ;;
+test_03) echo
+  echo -e "TASK: test_03"
+  pub run test --preset travis --total-shards 9 --shard-index 2
+  ;;
+test_04) echo
+  echo -e "TASK: test_04"
+  pub run test --preset travis --total-shards 9 --shard-index 3
+  ;;
+test_05) echo
+  echo -e "TASK: test_05"
+  pub run test --preset travis --total-shards 9 --shard-index 4
+  ;;
+test_06) echo
+  echo -e "TASK: test_06"
+  pub run test --preset travis --total-shards 9 --shard-index 5
+  ;;
+test_07) echo
+  echo -e "TASK: test_07"
+  pub run test --preset travis --total-shards 9 --shard-index 6
+  ;;
+test_08) echo
+  echo -e "TASK: test_08"
+  pub run test --preset travis --total-shards 9 --shard-index 7
+  ;;
+test_09) echo
+  echo -e "TASK: test_09"
+  pub run test --preset travis --total-shards 9 --shard-index 8
   ;;
 test_10) echo
   echo -e "TASK: test_10"
   pub run test
-  ;;
-test_2) echo
-  echo -e "TASK: test_2"
-  pub run test --preset travis --total-shards 9 --shard-index 1
-  ;;
-test_3) echo
-  echo -e "TASK: test_3"
-  pub run test --preset travis --total-shards 9 --shard-index 2
-  ;;
-test_4) echo
-  echo -e "TASK: test_4"
-  pub run test --preset travis --total-shards 9 --shard-index 3
-  ;;
-test_5) echo
-  echo -e "TASK: test_5"
-  pub run test --preset travis --total-shards 9 --shard-index 4
-  ;;
-test_6) echo
-  echo -e "TASK: test_6"
-  pub run test --preset travis --total-shards 9 --shard-index 5
-  ;;
-test_7) echo
-  echo -e "TASK: test_7"
-  pub run test --preset travis --total-shards 9 --shard-index 6
-  ;;
-test_8) echo
-  echo -e "TASK: test_8"
-  pub run test --preset travis --total-shards 9 --shard-index 7
-  ;;
-test_9) echo
-  echo -e "TASK: test_9"
-  pub run test --preset travis --total-shards 9 --shard-index 8
   ;;
 *) echo -e "Not expecting TASK '${TASK}'. Error!"
   exit 1
@@ -254,17 +254,17 @@ dart:
 env:
   - PKG=sub_pkg TASK=dartanalyzer
   - PKG=sub_pkg TASK=dartfmt
-  - PKG=sub_pkg TASK=test
-  - PKG=sub_pkg TASK=test_1
+  - PKG=sub_pkg TASK=test_00
+  - PKG=sub_pkg TASK=test_01
+  - PKG=sub_pkg TASK=test_02
+  - PKG=sub_pkg TASK=test_03
+  - PKG=sub_pkg TASK=test_04
+  - PKG=sub_pkg TASK=test_05
+  - PKG=sub_pkg TASK=test_06
+  - PKG=sub_pkg TASK=test_07
+  - PKG=sub_pkg TASK=test_08
+  - PKG=sub_pkg TASK=test_09
   - PKG=sub_pkg TASK=test_10
-  - PKG=sub_pkg TASK=test_2
-  - PKG=sub_pkg TASK=test_3
-  - PKG=sub_pkg TASK=test_4
-  - PKG=sub_pkg TASK=test_5
-  - PKG=sub_pkg TASK=test_6
-  - PKG=sub_pkg TASK=test_7
-  - PKG=sub_pkg TASK=test_8
-  - PKG=sub_pkg TASK=test_9
 
 matrix:
   exclude:

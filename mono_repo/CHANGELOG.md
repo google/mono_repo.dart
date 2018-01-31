@@ -1,3 +1,10 @@
+## 0.2.2
+
+* `travis` command
+
+  * Make numbering more consistent and clean when there is more than one task
+    with a given name.
+
 ## 0.2.1
 
 * `travis` command

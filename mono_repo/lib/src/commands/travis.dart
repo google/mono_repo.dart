@@ -270,20 +270,31 @@ List<String> _calculatePkgEntries(
 Map<String, String> _extractCommands(Map<String, TravisConfig> configs) {
   var commandsToKeys = <String, String>{};
 
-  for (var task in _travisTasks(configs)) {
-    if (commandsToKeys.containsKey(task.command)) {
+  var tasksToConfigure = _travisTasks(configs).toList();
+  var taskNames = tasksToConfigure.map((dt) => dt.name).toSet();
+
+  for (var taskName in taskNames) {
+    var commands = tasksToConfigure
+        .where((dt) => dt.name == taskName)
+        .map((dt) => dt.command)
+        .toSet();
+
+    if (commands.length == 1) {
+      commandsToKeys[commands.single] = taskName;
       continue;
     }
 
-    var taskKey = task.name;
+    // TODO: could likely use some clever `log` math here
+    final paddingSize = (commands.length - 1).toString().length;
 
-    var count = 1;
-    while (commandsToKeys.containsValue(taskKey)) {
-      taskKey = '${task.name}_${count++}';
+    var count = 0;
+    for (var command in commands) {
+      commandsToKeys[command] =
+          '${taskName}_${count.toString().padLeft(paddingSize, '0')}';
+      count++;
     }
-
-    commandsToKeys[task.command] = taskKey;
   }
+
   return commandsToKeys;
 }
 
