@@ -95,17 +95,8 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
-  var packageCase = pkgEntries.isEmpty
-      ? ''
-      : '''
-
-case \$PKG in
-${pkgEntries.join('\n')}
-esac
-''';
-
   travisScript
-      .writeAsStringSync(_travisSh(taskEntries, packageCase, prettyAnsi));
+      .writeAsStringSync(_travisSh(taskEntries, pkgEntries, prettyAnsi));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
@@ -311,7 +302,19 @@ void _logPkgs(Map<String, TravisConfig> configs) {
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');
 
-String _travisSh(Iterable<String> tasks, String pkgCase, bool prettyAnsi) => '''
+String _shellCase(String scriptVariable, List<String> entries) {
+  if (entries.isEmpty) return '';
+  return '''
+
+case \$$scriptVariable in
+${entries.join('\n')}
+esac
+''';
+}
+
+String _travisSh(
+        List<String> tasks, List<String> pkgEntries, bool prettyAnsi) =>
+    '''
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
@@ -328,11 +331,7 @@ fi
 
 pushd \$PKG
 pub upgrade
-$pkgCase
-case \$TASK in
-${tasks.join('\n')}
-esac
-''';
+${_shellCase('PKG', pkgEntries)}${_shellCase('TASK', tasks)}''';
 
 String _travisYml(
         Iterable<String> sdks, Iterable<String> envs, String matrix) =>
