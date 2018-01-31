@@ -199,15 +199,43 @@ test) echo
   ;;
 test_1) echo
   echo -e "TASK: test_1"
-  pub run test --preset travis --total-shards 5 --shard-index 0
+  pub run test --preset travis --total-shards 9 --shard-index 0
+  ;;
+test_10) echo
+  echo -e "TASK: test_10"
+  pub run test
   ;;
 test_2) echo
   echo -e "TASK: test_2"
-  pub run test --preset travis --total-shards 5 --shard-index 1
+  pub run test --preset travis --total-shards 9 --shard-index 1
   ;;
 test_3) echo
   echo -e "TASK: test_3"
-  pub run test
+  pub run test --preset travis --total-shards 9 --shard-index 2
+  ;;
+test_4) echo
+  echo -e "TASK: test_4"
+  pub run test --preset travis --total-shards 9 --shard-index 3
+  ;;
+test_5) echo
+  echo -e "TASK: test_5"
+  pub run test --preset travis --total-shards 9 --shard-index 4
+  ;;
+test_6) echo
+  echo -e "TASK: test_6"
+  pub run test --preset travis --total-shards 9 --shard-index 5
+  ;;
+test_7) echo
+  echo -e "TASK: test_7"
+  pub run test --preset travis --total-shards 9 --shard-index 6
+  ;;
+test_8) echo
+  echo -e "TASK: test_8"
+  pub run test --preset travis --total-shards 9 --shard-index 7
+  ;;
+test_9) echo
+  echo -e "TASK: test_9"
+  pub run test --preset travis --total-shards 9 --shard-index 8
   ;;
 *) echo -e "Not expecting TASK '${TASK}'. Error!"
   exit 1
@@ -228,8 +256,15 @@ env:
   - PKG=sub_pkg TASK=dartfmt
   - PKG=sub_pkg TASK=test
   - PKG=sub_pkg TASK=test_1
+  - PKG=sub_pkg TASK=test_10
   - PKG=sub_pkg TASK=test_2
   - PKG=sub_pkg TASK=test_3
+  - PKG=sub_pkg TASK=test_4
+  - PKG=sub_pkg TASK=test_5
+  - PKG=sub_pkg TASK=test_6
+  - PKG=sub_pkg TASK=test_7
+  - PKG=sub_pkg TASK=test_8
+  - PKG=sub_pkg TASK=test_9
 
 matrix:
   exclude:

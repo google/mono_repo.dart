@@ -58,8 +58,15 @@ dart:
 
 dart_task:
  - test: --platform dartium
- - test: --preset travis --total-shards 5 --shard-index 0
- - test: --preset travis --total-shards 5 --shard-index 1
+ - test: --preset travis --total-shards 9 --shard-index 0
+ - test: --preset travis --total-shards 9 --shard-index 1
+ - test: --preset travis --total-shards 9 --shard-index 2
+ - test: --preset travis --total-shards 9 --shard-index 3
+ - test: --preset travis --total-shards 9 --shard-index 4
+ - test: --preset travis --total-shards 9 --shard-index 5
+ - test: --preset travis --total-shards 9 --shard-index 6
+ - test: --preset travis --total-shards 9 --shard-index 7
+ - test: --preset travis --total-shards 9 --shard-index 8
  - test
  - dartanalyzer
  
