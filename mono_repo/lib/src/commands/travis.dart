@@ -95,8 +95,17 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
+  var packageCase = pkgEntries.isEmpty
+      ? ''
+      : '''
+
+case \$PKG in
+${pkgEntries.join('\n')}
+esac
+''';
+
   travisScript
-      .writeAsStringSync(_travisSh(taskEntries, pkgEntries, prettyAnsi));
+      .writeAsStringSync(_travisSh(taskEntries, packageCase, prettyAnsi));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
@@ -258,14 +267,12 @@ List<String> _calculatePkgEntries(
       addEntry(pkg, [
         'echo',
         'echo -e "${_wrap(prettyAnsi, styleBold, "PKG: $pkg")}"',
+        'echo -e "  Running `${config.beforeScript}`"',
         config.beforeScript
       ]);
     }
   }
 
-  addEntry('*', [
-    'echo -e "No before_script specified for PKG \'\${PKG}\'."',
-  ]);
   return pkgEntries;
 }
 
@@ -304,9 +311,7 @@ void _logPkgs(Map<String, TravisConfig> configs) {
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');
 
-String _travisSh(
-        Iterable<String> tasks, Iterable<String> pkgs, bool prettyAnsi) =>
-    '''
+String _travisSh(Iterable<String> tasks, String pkgCase, bool prettyAnsi) => '''
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
@@ -323,11 +328,7 @@ fi
 
 pushd \$PKG
 pub upgrade
-
-case \$PKG in
-${pkgs.join('\n')}
-esac
-
+$pkgCase
 case \$TASK in
 ${tasks.join('\n')}
 esac

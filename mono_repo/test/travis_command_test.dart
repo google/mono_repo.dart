@@ -146,11 +146,6 @@ fi
 pushd $PKG
 pub upgrade
 
-case $PKG in
-*) echo -e "No before_script specified for PKG '${PKG}'."
-  ;;
-esac
-
 case $TASK in
 dartfmt) echo
   echo -e "TASK: dartfmt"
@@ -184,9 +179,8 @@ pub upgrade
 case $PKG in
 sub_pkg) echo
   echo -e "PKG: sub_pkg"
+  echo -e "  Running `tool/build.sh`"
   tool/build.sh
-  ;;
-*) echo -e "No before_script specified for PKG '${PKG}'."
   ;;
 esac
 

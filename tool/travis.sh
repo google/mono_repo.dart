@@ -15,11 +15,6 @@ fi
 pushd $PKG
 pub upgrade
 
-case $PKG in
-*) echo -e "No before_script specified for PKG '${PKG}'."
-  ;;
-esac
-
 case $TASK in
 dartanalyzer) echo
   echo -e "\033[1mTASK: dartanalyzer\033[22m"
