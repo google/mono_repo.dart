@@ -28,10 +28,12 @@ class TravisConfig extends Object with _$TravisConfigSerializerMixin {
   final List<TravisJob> include, exclude, allowFailures;
 
   @override
-  final String beforeScript;
+  final List<String> beforeScript;
 
   TravisConfig(this.sdks, this.tasks, this.include, this.exclude,
-      this.allowFailures, this.beforeScript);
+      this.allowFailures, this.beforeScript) {
+    assert(beforeScript != null);
+  }
 
   factory TravisConfig.parse(Map<String, dynamic> travisYaml) {
     var ignoredKeys =
@@ -89,7 +91,20 @@ ${ignoredKeys.map((k) => '    $k').join('\n')}'''));
       processException(matrix['allow_failures'] as y.YamlList, allowFailures);
     }
 
-    var beforeScript = travisYaml['before_script'] as String;
+    var beforeScriptValue = travisYaml['before_script'];
+
+    var beforeScript = <String>[];
+    if (beforeScriptValue == null) {
+      // no-op
+    } else if (beforeScriptValue is String) {
+      beforeScript.add(beforeScriptValue);
+    } else if (beforeScriptValue is List<String>) {
+      if (beforeScriptValue.isNotEmpty) {
+        beforeScript.addAll(beforeScriptValue);
+      }
+    } else {
+      throw new ArgumentError('`before_script` `String` or `List<String>`.');
+    }
 
     return new TravisConfig(
         sdks, dartTasks, include, exclude, allowFailures, beforeScript);

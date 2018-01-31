@@ -255,12 +255,17 @@ List<String> _calculatePkgEntries(
 
   for (var pkg in configs.keys) {
     var config = configs[pkg];
-    if (config.beforeScript != null) {
-      addEntry(pkg, [
+    if (config.beforeScript.isNotEmpty) {
+      var items = [
         'echo',
-        safeEcho(prettyAnsi, styleBold, '$pkg: before_script'),
-        config.beforeScript
-      ]);
+        safeEcho(prettyAnsi, styleBold, '$pkg: before_script')
+      ];
+      for (var value in config.beforeScript) {
+        items.add(safeEcho(prettyAnsi, resetAll, value));
+        items.add(value);
+      }
+
+      addEntry(pkg, items);
     }
   }
 

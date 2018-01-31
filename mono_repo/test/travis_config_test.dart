@@ -59,7 +59,24 @@ void main() {
 
       var config = new TravisConfig.parse(travisYaml);
 
-      expect(config.beforeScript, 'tool/build.sh');
+      expect(config.beforeScript, ['tool/build.sh']);
+    });
+
+    test('before_script as array', () {
+      final thing = r'''
+language: dart
+dart:
+ - dev
+
+before_script:
+  - tool/build.sh
+  - pwd
+''';
+
+      var travisYaml = y.loadYaml(thing) as Map<String, dynamic>;
+      var config = new TravisConfig.parse(travisYaml);
+
+      expect(config.beforeScript, ['tool/build.sh', 'pwd']);
     });
   });
 }

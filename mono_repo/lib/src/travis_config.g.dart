@@ -33,7 +33,7 @@ TravisConfig _$TravisConfigFromJson(Map<String, dynamic> json) =>
                 ? null
                 : new TravisJob.fromJson(e as Map<String, dynamic>))
             ?.toList(),
-        json['beforeScript'] as String);
+        (json['beforeScript'] as List)?.map((e) => e as String)?.toList());
 
 abstract class _$TravisConfigSerializerMixin {
   List<String> get sdks;
@@ -41,7 +41,7 @@ abstract class _$TravisConfigSerializerMixin {
   List<TravisJob> get include;
   List<TravisJob> get exclude;
   List<TravisJob> get allowFailures;
-  String get beforeScript;
+  List<String> get beforeScript;
   Map<String, dynamic> toJson() => <String, dynamic>{
         'sdks': sdks,
         'tasks': tasks,

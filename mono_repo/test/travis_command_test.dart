@@ -198,6 +198,7 @@ pub upgrade
 case $PKG in
 sub_pkg) echo
   echo -e '\033[1msub_pkg: before_script\033[22m'
+  echo -e 'tool/build.sh'
   tool/build.sh
   ;;
 esac

@@ -7,6 +7,8 @@
 
   * Print out the full command that executed as part of a task.
 
+  * Support a `List` value for `before_script`. 
+
 ## 0.2.1
 
 * `travis` command
