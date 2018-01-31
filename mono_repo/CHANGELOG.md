@@ -5,6 +5,8 @@
   * Make numbering more consistent and clean when there is more than one task
     with a given name.
 
+  * Print out the full command that executed as part of a task.
+
 ## 0.2.1
 
 * `travis` command

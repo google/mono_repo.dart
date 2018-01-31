@@ -10,6 +10,24 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 import 'shared.dart';
 
 void main() {
+  group('safeEcho', () {
+    var values = {
+      'hello': "echo -e 'hello'",
+      "single-quotes 'inside' the string":
+          "echo -e 'single-quotes '\\''inside'\\'' the string'",
+      "'single quotes' at the beginning 'middle' and at the 'end'":
+          "echo -e ''\\''single quotes'\\'' at the beginning '\\''middle'\\'' and at the '\\''end'\\'''",
+      "Repeated single quotes ''' in the '' middle":
+          "echo -e 'Repeated single quotes '\\'''\\'''\\'' in the '\\'''\\'' middle'",
+    };
+
+    values.forEach((input, expected) {
+      test(input, () {
+        expect(safeEcho(false, null, input), expected);
+      });
+    });
+  });
+
   test('no package', () async {
     await d.dir('sub_pkg').create();
 
@@ -136,10 +154,10 @@ cache:
 set -e
 
 if [ -z "$PKG" ]; then
-  echo -e "PKG environment variable must be set!"
+  echo -e 'PKG environment variable must be set!'
   exit 1
 elif [ -z "$TASK" ]; then
-  echo -e "TASK environment variable must be set!"
+  echo -e 'TASK environment variable must be set!'
   exit 1
 fi
 
@@ -148,7 +166,8 @@ pub upgrade
 
 case $TASK in
 dartfmt) echo
-  echo -e "TASK: dartfmt"
+  echo -e 'TASK: dartfmt'
+  echo -e 'dartfmt -n --set-exit-if-changed .'
   dartfmt -n --set-exit-if-changed .
   ;;
 *) echo -e "Not expecting TASK '${TASK}'. Error!"
@@ -166,10 +185,10 @@ final _config2Shell = r'''#!/bin/bash
 set -e
 
 if [ -z "$PKG" ]; then
-  echo -e "PKG environment variable must be set!"
+  echo -e 'PKG environment variable must be set!'
   exit 1
 elif [ -z "$TASK" ]; then
-  echo -e "TASK environment variable must be set!"
+  echo -e 'TASK environment variable must be set!'
   exit 1
 fi
 
@@ -178,63 +197,75 @@ pub upgrade
 
 case $PKG in
 sub_pkg) echo
-  echo -e "PKG: sub_pkg"
-  echo -e "  Running `tool/build.sh`"
+  echo -e 'sub_pkg: before_script'
   tool/build.sh
   ;;
 esac
 
 case $TASK in
 dartanalyzer) echo
-  echo -e "TASK: dartanalyzer"
+  echo -e 'TASK: dartanalyzer'
+  echo -e 'dartanalyzer .'
   dartanalyzer .
   ;;
 dartfmt) echo
-  echo -e "TASK: dartfmt"
+  echo -e 'TASK: dartfmt'
+  echo -e 'dartfmt -n --set-exit-if-changed .'
   dartfmt -n --set-exit-if-changed .
   ;;
 test_00) echo
-  echo -e "TASK: test_00"
+  echo -e 'TASK: test_00'
+  echo -e 'pub run test --platform dartium'
   pub run test --platform dartium
   ;;
 test_01) echo
-  echo -e "TASK: test_01"
+  echo -e 'TASK: test_01'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 0'
   pub run test --preset travis --total-shards 9 --shard-index 0
   ;;
 test_02) echo
-  echo -e "TASK: test_02"
+  echo -e 'TASK: test_02'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 1'
   pub run test --preset travis --total-shards 9 --shard-index 1
   ;;
 test_03) echo
-  echo -e "TASK: test_03"
+  echo -e 'TASK: test_03'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 2'
   pub run test --preset travis --total-shards 9 --shard-index 2
   ;;
 test_04) echo
-  echo -e "TASK: test_04"
+  echo -e 'TASK: test_04'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 3'
   pub run test --preset travis --total-shards 9 --shard-index 3
   ;;
 test_05) echo
-  echo -e "TASK: test_05"
+  echo -e 'TASK: test_05'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 4'
   pub run test --preset travis --total-shards 9 --shard-index 4
   ;;
 test_06) echo
-  echo -e "TASK: test_06"
+  echo -e 'TASK: test_06'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 5'
   pub run test --preset travis --total-shards 9 --shard-index 5
   ;;
 test_07) echo
-  echo -e "TASK: test_07"
+  echo -e 'TASK: test_07'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 6'
   pub run test --preset travis --total-shards 9 --shard-index 6
   ;;
 test_08) echo
-  echo -e "TASK: test_08"
+  echo -e 'TASK: test_08'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 7'
   pub run test --preset travis --total-shards 9 --shard-index 7
   ;;
 test_09) echo
-  echo -e "TASK: test_09"
+  echo -e 'TASK: test_09'
+  echo -e 'pub run test --preset travis --total-shards 9 --shard-index 8'
   pub run test --preset travis --total-shards 9 --shard-index 8
   ;;
 test_10) echo
-  echo -e "TASK: test_10"
+  echo -e 'TASK: test_10'
+  echo -e 'pub run test'
   pub run test
   ;;
 *) echo -e "Not expecting TASK '${TASK}'. Error!"

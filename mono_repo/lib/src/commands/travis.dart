@@ -213,8 +213,9 @@ List<String> _calculateTaskEntries(
   commandsToKeys.forEach((command, taskKey) {
     addEntry(taskKey, [
       'echo',
-      'echo -e "${_wrap(prettyAnsi, styleBold, "TASK: $taskKey")}"',
-      command
+      safeEcho(prettyAnsi, styleBold, 'TASK: $taskKey'),
+      safeEcho(prettyAnsi, resetAll, command),
+      command,
     ]);
   });
 
@@ -257,8 +258,7 @@ List<String> _calculatePkgEntries(
     if (config.beforeScript != null) {
       addEntry(pkg, [
         'echo',
-        'echo -e "${_wrap(prettyAnsi, styleBold, "PKG: $pkg")}"',
-        'echo -e "  Running `${config.beforeScript}`"',
+        safeEcho(prettyAnsi, styleBold, '$pkg: before_script'),
         config.beforeScript
       ]);
     }
@@ -270,7 +270,7 @@ List<String> _calculatePkgEntries(
 Map<String, String> _extractCommands(Map<String, TravisConfig> configs) {
   var commandsToKeys = <String, String>{};
 
-  var tasksToConfigure = _travisTasks(configs).toList();
+  var tasksToConfigure = _travisTasks(configs);
   var taskNames = tasksToConfigure.map((dt) => dt.name).toSet();
 
   for (var taskName in taskNames) {
@@ -298,8 +298,8 @@ Map<String, String> _extractCommands(Map<String, TravisConfig> configs) {
   return commandsToKeys;
 }
 
-Iterable<DartTask> _travisTasks(Map<String, TravisConfig> configs) =>
-    configs.values.expand((tc) => tc.travisJobs).map((tj) => tj.task);
+List<DartTask> _travisTasks(Map<String, TravisConfig> configs) =>
+    configs.values.expand((tc) => tc.travisJobs).map((tj) => tj.task).toList();
 
 Set<String> _sdks(Map<String, TravisConfig> configs) =>
     (configs.values.expand((tc) => tc.sdks).toList()..sort()).toSet();
@@ -323,6 +323,19 @@ esac
 ''';
 }
 
+/// Safely escape everything:
+/// 1 - use single quotes.
+/// 2 - if there is a single quote in the string
+///     2.1 end the before the single quote
+///     2.2 echo the single quote escaped
+///     2.3 continue the string
+///
+/// See https://stackoverflow.com/a/20053121/39827
+String safeEcho(bool prettyAnsi, AnsiCode code, String value) {
+  value = value.replaceAll("'", "'\\''");
+  return "echo -e '${_wrap(prettyAnsi, code, value)}'";
+}
+
 String _travisSh(
         List<String> tasks, List<String> pkgEntries, bool prettyAnsi) =>
     '''
@@ -333,10 +346,10 @@ String _travisSh(
 set -e
 
 if [ -z "\$PKG" ]; then
-  echo -e "${_wrap(prettyAnsi, red, "PKG environment variable must be set!")}"
+  ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
   exit 1
 elif [ -z "\$TASK" ]; then
-  echo -e "${_wrap(prettyAnsi, red, "TASK environment variable must be set!")}"
+  ${safeEcho(prettyAnsi, red, "TASK environment variable must be set!")}
   exit 1
 fi
 
