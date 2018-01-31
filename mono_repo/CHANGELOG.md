@@ -1,3 +1,13 @@
+## 0.2.1
+
+* `travis` command
+
+  * Write ANSI escape sequences in `./tool/travis.sh` as pre-escaped ASCII
+    literals.
+  
+  * Added `--[no-]pretty-ansi` flag to allow ANSI sequences to be optionally
+    omitted.
+
 ## 0.2.0
 
 * Add `before_script` support to the `travis` command. When that value is set in

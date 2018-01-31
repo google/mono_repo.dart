@@ -19,15 +19,31 @@ class TravisCommand extends Command<Null> {
   @override
   String get description => 'Configure Travis-CI for child packages.';
 
+  TravisCommand() : super() {
+    argParser
+      ..addFlag(
+        'pretty-ansi',
+        abbr: 'p',
+        defaultsTo: true,
+        help:
+            'If the generated `$travisShPath` file should include ANSI escapes '
+            'to improve output readability.',
+      );
+  }
+
   @override
-  Future<Null> run() =>
-      generateTravisConfig(recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() => generateTravisConfig(
+      recursive: globalResults[recursiveFlag] as bool,
+      prettyAnsi: this.argResults['pretty-ansi'] as bool);
 }
 
 Future<Null> generateTravisConfig(
-    {String rootDirectory, bool recursive: false}) async {
+    {String rootDirectory,
+    bool recursive: false,
+    bool prettyAnsi: true}) async {
   rootDirectory ??= p.current;
   recursive ??= false;
+  prettyAnsi ??= true;
   var configs =
       getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
 
@@ -50,8 +66,11 @@ Future<Null> generateTravisConfig(
 
   _writeTravisYml(rootDirectory, sdks, envEntries, matrix);
 
-  _writeTravisScript(rootDirectory, _calculateTaskEntries(commandsToKeys),
-      _calculatePkgEntries(configs));
+  _writeTravisScript(
+      rootDirectory,
+      _calculateTaskEntries(commandsToKeys, prettyAnsi),
+      _calculatePkgEntries(configs, prettyAnsi),
+      prettyAnsi);
 }
 
 /// Write `.travis.yml`
@@ -64,8 +83,8 @@ void _writeTravisYml(String rootDirectory, Set<String> sdks,
 }
 
 /// Write `tool/travis.sh
-void _writeTravisScript(
-    String rootDirectory, List<String> taskEntries, List<String> pkgEntries) {
+void _writeTravisScript(String rootDirectory, List<String> taskEntries,
+    List<String> pkgEntries, bool prettyAnsi) {
   var travisFilePath = p.join(rootDirectory, travisShPath);
   var travisScript = new File(travisFilePath);
 
@@ -76,7 +95,8 @@ void _writeTravisScript(
     stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
-  travisScript.writeAsStringSync(_travisSh(taskEntries, pkgEntries));
+  travisScript
+      .writeAsStringSync(_travisSh(taskEntries, pkgEntries, prettyAnsi));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
@@ -173,7 +193,8 @@ List<String> _calculateAllowedFailures(Map<String, Set<String>> allowFailures) {
   return matrix;
 }
 
-List<String> _calculateTaskEntries(Map<String, String> commandsToKeys) {
+List<String> _calculateTaskEntries(
+    Map<String, String> commandsToKeys, bool prettyAnsi) {
   var taskEntries = <String>[];
 
   void addEntry(String label, List<String> contentLines) {
@@ -190,8 +211,11 @@ List<String> _calculateTaskEntries(Map<String, String> commandsToKeys) {
   }
 
   commandsToKeys.forEach((command, taskKey) {
-    addEntry(taskKey,
-        ['echo', 'echo -e "${styleBold.wrap("TASK: $taskKey")}"', command]);
+    addEntry(taskKey, [
+      'echo',
+      'echo -e "${_wrap(prettyAnsi, styleBold, "TASK: $taskKey")}"',
+      command
+    ]);
   });
 
   if (taskEntries.isEmpty) {
@@ -202,13 +226,17 @@ List<String> _calculateTaskEntries(Map<String, String> commandsToKeys) {
   taskEntries.sort();
 
   addEntry('*', [
-    'echo -e "${red.wrap("Not expecting TASK '\${TASK}'. Error!")}"',
+    'echo -e "${_wrap(prettyAnsi, red,"Not expecting TASK '\${TASK}'. Error!")}"',
     'exit 1'
   ]);
   return taskEntries;
 }
 
-List<String> _calculatePkgEntries(Map<String, TravisConfig> configs) {
+String _wrap(bool doWrap, AnsiCode code, String value) =>
+    doWrap ? code.wrap(value, forScript: true) : value;
+
+List<String> _calculatePkgEntries(
+    Map<String, TravisConfig> configs, bool prettyAnsi) {
   var pkgEntries = <String>[];
 
   void addEntry(String label, List<String> contentLines) {
@@ -229,7 +257,7 @@ List<String> _calculatePkgEntries(Map<String, TravisConfig> configs) {
     if (config.beforeScript != null) {
       addEntry(pkg, [
         'echo',
-        'echo -e "${styleBold.wrap("PKG: $pkg")}"',
+        'echo -e "${_wrap(prettyAnsi, styleBold, "PKG: $pkg")}"',
         config.beforeScript
       ]);
     }
@@ -276,7 +304,9 @@ void _logPkgs(Map<String, TravisConfig> configs) {
 String _indentAndJoin(Iterable<String> items) =>
     items.map((i) => '  - $i').join('\n');
 
-String _travisSh(Iterable<String> tasks, Iterable<String> pkgs) => '''
+String _travisSh(
+        Iterable<String> tasks, Iterable<String> pkgs, bool prettyAnsi) =>
+    '''
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
@@ -284,10 +314,10 @@ String _travisSh(Iterable<String> tasks, Iterable<String> pkgs) => '''
 set -e
 
 if [ -z "\$PKG" ]; then
-  echo -e "${red.wrap("PKG environment variable must be set!")}"
+  echo -e "${_wrap(prettyAnsi, red, "PKG environment variable must be set!")}"
   exit 1
 elif [ -z "\$TASK" ]; then
-  echo -e "${red.wrap("TASK environment variable must be set!")}"
+  echo -e "${_wrap(prettyAnsi, red, "TASK environment variable must be set!")}"
   exit 1
 fi
 
