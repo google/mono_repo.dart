@@ -216,8 +216,8 @@ dartfmt) echo
   ;;
 test_00) echo
   echo -e '\033[1mTASK: test_00\033[22m'
-  echo -e 'pub run test --platform dartium'
-  pub run test --platform dartium
+  echo -e 'pub run test --platform chrome'
+  pub run test --platform chrome
   ;;
 test_01) echo
   echo -e '\033[1mTASK: test_01\033[22m'

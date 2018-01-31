@@ -86,8 +86,8 @@ List get _testConfig1expectedOutput => [
         "sdk": "dev",
         "task": {
           "name": "test",
-          "args": "--platform dartium",
-          "config": {"install_dartium": true}
+          "args": "--platform chrome",
+          "config": {"xvfb": true}
         }
       },
       {
@@ -95,7 +95,7 @@ List get _testConfig1expectedOutput => [
         "task": {
           "name": "test",
           "args": "--preset travis --total-shards 5 --shard-index 0",
-          "config": {"install_dartium": true}
+          "config": {"xvfb": true}
         }
       },
       {
@@ -120,8 +120,8 @@ List get _testConfig1expectedOutput => [
         "sdk": "stable",
         "task": {
           "name": "test",
-          "args": "--platform dartium",
-          "config": {"install_dartium": true}
+          "args": "--platform chrome",
+          "config": {"xvfb": true}
         }
       },
       {
@@ -129,7 +129,7 @@ List get _testConfig1expectedOutput => [
         "task": {
           "name": "test",
           "args": "--preset travis --total-shards 5 --shard-index 0",
-          "config": {"install_dartium": true}
+          "config": {"xvfb": true}
         }
       },
       {
@@ -154,8 +154,8 @@ List get _testConfig1expectedOutput => [
         "sdk": "1.23.0",
         "task": {
           "name": "test",
-          "args": "--platform dartium",
-          "config": {"install_dartium": true}
+          "args": "--platform chrome",
+          "config": {"xvfb": true}
         }
       },
       {
@@ -163,7 +163,7 @@ List get _testConfig1expectedOutput => [
         "task": {
           "name": "test",
           "args": "--preset travis --total-shards 5 --shard-index 0",
-          "config": {"install_dartium": true}
+          "config": {"xvfb": true}
         }
       },
       {

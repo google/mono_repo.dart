@@ -29,10 +29,10 @@ before_install:
   - just here for completeness
 
 dart_task:
- - test: --platform dartium
-   install_dartium: true
+ - test: --platform chrome
+   xvfb: true
  - test: --preset travis --total-shards 5 --shard-index 0
-   install_dartium: true
+   xvfb: true
  - test: --preset travis --total-shards 5 --shard-index 1
  - test #no args
  - dartanalyzer: --fatal-infos --fatal-warnings .
@@ -57,7 +57,7 @@ dart:
  - 1.23.0
 
 dart_task:
- - test: --platform dartium
+ - test: --platform chrome
  - test: --preset travis --total-shards 9 --shard-index 0
  - test: --preset travis --total-shards 9 --shard-index 1
  - test: --preset travis --total-shards 9 --shard-index 2
