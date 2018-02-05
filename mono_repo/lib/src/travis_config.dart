@@ -4,134 +4,76 @@
 
 library mono_repo.travis_config;
 
-import 'dart:io';
-
 import 'package:collection/collection.dart';
-import 'package:io/ansi.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:yaml/yaml.dart' as y;
 
 part 'travis_config.g.dart';
 
-final travisFileName = '.travis.yml';
+final monoFileName = '.mono.yml';
 final travisShPath = './tool/travis.sh';
 
 @JsonSerializable()
-class TravisConfig extends Object with _$TravisConfigSerializerMixin {
+class MonoConfig extends Object with _$MonoConfigSerializerMixin {
   @override
   final List<String> sdks;
 
   @override
-  final List<DartTask> tasks;
+  final List<TravisJob> jobs;
 
-  @override
-  final List<TravisJob> include, exclude, allowFailures;
+  MonoConfig(this.sdks, this.jobs);
 
-  @override
-  final List<String> beforeScript;
+  factory MonoConfig.parse(Map<String, dynamic> monoYaml) {
+    var unrecognizedKeys =
+        (monoYaml.keys.toSet()..removeAll(_validKeys)).toList()..sort();
 
-  TravisConfig(this.sdks, this.tasks, this.include, this.exclude,
-      this.allowFailures, this.beforeScript) {
-    assert(beforeScript != null);
-  }
-
-  factory TravisConfig.parse(Map<String, dynamic> travisYaml) {
-    var ignoredKeys =
-        (travisYaml.keys.toSet()..removeAll(_processedKeys)).toList()..sort();
-
-    if (ignoredKeys.isNotEmpty) {
-      stderr.writeln(yellow.wrap('''  Ignoring these keys in `$travisFileName`:
-${ignoredKeys.map((k) => '    $k').join('\n')}'''));
+    if (unrecognizedKeys.isNotEmpty) {
+      throw new ArgumentError(
+          'Unrecognized keys $unrecognizedKeys in .mono_repo.yaml.'
+          'Only $_validKeys are allowed.');
     }
 
-    var language = travisYaml['language'] as String;
-    if (language == null || language != 'dart') {
-      throw new ArgumentError('"language" must be set to "dart".');
-    }
-
-    var sdks = (travisYaml['dart'] as List<String>);
-
+    var sdks = monoYaml['dart'] as List<String>;
     if (sdks == null || sdks.isEmpty) {
       throw new ArgumentError(
           'At least one SDK version is required under "dart".');
     }
 
     // FYI: 'test' is default if there are no tasks defined
-    var dartTasks = ((travisYaml['dart_task'] as List) ?? ['test'])
-        .map((yamlValue) => new DartTask.parse(yamlValue))
-        .toList();
+    var jobs = <TravisJob>[];
 
-    var include = <TravisJob>[];
-    var exclude = <TravisJob>[];
-    var allowFailures = <TravisJob>[];
-
-    var matrix = travisYaml['matrix'] as Map;
-
-    if (matrix != null) {
-      void processException(y.YamlList matrixItem, List<TravisJob> targetList) {
-        if (matrixItem == null) {
-          return;
-        }
-
-        for (y.YamlMap item in matrixItem) {
-          var sdk = item['dart'] as String;
-          if (sdk == null) {
-            throw new ArgumentError('Matrix items require `dart` key.');
+    var stages = ((monoYaml['stages'] as List<Map<String, dynamic>>) ??
+        [
+          {
+            'unit_test': ['test']
           }
-
-          var taskValue = item['dart_task'];
-          var task = new DartTask.parse(taskValue);
-
-          targetList.add(new TravisJob(sdk, task));
+        ]);
+    for (var stage in stages) {
+      if (stage.length != 1) {
+        throw new ArgumentError(
+            '`stages` expects a list of maps with exactly one key '
+            '(the name of the stage). Got $stage.');
+      }
+      var stageName = stage.keys.first;
+      for (var job in stage.values.first) {
+        var jobSdks = sdks;
+        if (job is Map<String, dynamic> && job.containsKey('dart')) {
+          jobSdks = job.remove('dart') as List<String>;
         }
-      }
-
-      processException(matrix['include'] as y.YamlList, include);
-      processException(matrix['exclude'] as y.YamlList, exclude);
-      processException(matrix['allow_failures'] as y.YamlList, allowFailures);
-    }
-
-    var beforeScriptValue = travisYaml['before_script'];
-
-    var beforeScript = <String>[];
-    if (beforeScriptValue == null) {
-      // no-op
-    } else if (beforeScriptValue is String) {
-      beforeScript.add(beforeScriptValue);
-    } else if (beforeScriptValue is List<String>) {
-      if (beforeScriptValue.isNotEmpty) {
-        beforeScript.addAll(beforeScriptValue);
-      }
-    } else {
-      throw new ArgumentError('`before_script` `String` or `List<String>`.');
-    }
-
-    return new TravisConfig(
-        sdks, dartTasks, include, exclude, allowFailures, beforeScript);
-  }
-
-  Iterable<TravisJob> get travisJobs sync* {
-    for (var sdk in sdks) {
-      for (var task in tasks) {
-        var job = new TravisJob(sdk, task);
-        if (!exclude.contains(job)) {
-          yield job;
+        for (var sdk in jobSdks) {
+          jobs.add(new TravisJob.parse(sdk, stageName, job));
         }
       }
     }
 
-    yield* include;
+    return new MonoConfig(sdks, jobs);
   }
 
-  factory TravisConfig.fromJson(Map<String, dynamic> json) =>
-      _$TravisConfigFromJson(json);
+  factory MonoConfig.fromJson(Map<String, dynamic> json) =>
+      _$MonoConfigFromJson(json);
 
-  static final _processedKeys = const [
-    'dart_task',
+  static final _validKeys = const [
     'dart',
-    'matrix',
-    'language',
-    'before_script'
+    'stages',
   ];
 }
 
@@ -141,12 +83,19 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   final String sdk;
 
   @override
-  final DartTask task;
+  final String stageName;
 
-  TravisJob(this.sdk, this.task);
+  @override
+  final Task task;
+
+  TravisJob(this.sdk, this.stageName, this.task);
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
+
+  factory TravisJob.parse(String sdk, String stageName, Object yaml) {
+    return new TravisJob(sdk, stageName, new Task.parse(yaml));
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -159,8 +108,8 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
 }
 
 @JsonSerializable(includeIfNull: false)
-class DartTask extends Object with _$DartTaskSerializerMixin {
-  static final _tasks = const ['dartfmt', 'dartanalyzer', 'test'];
+class Task extends Object with _$TaskSerializerMixin {
+  static final _tasks = const ['dartfmt', 'dartanalyzer', 'test', 'command'];
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
   @override
@@ -172,11 +121,14 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
   @override
   final Map<String, dynamic> config;
 
-  DartTask(this.name, {this.args, this.config});
+  Task(this.name, {this.args, this.config});
 
-  factory DartTask.parse(Object yamlValue) {
+  factory Task.parse(Object yamlValue) {
     if (yamlValue is String) {
-      return new DartTask(yamlValue);
+      if (yamlValue == 'command') {
+        throw new ArgumentError.value(yamlValue, 'command', 'requires a value');
+      }
+      return new Task(yamlValue);
     }
 
     if (yamlValue is Map<String, dynamic>) {
@@ -186,7 +138,22 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
             'Must have one and only one key of $_prettyTaskList.');
       }
       var taskName = taskNames.single;
-      var args = yamlValue[taskName] as String;
+      String args;
+      switch (taskName) {
+        case 'command':
+          var taskValue = yamlValue[taskName];
+          if (taskValue is String) {
+            args = taskValue;
+          } else if (taskValue is List<String>) {
+            args = taskValue.join(';');
+          } else {
+            throw new ArgumentError.value(taskValue, 'command',
+                'only supports a string or array of strings');
+          }
+          break;
+        default:
+          args = yamlValue[taskName] as String;
+      }
 
       var config = new Map<String, dynamic>.from(yamlValue);
       config.remove(taskName);
@@ -194,14 +161,13 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
       if (config.isEmpty) {
         config = null;
       }
-      return new DartTask(taskName, args: args, config: config);
+      return new Task(taskName, args: args, config: config);
     }
 
     throw new ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
   }
 
-  factory DartTask.fromJson(Map<String, dynamic> json) =>
-      _$DartTaskFromJson(json);
+  factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
   String get command {
     switch (name) {
@@ -220,6 +186,8 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
           value = '$value $args';
         }
         return value;
+      case 'command':
+        return args;
       default:
         throw new UnsupportedError('Cannot generate the command for `$name`.');
     }
@@ -227,7 +195,7 @@ class DartTask extends Object with _$DartTaskSerializerMixin {
 
   @override
   bool operator ==(Object other) =>
-      other is DartTask && _equality.equals(_items, other._items);
+      other is Task && _equality.equals(_items, other._items);
 
   @override
   int get hashCode => _equality.hash(_items);
