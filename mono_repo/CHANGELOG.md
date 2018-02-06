@@ -1,3 +1,36 @@
+## 0.3.0
+
+### Breaking Changes
+
+* Sub-package `.travis.yml` files should be replaces with `.mono_repo.yml`
+  files, which are a simplified format that supports travis build stages. A
+  basic example file might look like this:
+
+```yaml
+# List of the sdk versions you support
+dart:
+  - dev
+  - stable
+
+# Ordered list of all stages you want to run.
+stages:
+  # A single stage, called `analyze_and_format` which runs the analyzer and
+  # the formatter only.
+  - analyze_and_format:
+    - dartanalyzer: --hints-as-warnings .
+    - dartfmt: sdk
+      dart:
+        - dev # Overrides the top level sdk default
+  # Assuming everything analyzed correctly, runs a build.
+  - build:
+    - command: "pub run build_runner build"
+  # And finally run tests, these are custom build_runner tests but the regular
+  # `test` task is also supported.
+  - test:
+    - command: "pub run build_runner test"
+    - command: "pub run build_runner test -- -p chrome"
+```
+
 ## 0.2.2
 
 * `travis` command
