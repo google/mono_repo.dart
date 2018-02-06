@@ -22,7 +22,8 @@ void main() {
       expect(
           () => presubmit(rootDirectory: d.sandbox),
           throwsUserExceptionWith(
-              'No $travisShPath file found, please run the `travis` command first.'));
+              'No $travisShPath file found, please run the `travis` '
+              'command first.'));
     });
   });
 
@@ -38,7 +39,7 @@ void main() {
       pkgBPath = p.join(repoPath, 'pkg_b');
       new Directory(pkgBPath).createSync();
 
-      new File(p.join(pkgAPath, '.travis.yml'))
+      new File(p.join(pkgAPath, monoFileName))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgAConfig);
       new File(p.join(pkgAPath, 'pubspec.yaml'))
@@ -48,7 +49,7 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync(basicTest);
 
-      new File(p.join(pkgBPath, '.travis.yml'))
+      new File(p.join(pkgBPath, monoFileName))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgBConfig);
       new File(p.join(pkgBPath, 'pubspec.yaml'))
@@ -179,25 +180,26 @@ pkg_a
 }
 
 final pkgAConfig = '''
-language: dart
 dart:
   - dev
   - stable
 
-dart_task:
-  - test
-  - dartanalyzer
-  - dartfmt
+stages:
+  - analyze_and_format:
+    - dartanalyzer 
+    - dartfmt
+  - test:
+    - test
 ''';
 
 final pkgBConfig = '''
-language: dart
 dart:
   - dev
   - stable
 
-dart_task:
-  - dartfmt
+stages:
+  - format:
+    - dartfmt
 ''';
 
 final pkgAPubspec = '''

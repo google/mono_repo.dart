@@ -35,36 +35,30 @@ stages:
 ''';
 
 final testConfig2 = r'''
-language: dart
 dart:
  - dev
  - stable
  - 1.23.0
 
-dart_task:
- - test: --platform chrome
- - test: --preset travis --total-shards 9 --shard-index 0
- - test: --preset travis --total-shards 9 --shard-index 1
- - test: --preset travis --total-shards 9 --shard-index 2
- - test: --preset travis --total-shards 9 --shard-index 3
- - test: --preset travis --total-shards 9 --shard-index 4
- - test: --preset travis --total-shards 9 --shard-index 5
- - test: --preset travis --total-shards 9 --shard-index 6
- - test: --preset travis --total-shards 9 --shard-index 7
- - test: --preset travis --total-shards 9 --shard-index 8
- - test
- - dartanalyzer
- 
-before_script: tool/build.sh
-
-matrix:
-  exclude:
-    - dart: stable
-      dart_task: dartanalyzer
-  include:
-    - dart: dev
-      dart_task: dartfmt
-  allow_failures:
-    - dart: dev
-      dart_task: dartfmt
+stages:
+  - analyze:
+    - dartanalyzer:
+      dart:
+        - dev
+        - 1.23.0
+    - dartfmt:
+      dart:
+        - dev
+  - unit_test:
+    - test: --platform chrome
+    - test: --preset travis --total-shards 9 --shard-index 0
+    - test: --preset travis --total-shards 9 --shard-index 1
+    - test: --preset travis --total-shards 9 --shard-index 2
+    - test: --preset travis --total-shards 9 --shard-index 3
+    - test: --preset travis --total-shards 9 --shard-index 4
+    - test: --preset travis --total-shards 9 --shard-index 5
+    - test: --preset travis --total-shards 9 --shard-index 6
+    - test: --preset travis --total-shards 9 --shard-index 7
+    - test: --preset travis --total-shards 9 --shard-index 8
+    - test
 ''';

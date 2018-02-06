@@ -200,7 +200,6 @@ String _travisSh(List<String> tasks, bool prettyAnsi) => '''
 # Fast fail the script on failures.
 set -e
 
-
 if [ -z "\$PKG" ]; then
   ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
   exit 1
@@ -211,15 +210,15 @@ if [ "\$#" == "0" ]; then
   exit 1
 fi
 
-EXIT_CODE=0
-
 pushd \$PKG
-pub upgrade || EXIT_CODE=\$?
+pub upgrade
+
 while (( "\$#" )); do
   TASK=\$1
 ${_shellCase('TASK', tasks)}
   shift
-done''';
+done
+''';
 
 String _travisYml(
     Map<String, MonoConfig> configs, Map<String, String> commandsToKeys) {
@@ -235,14 +234,13 @@ jobs:
 ${_listJobs(jobs, commandsToKeys)}
 stages:
 ${_listStages(orderedStages)}
-
 # Only building master means that we don't run two builds for each pull request.
 branches:
   only: [master]
 
 cache:
- directories:
-   - \$HOME/.pub-cache
+  directories:
+    - \$HOME/.pub-cache
 ''';
 }
 
@@ -287,7 +285,8 @@ String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
     buffer.writeln('''
     - stage: ${job.stageName}
       script: ./tool/travis.sh ${commandsToKeys[job.task.command]}
-      env: PKG="${job.package}"''');
+      env: PKG="${job.package}"
+      dart: ${job.sdk}''');
   }
   return buffer.toString();
 }
