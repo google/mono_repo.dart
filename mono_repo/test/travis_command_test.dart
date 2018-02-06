@@ -65,6 +65,48 @@ name: pkg_name
             'See `sub_pkg/$monoFileName`.'));
   });
 
+  test('conflicting stage orders are not allowed', () async {
+    await d.dir('pkg_a', [
+      d.file(monoFileName, r'''
+dart:
+ - dev
+
+stages:
+  - format:
+    - dartfmt
+  - analyze:
+    - dartanalyzer
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+    ]).create();
+
+    await d.dir('pkg_b', [
+      d.file(monoFileName, r'''
+dart:
+ - dev
+
+stages:
+  - analyze:
+    - dartanalyzer
+  - format:
+    - dartfmt: sdk
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_b
+      ''')
+    ]).create();
+
+    expect(
+        () async => await overrideAnsiOutput(false, () async {
+              await generateTravisConfig(rootDirectory: d.sandbox);
+            }),
+        throwsUserExceptionWith(
+            'Not all packages agree on `stages` ordering, found a cycle '
+            'between the following stages: [analyze, format]'));
+  });
+
   test('complete travis.yml file', () async {
     await d.dir('sub_pkg', [
       d.file(monoFileName, testConfig2),

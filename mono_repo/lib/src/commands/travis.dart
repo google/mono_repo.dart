@@ -261,7 +261,7 @@ List<String> _calculateOrderedStages(Iterable<MonoConfig> configs) {
       stronglyConnectedComponents(edges.keys, (n) => n, (n) => edges[n]);
   for (var component in components) {
     if (component.length > 1) {
-      throw new ArgumentError(
+      throw new UserException(
           'Not all packages agree on `stages` ordering, found '
           'a cycle between the following stages: $component');
     }
