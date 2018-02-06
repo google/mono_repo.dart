@@ -123,15 +123,15 @@ jobs:
   include:
     - stage: format
       script: ./tool/travis.sh dartfmt
-      env: PKG="pkg_b"
-      dart: dev
-    - stage: format
-      script: ./tool/travis.sh dartfmt
       env: PKG="pkg_a"
       dart: stable
     - stage: format
       script: ./tool/travis.sh dartfmt
       env: PKG="pkg_a"
+      dart: dev
+    - stage: format
+      script: ./tool/travis.sh dartfmt
+      env: PKG="pkg_b"
       dart: dev
 
 stages:

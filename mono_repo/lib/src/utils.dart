@@ -47,8 +47,9 @@ Map<String, PackageConfig> getPackageConfig(
   var packages = <String, PackageConfig>{};
 
   void visitDirectory(Directory directory) {
-    for (Directory subdir
-        in directory.listSync().where((fse) => fse is Directory)) {
+    var dirs = directory.listSync().where((fse) => fse is Directory).toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
+    for (Directory subdir in dirs) {
       File pubspecFile = subdir.listSync().firstWhere((fse) {
         return fse is File && p.basename(fse.path) == 'pubspec.yaml';
       }, orElse: () => null);
