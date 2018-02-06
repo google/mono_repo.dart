@@ -1,15 +1,28 @@
 # Created with https://github.com/dart-lang/mono_repo
 language: dart
 
-dart:
-  - dev
+jobs:
+  include:
+    - stage: smoke_test
+      script: ./tool/travis.sh dartfmt
+      env: PKG="mono_repo"
+    - stage: smoke_test
+      script: ./tool/travis.sh dartanalyzer
+      env: PKG="mono_repo"
+    - stage: unit_test
+      script: ./tool/travis.sh test
+      env: PKG="mono_repo"
+    - stage: unit_test
+      script: ./tool/travis.sh command_0
+      env: PKG="mono_repo"
+    - stage: unit_test
+      script: ./tool/travis.sh command_1
+      env: PKG="mono_repo"
 
-env:
-  - PKG=mono_repo TASK=dartanalyzer
-  - PKG=mono_repo TASK=dartfmt
-  - PKG=mono_repo TASK=test
+stages:
+  - smoke_test
+  - unit_test
 
-script: ./tool/travis.sh
 
 # Only building master means that we don't run two builds for each pull request.
 branches:

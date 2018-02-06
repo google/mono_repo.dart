@@ -12,6 +12,7 @@ part of mono_repo.travis_config;
 
 MonoConfig _$MonoConfigFromJson(Map<String, dynamic> json) => new MonoConfig(
     (json['sdks'] as List)?.map((e) => e as String)?.toList(),
+    (json['stageNames'] as List)?.map((e) => e as String)?.toList(),
     (json['jobs'] as List)
         ?.map((e) => e == null
             ? null
@@ -20,12 +21,14 @@ MonoConfig _$MonoConfigFromJson(Map<String, dynamic> json) => new MonoConfig(
 
 abstract class _$MonoConfigSerializerMixin {
   List<String> get sdks;
+  List<String> get stageNames;
   List<TravisJob> get jobs;
   Map<String, dynamic> toJson() =>
-      <String, dynamic>{'sdks': sdks, 'jobs': jobs};
+      <String, dynamic>{'sdks': sdks, 'stageNames': stageNames, 'jobs': jobs};
 }
 
 TravisJob _$TravisJobFromJson(Map<String, dynamic> json) => new TravisJob(
+    json['package'] as String,
     json['sdk'] as String,
     json['stageName'] as String,
     json['task'] == null
@@ -33,11 +36,16 @@ TravisJob _$TravisJobFromJson(Map<String, dynamic> json) => new TravisJob(
         : new Task.fromJson(json['task'] as Map<String, dynamic>));
 
 abstract class _$TravisJobSerializerMixin {
+  String get package;
   String get sdk;
   String get stageName;
   Task get task;
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{'sdk': sdk, 'stageName': stageName, 'task': task};
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'package': package,
+        'sdk': sdk,
+        'stageName': stageName,
+        'task': task
+      };
 }
 
 Task _$TaskFromJson(Map<String, dynamic> json) =>

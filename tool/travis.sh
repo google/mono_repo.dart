@@ -4,18 +4,33 @@
 # Fast fail the script on failures.
 set -e
 
+
 if [ -z "$PKG" ]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
-elif [ -z "$TASK" ]; then
-  echo -e '\033[31mTASK environment variable must be set!\033[0m'
+fi
+
+if [ "$#" == "0" ]; then
+  echo -e '\033[31mAt least one task argument must be provided!\033[0m'
   exit 1
 fi
 
+EXIT_CODE=0
+
 pushd $PKG
-pub upgrade
+pub upgrade || EXIT_CODE=$?
 
 case $TASK in
+command_0) echo
+  echo -e '\033[1mTASK: command_0\033[22m'
+  echo -e 'echo "HELLO"'
+  echo "HELLO"
+  ;;
+command_1) echo
+  echo -e '\033[1mTASK: command_1\033[22m'
+  echo -e 'echo "HELLO WORLD"'
+  echo "HELLO WORLD"
+  ;;
 dartanalyzer) echo
   echo -e '\033[1mTASK: dartanalyzer\033[22m'
   echo -e 'dartanalyzer --fatal-infos --fatal-warnings .'

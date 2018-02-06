@@ -75,15 +75,15 @@ Future<bool> presubmit(
   }
 
   var configs =
-      getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
+      getMonoConfigs(rootDirectory: rootDirectory, recursive: recursive);
   // By default, run on all packages.
   if (packages.isEmpty) packages = configs.keys;
   packages = packages.toList()..sort();
 
   // By default run all tasks.
   var allKnownTasks = configs.values.fold(new Set<String>(),
-      (Set<String> exising, TravisConfig config) {
-    return exising..addAll(config.tasks.map((task) => task.name));
+      (Set<String> exising, MonoConfig config) {
+    return exising..addAll(config.jobs.map((job) => job.task.name));
   });
   if (tasks.isEmpty) tasks = allKnownTasks;
   var unrecognizedTasks = tasks.where((task) => !allKnownTasks.contains(task));
@@ -106,7 +106,7 @@ Future<bool> presubmit(
     }
 
     stderr.writeln(styleBold.wrap(package));
-    for (var job in config.travisJobs) {
+    for (var job in config.jobs) {
       var sdk = job.sdk;
       var task = job.task;
       // Skip tasks that weren't specified

@@ -9,7 +9,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'travis_config.g.dart';
 
-final monoFileName = '.mono.yml';
+final monoFileName = '.mono_repo.yml';
+final travisFileName = '.travis.yml';
 final travisShPath = './tool/travis.sh';
 
 @JsonSerializable()
@@ -18,11 +19,14 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
   final List<String> sdks;
 
   @override
+  final List<String> stageNames;
+
+  @override
   final List<TravisJob> jobs;
 
-  MonoConfig(this.sdks, this.jobs);
+  MonoConfig(this.sdks, this.stageNames, this.jobs);
 
-  factory MonoConfig.parse(Map<String, dynamic> monoYaml) {
+  factory MonoConfig.parse(String package, Map<String, dynamic> monoYaml) {
     var unrecognizedKeys =
         (monoYaml.keys.toSet()..removeAll(_validKeys)).toList()..sort();
 
@@ -41,31 +45,38 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
     // FYI: 'test' is default if there are no tasks defined
     var jobs = <TravisJob>[];
 
-    var stages = ((monoYaml['stages'] as List<Map<String, dynamic>>) ??
+    var stagesYaml = ((monoYaml['stages'] as List<Map<String, dynamic>>) ??
         [
           {
             'unit_test': ['test']
           }
         ]);
-    for (var stage in stages) {
+    var stageNames = <String>[];
+    for (var stage in stagesYaml) {
       if (stage.length != 1) {
         throw new ArgumentError(
             '`stages` expects a list of maps with exactly one key '
             '(the name of the stage). Got $stage.');
       }
       var stageName = stage.keys.first;
+      if (stageNames.contains(stageName)) {
+        throw new ArgumentError(
+            'There should only be one entry for each stage, '
+            'saw $stageName more than once.');
+      }
+      stageNames.add(stageName);
       for (var job in stage.values.first) {
         var jobSdks = sdks;
         if (job is Map<String, dynamic> && job.containsKey('dart')) {
           jobSdks = job.remove('dart') as List<String>;
         }
         for (var sdk in jobSdks) {
-          jobs.add(new TravisJob.parse(sdk, stageName, job));
+          jobs.add(new TravisJob.parse(package, sdk, stageName, job));
         }
       }
     }
 
-    return new MonoConfig(sdks, jobs);
+    return new MonoConfig(sdks, stageNames, jobs);
   }
 
   factory MonoConfig.fromJson(Map<String, dynamic> json) =>
@@ -80,6 +91,9 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
 @JsonSerializable()
 class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
+  final String package;
+
+  @override
   final String sdk;
 
   @override
@@ -88,13 +102,14 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   final Task task;
 
-  TravisJob(this.sdk, this.stageName, this.task);
+  TravisJob(this.package, this.sdk, this.stageName, this.task);
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
 
-  factory TravisJob.parse(String sdk, String stageName, Object yaml) {
-    return new TravisJob(sdk, stageName, new Task.parse(yaml));
+  factory TravisJob.parse(
+      String package, String sdk, String stageName, Object yaml) {
+    return new TravisJob(package, sdk, stageName, new Task.parse(yaml));
   }
 
   @override

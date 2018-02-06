@@ -81,7 +81,7 @@ Map<String, PackageConfig> getPackageConfig(
   return packages;
 }
 
-Map<String, TravisConfig> getTravisConfigs(
+Map<String, MonoConfig> getMonoConfigs(
     {String rootDirectory, bool recursive: false}) {
   rootDirectory ??= p.current;
 
@@ -92,22 +92,23 @@ Map<String, TravisConfig> getTravisConfigs(
     throw new UserException('No nested packages found.');
   }
 
-  var configs = <String, TravisConfig>{};
+  var configs = <String, MonoConfig>{};
 
   for (var pkg in packages.keys) {
-    var travisPath = p.join(rootDirectory, pkg, travisFileName);
+    var travisPath = p.join(rootDirectory, pkg, monoFileName);
     var travisFile = new File(travisPath);
 
     if (travisFile.existsSync()) {
       var travisYaml =
           y.loadYaml(travisFile.readAsStringSync(), sourceUrl: travisPath);
 
-      var config = new TravisConfig.parse(travisYaml as Map<String, dynamic>);
+      var config =
+          new MonoConfig.parse(pkg, travisYaml as Map<String, dynamic>);
 
-      var configuredTasks =
-          config.tasks.where((dt) => dt.config != null).toList();
+      var configuredJobs =
+          config.jobs.where((dt) => dt.task.config != null).toList();
 
-      if (configuredTasks.isNotEmpty) {
+      if (configuredJobs.isNotEmpty) {
         throw new UserException(
             'Tasks with fancy configuration are not supported. '
             'See `${p.relative(travisPath, from: rootDirectory)}`.');

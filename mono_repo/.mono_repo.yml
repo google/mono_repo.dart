@@ -1,0 +1,11 @@
+dart:
+  - dev
+
+stages:
+  - smoke_test:
+    - dartfmt
+    - dartanalyzer: --fatal-infos --fatal-warnings .
+  - unit_test:
+    - test
+    - command: echo "HELLO"
+    - command: echo "HELLO WORLD"
