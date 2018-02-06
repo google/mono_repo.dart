@@ -8,8 +8,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
 
+import 'mono_config.dart';
 import 'package_config.dart';
-import 'travis_config.dart';
 
 const recursiveFlag = 'recursive';
 final packageConfigFileName = 'mono_repo.yaml';

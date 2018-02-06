@@ -10,7 +10,7 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
-import '../travis_config.dart';
+import '../mono_config.dart';
 import '../utils.dart';
 import 'travis.dart';
 

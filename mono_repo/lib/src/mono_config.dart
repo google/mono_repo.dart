@@ -7,7 +7,7 @@ library mono_repo.travis_config;
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'travis_config.g.dart';
+part 'mono_config.g.dart';
 
 final monoFileName = '.mono_repo.yml';
 final travisFileName = '.travis.yml';

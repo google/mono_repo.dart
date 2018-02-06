@@ -10,7 +10,7 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
-import '../travis_config.dart';
+import '../mono_config.dart';
 import '../utils.dart';
 
 class TravisCommand extends Command<Null> {

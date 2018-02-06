@@ -10,7 +10,7 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'package:mono_repo/src/commands/presubmit.dart';
 import 'package:mono_repo/src/commands/travis.dart';
-import 'package:mono_repo/src/travis_config.dart';
+import 'package:mono_repo/src/mono_config.dart';
 
 import 'shared.dart';
 
