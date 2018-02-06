@@ -2,7 +2,7 @@
 
 ### Breaking Changes
 
-* Sub-package `.travis.yml` files should be replaces with `.mono_repo.yml`
+* Sub-package `.travis.yml` files should be replaced with `.mono_repo.yml`
   files, which are a simplified format that supports travis build stages. A
   basic example file might look like this:
 
@@ -26,7 +26,7 @@ stages:
     - command: "pub run build_runner build"
   # And finally run tests, these are custom build_runner tests but the regular
   # `test` task is also supported.
-  - test:
+  - unit_test:
     - command: "pub run build_runner test"
     - command: "pub run build_runner test -- -p chrome"
 ```
