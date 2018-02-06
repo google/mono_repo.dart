@@ -6,28 +6,24 @@ jobs:
     - stage: smoke_test
       script: ./tool/travis.sh dartfmt
       env: PKG="mono_repo"
+      dart: dev
     - stage: smoke_test
       script: ./tool/travis.sh dartanalyzer
       env: PKG="mono_repo"
+      dart: dev
     - stage: unit_test
       script: ./tool/travis.sh test
       env: PKG="mono_repo"
-    - stage: unit_test
-      script: ./tool/travis.sh command_0
-      env: PKG="mono_repo"
-    - stage: unit_test
-      script: ./tool/travis.sh command_1
-      env: PKG="mono_repo"
+      dart: dev
 
 stages:
   - smoke_test
   - unit_test
-
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
   only: [master]
 
 cache:
- directories:
-   - $HOME/.pub-cache
+  directories:
+    - $HOME/.pub-cache
