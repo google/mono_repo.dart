@@ -76,12 +76,12 @@ void main() {
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
       expect(result.stderr, '''
 pkg_a
-  Running task test:dev (success)
   Running task dartanalyzer:dev (success)
-  Running task dartfmt:dev (success)
-  Running task test:stable (skipped, mismatched sdk)
   Running task dartanalyzer:stable (skipped, mismatched sdk)
+  Running task dartfmt:dev (success)
   Running task dartfmt:stable (skipped, mismatched sdk)
+  Running task test:dev (success)
+  Running task test:stable (skipped, mismatched sdk)
 pkg_b
   Running task dartfmt:dev (success)
   Running task dartfmt:stable (skipped, mismatched sdk)
