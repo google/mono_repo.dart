@@ -36,7 +36,7 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
           'Only $_validKeys are allowed.');
     }
 
-    var sdks = monoYaml['dart'] as List<String>;
+    var sdks = (monoYaml['dart'] as List<String>)?.toList();
     if (sdks == null || sdks.isEmpty) {
       throw new ArgumentError(
           'At least one SDK version is required under "dart".');
@@ -51,6 +51,7 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
             'unit_test': ['test']
           }
         ]);
+
     var stageNames = <String>[];
     for (var stage in stagesYaml) {
       if (stage.length != 1) {
@@ -68,6 +69,7 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
       for (var job in stage.values.first) {
         var jobSdks = sdks;
         if (job is Map<String, dynamic> && job.containsKey('dart')) {
+          job = new Map<String, dynamic>.from(job as Map<String, dynamic>);
           jobSdks = job.remove('dart') as List<String>;
         }
         for (var sdk in jobSdks) {
