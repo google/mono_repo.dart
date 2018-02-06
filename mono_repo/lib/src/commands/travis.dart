@@ -50,7 +50,7 @@ Future<Null> generateTravisConfig(
 
   _logPkgs(configs);
 
-  var commandsToKeys = _extractCommands(configs);
+  var commandsToKeys = extractCommands(configs);
 
   _writeTravisYml(rootDirectory, configs, commandsToKeys);
 
@@ -93,8 +93,8 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    var buffer = new StringBuffer('$label) ${contentLines.first}\n');
-    buffer.writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
+    var buffer = new StringBuffer('  $label) ${contentLines.first}\n');
+    buffer.writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
 
     var output = buffer.toString();
     if (!taskEntries.contains(output)) {
@@ -128,7 +128,8 @@ List<String> _calculateTaskEntries(
 String _wrap(bool doWrap, AnsiCode code, String value) =>
     doWrap ? code.wrap(value, forScript: true) : value;
 
-Map<String, String> _extractCommands(Map<String, MonoConfig> configs) {
+/// Gives a map of command to unique task key for all [configs].
+Map<String, String> extractCommands(Map<String, MonoConfig> configs) {
   var commandsToKeys = <String, String>{};
 
   var tasksToConfigure = _travisTasks(configs);
@@ -173,10 +174,9 @@ void _logPkgs(Map<String, MonoConfig> configs) {
 String _shellCase(String scriptVariable, List<String> entries) {
   if (entries.isEmpty) return '';
   return '''
-
-case \$$scriptVariable in
+  case \$$scriptVariable in
 ${entries.join('\n')}
-esac
+  esac
 ''';
 }
 
@@ -215,7 +215,11 @@ EXIT_CODE=0
 
 pushd \$PKG
 pub upgrade || EXIT_CODE=\$?
-${_shellCase('TASK', tasks)}''';
+while (( "\$#" )); do
+  TASK=\$1
+${_shellCase('TASK', tasks)}
+  shift
+done''';
 
 String _travisYml(
     Map<String, MonoConfig> configs, Map<String, String> commandsToKeys) {
