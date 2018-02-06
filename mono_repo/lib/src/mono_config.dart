@@ -60,13 +60,23 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
             '(the name of the stage). Got $stage.');
       }
       var stageName = stage.keys.first;
+      if (stageName == 'test') {
+        throw new ArgumentError(
+            'Stages are not allowed to have the name `test` because it '
+            'interacts poorly with the default stage by the same name.');
+      }
       if (stageNames.contains(stageName)) {
         throw new ArgumentError(
             'There should only be one entry for each stage, '
-            'saw $stageName more than once.');
+            'saw `$stageName` more than once.');
       }
       stageNames.add(stageName);
-      for (var job in stage.values.first) {
+      var stageYaml = stage.values.first as List;
+      if (stageYaml.isEmpty) {
+        throw new ArgumentError(
+            'Stages are required to have at least one job. Got $stage.');
+      }
+      for (var job in stageYaml) {
         var jobSdks = sdks;
         if (job is Map<String, dynamic> && job.containsKey('dart')) {
           job = new Map<String, dynamic>.from(job as Map<String, dynamic>);

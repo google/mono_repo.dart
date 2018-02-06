@@ -39,15 +39,66 @@ void main() {
     });
 
     test('valid example', () {
-      var travisYaml = y.loadYaml(testConfig1) as Map<String, dynamic>;
+      var monoYaml = y.loadYaml(testConfig1) as Map<String, dynamic>;
 
-      var config = new MonoConfig.parse('a', travisYaml);
+      var config = new MonoConfig.parse('a', monoYaml);
 
       expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 
       var jobs = config.jobs.toList();
 
       expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
+    });
+
+    group('error checks', () {
+      test('Stages named `test` are not allowed', () {
+        var monoYaml = {
+          'dart': ['stable'],
+          'stages': [
+            {
+              'test': ['test']
+            },
+          ]
+        };
+        expect(
+            () => new MonoConfig.parse('a', monoYaml),
+            throwsArgumentErrorWith(
+                'Stages are not allowed to have the name `test` because it '
+                'interacts poorly with the default stage by the same name.'));
+      });
+
+      test('Stage with no actions', () {
+        var monoYaml = {
+          'dart': ['stable'],
+          'stages': [
+            {'a': []},
+          ]
+        };
+        expect(
+            () => new MonoConfig.parse('a', monoYaml),
+            throwsArgumentErrorWith(
+                'Stages are required to have at least one job. '
+                'Got {a: []}.'));
+      });
+
+      test('Duplicate stage names are not allowed', () {
+        var monoYaml = {
+          'dart': ['stable'],
+          'stages': [
+            {
+              'a': ['test']
+            },
+            {
+              'a': ['dartfmt']
+            },
+          ]
+        };
+        expect(
+            () => new MonoConfig.parse('a', monoYaml),
+            throwsArgumentErrorWith(
+                'There should only be one entry for each stage, '
+                'saw `a` more than once.'));
+      });
     });
   });
 }
