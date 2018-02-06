@@ -188,7 +188,7 @@ stages:
   - analyze_and_format:
     - dartanalyzer 
     - dartfmt
-  - test:
+  - unit_test:
     - test
 ''';
 
