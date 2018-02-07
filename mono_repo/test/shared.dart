@@ -18,13 +18,14 @@ dart:
 
 stages:
   - analyze_and_format:
+    - group:
+        - dartanalyzer: --fatal-infos --fatal-warnings .
+        - dartfmt
+      dart:
+        - dev
     - dartanalyzer: --fatal-infos --fatal-warnings .
       dart:
-        - dev
         - 1.23.0
-    - dartfmt:
-      dart:
-        - dev
   - unit_test:
     - test: --platform chrome
       xvfb: true
@@ -42,13 +43,14 @@ dart:
 
 stages:
   - analyze:
+    - group:
+        - dartanalyzer
+        - dartfmt
+      dart:
+        - dev
     - dartanalyzer:
       dart:
-        - dev
         - 1.23.0
-    - dartfmt:
-      dart:
-        - dev
   - unit_test:
     - test: --platform chrome
     - test: --preset travis --total-shards 9 --shard-index 0

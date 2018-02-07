@@ -108,129 +108,146 @@ List get _testConfig1expectedOutput => [
         "package": "a",
         "sdk": "dev",
         "stageName": "analyze_and_format",
-        "task": {
-          "name": "dartanalyzer",
-          "args": "--fatal-infos --fatal-warnings ."
-        }
+        "tasks": [
+          {"name": "dartanalyzer", "args": "--fatal-infos --fatal-warnings ."},
+          {"name": "dartfmt"}
+        ]
       },
       {
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "analyze_and_format",
-        "task": {
-          "name": "dartanalyzer",
-          "args": "--fatal-infos --fatal-warnings ."
-        }
-      },
-      {
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "analyze_and_format",
-        "task": {"name": "dartfmt"}
+        "tasks": [
+          {"name": "dartanalyzer", "args": "--fatal-infos --fatal-warnings ."}
+        ]
       },
       {
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--platform chrome",
-          "config": {"xvfb": true}
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--platform chrome",
+            "config": {"xvfb": true}
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--platform chrome",
-          "config": {"xvfb": true}
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--platform chrome",
+            "config": {"xvfb": true}
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--platform chrome",
-          "config": {"xvfb": true}
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--platform chrome",
+            "config": {"xvfb": true}
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--preset travis --total-shards 5 --shard-index 0",
-          "config": {"xvfb": true}
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--preset travis --total-shards 5 --shard-index 0",
+            "config": {"xvfb": true}
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--preset travis --total-shards 5 --shard-index 0",
-          "config": {"xvfb": true}
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--preset travis --total-shards 5 --shard-index 0",
+            "config": {"xvfb": true}
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--preset travis --total-shards 5 --shard-index 0",
-          "config": {"xvfb": true}
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--preset travis --total-shards 5 --shard-index 0",
+            "config": {"xvfb": true}
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--preset travis --total-shards 5 --shard-index 1"
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--preset travis --total-shards 5 --shard-index 1"
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--preset travis --total-shards 5 --shard-index 1"
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--preset travis --total-shards 5 --shard-index 1"
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
-        "task": {
-          "name": "test",
-          "args": "--preset travis --total-shards 5 --shard-index 1"
-        }
+        "tasks": [
+          {
+            "name": "test",
+            "args": "--preset travis --total-shards 5 --shard-index 1"
+          }
+        ]
       },
       {
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
-        "task": {"name": "test"}
+        "tasks": [
+          {"name": "test"}
+        ]
       },
       {
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
-        "task": {"name": "test"}
+        "tasks": [
+          {"name": "test"}
+        ]
       },
       {
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
-        "task": {"name": "test"}
+        "tasks": [
+          {"name": "test"}
+        ]
       }
     ];
