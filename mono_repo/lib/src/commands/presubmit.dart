@@ -85,7 +85,8 @@ Future<bool> presubmit(
   // By default run all tasks.
   var allKnownTasks = configs.values.fold(new Set<String>(),
       (Set<String> exising, MonoConfig config) {
-    return exising..addAll(config.jobs.map((job) => job.task.name));
+    return exising
+      ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name)));
   });
   if (tasks.isEmpty) tasks = allKnownTasks;
   var unrecognizedTasks = tasks.where((task) => !allKnownTasks.contains(task));
@@ -110,30 +111,31 @@ Future<bool> presubmit(
     stderr.writeln(styleBold.wrap(package));
     for (var job in config.jobs) {
       var sdk = job.sdk;
-      var task = job.task;
-      var taskKey = commandsToKeys[job.task.command];
-      // Skip tasks that weren't specified
-      if (!tasks.contains(task.name)) continue;
+      for (var task in job.tasks) {
+        var taskKey = commandsToKeys[task.command];
+        // Skip tasks that weren't specified
+        if (!tasks.contains(task.name)) continue;
 
-      stderr.write(
-          '  Running task ${styleBold.wrap(white.wrap('${task.name}:$sdk'))} ');
-      if (sdk != sdkToRun) {
-        stderr.writeln(yellow.wrap('(skipped, mismatched sdk)'));
-        continue;
-      }
+        stderr.write(
+            '  Running task ${styleBold.wrap(white.wrap('${task.name}:$sdk'))} ');
+        if (sdk != sdkToRun) {
+          stderr.writeln(yellow.wrap('(skipped, mismatched sdk)'));
+          continue;
+        }
 
-      var result = await Process
-          .run(travisShPath, [taskKey], environment: {'PKG': package});
-      if (result.exitCode == 0) {
-        stderr.writeln(green.wrap('(success)'));
-      } else {
-        tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
-        var file = new File(
-            p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
-        await file.create(recursive: true);
-        await file.writeAsString(result.stdout as String);
-        stderr.writeln(red.wrap('(failure, ${file.path})'));
-        passed = false;
+        var result = await Process
+            .run(travisShPath, [taskKey], environment: {'PKG': package});
+        if (result.exitCode == 0) {
+          stderr.writeln(green.wrap('(success)'));
+        } else {
+          tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
+          var file = new File(
+              p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
+          await file.create(recursive: true);
+          await file.writeAsString(result.stdout as String);
+          stderr.writeln(red.wrap('(failure, ${file.path})'));
+          passed = false;
+        }
       }
     }
   }

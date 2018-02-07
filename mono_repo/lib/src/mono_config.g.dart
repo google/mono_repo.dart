@@ -31,20 +31,21 @@ TravisJob _$TravisJobFromJson(Map<String, dynamic> json) => new TravisJob(
     json['package'] as String,
     json['sdk'] as String,
     json['stageName'] as String,
-    json['task'] == null
-        ? null
-        : new Task.fromJson(json['task'] as Map<String, dynamic>));
+    (json['tasks'] as List)
+        ?.map((e) =>
+            e == null ? null : new Task.fromJson(e as Map<String, dynamic>))
+        ?.toList());
 
 abstract class _$TravisJobSerializerMixin {
   String get package;
   String get sdk;
   String get stageName;
-  Task get task;
+  List<Task> get tasks;
   Map<String, dynamic> toJson() => <String, dynamic>{
         'package': package,
         'sdk': sdk,
         'stageName': stageName,
-        'task': task
+        'tasks': tasks
       };
 }
 

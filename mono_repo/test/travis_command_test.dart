@@ -192,9 +192,6 @@ cache:
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
-# Fast fail the script on failures.
-set -e
-
 if [ -z "$PKG" ]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
@@ -206,7 +203,9 @@ if [ "$#" == "0" ]; then
 fi
 
 pushd $PKG
-pub upgrade
+pub upgrade || exit $?
+
+EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
@@ -214,15 +213,17 @@ while (( "$#" )); do
   dartfmt) echo
     echo -e '\033[1mTASK: dartfmt\033[22m'
     echo -e 'dartfmt -n --set-exit-if-changed .'
-    dartfmt -n --set-exit-if-changed .
+    dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-    exit 1
+    EXIT_CODE=1
     ;;
   esac
 
   shift
 done
+
+exit $EXIT_CODE
 ''').validate();
   });
 }
@@ -231,9 +232,6 @@ final _config2Shell = r"""
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
-# Fast fail the script on failures.
-set -e
-
 if [ -z "$PKG" ]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
@@ -245,7 +243,9 @@ if [ "$#" == "0" ]; then
 fi
 
 pushd $PKG
-pub upgrade
+pub upgrade || exit $?
+
+EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
@@ -253,75 +253,77 @@ while (( "$#" )); do
   dartanalyzer) echo
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
     echo -e 'dartanalyzer .'
-    dartanalyzer .
+    dartanalyzer . || EXIT_CODE=$?
     ;;
   dartfmt) echo
     echo -e '\033[1mTASK: dartfmt\033[22m'
     echo -e 'dartfmt -n --set-exit-if-changed .'
-    dartfmt -n --set-exit-if-changed .
+    dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
     ;;
   test_00) echo
     echo -e '\033[1mTASK: test_00\033[22m'
     echo -e 'pub run test --platform chrome'
-    pub run test --platform chrome
+    pub run test --platform chrome || EXIT_CODE=$?
     ;;
   test_01) echo
     echo -e '\033[1mTASK: test_01\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 0'
-    pub run test --preset travis --total-shards 9 --shard-index 0
+    pub run test --preset travis --total-shards 9 --shard-index 0 || EXIT_CODE=$?
     ;;
   test_02) echo
     echo -e '\033[1mTASK: test_02\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 1'
-    pub run test --preset travis --total-shards 9 --shard-index 1
+    pub run test --preset travis --total-shards 9 --shard-index 1 || EXIT_CODE=$?
     ;;
   test_03) echo
     echo -e '\033[1mTASK: test_03\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 2'
-    pub run test --preset travis --total-shards 9 --shard-index 2
+    pub run test --preset travis --total-shards 9 --shard-index 2 || EXIT_CODE=$?
     ;;
   test_04) echo
     echo -e '\033[1mTASK: test_04\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 3'
-    pub run test --preset travis --total-shards 9 --shard-index 3
+    pub run test --preset travis --total-shards 9 --shard-index 3 || EXIT_CODE=$?
     ;;
   test_05) echo
     echo -e '\033[1mTASK: test_05\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 4'
-    pub run test --preset travis --total-shards 9 --shard-index 4
+    pub run test --preset travis --total-shards 9 --shard-index 4 || EXIT_CODE=$?
     ;;
   test_06) echo
     echo -e '\033[1mTASK: test_06\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 5'
-    pub run test --preset travis --total-shards 9 --shard-index 5
+    pub run test --preset travis --total-shards 9 --shard-index 5 || EXIT_CODE=$?
     ;;
   test_07) echo
     echo -e '\033[1mTASK: test_07\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 6'
-    pub run test --preset travis --total-shards 9 --shard-index 6
+    pub run test --preset travis --total-shards 9 --shard-index 6 || EXIT_CODE=$?
     ;;
   test_08) echo
     echo -e '\033[1mTASK: test_08\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 7'
-    pub run test --preset travis --total-shards 9 --shard-index 7
+    pub run test --preset travis --total-shards 9 --shard-index 7 || EXIT_CODE=$?
     ;;
   test_09) echo
     echo -e '\033[1mTASK: test_09\033[22m'
     echo -e 'pub run test --preset travis --total-shards 9 --shard-index 8'
-    pub run test --preset travis --total-shards 9 --shard-index 8
+    pub run test --preset travis --total-shards 9 --shard-index 8 || EXIT_CODE=$?
     ;;
   test_10) echo
     echo -e '\033[1mTASK: test_10\033[22m'
     echo -e 'pub run test'
-    pub run test
+    pub run test || EXIT_CODE=$?
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-    exit 1
+    EXIT_CODE=1
     ;;
   esac
 
   shift
 done
+
+exit $EXIT_CODE
 """;
 
 final _config2Yaml = r'''
@@ -331,17 +333,13 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      script: ./tool/travis.sh dartanalyzer
+      script: ./tool/travis.sh dartanalyzer dartfmt
       env: PKG="sub_pkg"
       dart: dev
     - stage: analyze
       script: ./tool/travis.sh dartanalyzer
       env: PKG="sub_pkg"
       dart: 1.23.0
-    - stage: analyze
-      script: ./tool/travis.sh dartfmt
-      env: PKG="sub_pkg"
-      dart: dev
     - stage: unit_test
       script: ./tool/travis.sh test_00
       env: PKG="sub_pkg"
