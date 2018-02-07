@@ -32,9 +32,9 @@ void main() {
 
       var oneJob = config.jobs.single;
       expect(oneJob.sdk, 'stable');
-      expect(oneJob.task.name, 'test');
-      expect(oneJob.task.args, isNull);
-      expect(oneJob.task.config, isNull);
+      expect(oneJob.tasks.first.name, 'test');
+      expect(oneJob.tasks.first.args, isNull);
+      expect(oneJob.tasks.first.config, isNull);
       expect(oneJob.stageName, 'unit_test');
     });
 

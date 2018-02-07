@@ -116,9 +116,9 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   final String stageName;
 
   @override
-  final Task task;
+  final List<Task> tasks;
 
-  TravisJob(this.package, this.sdk, this.stageName, this.task);
+  TravisJob(this.package, this.sdk, this.stageName, this.tasks);
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
@@ -126,7 +126,7 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   factory TravisJob.parse(
       String package, String sdk, String stageName, Object yaml) {
     return new TravisJob(
-        package, sdk, stageName, new Task.parse(package, yaml));
+        package, sdk, stageName, Task.parseTaskOrGroup(package, yaml));
   }
 
   @override
@@ -136,7 +136,7 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   int get hashCode => _equality.hash(_items);
 
-  List get _items => [sdk, task];
+  List get _items => [sdk, tasks];
 }
 
 @JsonSerializable(includeIfNull: false)
@@ -154,6 +154,25 @@ class Task extends Object with _$TaskSerializerMixin {
   final Map<String, dynamic> config;
 
   Task(this.name, {this.args, this.config});
+
+  /// Parses an individual item under `stages`, which might be a `group` or an
+  /// individual task.
+  static List<Task> parseTaskOrGroup(String package, Object yamlValue) {
+    if (yamlValue is Map<String, dynamic>) {
+      var group = yamlValue['group'];
+      if (group != null) {
+        if (group is List<dynamic>) {
+          return group
+              .map((taskYaml) => new Task.parse(package, taskYaml))
+              .toList();
+        } else {
+          throw new MonoConfigFormatError.value(
+              package, group, 'group', 'expected a list of tasks');
+        }
+      }
+    }
+    return [new Task.parse(package, yamlValue)];
+  }
 
   factory Task.parse(String package, Object yamlValue) {
     if (yamlValue is String) {

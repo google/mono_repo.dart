@@ -106,8 +106,10 @@ Map<String, MonoConfig> getMonoConfigs(
       var config =
           new MonoConfig.parse(pkg, travisYaml as Map<String, dynamic>);
 
-      var configuredJobs =
-          config.jobs.where((dt) => dt.task.config != null).toList();
+      var configuredJobs = config.jobs
+          .expand((job) => job.tasks)
+          .where((task) => task.config != null)
+          .toList();
 
       if (configuredJobs.isNotEmpty) {
         throw new UserException(

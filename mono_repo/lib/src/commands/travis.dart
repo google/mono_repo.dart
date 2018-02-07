@@ -107,7 +107,7 @@ List<String> _calculateTaskEntries(
       'echo',
       safeEcho(prettyAnsi, styleBold, 'TASK: $taskKey'),
       safeEcho(prettyAnsi, resetAll, command),
-      command,
+      '$command || EXIT_CODE=\$?',
     ]);
   });
 
@@ -120,7 +120,7 @@ List<String> _calculateTaskEntries(
 
   addEntry('*', [
     'echo -e "${_wrap(prettyAnsi, red,"Not expecting TASK '\${TASK}'. Error!")}"',
-    'exit 1'
+    'EXIT_CODE = 1'
   ]);
   return taskEntries;
 }
@@ -162,7 +162,7 @@ Map<String, String> extractCommands(Map<String, MonoConfig> configs) {
 
 List<Task> _travisTasks(Map<String, MonoConfig> configs) => configs.values
     .expand((config) => config.jobs)
-    .map((job) => job.task)
+    .expand((job) => job.tasks)
     .toList();
 
 void _logPkgs(Map<String, MonoConfig> configs) {
@@ -197,9 +197,6 @@ String _travisSh(List<String> tasks, bool prettyAnsi) => '''
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
-# Fast fail the script on failures.
-set -e
-
 if [ -z "\$PKG" ]; then
   ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
   exit 1
@@ -210,14 +207,18 @@ if [ "\$#" == "0" ]; then
   exit 1
 fi
 
+EXIT_CODE=0
+
 pushd \$PKG
-pub upgrade
+pub upgrade || EXIT_CODE=\$?
 
 while (( "\$#" )); do
   TASK=\$1
 ${_shellCase('TASK', tasks)}
   shift
 done
+
+exit \$EXIT_CODE
 ''';
 
 String _travisYml(
@@ -286,9 +287,11 @@ String _listStages(Iterable<String> stages) {
 String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
   var buffer = new StringBuffer();
   for (var job in jobs) {
+    var commands =
+        job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
     buffer.writeln('''
     - stage: ${job.stageName}
-      script: ./tool/travis.sh ${commandsToKeys[job.task.command]}
+      script: ./tool/travis.sh $commands
       env: PKG="${job.package}"
       dart: ${job.sdk}''');
   }
