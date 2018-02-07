@@ -31,15 +31,16 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
         (monoYaml.keys.toSet()..removeAll(_validKeys)).toList()..sort();
 
     if (unrecognizedKeys.isNotEmpty) {
-      throw new ArgumentError(
+      throw new MonoConfigFormatError(
+          package,
           'Unrecognized keys $unrecognizedKeys in .mono_repo.yaml.'
           'Only $_validKeys are allowed.');
     }
 
     var sdks = (monoYaml['dart'] as List<String>)?.toList();
     if (sdks == null || sdks.isEmpty) {
-      throw new ArgumentError(
-          'At least one SDK version is required under "dart".');
+      throw new MonoConfigFormatError(
+          package, 'At least one SDK version is required under "dart".');
     }
 
     // FYI: 'test' is default if there are no tasks defined
@@ -55,25 +56,28 @@ class MonoConfig extends Object with _$MonoConfigSerializerMixin {
     var stageNames = <String>[];
     for (var stage in stagesYaml) {
       if (stage.length != 1) {
-        throw new ArgumentError(
+        throw new MonoConfigFormatError(
+            package,
             '`stages` expects a list of maps with exactly one key '
             '(the name of the stage). Got $stage.');
       }
       var stageName = stage.keys.first;
       if (stageName == 'test') {
-        throw new ArgumentError(
+        throw new MonoConfigFormatError(
+            package,
             'Stages are not allowed to have the name `test` because it '
             'interacts poorly with the default stage by the same name.');
       }
       if (stageNames.contains(stageName)) {
-        throw new ArgumentError(
+        throw new MonoConfigFormatError(
+            package,
             'There should only be one entry for each stage, '
             'saw `$stageName` more than once.');
       }
       stageNames.add(stageName);
       var stageYaml = stage.values.first as List;
       if (stageYaml.isEmpty) {
-        throw new ArgumentError(
+        throw new MonoConfigFormatError(package,
             'Stages are required to have at least one job. Got $stage.');
       }
       for (var job in stageYaml) {
@@ -121,7 +125,8 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
 
   factory TravisJob.parse(
       String package, String sdk, String stageName, Object yaml) {
-    return new TravisJob(package, sdk, stageName, new Task.parse(yaml));
+    return new TravisJob(
+        package, sdk, stageName, new Task.parse(package, yaml));
   }
 
   @override
@@ -150,10 +155,11 @@ class Task extends Object with _$TaskSerializerMixin {
 
   Task(this.name, {this.args, this.config});
 
-  factory Task.parse(Object yamlValue) {
+  factory Task.parse(String package, Object yamlValue) {
     if (yamlValue is String) {
       if (yamlValue == 'command') {
-        throw new ArgumentError.value(yamlValue, 'command', 'requires a value');
+        throw new MonoConfigFormatError.value(
+            package, yamlValue, 'command', 'requires a value');
       }
       return new Task(yamlValue);
     }
@@ -161,8 +167,8 @@ class Task extends Object with _$TaskSerializerMixin {
     if (yamlValue is Map<String, dynamic>) {
       var taskNames = yamlValue.keys.where(_tasks.contains).toList();
       if (taskNames.isEmpty || taskNames.length > 1) {
-        throw new ArgumentError(
-            'Must have one and only one key of $_prettyTaskList.');
+        throw new MonoConfigFormatError(
+            package, 'Must have one and only one key of $_prettyTaskList.');
       }
       var taskName = taskNames.single;
       String args;
@@ -174,7 +180,7 @@ class Task extends Object with _$TaskSerializerMixin {
           } else if (taskValue is List<String>) {
             args = taskValue.join(';');
           } else {
-            throw new ArgumentError.value(taskValue, 'command',
+            throw new MonoConfigFormatError.value(package, taskValue, 'command',
                 'only supports a string or array of strings');
           }
           break;
@@ -191,7 +197,8 @@ class Task extends Object with _$TaskSerializerMixin {
       return new Task(taskName, args: args, config: config);
     }
 
-    throw new ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
+    throw new MonoConfigFormatError(
+        package, 'huh? $yamlValue ${yamlValue.runtimeType}');
   }
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -231,3 +238,17 @@ class Task extends Object with _$TaskSerializerMixin {
 }
 
 final _equality = const DeepCollectionEquality.unordered();
+
+/// Custom [ArgumentError] that reports the invalid mono config file location.
+class MonoConfigFormatError extends ArgumentError {
+  final String package;
+
+  MonoConfigFormatError(this.package, String message) : super(message);
+
+  MonoConfigFormatError.value(this.package, value, [String name, message])
+      : super.value(value, name, message);
+
+  @override
+  String toString() =>
+      'Error parsing $package/$monoFileName:\n${super.toString()}';
+}
