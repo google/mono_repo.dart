@@ -10,8 +10,9 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
-import '../travis_config.dart';
+import '../mono_config.dart';
 import '../utils.dart';
+import 'travis.dart';
 
 class PresubmitCommand extends Command<Null> {
   @override
@@ -75,15 +76,16 @@ Future<bool> presubmit(
   }
 
   var configs =
-      getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
+      getMonoConfigs(rootDirectory: rootDirectory, recursive: recursive);
+  var commandsToKeys = extractCommands(configs);
   // By default, run on all packages.
   if (packages.isEmpty) packages = configs.keys;
   packages = packages.toList()..sort();
 
   // By default run all tasks.
   var allKnownTasks = configs.values.fold(new Set<String>(),
-      (Set<String> exising, TravisConfig config) {
-    return exising..addAll(config.tasks.map((task) => task.name));
+      (Set<String> exising, MonoConfig config) {
+    return exising..addAll(config.jobs.map((job) => job.task.name));
   });
   if (tasks.isEmpty) tasks = allKnownTasks;
   var unrecognizedTasks = tasks.where((task) => !allKnownTasks.contains(task));
@@ -106,9 +108,10 @@ Future<bool> presubmit(
     }
 
     stderr.writeln(styleBold.wrap(package));
-    for (var job in config.travisJobs) {
+    for (var job in config.jobs) {
       var sdk = job.sdk;
       var task = job.task;
+      var taskKey = commandsToKeys[job.task.command];
       // Skip tasks that weren't specified
       if (!tasks.contains(task.name)) continue;
 
@@ -118,14 +121,15 @@ Future<bool> presubmit(
         stderr.writeln(yellow.wrap('(skipped, mismatched sdk)'));
         continue;
       }
-      var result = await Process.run(travisShPath, [],
-          environment: {'TASK': job.task.name, 'PKG': package});
+
+      var result = await Process
+          .run(travisShPath, [taskKey], environment: {'PKG': package});
       if (result.exitCode == 0) {
         stderr.writeln(green.wrap('(success)'));
       } else {
         tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
         var file = new File(
-            p.join(tmpDir.path, '${package}_${job.task.name}_${job.sdk}.txt'));
+            p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
         await file.create(recursive: true);
         await file.writeAsString(result.stdout as String);
         stderr.writeln(red.wrap('(failure, ${file.path})'));

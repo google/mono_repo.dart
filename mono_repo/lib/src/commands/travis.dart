@@ -6,10 +6,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
+import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
-import '../travis_config.dart';
+import '../mono_config.dart';
 import '../utils.dart';
 
 class TravisCommand extends Command<Null> {
@@ -45,46 +46,30 @@ Future<Null> generateTravisConfig(
   recursive ??= false;
   prettyAnsi ??= true;
   var configs =
-      getTravisConfigs(rootDirectory: rootDirectory, recursive: recursive);
+      getMonoConfigs(rootDirectory: rootDirectory, recursive: recursive);
 
   _logPkgs(configs);
 
-  var sdks = _sdks(configs);
-  var commandsToKeys = _extractCommands(configs);
+  var commandsToKeys = extractCommands(configs);
 
-  var environmentVars = new Map<String, Set<String>>();
-  // Map from environment variable to SDKs for which failures are allowed
-  var allowFailures = new Map<String, Set<String>>();
+  _writeTravisYml(rootDirectory, configs, commandsToKeys);
 
-  _calculateEnvironment(
-      configs, commandsToKeys, environmentVars, allowFailures);
-
-  var envEntries = environmentVars.keys.toList()..sort();
-
-  var matrix =
-      _calculateMatrix(envEntries, environmentVars, sdks, allowFailures);
-
-  _writeTravisYml(rootDirectory, sdks, envEntries, matrix);
-
-  _writeTravisScript(
-      rootDirectory,
-      _calculateTaskEntries(commandsToKeys, prettyAnsi),
-      _calculatePkgEntries(configs, prettyAnsi),
-      prettyAnsi);
+  _writeTravisScript(rootDirectory,
+      _calculateTaskEntries(commandsToKeys, prettyAnsi), prettyAnsi);
 }
 
 /// Write `.travis.yml`
-void _writeTravisYml(String rootDirectory, Set<String> sdks,
-    List<String> envEntries, List<String> matrix) {
+void _writeTravisYml(String rootDirectory, Map<String, MonoConfig> configs,
+    Map<String, String> commandsToKeys) {
   var travisPath = p.join(rootDirectory, travisFileName);
   var travisFile = new File(travisPath);
-  travisFile.writeAsStringSync(_travisYml(sdks, envEntries, matrix.join('\n')));
+  travisFile.writeAsStringSync(_travisYml(configs, commandsToKeys));
   stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
 }
 
-/// Write `tool/travis.sh
-void _writeTravisScript(String rootDirectory, List<String> taskEntries,
-    List<String> pkgEntries, bool prettyAnsi) {
+/// Write `tool/travis.sh`
+void _writeTravisScript(
+    String rootDirectory, List<String> taskEntries, bool prettyAnsi) {
   var travisFilePath = p.join(rootDirectory, travisShPath);
   var travisScript = new File(travisFilePath);
 
@@ -95,102 +80,9 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
-  travisScript
-      .writeAsStringSync(_travisSh(taskEntries, pkgEntries, prettyAnsi));
+  travisScript.writeAsStringSync(_travisSh(taskEntries, prettyAnsi));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
-}
-
-void _calculateEnvironment(
-    Map<String, TravisConfig> configs,
-    Map<String, String> commandsToKeys,
-    Map<String, Set<String>> environmentVars,
-    Map<String, Set<String>> allowFailures) {
-  configs.forEach((pkg, config) {
-    for (var job in config.travisJobs) {
-      var newVar = 'PKG=$pkg TASK=${commandsToKeys[job.task.command]}';
-      environmentVars.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
-
-      if (config.allowFailures.contains(job)) {
-        allowFailures.putIfAbsent(newVar, () => new Set<String>()).add(job.sdk);
-      }
-    }
-  });
-}
-
-List<String> _calculateMatrix(
-    List<String> envEntries,
-    Map<String, Set<String>> environmentVars,
-    Set<String> sdks,
-    Map<String, Set<String>> allowFailures) {
-  var matrix = <String>[];
-
-  var excluded = _calculateExcluded(envEntries, environmentVars, sdks);
-  if (excluded.isNotEmpty) {
-    matrix.addAll(['', 'matrix:']);
-    matrix.addAll(excluded);
-  }
-  var allowedFailures = _calculateAllowedFailures(allowFailures);
-  if (allowedFailures.isNotEmpty) {
-    if (matrix.isEmpty) {
-      matrix.addAll(['', 'matrix:']);
-    }
-    matrix.addAll(allowedFailures);
-  }
-
-  if (matrix.isNotEmpty) {
-    // Ensure there is a trailing newline after the matrix
-    matrix.add('');
-  }
-  return matrix;
-}
-
-List<String> _calculateExcluded(List<String> envEntries,
-    Map<String, Set<String>> environmentVars, Set<String> sdks) {
-  var matrix = <String>[];
-
-  /// Iterate in the already sorted order instead of using `forEach`.
-  for (var envVarEntry in envEntries) {
-    var entrySdks = environmentVars[envVarEntry];
-    var excludeSdks = sdks.toSet()..removeAll(entrySdks);
-
-    if (excludeSdks.isNotEmpty) {
-      if (matrix.isEmpty) {
-        matrix.add('  exclude:');
-      }
-
-      for (var sdk in excludeSdks) {
-        matrix.add('    - dart: $sdk');
-        matrix.add('      env: $envVarEntry');
-      }
-    }
-  }
-  return matrix;
-}
-
-List<String> _calculateAllowedFailures(Map<String, Set<String>> allowFailures) {
-  var matrix = <String>[];
-
-  var allowFailuresEntries = allowFailures.keys.toList()..sort();
-  for (var envVarEntry in allowFailuresEntries) {
-    var failureSdks = allowFailures[envVarEntry];
-
-    if (failureSdks == null) {
-      continue;
-    }
-
-    assert(failureSdks.isNotEmpty);
-    if (matrix.isEmpty) {
-      matrix.add('  allow_failures:');
-    }
-
-    for (var sdk in failureSdks) {
-      matrix.add('    - dart: $sdk');
-      matrix.add('      env: $envVarEntry');
-    }
-  }
-
-  return matrix;
 }
 
 List<String> _calculateTaskEntries(
@@ -201,8 +93,8 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    var buffer = new StringBuffer('$label) ${contentLines.first}\n');
-    buffer.writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
+    var buffer = new StringBuffer('  $label) ${contentLines.first}\n');
+    buffer.writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
 
     var output = buffer.toString();
     if (!taskEntries.contains(output)) {
@@ -221,7 +113,7 @@ List<String> _calculateTaskEntries(
 
   if (taskEntries.isEmpty) {
     throw new UserException(
-        'No entries created. Check your nested `$travisFileName` files.');
+        'No entries created. Check your nested `$monoFileName` files.');
   }
 
   taskEntries.sort();
@@ -236,52 +128,17 @@ List<String> _calculateTaskEntries(
 String _wrap(bool doWrap, AnsiCode code, String value) =>
     doWrap ? code.wrap(value, forScript: true) : value;
 
-List<String> _calculatePkgEntries(
-    Map<String, TravisConfig> configs, bool prettyAnsi) {
-  var pkgEntries = <String>[];
-
-  void addEntry(String label, List<String> contentLines) {
-    assert(contentLines.isNotEmpty);
-    contentLines.add(';;');
-
-    var buffer = new StringBuffer('$label) ${contentLines.first}\n');
-    buffer.writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
-
-    var output = buffer.toString();
-    if (!pkgEntries.contains(output)) {
-      pkgEntries.add(output);
-    }
-  }
-
-  for (var pkg in configs.keys) {
-    var config = configs[pkg];
-    if (config.beforeScript.isNotEmpty) {
-      var items = [
-        'echo',
-        safeEcho(prettyAnsi, styleBold, '$pkg: before_script')
-      ];
-      for (var value in config.beforeScript) {
-        items.add(safeEcho(prettyAnsi, resetAll, value));
-        items.add(value);
-      }
-
-      addEntry(pkg, items);
-    }
-  }
-
-  return pkgEntries;
-}
-
-Map<String, String> _extractCommands(Map<String, TravisConfig> configs) {
+/// Gives a map of command to unique task key for all [configs].
+Map<String, String> extractCommands(Map<String, MonoConfig> configs) {
   var commandsToKeys = <String, String>{};
 
   var tasksToConfigure = _travisTasks(configs);
-  var taskNames = tasksToConfigure.map((dt) => dt.name).toSet();
+  var taskNames = tasksToConfigure.map((task) => task.name).toSet();
 
   for (var taskName in taskNames) {
     var commands = tasksToConfigure
-        .where((dt) => dt.name == taskName)
-        .map((dt) => dt.command)
+        .where((task) => task.name == taskName)
+        .map((task) => task.command)
         .toSet();
 
     if (commands.length == 1) {
@@ -303,28 +160,23 @@ Map<String, String> _extractCommands(Map<String, TravisConfig> configs) {
   return commandsToKeys;
 }
 
-List<DartTask> _travisTasks(Map<String, TravisConfig> configs) =>
-    configs.values.expand((tc) => tc.travisJobs).map((tj) => tj.task).toList();
+List<Task> _travisTasks(Map<String, MonoConfig> configs) => configs.values
+    .expand((config) => config.jobs)
+    .map((job) => job.task)
+    .toList();
 
-Set<String> _sdks(Map<String, TravisConfig> configs) =>
-    (configs.values.expand((tc) => tc.sdks).toList()..sort()).toSet();
-
-void _logPkgs(Map<String, TravisConfig> configs) {
+void _logPkgs(Map<String, MonoConfig> configs) {
   for (var pkg in configs.keys) {
     stderr.writeln(styleBold.wrap('package:$pkg'));
   }
 }
 
-String _indentAndJoin(Iterable<String> items) =>
-    items.map((i) => '  - $i').join('\n');
-
 String _shellCase(String scriptVariable, List<String> entries) {
   if (entries.isEmpty) return '';
   return '''
-
-case \$$scriptVariable in
+  case \$$scriptVariable in
 ${entries.join('\n')}
-esac
+  esac
 ''';
 }
 
@@ -341,9 +193,7 @@ String safeEcho(bool prettyAnsi, AnsiCode code, String value) {
   return "echo -e '${_wrap(prettyAnsi, code, value)}'";
 }
 
-String _travisSh(
-        List<String> tasks, List<String> pkgEntries, bool prettyAnsi) =>
-    '''
+String _travisSh(List<String> tasks, bool prettyAnsi) => '''
 #!/bin/bash
 # Created with https://github.com/dart-lang/mono_repo
 
@@ -353,34 +203,94 @@ set -e
 if [ -z "\$PKG" ]; then
   ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
   exit 1
-elif [ -z "\$TASK" ]; then
-  ${safeEcho(prettyAnsi, red, "TASK environment variable must be set!")}
+fi
+
+if [ "\$#" == "0" ]; then
+  ${safeEcho(prettyAnsi, red, "At least one task argument must be provided!")}
   exit 1
 fi
 
 pushd \$PKG
 pub upgrade
-${_shellCase('PKG', pkgEntries)}${_shellCase('TASK', tasks)}''';
+
+while (( "\$#" )); do
+  TASK=\$1
+${_shellCase('TASK', tasks)}
+  shift
+done
+''';
 
 String _travisYml(
-        Iterable<String> sdks, Iterable<String> envs, String matrix) =>
-    '''
+    Map<String, MonoConfig> configs, Map<String, String> commandsToKeys) {
+  var orderedStages = _calculateOrderedStages(configs.values);
+  var jobs = configs.values.expand((config) => config.jobs);
+
+  return '''
 # Created with https://github.com/dart-lang/mono_repo
 language: dart
 
-dart:
-${_indentAndJoin(sdks)}
-
-env:
-${_indentAndJoin(envs)}
-$matrix
-script: $travisShPath
-
+jobs:
+  include:
+${_listJobs(jobs, commandsToKeys)}
+stages:
+${_listStages(orderedStages)}
 # Only building master means that we don't run two builds for each pull request.
 branches:
   only: [master]
 
 cache:
- directories:
-   - \$HOME/.pub-cache
+  directories:
+    - \$HOME/.pub-cache
 ''';
+}
+
+/// Calculates the global stages ordering, and throws a [UserException] if it
+/// detects any cycles.
+List<String> _calculateOrderedStages(Iterable<MonoConfig> configs) {
+  // Convert the configs to a graph so we can run strongly connected components.
+  var edges = <String, Set<String>>{};
+  for (var config in configs) {
+    String previous;
+    for (var stage in config.stageNames) {
+      edges.putIfAbsent(stage, () => new Set<String>());
+      if (previous != null) {
+        edges[previous].add(stage);
+      }
+      previous = stage;
+    }
+  }
+  // Running strongly connected components lets us detect cycles (which aren't
+  // allowed), and gives us the reverse order of what we ultimately want.
+  var components =
+      stronglyConnectedComponents(edges.keys, (n) => n, (n) => edges[n]);
+  for (var component in components) {
+    if (component.length > 1) {
+      throw new UserException(
+          'Not all packages agree on `stages` ordering, found '
+          'a cycle between the following stages: $component');
+    }
+  }
+
+  return components.map((c) => c.first).toList().reversed.toList();
+}
+
+String _listStages(Iterable<String> stages) {
+  var buffer = new StringBuffer();
+  for (var stage in stages) {
+    buffer.writeln('  - $stage');
+  }
+  return buffer.toString();
+}
+
+/// Lists all the jobs, setting their stage, enviroment, and script.
+String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
+  var buffer = new StringBuffer();
+  for (var job in jobs) {
+    buffer.writeln('''
+    - stage: ${job.stageName}
+      script: ./tool/travis.sh ${commandsToKeys[job.task.command]}
+      env: PKG="${job.package}"
+      dart: ${job.sdk}''');
+  }
+  return buffer.toString();
+}
