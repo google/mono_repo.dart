@@ -244,8 +244,10 @@ cache:
 ''';
 }
 
-// Calculates the ore
+/// Calculates the global stages ordering, and throws a [UserException] if it
+/// detects any cycles.
 List<String> _calculateOrderedStages(Iterable<MonoConfig> configs) {
+  // Convert the configs to a graph so we can run strongly connected components.
   var edges = <String, Set<String>>{};
   for (var config in configs) {
     String previous;
@@ -257,6 +259,8 @@ List<String> _calculateOrderedStages(Iterable<MonoConfig> configs) {
       previous = stage;
     }
   }
+  // Running strongly connected components lets us detect cycles (which aren't
+  // allowed), and gives us the reverse order of what we ultimately want.
   var components =
       stronglyConnectedComponents(edges.keys, (n) => n, (n) => edges[n]);
   for (var component in components) {
