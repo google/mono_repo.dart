@@ -1,3 +1,22 @@
+## 0.3.1
+
+### New Features
+
+* Added support for the `group` task, which accepts a list of tasks using the
+  normal format. This can be used to group multiple tasks in a single travis
+  job. All tasks will be ran, but if any of them fail then the whole job will
+  fail.
+  
+  Example usage combining the analyzer/dartfmt tasks:
+
+```yaml
+stages:
+  - analyze_and_format:
+    - group:
+        - dartanalyzer
+        - dartfmt
+```
+
 ## 0.3.0
 
 ### Breaking Changes
