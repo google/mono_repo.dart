@@ -8,7 +8,7 @@ environment:
   sdk: '>=1.24.0 <2.0.0'
 
 dependencies:
-  args: ">=0.13.7 <1.4.0"
+  args: ">=1.4.0 <2.0.0"
   collection: ^1.14.3
   graphs: ^0.1.0
   io: ^0.3.2+1

@@ -62,14 +62,14 @@ class SdkData implements DependencyData {
 
   factory SdkData(Object data) {
     if (data is String) {
-      return new SdkData._(name: data);
+      return new SdkData._(data);
     } else {
       throw new ArgumentError.value(
           data, 'data', 'Does not support provided value.');
     }
   }
 
-  SdkData._({this.name});
+  SdkData._(this.name);
 }
 
 class GitData implements DependencyData {
