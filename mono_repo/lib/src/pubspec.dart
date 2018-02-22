@@ -20,7 +20,7 @@ class Dependency {
   }
 }
 
-enum DependencyType { hosted, path, git }
+enum DependencyType { hosted, path, git, sdk }
 
 abstract class DependencyData {
   DependencyType get type;
@@ -43,10 +43,33 @@ abstract class DependencyData {
         return new GitData.fromData(git);
       }
 
+      final sdk = mapData['sdk'];
+      if (sdk != null) {
+        return new SdkData(sdk);
+      }
+
       throw new ArgumentError.value(
           data, 'data', 'No clue how to deal with `$data`.');
     }
   }
+}
+
+class SdkData implements DependencyData {
+  final String name;
+
+  @override
+  DependencyType get type => DependencyType.sdk;
+
+  factory SdkData(Object data) {
+    if (data is String) {
+      return new SdkData._(name: data);
+    } else {
+      throw new ArgumentError.value(
+          data, 'data', 'Does not support provided value.');
+    }
+  }
+
+  SdkData._({this.name});
 }
 
 class GitData implements DependencyData {

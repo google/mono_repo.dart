@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:mono_repo/src/commands/check.dart';
+import 'package:mono_repo/src/commands/check.dart' hide DependencyType;
 import 'package:mono_repo/src/pubspec.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -45,12 +45,37 @@ dependencies:
         '''),
       ]),
     ]).create();
+
+    await d.dir('flutter', [
+      // typical pubspec.yaml from flutter
+      d.file('pubspec.yaml', r'''
+name: flutter
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^0.1.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter:
+  uses-material-design: true
+  assets:
+   - images/a_dot_burr.jpeg
+  fonts:
+    - family: Schyler
+      fonts:
+        - asset: fonts/Schyler-Regular.ttf
+        - asset: fonts/Schyler-Italic.ttf
+          style: italic
+          weight: 700
+''')
+    ]).create();
   });
 
   test('check', () async {
     var reports = await getPackageReports(rootDirectory: d.sandbox);
 
-    expect(reports, hasLength(3));
+    expect(reports, hasLength(4));
 
     var fooReport = reports['foo'];
     expect(fooReport.packageName, 'foo');
@@ -62,10 +87,10 @@ dependencies:
 
     expect(barReport.pubspec.dependencies, hasLength(1));
 
-    var buildDep = barReport.pubspec.dependencies['build'].data as GitData;
-    expect(buildDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
-    expect(buildDep.path, 'build');
-    expect(buildDep.ref, 'hacking');
+    var gitDep = barReport.pubspec.dependencies['build'].data as GitData;
+    expect(gitDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
+    expect(gitDep.path, 'build');
+    expect(gitDep.ref, 'hacking');
 
     var bazReport = reports['baz'];
     expect(bazReport.packageName, 'baz');
@@ -73,17 +98,26 @@ dependencies:
 
     expect(bazReport.pubspec.dependencies, hasLength(1));
 
-    buildDep = bazReport.pubspec.dependencies['build'].data as GitData;
-    expect(buildDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
-    expect(buildDep.path, isNull);
-    expect(buildDep.ref, isNull);
+    gitDep = bazReport.pubspec.dependencies['build'].data as GitData;
+    expect(gitDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
+    expect(gitDep.path, isNull);
+    expect(gitDep.ref, isNull);
+
+    var flutterReport = reports['flutter'];
+    expect(flutterReport.packageName, 'flutter');
+    expect(flutterReport.published, isFalse);
+    expect(flutterReport.pubspec.dependencies, hasLength(2));
+
+    var sdkDep = flutterReport.pubspec.dependencies['flutter'].data as SdkData;
+    expect(sdkDep.name, 'flutter');
+    expect(sdkDep.type, DependencyType.sdk);
   });
 
   test('check recursive', () async {
     var reports =
         await getPackageReports(rootDirectory: d.sandbox, recursive: true);
 
-    expect(reports, hasLength(4));
+    expect(reports, hasLength(5));
 
     var recursiveReport = reports['baz/recursive'];
     expect(recursiveReport.packageName, 'baz.recursive');
