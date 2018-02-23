@@ -22,17 +22,12 @@ class PresubmitCommand extends Command<Null> {
   String get description => 'Run the travis presubmits locally.';
 
   PresubmitCommand() {
-    argParser.addOption('package',
-        help: 'The package(s) to run on, defaults to all packages',
-        allowMultiple: true,
-        abbr: 'p');
-    argParser.addOption('task',
-        help: 'The task(s) to run, defaults to all tasks',
-        allowMultiple: true,
-        abbr: 't');
+    argParser.addMultiOption('package',
+        help: 'The package(s) to run on, defaults to all packages', abbr: 'p');
+    argParser.addMultiOption('task',
+        help: 'The task(s) to run, defaults to all tasks', abbr: 't');
     argParser.addOption('sdk',
         help: 'Which sdk to use for match tasks, defaults to current sdk',
-        allowMultiple: false,
         defaultsTo: _currentSdk);
   }
 
