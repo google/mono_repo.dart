@@ -1,3 +1,7 @@
+## 0.3.2
+
+* Support dependencies that specify an SDK – common with Flutter.
+
 ## 0.3.1
 
 ### New Features
