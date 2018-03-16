@@ -5,7 +5,7 @@
 import 'package:mono_repo/src/utils.dart';
 import 'package:test/test.dart';
 
-final isUserException = new isInstanceOf<UserException>();
+final isUserException = const isInstanceOf<UserException>();
 
 Matcher throwsUserExceptionWith(String content) => throwsA(
     allOf(isUserException, (e) => (e as UserException).message == content));
