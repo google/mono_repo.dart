@@ -35,7 +35,7 @@ class TravisCommand extends Command<Null> {
   @override
   Future<Null> run() => generateTravisConfig(
       recursive: globalResults[recursiveFlag] as bool,
-      prettyAnsi: this.argResults['pretty-ansi'] as bool);
+      prettyAnsi: argResults['pretty-ansi'] as bool);
 }
 
 Future<Null> generateTravisConfig(

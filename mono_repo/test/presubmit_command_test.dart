@@ -86,7 +86,7 @@ pkg_b
   Running task dartfmt:dev (success)
   Running task dartfmt:stable (skipped, mismatched sdk)
 ''');
-    }, timeout: new Timeout.factor(2));
+    }, timeout: const Timeout.factor(2));
 
     test('can filter by package', () async {
       var result = await Process.run(
