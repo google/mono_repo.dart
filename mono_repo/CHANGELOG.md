@@ -1,6 +1,7 @@
 ## 0.3.2
 
 * Support dependencies that specify an SDK – common with Flutter.
+* Require at least Dart 2.0.0-dev.54.
 
 ## 0.3.1
 
