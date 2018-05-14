@@ -30,13 +30,12 @@ Future<Null> init({bool recursive: false}) async {
   // TODO: check to see if we're in the root of a GIT repo. If not, warn.
 
   if (FileSystemEntity.typeSync(packagesFileName) !=
-      FileSystemEntityType.NOT_FOUND) {
+      FileSystemEntityType.notFound) {
     throw new UserException('`$packagesFileName` already exists.');
   }
 
   var pubspecPath = p.join(p.current, 'pubspec.yaml');
-  if (FileSystemEntity.typeSync(pubspecPath) !=
-      FileSystemEntityType.NOT_FOUND) {
+  if (FileSystemEntity.typeSync(pubspecPath) != FileSystemEntityType.notFound) {
     throw new UserException(
         'Found `pubspec.yaml` in the current directory. Not supported.');
   }
@@ -52,5 +51,5 @@ Future<Null> init({bool recursive: false}) async {
     writer.writeln('  published: ${v.published}');
   });
 
-  file.writeAsStringSync(writer.toString(), mode: FileMode.WRITE_ONLY);
+  file.writeAsStringSync(writer.toString(), mode: FileMode.writeOnly);
 }
