@@ -4,7 +4,7 @@
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of mono_repo.mono_config;
+part of 'mono_config.dart';
 
 // **************************************************************************
 // Generator: JsonSerializableGenerator
