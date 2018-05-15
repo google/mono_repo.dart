@@ -7,7 +7,6 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
-import 'package:io/io.dart';
 
 import 'package:path/path.dart' as p;
 
@@ -54,17 +53,13 @@ Future<Null> pub(String pubCommand,
   print(lightBlue
       .wrap('Running `pub $pubCommand` across ${configs.length} package(s).'));
 
-  var processManager = new ProcessManager();
-
   for (var dir in configs.keys) {
     print('');
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
     var workingDir = p.join(rootDirectory, dir);
 
-    // TODO(kevmoo): https://github.com/dart-lang/io/issues/22
-    Directory.current = workingDir;
-
-    var proc = await processManager.spawn('pub', [pubCommand]);
+    var proc = await Process.start('pub', [pubCommand],
+        mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
 
     var exit = await proc.exitCode;
 
@@ -74,6 +69,4 @@ Future<Null> pub(String pubCommand,
       print(wrapWith('`$dir`: failed!', [styleBold, red]));
     }
   }
-
-  await ProcessManager.terminateStdIn();
 }
