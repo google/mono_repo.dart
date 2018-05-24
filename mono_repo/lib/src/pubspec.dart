@@ -5,27 +5,17 @@
 // TODO(kevmoo) - it'd be nice if this didn't have to be recreated
 // https://github.com/dart-lang/pub/issues/1676
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:pub_semver/pub_semver.dart';
 
-class Dependency {
-  final String name;
-  final DependencyData data;
-
-  Dependency(this.name, this.data);
-
-  factory Dependency.parse(String name, dynamic data) {
-    var dd = new DependencyData(data);
-
-    return new Dependency(name, dd);
-  }
-}
+part 'pubspec.g.dart';
 
 enum DependencyType { hosted, path, git, sdk }
 
 abstract class DependencyData {
   DependencyType get type;
 
-  factory DependencyData(dynamic data) {
+  factory DependencyData.fromJson(dynamic data) {
     if (data == null) {
       return new HostedData(VersionConstraint.any);
     } else if (data is String) {
@@ -89,7 +79,7 @@ class GitData implements DependencyData {
 
     if (data is String) {
       url = data;
-    } else if (data is Map<String, dynamic>) {
+    } else if (data is Map) {
       url = data['url'] as String;
       path = data['path'] as String;
       ref = data['ref'] as String;
@@ -127,49 +117,38 @@ class HostedData implements DependencyData {
   HostedData(this.constraint);
 }
 
+@JsonSerializable(createToJson: false)
 class Pubspec {
   final String name;
+
+  @JsonKey(fromJson: _versionFromString)
   final Version version;
 
-  final Map<String, Dependency> dependencies,
-      devDependencies,
-      dependencyOverrides;
+  @JsonKey(fromJson: _getDeps, nullable: false)
+  final Map<String, DependencyData> dependencies;
+
+  @JsonKey(name: 'dev_dependencies', fromJson: _getDeps, nullable: false)
+  final Map<String, DependencyData> devDependencies;
+
+  @JsonKey(name: 'dependency_overrides', fromJson: _getDeps, nullable: false)
+  final Map<String, DependencyData> dependencyOverrides;
 
   Pubspec(
       this.name,
       this.version,
-      Map<String, Dependency> dependencies,
-      Map<String, Dependency> devDependencies,
-      Map<String, Dependency> dependencyOverrides)
-      : this.dependencies = dependencies ?? {},
-        this.devDependencies = devDependencies ?? {},
-        this.dependencyOverrides = dependencyOverrides ?? {};
+      Map<String, DependencyData> dependencies,
+      Map<String, DependencyData> devDependencies,
+      Map<String, DependencyData> dependencyOverrides)
+      : this.dependencies = dependencies ?? const {},
+        this.devDependencies = devDependencies ?? const {},
+        this.dependencyOverrides = dependencyOverrides ?? const {};
 
-  factory Pubspec.fromJson(Map<String, dynamic> json) {
-    var versionStr = json['version'] as String;
-    Version version;
-    if (versionStr != null) {
-      version = new Version.parse(versionStr);
-    }
-
-    return new Pubspec(
-        json['name'] as String,
-        version,
-        _getDependencies(json['dependencies'] as Map<String, dynamic>),
-        _getDependencies(json['dev_dependencies'] as Map<String, dynamic>),
-        _getDependencies(json['dependency_overrides'] as Map<String, dynamic>));
-  }
-
-  static Map<String, Dependency> _getDependencies(Map<String, dynamic> json) {
-    if (json == null) {
-      return null;
-    }
-
-    var deps = <String, Dependency>{};
-    json.forEach((k, v) {
-      deps[k] = new Dependency.parse(k, v);
-    });
-
-    return deps;
-  }
+  factory Pubspec.fromJson(Map json) => _$PubspecFromJson(json);
 }
+
+Map<String, DependencyData> _getDeps(Map source) =>
+    source?.map(
+        (k, v) => new MapEntry(k as String, new DependencyData.fromJson(v))) ??
+    {};
+
+Version _versionFromString(String input) => new Version.parse(input);

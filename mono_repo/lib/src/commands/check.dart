@@ -45,8 +45,8 @@ Future<Map<String, PackageReport>> getPackageReports(
   var pubspecs = <String, Pubspec>{};
   packages.forEach((dir, config) {
     var pkgPath = p.join(rootDirectory, dir, 'pubspec.yaml');
-    var pubspecContent = y.loadYaml(new File(pkgPath).readAsStringSync())
-        as Map<String, dynamic>;
+    var pubspecContent =
+        y.loadYaml(new File(pkgPath).readAsStringSync()) as Map;
 
     var pubspec = new Pubspec.fromJson(pubspecContent);
 
@@ -131,27 +131,27 @@ class SiblingReference {
   SiblingReference(this.type, this.normalData, this.overrideData);
 
   factory SiblingReference.create(Pubspec sourcePubspec, Pubspec sibling) {
-    for (var dep in sourcePubspec.dependencies.values) {
-      if (dep.name == sibling.name) {
+    for (var dep in sourcePubspec.dependencies.entries) {
+      if (dep.key == sibling.name) {
         // a match!
-        var override = sourcePubspec.dependencyOverrides.values
-            .firstWhere((d) => d.name == dep.name, orElse: () => null);
+        var override = sourcePubspec.dependencyOverrides.entries
+            .firstWhere((d) => d.key == dep.key, orElse: () => null);
         return new SiblingReference(
-            DependencyType.direct, dep.data, override?.data);
+            DependencyType.direct, dep.value, override?.value);
       }
     }
-    for (var dep in sourcePubspec.devDependencies.values) {
-      if (dep.name == sibling.name) {
+    for (var dep in sourcePubspec.devDependencies.entries) {
+      if (dep.key == sibling.name) {
         // a match!
-        var override = sourcePubspec.dependencyOverrides.values
-            .firstWhere((d) => d.name == dep.name, orElse: () => null);
+        var override = sourcePubspec.dependencyOverrides.entries
+            .firstWhere((d) => d.key == dep.key, orElse: () => null);
         return new SiblingReference(
-            DependencyType.dev, dep.data, override?.data);
+            DependencyType.dev, dep.value, override?.value);
       }
     }
-    for (var dep in sourcePubspec.dependencyOverrides.values) {
-      if (dep.name == sibling.name) {
-        return new SiblingReference(DependencyType.indirect, null, dep.data);
+    for (var dep in sourcePubspec.dependencyOverrides.entries) {
+      if (dep.key == sibling.name) {
+        return new SiblingReference(DependencyType.indirect, null, dep.value);
       }
     }
     return null;

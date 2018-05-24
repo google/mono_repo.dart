@@ -5,101 +5,50 @@
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'raw_config.dart';
+
 part 'mono_config.g.dart';
 
 final monoFileName = '.mono_repo.yml';
 final travisFileName = '.travis.yml';
 final travisShPath = './tool/travis.sh';
 
-@JsonSerializable()
-class MonoConfig extends Object with _$MonoConfigSerializerMixin {
-  @override
+class MonoConfig {
   final List<String> sdks;
 
-  @override
   final List<String> stageNames;
 
-  @override
   final List<TravisJob> jobs;
 
   MonoConfig(this.sdks, this.stageNames, this.jobs);
 
-  factory MonoConfig.parse(String package, Map<String, dynamic> monoYaml) {
-    var unrecognizedKeys =
-        (monoYaml.keys.toSet()..removeAll(_validKeys)).toList()..sort();
+  factory MonoConfig.parse(String package, Map monoYaml) {
+    try {
+      var rawConfig = new RawConfig.fromJson(monoYaml);
 
-    if (unrecognizedKeys.isNotEmpty) {
-      throw new MonoConfigFormatError(
-          package,
-          'Unrecognized keys $unrecognizedKeys in .mono_repo.yaml.'
-          'Only $_validKeys are allowed.');
-    }
+      // FYI: 'test' is default if there are no tasks defined
+      var jobs = <TravisJob>[];
 
-    var sdks = (monoYaml['dart'] as List<String>)?.toList();
-    if (sdks == null || sdks.isEmpty) {
-      throw new MonoConfigFormatError(
-          package, 'At least one SDK version is required under "dart".');
-    }
-
-    // FYI: 'test' is default if there are no tasks defined
-    var jobs = <TravisJob>[];
-
-    var stagesYaml = ((monoYaml['stages'] as List<Map<String, dynamic>>) ??
-        [
-          {
-            'unit_test': ['test']
+      var stageNames = rawConfig.stages.map((stage) {
+        var stageYaml = stage.items;
+        for (var job in stageYaml) {
+          var jobSdks = rawConfig.sdks;
+          if (job is Map && job.containsKey('dart')) {
+            job = new Map<String, dynamic>.from(job as Map);
+            jobSdks = (job.remove('dart') as List).cast<String>();
           }
-        ]);
+          for (var sdk in jobSdks) {
+            jobs.add(new TravisJob.parse(package, sdk, stage.name, job));
+          }
+        }
+        return stage.name;
+      }).toList();
 
-    var stageNames = <String>[];
-    for (var stage in stagesYaml) {
-      if (stage.length != 1) {
-        throw new MonoConfigFormatError(
-            package,
-            '`stages` expects a list of maps with exactly one key '
-            '(the name of the stage). Got $stage.');
-      }
-      var stageName = stage.keys.first;
-      if (stageName == 'test') {
-        throw new MonoConfigFormatError(
-            package,
-            'Stages are not allowed to have the name `test` because it '
-            'interacts poorly with the default stage by the same name.');
-      }
-      if (stageNames.contains(stageName)) {
-        throw new MonoConfigFormatError(
-            package,
-            'There should only be one entry for each stage, '
-            'saw `$stageName` more than once.');
-      }
-      stageNames.add(stageName);
-      var stageYaml = stage.values.first as List;
-      if (stageYaml.isEmpty) {
-        throw new MonoConfigFormatError(package,
-            'Stages are required to have at least one job. Got $stage.');
-      }
-      for (var job in stageYaml) {
-        var jobSdks = sdks;
-        if (job is Map<String, dynamic> && job.containsKey('dart')) {
-          job = new Map<String, dynamic>.from(job as Map<String, dynamic>);
-          jobSdks = job.remove('dart') as List<String>;
-        }
-        for (var sdk in jobSdks) {
-          jobs.add(new TravisJob.parse(package, sdk, stageName, job));
-        }
-      }
+      return new MonoConfig(rawConfig.sdks, stageNames, jobs);
+    } on CheckedFromJsonException catch (e) {
+      throw new MonoConfigFormatException(package, e);
     }
-
-    return new MonoConfig(sdks, stageNames, jobs);
   }
-
-  factory MonoConfig.fromJson(Map<String, dynamic> json) =>
-      _$MonoConfigFromJson(json);
-
-  static final _validKeys = const [
-    'dart',
-    'stages',
-  ];
 }
 
 @JsonSerializable()
@@ -122,10 +71,8 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
-      String package, String sdk, String stageName, Object yaml) {
-    return new TravisJob(
-        package, sdk, stageName, Task.parseTaskOrGroup(package, yaml));
-  }
+          String package, String sdk, String stageName, Object yaml) =>
+      new TravisJob(package, sdk, stageName, Task.parseTaskOrGroup(yaml));
 
   @override
   bool operator ==(Object other) =>
@@ -155,39 +102,36 @@ class Task extends Object with _$TaskSerializerMixin {
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
-  static List<Task> parseTaskOrGroup(String package, Object yamlValue) {
-    if (yamlValue is Map<String, dynamic>) {
+  static List<Task> parseTaskOrGroup(Object yamlValue) {
+    if (yamlValue is Map) {
       var group = yamlValue['group'];
       if (group != null) {
-        if (group is List<dynamic>) {
-          return group
-              .map((taskYaml) => new Task.parse(package, taskYaml))
-              .toList();
+        if (group is List) {
+          return group.map((taskYaml) => new Task.parse(taskYaml)).toList();
         } else {
-          throw new MonoConfigFormatError.value(
-              package, group, 'group', 'expected a list of tasks');
+          throw new ArgumentError.value(
+              group, 'group', 'expected a list of tasks');
         }
       }
     }
-    return [new Task.parse(package, yamlValue)];
+    return [new Task.parse(yamlValue)];
   }
 
-  factory Task.parse(String package, Object yamlValue) {
+  factory Task.parse(Object yamlValue) {
     if (yamlValue is String) {
       if (yamlValue == 'command') {
-        throw new MonoConfigFormatError.value(
-            package, yamlValue, 'command', 'requires a value');
+        throw new ArgumentError.value(yamlValue, 'command', 'requires a value');
       }
       return new Task(yamlValue);
     }
 
-    if (yamlValue is Map<String, dynamic>) {
+    if (yamlValue is Map) {
       var taskNames = yamlValue.keys.where(_tasks.contains).toList();
       if (taskNames.isEmpty || taskNames.length > 1) {
-        throw new MonoConfigFormatError(
-            package, 'Must have one and only one key of $_prettyTaskList.');
+        throw new ArgumentError(
+            'Must have one and only one key of $_prettyTaskList.');
       }
-      var taskName = taskNames.single;
+      var taskName = taskNames.single as String;
       String args;
       switch (taskName) {
         case 'command':
@@ -197,7 +141,7 @@ class Task extends Object with _$TaskSerializerMixin {
           } else if (taskValue is List<String>) {
             args = taskValue.join(';');
           } else {
-            throw new MonoConfigFormatError.value(package, taskValue, 'command',
+            throw new ArgumentError.value(taskValue, 'command',
                 'only supports a string or array of strings');
           }
           break;
@@ -214,8 +158,7 @@ class Task extends Object with _$TaskSerializerMixin {
       return new Task(taskName, args: args, config: config);
     }
 
-    throw new MonoConfigFormatError(
-        package, 'huh? $yamlValue ${yamlValue.runtimeType}');
+    throw new ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
   }
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -256,16 +199,13 @@ class Task extends Object with _$TaskSerializerMixin {
 
 final _equality = const DeepCollectionEquality.unordered();
 
-/// Custom [ArgumentError] that reports the invalid mono config file location.
-class MonoConfigFormatError extends ArgumentError {
+/// Custom [Exception] that reports the invalid mono config file location.
+class MonoConfigFormatException implements Exception {
   final String package;
+  final CheckedFromJsonException exception;
 
-  MonoConfigFormatError(this.package, String message) : super(message);
-
-  MonoConfigFormatError.value(this.package, value, [String name, message])
-      : super.value(value, name, message);
+  MonoConfigFormatException(this.package, this.exception);
 
   @override
-  String toString() =>
-      'Error parsing $package/$monoFileName:\n${super.toString()}';
+  String toString() => 'Error parsing $package/$monoFileName:\n$exception';
 }

@@ -97,7 +97,7 @@ flutter:
 
     expect(barReport.pubspec.dependencies, hasLength(1));
 
-    var gitDep = barReport.pubspec.dependencies['build'].data as GitData;
+    var gitDep = barReport.pubspec.dependencies['build'] as GitData;
     expect(gitDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
     expect(gitDep.path, 'build');
     expect(gitDep.ref, 'hacking');
@@ -109,7 +109,7 @@ flutter:
     expect(bazReport.pubspec.dependencies, hasLength(1));
     expect(bazReport.pubspec.dependencyOverrides, hasLength(1));
 
-    gitDep = bazReport.pubspec.dependencies['build'].data as GitData;
+    gitDep = bazReport.pubspec.dependencies['build'] as GitData;
     expect(gitDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
     expect(gitDep.path, isNull);
     expect(gitDep.ref, isNull);
@@ -120,7 +120,7 @@ flutter:
     expect(flutterReport.pubspec.dependencies, hasLength(2));
     expect(flutterReport.pubspec.devDependencies, hasLength(1));
 
-    var sdkDep = flutterReport.pubspec.dependencies['flutter'].data as SdkData;
+    var sdkDep = flutterReport.pubspec.dependencies['flutter'] as SdkData;
     expect(sdkDep.name, 'flutter');
     expect(sdkDep.type, DependencyType.sdk);
   });

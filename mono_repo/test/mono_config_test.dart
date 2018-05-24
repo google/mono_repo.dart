@@ -5,6 +5,9 @@
 // Doing a copy-paste from JSON – which uses double-quotes
 // ignore_for_file: prefer_single_quotes
 
+import 'dart:convert';
+
+import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/mono_config.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart' as y;
@@ -12,25 +15,72 @@ import 'package:yaml/yaml.dart' as y;
 import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
-Matcher throwsArgumentErrorWith(String value) =>
-    throwsA(allOf(isArgumentError, (Object e) {
-      var thing = e as MonoConfigFormatError;
-      printOnFailure([thing.package, thing.message].toString());
-      return thing.package == 'a' && thing.message == value;
+String _prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
+  var yamlMap = err.map as y.YamlMap;
+
+  var yamlKey = yamlMap.nodes.keys.singleWhere(
+      (k) => (k as y.YamlScalar).value == err.key,
+      orElse: () => null) as y.YamlScalar;
+
+  String message;
+  if (yamlKey == null) {
+    var innerError = err.innerError;
+    if (innerError is ArgumentError) {
+      message = '${innerError.message}';
+    } else {
+      message = '${err.innerError}';
+    }
+    message = '${yamlMap.span.message(message)}';
+  } else {
+    if (err.message == null) {
+      message = 'Unsupported value for `${err.key}`.';
+    } else {
+      message = err.message.toString();
+    }
+    message = yamlKey.span.message(message);
+  }
+
+  return message;
+}
+
+Matcher throwsCheckedFromJsonException(String value) =>
+    throwsA(allOf(const isInstanceOf<MonoConfigFormatException>(), (Object e) {
+      var monoConfigError = e as MonoConfigFormatException;
+      var exp = monoConfigError.exception;
+
+      // TODO: actually validate this output as part of tests
+      printOnFailure(_prettyPrintCheckedFromJsonException(exp));
+
+      printOnFailure(exp.message.toString());
+      return monoConfigError.package == 'a' && exp.message.toString() == value;
     }));
+
+MonoConfig _parse(Map<String, dynamic> map) => new MonoConfig.parse('a',
+    y.loadYaml(const JsonEncoder.withIndent('  ').convert(map)) as y.YamlMap);
 
 void main() {
   group('MonoConfig', () {
-    test('sdk version is required', () {
+    test('dart key is required', () {
+      expect(() => _parse({}), throwsArgumentError);
+    });
+
+    test('dart value cannot be null', () {
       expect(
-          () => new MonoConfig.parse('a', {}),
-          throwsArgumentErrorWith(
-              'At least one SDK version is required under "dart".'));
+          () => _parse({'dart': null}),
+          throwsCheckedFromJsonException(
+              'The "dart" key must have at least one value.'));
+    });
+
+    test('dart value cannot be empty', () {
+      expect(
+          () => _parse({'dart': []}),
+          throwsCheckedFromJsonException(
+              'The "dart" key must have at least one value.'));
     });
 
     test('no stages - end up with one `unit_test` stage with one `test` task',
         () {
-      var config = new MonoConfig.parse('a', {
+      var config = _parse({
         'dart': ['stable']
       });
 
@@ -43,7 +93,7 @@ void main() {
     });
 
     test('valid example', () {
-      var monoYaml = y.loadYaml(testConfig1) as Map<String, dynamic>;
+      var monoYaml = y.loadYaml(testConfig1) as y.YamlMap;
 
       var config = new MonoConfig.parse('a', monoYaml);
 
@@ -65,13 +115,13 @@ void main() {
           ]
         };
         expect(
-            () => new MonoConfig.parse('a', monoYaml),
-            throwsArgumentErrorWith(
+            () => _parse(monoYaml),
+            throwsCheckedFromJsonException(
                 'Stages are not allowed to have the name `test` because it '
                 'interacts poorly with the default stage by the same name.'));
       });
 
-      test('Stage with no actions', () {
+      test('empty stage job', () {
         var monoYaml = {
           'dart': ['stable'],
           'stages': [
@@ -79,10 +129,22 @@ void main() {
           ]
         };
         expect(
-            () => new MonoConfig.parse('a', monoYaml),
-            throwsArgumentErrorWith(
-                'Stages are required to have at least one job. '
-                'Got {a: []}.'));
+            () => _parse(monoYaml),
+            throwsCheckedFromJsonException(
+                'Stages are required to have at least one job. "a" is empty.'));
+      });
+
+      test('null stage job', () {
+        var monoYaml = {
+          'dart': ['stable'],
+          'stages': [
+            {'a': null},
+          ]
+        };
+        expect(
+            () => _parse(monoYaml),
+            throwsCheckedFromJsonException(
+                'Stages are required to have at least one job. "a" is null.'));
       });
 
       test('Duplicate stage names are not allowed', () {
@@ -98,10 +160,9 @@ void main() {
           ]
         };
         expect(
-            () => new MonoConfig.parse('a', monoYaml),
-            throwsArgumentErrorWith(
-                'There should only be one entry for each stage, '
-                'saw `a` more than once.'));
+            () => _parse(monoYaml),
+            throwsCheckedFromJsonException(
+                'Stages muts be unique. "a" appears more than once.'));
       });
     });
   });

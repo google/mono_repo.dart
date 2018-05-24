@@ -10,31 +10,21 @@ part of 'mono_config.dart';
 // Generator: JsonSerializableGenerator
 // **************************************************************************
 
-MonoConfig _$MonoConfigFromJson(Map<String, dynamic> json) => new MonoConfig(
-    (json['sdks'] as List)?.map((e) => e as String)?.toList(),
-    (json['stageNames'] as List)?.map((e) => e as String)?.toList(),
-    (json['jobs'] as List)
-        ?.map((e) => e == null
-            ? null
-            : new TravisJob.fromJson(e as Map<String, dynamic>))
-        ?.toList());
-
-abstract class _$MonoConfigSerializerMixin {
-  List<String> get sdks;
-  List<String> get stageNames;
-  List<TravisJob> get jobs;
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{'sdks': sdks, 'stageNames': stageNames, 'jobs': jobs};
-}
-
-TravisJob _$TravisJobFromJson(Map<String, dynamic> json) => new TravisJob(
-    json['package'] as String,
-    json['sdk'] as String,
-    json['stageName'] as String,
-    (json['tasks'] as List)
-        ?.map((e) =>
-            e == null ? null : new Task.fromJson(e as Map<String, dynamic>))
-        ?.toList());
+TravisJob _$TravisJobFromJson(Map json) => $checkedNew(
+    'TravisJob',
+    json,
+    () => new TravisJob(
+        $checkedConvert(json, 'package', (v) => v as String),
+        $checkedConvert(json, 'sdk', (v) => v as String),
+        $checkedConvert(json, 'stageName', (v) => v as String),
+        $checkedConvert(
+            json,
+            'tasks',
+            (v) => (v as List)
+                ?.map((e) => e == null
+                    ? null
+                    : new Task.fromJson(e as Map<String, dynamic>))
+                ?.toList())));
 
 abstract class _$TravisJobSerializerMixin {
   String get package;
@@ -49,10 +39,16 @@ abstract class _$TravisJobSerializerMixin {
       };
 }
 
-Task _$TaskFromJson(Map<String, dynamic> json) =>
-    new Task(json['name'] as String,
-        args: json['args'] as String,
-        config: json['config'] as Map<String, dynamic>);
+Task _$TaskFromJson(Map json) => $checkedNew(
+    'Task',
+    json,
+    () => new Task($checkedConvert(json, 'name', (v) => v as String),
+        args: $checkedConvert(json, 'args', (v) => v as String),
+        config: $checkedConvert(
+            json,
+            'config',
+            (v) =>
+                v == null ? null : new Map<String, dynamic>.from(v as Map))));
 
 abstract class _$TaskSerializerMixin {
   String get name;

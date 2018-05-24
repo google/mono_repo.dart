@@ -100,11 +100,10 @@ Map<String, MonoConfig> getMonoConfigs(
     var travisFile = new File(travisPath);
 
     if (travisFile.existsSync()) {
-      var travisYaml =
-          y.loadYaml(travisFile.readAsStringSync(), sourceUrl: travisPath);
+      var travisYaml = y.loadYaml(travisFile.readAsStringSync(),
+          sourceUrl: travisPath) as y.YamlMap;
 
-      var config =
-          new MonoConfig.parse(pkg, travisYaml as Map<String, dynamic>);
+      var config = new MonoConfig.parse(pkg, travisYaml);
 
       var configuredJobs = config.jobs
           .expand((job) => job.tasks)
