@@ -13,7 +13,11 @@ import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
 Matcher throwsArgumentErrorWith(String value) =>
-    throwsA((Object e) => (e as ArgumentError).message == value);
+    throwsA(allOf(isArgumentError, (Object e) {
+      var thing = e as MonoConfigFormatError;
+      printOnFailure([thing.package, thing.message].toString());
+      return thing.package == 'a' && thing.message == value;
+    }));
 
 void main() {
   group('MonoConfig', () {
