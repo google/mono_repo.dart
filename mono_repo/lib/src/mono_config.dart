@@ -23,31 +23,27 @@ class MonoConfig {
   MonoConfig(this.sdks, this.stageNames, this.jobs);
 
   factory MonoConfig.parse(String package, Map monoYaml) {
-    try {
-      var rawConfig = new RawConfig.fromJson(monoYaml);
+    var rawConfig = new RawConfig.fromJson(monoYaml);
 
-      // FYI: 'test' is default if there are no tasks defined
-      var jobs = <TravisJob>[];
+    // FYI: 'test' is default if there are no tasks defined
+    var jobs = <TravisJob>[];
 
-      var stageNames = rawConfig.stages.map((stage) {
-        var stageYaml = stage.items;
-        for (var job in stageYaml) {
-          var jobSdks = rawConfig.sdks;
-          if (job is Map && job.containsKey('dart')) {
-            job = new Map<String, dynamic>.from(job as Map);
-            jobSdks = (job.remove('dart') as List).cast<String>();
-          }
-          for (var sdk in jobSdks) {
-            jobs.add(new TravisJob.parse(package, sdk, stage.name, job));
-          }
+    var stageNames = rawConfig.stages.map((stage) {
+      var stageYaml = stage.items;
+      for (var job in stageYaml) {
+        var jobSdks = rawConfig.sdks;
+        if (job is Map && job.containsKey('dart')) {
+          job = new Map<String, dynamic>.from(job as Map);
+          jobSdks = (job.remove('dart') as List).cast<String>();
         }
-        return stage.name;
-      }).toList();
+        for (var sdk in jobSdks) {
+          jobs.add(new TravisJob.parse(package, sdk, stage.name, job));
+        }
+      }
+      return stage.name;
+    }).toList();
 
-      return new MonoConfig(rawConfig.sdks, stageNames, jobs);
-    } on CheckedFromJsonException catch (e) {
-      throw new MonoConfigFormatException(package, e);
-    }
+    return new MonoConfig(rawConfig.sdks, stageNames, jobs);
   }
 }
 
@@ -198,14 +194,3 @@ class Task extends Object with _$TaskSerializerMixin {
 }
 
 final _equality = const DeepCollectionEquality.unordered();
-
-/// Custom [Exception] that reports the invalid mono config file location.
-class MonoConfigFormatException implements Exception {
-  final String package;
-  final CheckedFromJsonException exception;
-
-  MonoConfigFormatException(this.package, this.exception);
-
-  @override
-  String toString() => 'Error parsing $package/$monoFileName:\n$exception';
-}

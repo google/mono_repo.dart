@@ -44,15 +44,14 @@ String _prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
 }
 
 Matcher throwsCheckedFromJsonException(String value) =>
-    throwsA(allOf(const isInstanceOf<MonoConfigFormatException>(), (Object e) {
-      var monoConfigError = e as MonoConfigFormatException;
-      var exp = monoConfigError.exception;
+    throwsA(allOf(const isInstanceOf<CheckedFromJsonException>(), (Object e) {
+      var exp = e as CheckedFromJsonException;
 
       // TODO: actually validate this output as part of tests
       printOnFailure(_prettyPrintCheckedFromJsonException(exp));
 
       printOnFailure(exp.message.toString());
-      return monoConfigError.package == 'a' && exp.message.toString() == value;
+      return exp.message.toString() == value;
     }));
 
 MonoConfig _parse(Map<String, dynamic> map) => new MonoConfig.parse('a',
@@ -61,7 +60,8 @@ MonoConfig _parse(Map<String, dynamic> map) => new MonoConfig.parse('a',
 void main() {
   group('MonoConfig', () {
     test('dart key is required', () {
-      expect(() => _parse({}), throwsCheckedFromJsonException('The "dart" key is required.'));
+      expect(() => _parse({}),
+          throwsCheckedFromJsonException('The "dart" key is required.'));
     });
 
     test('dart value cannot be null', () {
