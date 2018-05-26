@@ -61,7 +61,7 @@ MonoConfig _parse(Map<String, dynamic> map) => new MonoConfig.parse('a',
 void main() {
   group('MonoConfig', () {
     test('dart key is required', () {
-      expect(() => _parse({}), throwsArgumentError);
+      expect(() => _parse({}), throwsCheckedFromJsonException('The "dart" key is required.'));
     });
 
     test('dart value cannot be null', () {

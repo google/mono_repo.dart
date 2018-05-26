@@ -6,6 +6,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'raw_config.g.dart';
 
+// TODO: need ctor for CheckedFromJsonException
+// https://github.com/dart-lang/json_serializable/issues/187
+T _checkedNew<T>(String className, Map map, T constructor(),
+    {Map<String, String> fieldKeyMap}) {
+  return $checkedNew(className, map, constructor);
+}
+
 @JsonSerializable()
 class RawConfig extends Object with _$RawConfigSerializerMixin {
   @override
@@ -28,7 +35,8 @@ class RawConfig extends Object with _$RawConfigSerializerMixin {
 
   factory RawConfig.fromJson(Map json) {
     if (!json.containsKey('dart')) {
-      throw new ArgumentError('The "dart" key is required.');
+      _checkedNew('RawConfig', json,
+          () => throw new ArgumentError('The "dart" key is required.'));
     }
 
     var unrecognizedKeys = (json.keys.toSet()..removeAll(_validKeys)).toList()
@@ -48,9 +56,7 @@ class RawConfig extends Object with _$RawConfigSerializerMixin {
       if (!stages.add(name)) {
         var map = (json['stages'] as List)[i] as Map;
 
-        // TODO: need ctor for CheckedFromJsonException
-        // https://github.com/dart-lang/json_serializable/issues/187
-        return $checkedNew(
+        _checkedNew(
             'RawConfig',
             map,
             () => throw new ArgumentError.value(null, name,
@@ -104,9 +110,7 @@ class RawStage extends Object with _$RawStageSerializerMixin {
 
     var entry = json.entries.single;
 
-    // TODO: need ctor for CheckedFromJsonException
-    // https://github.com/dart-lang/json_serializable/issues/187
-    return $checkedNew('RawStage', json,
+    return _checkedNew('RawStage', json,
         () => new RawStage(entry.key as String, entry.value as List));
   }
 
