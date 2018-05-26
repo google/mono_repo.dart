@@ -13,6 +13,9 @@ T _checkedNew<T>(String className, Map map, T constructor(),
   return $checkedNew(className, map, constructor);
 }
 
+String _quotedStringList(Iterable<String> items) =>
+    items.map((e) => '"$e"').join(', ');
+
 @JsonSerializable()
 class RawConfig extends Object with _$RawConfigSerializerMixin {
   @override
@@ -39,13 +42,22 @@ class RawConfig extends Object with _$RawConfigSerializerMixin {
           () => throw new ArgumentError('The "dart" key is required.'));
     }
 
-    var unrecognizedKeys = (json.keys.toSet()..removeAll(_validKeys)).toList()
-      ..sort();
+    // TODO: remove this logic once json_serializable supports this
+    // https://github.com/dart-lang/json_serializable/issues/184
+    var unrecognizedKeys =
+        (json.keys.cast<String>().toSet()..removeAll(_validKeys)).toList()
+          ..sort();
 
     if (unrecognizedKeys.isNotEmpty) {
-      throw new ArgumentError(
-          'Unrecognized keys $unrecognizedKeys in .mono_repo.yaml.'
-          'Only $_validKeys are allowed.');
+      return _checkedNew(
+          'RawConfig',
+          json,
+          () => throw new ArgumentError.value(
+              null,
+              unrecognizedKeys.first,
+              'Unrecognized key(s) ${_quotedStringList(unrecognizedKeys)} in '
+              '.mono_repo.yaml. Allowed values: '
+              '${_quotedStringList(_validKeys)}.'));
     }
 
     var config = _$RawConfigFromJson(json);

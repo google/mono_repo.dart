@@ -15,40 +15,12 @@ import 'package:yaml/yaml.dart' as y;
 import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
-String _prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
-  var yamlMap = err.map as y.YamlMap;
-
-  var yamlKey = yamlMap.nodes.keys.singleWhere(
-      (k) => (k as y.YamlScalar).value == err.key,
-      orElse: () => null) as y.YamlScalar;
-
-  String message;
-  if (yamlKey == null) {
-    var innerError = err.innerError;
-    if (innerError is ArgumentError) {
-      message = '${innerError.message}';
-    } else {
-      message = '${err.innerError}';
-    }
-    message = '${yamlMap.span.message(message)}';
-  } else {
-    if (err.message == null) {
-      message = 'Unsupported value for `${err.key}`.';
-    } else {
-      message = err.message.toString();
-    }
-    message = yamlKey.span.message(message);
-  }
-
-  return message;
-}
-
 Matcher throwsCheckedFromJsonException(String value) =>
     throwsA(allOf(const isInstanceOf<CheckedFromJsonException>(), (Object e) {
       var exp = e as CheckedFromJsonException;
 
       // TODO: actually validate this output as part of tests
-      printOnFailure(_prettyPrintCheckedFromJsonException(exp));
+      printOnFailure(prettyPrintCheckedFromJsonException(exp));
 
       printOnFailure(exp.message.toString());
       return exp.message.toString() == value;

@@ -14,6 +14,9 @@ main(List<String> arguments) async {
     await run(arguments);
   } on UserException catch (e) {
     print(ansi.red.wrap(e.message));
+    if (e.details != null) {
+      print(e.details);
+    }
     exitCode = ExitCode.config.code;
   } on UsageException catch (e) {
     print(ansi.red.wrap(e.message));
