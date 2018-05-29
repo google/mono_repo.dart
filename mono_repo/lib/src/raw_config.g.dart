@@ -23,17 +23,3 @@ RawConfig _$RawConfigFromJson(Map json) => $checkedNew(
                 ?.map((e) => e == null ? null : new RawStage.fromJson(e as Map))
                 ?.toList())),
     fieldKeyMap: const {'sdks': 'dart'});
-
-abstract class _$RawConfigSerializerMixin {
-  List<String> get sdks;
-  List<RawStage> get stages;
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{'dart': sdks, 'stages': stages};
-}
-
-abstract class _$RawStageSerializerMixin {
-  String get name;
-  List<dynamic> get items;
-  Map<String, dynamic> toJson() =>
-      <String, dynamic>{'name': name, 'items': items};
-}
