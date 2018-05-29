@@ -6,6 +6,7 @@ targets:
       json_serializable:
         generate_for:
           - lib/src/mono_config.dart
+          - lib/src/package_config.dart
           - lib/src/pubspec.dart
           - lib/src/raw_config.dart
         options:

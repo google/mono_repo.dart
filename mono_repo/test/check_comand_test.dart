@@ -5,76 +5,10 @@ import 'package:mono_repo/src/pubspec.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
+import 'shared.dart';
+
 main() {
-  setUp(() async {
-    await d.dir('foo', [
-      d.file('pubspec.yaml', r'''
-name: foo
-
-dependencies:
-  build: any
-  implied_any:
-''')
-    ]).create();
-
-    await d.dir('bar', [
-      d.file('pubspec.yaml', r'''
-name: bar
-
-dependencies:
-  build:
-    git:
-      url: https://github.com/dart-lang/build.git
-      path: build
-      ref: hacking
-''')
-    ]).create();
-
-    await d.dir('baz', [
-      d.file('pubspec.yaml', r'''
-name: baz
-
-dependencies:
-  build:
-    git: https://github.com/dart-lang/build.git
-dependency_overrides:
-  analyzer:
-'''),
-      d.dir('recursive', [
-        d.file('pubspec.yaml', r'''
-name: baz.recursive
-
-dependencies:
-  baz: any
-        '''),
-      ]),
-    ]).create();
-
-    await d.dir('flutter', [
-      // typical pubspec.yaml from flutter
-      d.file('pubspec.yaml', r'''
-name: flutter
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^0.1.0
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-flutter:
-  uses-material-design: true
-  assets:
-   - images/a_dot_burr.jpeg
-  fonts:
-    - family: Schyler
-      fonts:
-        - asset: fonts/Schyler-Regular.ttf
-        - asset: fonts/Schyler-Italic.ttf
-          style: italic
-          weight: 700
-''')
-    ]).create();
-  });
+  setUp(sharedSetup);
 
   test('check', () async {
     var reports = await getPackageReports(rootDirectory: d.sandbox);
