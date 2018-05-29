@@ -16,13 +16,11 @@ T _checkedNew<T>(String className, Map map, T constructor(),
 String _quotedStringList(Iterable<String> items) =>
     items.map((e) => '"$e"').join(', ');
 
-@JsonSerializable()
-class RawConfig extends Object with _$RawConfigSerializerMixin {
-  @override
+@JsonSerializable(createToJson: false)
+class RawConfig {
   @JsonKey(name: 'dart')
   final List<String> sdks;
 
-  @override
   final List<RawStage> stages;
 
   RawConfig(this.sdks, List<RawStage> stages)
@@ -85,11 +83,8 @@ class RawConfig extends Object with _$RawConfigSerializerMixin {
   ];
 }
 
-@JsonSerializable(createFactory: false)
-class RawStage extends Object with _$RawStageSerializerMixin {
-  @override
+class RawStage {
   final String name;
-  @override
   final List items;
 
   RawStage(this.name, this.items) {
