@@ -2,13 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'package_config.g.dart';
+
+@JsonSerializable(createToJson: false)
 class PackageConfig {
   final bool published;
 
   PackageConfig(this.published);
 
-  factory PackageConfig.fromJson(Map<String, dynamic> json) =>
-      new PackageConfig(json['published'] as bool);
-
-  Map<String, dynamic> toJson() => {'published': published};
+  factory PackageConfig.fromJson(Map json) => _$PackageConfigFromJson(json);
 }

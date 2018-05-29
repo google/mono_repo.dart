@@ -15,23 +15,36 @@ import 'package_config.dart';
 const recursiveFlag = 'recursive';
 final packageConfigFileName = 'mono_repo.yaml';
 
-Map<String, PackageConfig> openPackageConfig({String rootDirectory}) {
+Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {
   rootDirectory ??= p.current;
 
   var packagesFile = new File(p.join(rootDirectory, packageConfigFileName));
 
-  // TODO: better error if file does not exist
+  try {
+    var yaml = y.loadYaml(packagesFile.readAsStringSync());
 
-  var yaml = y.loadYaml(packagesFile.readAsStringSync()) as Map;
+    if (yaml == null) {
+      throw new UserException(
+          'Config file "$packageConfigFileName" contains no values.');
+    }
 
-  var sortedKeys = yaml.keys.toList()..sort();
+    if (yaml is! Map) {
+      throw new UserException(
+          'Config file "$packageConfigFileName" must contain map values.');
+    }
 
-  var packages = <String, PackageConfig>{};
-  for (String k in sortedKeys) {
-    packages[k] = new PackageConfig.fromJson(yaml[k] as Map<String, dynamic>);
+    var sortedKeys = (yaml as Map).keys.toList()..sort();
+
+    var packages = <String, PackageConfig>{};
+    for (String k in sortedKeys) {
+      packages[k] = new PackageConfig.fromJson(yaml[k] as Map);
+    }
+
+    return packages;
+  } on CheckedFromJsonException catch (e) {
+    throw new UserException('Error parsing "$packageConfigFileName".',
+        details: prettyPrintCheckedFromJsonException(e));
   }
-
-  return packages;
 }
 
 /// If the file exists, open it – otherwise infer it from the data on disk.
@@ -42,7 +55,7 @@ Map<String, PackageConfig> getPackageConfig(
   var packageFileName = p.join(rootDirectory, packageConfigFileName);
 
   if (FileSystemEntity.isFileSync(packageFileName)) {
-    return openPackageConfig();
+    return _openPackageConfig(rootDirectory);
   }
 
   var packages = <String, PackageConfig>{};
@@ -136,7 +149,14 @@ class UserException implements Exception {
   UserException(this.message, {this.details});
 
   @override
-  String toString() => 'UserException: $message';
+  String toString() {
+    var msg = 'UserException: $message';
+
+    if (details != null) {
+      msg += '\n$details';
+    }
+    return msg;
+  }
 }
 
 String encodeJson(Object input) =>
