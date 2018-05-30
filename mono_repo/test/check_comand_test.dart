@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
 import 'package:mono_repo/src/commands/check.dart' hide DependencyType;
-import 'package:mono_repo/src/pubspec.dart';
+import 'package:pubspek/pubspek.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
