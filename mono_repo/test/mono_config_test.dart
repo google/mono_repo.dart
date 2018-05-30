@@ -15,19 +15,19 @@ import 'package:yaml/yaml.dart' as y;
 import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
-Matcher throwsCheckedFromJsonException(String prettyValue) =>
-    throwsA(allOf(const isInstanceOf<CheckedFromJsonException>(), (Object e) {
-      var exp = e as CheckedFromJsonException;
+Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(allOf(
+    const isInstanceOf<CheckedFromJsonException>(),
+    new FeatureMatcher<CheckedFromJsonException>('prettyPrint', (e) {
+      var prettyValue = prettyPrintCheckedFromJsonException(e);
+      printOnFailure("r'''\n$prettyValue'''");
+      return prettyValue;
+    }, prettyValue)));
 
-      printOnFailure("r'''\n${prettyPrintCheckedFromJsonException(exp)}'''");
-
-      expect(prettyPrintCheckedFromJsonException(exp), prettyValue);
-
-      return true;
-    }));
-
-MonoConfig _parse(Map<String, dynamic> map) => new MonoConfig.parse('a',
+MonoConfig _parse(map) => new MonoConfig.parse('a',
     y.loadYaml(const JsonEncoder.withIndent('  ').convert(map)) as y.YamlMap);
+
+void _expectParseThrows(Object content, String expectedError) => expect(
+    () => _parse(content), throwsCheckedFromJsonException(expectedError));
 
 void main() {
   test('no stages - end up with one `unit_test` stage with one `test` task',
@@ -58,24 +58,24 @@ void main() {
 
   group('error checks', () {
     test('dart key is required', () {
-      expect(() => _parse({}), throwsCheckedFromJsonException(r'''
+      _expectParseThrows({}, r'''
 line 1, column 1: The "dart" key is required.
 {}
-^^'''));
+^^''');
     });
 
     test('dart value cannot be null', () {
-      expect(() => _parse({'dart': null}), throwsCheckedFromJsonException(r'''
+      _expectParseThrows({'dart': null}, r'''
 line 2, column 3: The "dart" key must have at least one value.
   "dart": null
-  ^^^^^^'''));
+  ^^^^^^''');
     });
 
     test('dart value cannot be empty', () {
-      expect(() => _parse({'dart': []}), throwsCheckedFromJsonException(r'''
+      _expectParseThrows({'dart': []}, r'''
 line 2, column 3: The "dart" key must have at least one value.
   "dart": []
-  ^^^^^^'''));
+  ^^^^^^''');
     });
 
     test('Stages named `test` are not allowed', () {
@@ -87,10 +87,76 @@ line 2, column 3: The "dart" key must have at least one value.
           },
         ]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+      _expectParseThrows(monoYaml, r'''
 line 7, column 7: Stages are not allowed to have the name `test` because it interacts poorly with the default stage by the same name.
       "test": [
-      ^^^^^^'''));
+      ^^^^^^''');
+    });
+
+    test('Stages tasks must be a list', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {'a': 42},
+        ]
+      };
+
+      _expectParseThrows(monoYaml, r'''
+line 7, column 7: `stages` expects a list of maps with exactly one key (the name of the stage). The provided value `{a: 42}` is not valid.
+      "a": 42
+      ^^^''');
+    });
+
+    test('Stages tasks must be a list', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {'a': 42},
+        ]
+      };
+
+      _expectParseThrows(monoYaml, r'''
+line 7, column 7: `stages` expects a list of maps with exactly one key (the name of the stage). The provided value `{a: 42}` is not valid.
+      "a": 42
+      ^^^''');
+    });
+
+    test(
+        'Stages tasks must be a list with map with one key in the approved set',
+        () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {
+            'a': [
+              {'weird': 'thing'}
+            ]
+          },
+        ]
+      };
+
+      _expectParseThrows(monoYaml, r'''
+line 9, column 11: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
+          "weird": "thing"
+          ^^^^^^^''');
+    });
+
+    test('Stage tasks entries must have one key in the approved set', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {
+            'a': [
+              {'test': 'thing', 'command': 'other thing'}
+            ]
+          },
+        ]
+      };
+
+      _expectParseThrows(monoYaml, r'''
+line 10, column 11: Must have one and only one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
+          "command": "other thing"
+          ^^^^^^^^^''');
     });
 
     test('empty stage job', () {
@@ -100,10 +166,10 @@ line 7, column 7: Stages are not allowed to have the name `test` because it inte
           {'a': []},
         ]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+      _expectParseThrows(monoYaml, r'''
 line 7, column 7: Stages are required to have at least one job. "a" is empty.
       "a": []
-      ^^^'''));
+      ^^^''');
     });
 
     test('multiple keys under a stage', () {
@@ -113,10 +179,10 @@ line 7, column 7: Stages are required to have at least one job. "a" is empty.
           {'a': null, 'b': null},
         ]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
-line 5, column 3: `stages` expects a list of maps with exactly one key (the name of the stage). Got {a: null, b: null}.
-  "stages": [
-  ^^^^^^^^'''));
+      _expectParseThrows(monoYaml, r'''
+line 8, column 7: `stages` expects a list of maps with exactly one key (the name of the stage), but the provided value has 2 values.
+      "b": null
+      ^^^''');
     });
 
     test('no keys under a stage', () {
@@ -124,10 +190,10 @@ line 5, column 3: `stages` expects a list of maps with exactly one key (the name
         'dart': ['stable'],
         'stages': [{}]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
-line 5, column 3: `stages` expects a list of maps with exactly one key (the name of the stage). Got {}.
-  "stages": [
-  ^^^^^^^^'''));
+      _expectParseThrows(monoYaml, r'''
+line 6, column 5: `stages` expects a list of maps with exactly one key (the name of the stage), but no items exist.
+    {}
+    ^^''');
     });
 
     test('null stage job', () {
@@ -137,10 +203,10 @@ line 5, column 3: `stages` expects a list of maps with exactly one key (the name
           {'a': null},
         ]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+      _expectParseThrows(monoYaml, r'''
 line 7, column 7: Stages are required to have at least one job. "a" is null.
       "a": null
-      ^^^'''));
+      ^^^''');
     });
 
     test('unsupported keys', () {
@@ -156,10 +222,10 @@ line 7, column 7: Stages are required to have at least one job. "a" is null.
           },
         ]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+      _expectParseThrows(monoYaml, r'''
 line 2, column 3: Unrecognized key(s) "extra" in .mono_repo.yaml. Allowed values: "dart", "stages".
   "extra": "foo",
-  ^^^^^^^'''));
+  ^^^^^^^''');
     });
 
     test('Duplicate stage names are not allowed', () {
@@ -174,10 +240,11 @@ line 2, column 3: Unrecognized key(s) "extra" in .mono_repo.yaml. Allowed values
           },
         ]
       };
-      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+
+      _expectParseThrows(monoYaml, r'''
 line 12, column 7: Stages muts be unique. "a" appears more than once.
       "a": [
-      ^^^'''));
+      ^^^''');
     });
   });
 }
