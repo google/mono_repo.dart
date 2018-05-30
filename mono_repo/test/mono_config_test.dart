@@ -16,7 +16,7 @@ import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
 String _encodeJson(Object input) =>
-    const JsonEncoder.withIndent(' ').convert(input);
+    const JsonEncoder.withIndent('  ').convert(input);
 
 Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(allOf(
     const isInstanceOf<CheckedFromJsonException>(),
@@ -26,8 +26,8 @@ Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(allOf(
       return prettyValue;
     }, prettyValue)));
 
-MonoConfig _parse(map) => new MonoConfig.parse('a',
-    y.loadYaml(const JsonEncoder.withIndent('  ').convert(map)) as y.YamlMap);
+MonoConfig _parse(map) =>
+    new MonoConfig.parse('a', y.loadYaml(_encodeJson(map)) as y.YamlMap);
 
 void _expectParseThrows(Object content, String expectedError) => expect(
     () => _parse(content), throwsCheckedFromJsonException(expectedError));
