@@ -15,6 +15,9 @@ import 'package:yaml/yaml.dart' as y;
 import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
+String _encodeJson(Object input) =>
+    const JsonEncoder.withIndent(' ').convert(input);
+
 Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(allOf(
     const isInstanceOf<CheckedFromJsonException>(),
     new FeatureMatcher<CheckedFromJsonException>('prettyPrint', (e) {
@@ -53,7 +56,7 @@ void main() {
 
     var jobs = config.jobs.toList();
 
-    expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
+    expect(_encodeJson(jobs), _encodeJson(_testConfig1expectedOutput));
   });
 
   group('error checks', () {
