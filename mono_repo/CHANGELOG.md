@@ -3,6 +3,7 @@
 * Support dependencies that specify an SDK – common with Flutter.
 * Require at least Dart 2.0.0-dev.54.
 * `pub` command now runs with inherited standard IO. You now see colors!
+* Improved error output with bad configuration.
 
 ## 0.3.1
 
