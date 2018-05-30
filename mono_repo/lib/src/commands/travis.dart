@@ -11,6 +11,7 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../mono_config.dart';
+import '../user_exception.dart';
 import '../utils.dart';
 
 class TravisCommand extends Command<Null> {

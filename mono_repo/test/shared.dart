@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:mono_repo/src/utils.dart';
+import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 

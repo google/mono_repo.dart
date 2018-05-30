@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
+import '../user_exception.dart';
 import '../utils.dart';
 
 class InitCommand extends Command<Null> {
