@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -158,9 +157,6 @@ class UserException implements Exception {
     return msg;
   }
 }
-
-String encodeJson(Object input) =>
-    const JsonEncoder.withIndent(' ').convert(input);
 
 String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
   var yamlMap = err.map as y.YamlMap;
