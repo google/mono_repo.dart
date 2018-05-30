@@ -171,13 +171,8 @@ String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
 
   String message;
   if (yamlKey == null) {
-    var innerError = err.innerError;
-    if (innerError is ArgumentError) {
-      message = '${innerError.message}';
-    } else {
-      message = '${err.innerError}';
-    }
-    message = '${yamlMap.span.message(message)}';
+    assert(err.message != null);
+    message = '${yamlMap.span.message(err.message.toString())}';
   } else {
     if (err.message == null) {
       message = 'Unsupported value for `${err.key}`.';
