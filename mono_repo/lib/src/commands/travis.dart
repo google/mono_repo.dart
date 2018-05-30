@@ -202,8 +202,8 @@ if [ -z "\$PKG" ]; then
   exit 1
 fi
 
-if [ "\$#" == "0" ]; then
-  ${safeEcho(prettyAnsi, red, "At least one task argument must be provided!")}
+if [ -z "\COMMANDS" ]; then
+  ${safeEcho(prettyAnsi, red, "COMMANDS environment variable must be set!")}
   exit 1
 fi
 
@@ -212,7 +212,7 @@ pub upgrade || exit \$?
 
 EXIT_CODE=0
 
-while (( "\$#" )); do
+while (( "\$COMMANDS" )); do
   TASK=\$1
 ${_shellCase('TASK', tasks)}
   shift
@@ -291,8 +291,8 @@ String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
         job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
     buffer.writeln('''
     - stage: ${job.stageName}
-      script: ./tool/travis.sh $commands
-      env: PKG="${job.package}"
+      env: PKG="${job.package}" COMMANDS="$commands"
+      script: ./tool/travis.sh
       dart: ${job.sdk}''');
   }
   return buffer.toString();
