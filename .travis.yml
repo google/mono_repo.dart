@@ -4,16 +4,16 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
-      script: ./tool/travis.sh dartfmt dartanalyzer
-      env: PKG="mono_repo"
+      env: PKG="mono_repo" COMMANDS="dartfmt dartanalyzer"
+      script: ./tool/travis.sh
       dart: dev
     - stage: unit_test
-      script: ./tool/travis.sh test_0
-      env: PKG="mono_repo"
+      env: PKG="mono_repo" COMMANDS="test_0"
+      script: ./tool/travis.sh
       dart: dev
     - stage: unit_test
-      script: ./tool/travis.sh test_1
-      env: PKG="mono_repo"
+      env: PKG="mono_repo" COMMANDS="test_1"
+      script: ./tool/travis.sh
       dart: dev
 
 stages:

@@ -6,8 +6,8 @@ if [ -z "$PKG" ]; then
   exit 1
 fi
 
-if [ "$#" == "0" ]; then
-  echo -e '\033[31mAt least one task argument must be provided!\033[0m'
+if [ -z "COMMANDS" ]; then
+  echo -e '\033[31mCOMMANDS environment variable must be set!\033[0m'
   exit 1
 fi
 
@@ -16,7 +16,7 @@ pub upgrade || exit $?
 
 EXIT_CODE=0
 
-while (( "$#" )); do
+while (( "$COMMANDS" )); do
   TASK=$1
   case $TASK in
   dartanalyzer) echo
