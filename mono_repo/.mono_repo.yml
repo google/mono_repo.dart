@@ -8,4 +8,5 @@ stages:
         - dartfmt
         - dartanalyzer: --fatal-infos --fatal-warnings .
   - unit_test:
-    - test
+    - test: -x presubmit-only
+    - test: --run-skipped -t presubmit-only

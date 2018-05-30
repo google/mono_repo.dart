@@ -8,7 +8,11 @@ jobs:
       env: PKG="mono_repo"
       dart: dev
     - stage: unit_test
-      script: ./tool/travis.sh test
+      script: ./tool/travis.sh test_0
+      env: PKG="mono_repo"
+      dart: dev
+    - stage: unit_test
+      script: ./tool/travis.sh test_1
       env: PKG="mono_repo"
       dart: dev
 
