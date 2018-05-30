@@ -15,127 +15,169 @@ import 'package:yaml/yaml.dart' as y;
 import 'package:mono_repo/src/utils.dart';
 import 'shared.dart';
 
-Matcher throwsCheckedFromJsonException(String value) =>
+Matcher throwsCheckedFromJsonException(String prettyValue) =>
     throwsA(allOf(const isInstanceOf<CheckedFromJsonException>(), (Object e) {
       var exp = e as CheckedFromJsonException;
 
-      // TODO: actually validate this output as part of tests
-      printOnFailure(prettyPrintCheckedFromJsonException(exp));
+      printOnFailure("r'''\n${prettyPrintCheckedFromJsonException(exp)}'''");
 
-      printOnFailure(exp.message.toString());
-      return exp.message.toString() == value;
+      expect(prettyPrintCheckedFromJsonException(exp), prettyValue);
+
+      return true;
     }));
 
 MonoConfig _parse(Map<String, dynamic> map) => new MonoConfig.parse('a',
     y.loadYaml(const JsonEncoder.withIndent('  ').convert(map)) as y.YamlMap);
 
 void main() {
-  group('MonoConfig', () {
+  test('no stages - end up with one `unit_test` stage with one `test` task',
+      () {
+    var config = _parse({
+      'dart': ['stable']
+    });
+
+    var oneJob = config.jobs.single;
+    expect(oneJob.sdk, 'stable');
+    expect(oneJob.tasks.first.name, 'test');
+    expect(oneJob.tasks.first.args, isNull);
+    expect(oneJob.tasks.first.config, isNull);
+    expect(oneJob.stageName, 'unit_test');
+  });
+
+  test('valid example', () {
+    var monoYaml = y.loadYaml(testConfig1) as y.YamlMap;
+
+    var config = new MonoConfig.parse('a', monoYaml);
+
+    expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
+
+    var jobs = config.jobs.toList();
+
+    expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
+  });
+
+  group('error checks', () {
     test('dart key is required', () {
-      expect(() => _parse({}),
-          throwsCheckedFromJsonException('The "dart" key is required.'));
+      expect(() => _parse({}), throwsCheckedFromJsonException(r'''
+line 1, column 1: The "dart" key is required.
+{}
+^^'''));
     });
 
     test('dart value cannot be null', () {
-      expect(
-          () => _parse({'dart': null}),
-          throwsCheckedFromJsonException(
-              'The "dart" key must have at least one value.'));
+      expect(() => _parse({'dart': null}), throwsCheckedFromJsonException(r'''
+line 2, column 3: The "dart" key must have at least one value.
+  "dart": null
+  ^^^^^^'''));
     });
 
     test('dart value cannot be empty', () {
-      expect(
-          () => _parse({'dart': []}),
-          throwsCheckedFromJsonException(
-              'The "dart" key must have at least one value.'));
+      expect(() => _parse({'dart': []}), throwsCheckedFromJsonException(r'''
+line 2, column 3: The "dart" key must have at least one value.
+  "dart": []
+  ^^^^^^'''));
     });
 
-    test('no stages - end up with one `unit_test` stage with one `test` task',
-        () {
-      var config = _parse({
-        'dart': ['stable']
-      });
-
-      var oneJob = config.jobs.single;
-      expect(oneJob.sdk, 'stable');
-      expect(oneJob.tasks.first.name, 'test');
-      expect(oneJob.tasks.first.args, isNull);
-      expect(oneJob.tasks.first.config, isNull);
-      expect(oneJob.stageName, 'unit_test');
+    test('Stages named `test` are not allowed', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {
+            'test': ['test']
+          },
+        ]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 7, column 7: Stages are not allowed to have the name `test` because it interacts poorly with the default stage by the same name.
+      "test": [
+      ^^^^^^'''));
     });
 
-    test('valid example', () {
-      var monoYaml = y.loadYaml(testConfig1) as y.YamlMap;
-
-      var config = new MonoConfig.parse('a', monoYaml);
-
-      expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
-
-      var jobs = config.jobs.toList();
-
-      expect(encodeJson(jobs), encodeJson(_testConfig1expectedOutput));
+    test('empty stage job', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {'a': []},
+        ]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 7, column 7: Stages are required to have at least one job. "a" is empty.
+      "a": []
+      ^^^'''));
     });
 
-    group('error checks', () {
-      test('Stages named `test` are not allowed', () {
-        var monoYaml = {
-          'dart': ['stable'],
-          'stages': [
-            {
-              'test': ['test']
-            },
-          ]
-        };
-        expect(
-            () => _parse(monoYaml),
-            throwsCheckedFromJsonException(
-                'Stages are not allowed to have the name `test` because it '
-                'interacts poorly with the default stage by the same name.'));
-      });
+    test('multiple keys under a stage', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {'a': null, 'b': null},
+        ]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 5, column 3: `stages` expects a list of maps with exactly one key (the name of the stage). Got {a: null, b: null}.
+  "stages": [
+  ^^^^^^^^'''));
+    });
 
-      test('empty stage job', () {
-        var monoYaml = {
-          'dart': ['stable'],
-          'stages': [
-            {'a': []},
-          ]
-        };
-        expect(
-            () => _parse(monoYaml),
-            throwsCheckedFromJsonException(
-                'Stages are required to have at least one job. "a" is empty.'));
-      });
+    test('no keys under a stage', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [{}]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 5, column 3: `stages` expects a list of maps with exactly one key (the name of the stage). Got {}.
+  "stages": [
+  ^^^^^^^^'''));
+    });
 
-      test('null stage job', () {
-        var monoYaml = {
-          'dart': ['stable'],
-          'stages': [
-            {'a': null},
-          ]
-        };
-        expect(
-            () => _parse(monoYaml),
-            throwsCheckedFromJsonException(
-                'Stages are required to have at least one job. "a" is null.'));
-      });
+    test('null stage job', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {'a': null},
+        ]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 7, column 7: Stages are required to have at least one job. "a" is null.
+      "a": null
+      ^^^'''));
+    });
 
-      test('Duplicate stage names are not allowed', () {
-        var monoYaml = {
-          'dart': ['stable'],
-          'stages': [
-            {
-              'a': ['test']
-            },
-            {
-              'a': ['dartfmt']
-            },
-          ]
-        };
-        expect(
-            () => _parse(monoYaml),
-            throwsCheckedFromJsonException(
-                'Stages muts be unique. "a" appears more than once.'));
-      });
+    test('unsupported keys', () {
+      var monoYaml = {
+        'extra': 'foo',
+        'dart': ['stable'],
+        'stages': [
+          {
+            'a': ['test']
+          },
+          {
+            'a': ['dartfmt']
+          },
+        ]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 2, column 3: Unrecognized key(s) "extra" in .mono_repo.yaml. Allowed values: "dart", "stages".
+  "extra": "foo",
+  ^^^^^^^'''));
+    });
+
+    test('Duplicate stage names are not allowed', () {
+      var monoYaml = {
+        'dart': ['stable'],
+        'stages': [
+          {
+            'a': ['test']
+          },
+          {
+            'a': ['dartfmt']
+          },
+        ]
+      };
+      expect(() => _parse(monoYaml), throwsCheckedFromJsonException(r'''
+line 12, column 7: Stages muts be unique. "a" appears more than once.
+      "a": [
+      ^^^'''));
     });
   });
 }
