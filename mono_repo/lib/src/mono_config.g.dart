@@ -44,11 +44,8 @@ Task _$TaskFromJson(Map json) => $checkedNew(
     json,
     () => new Task($checkedConvert(json, 'name', (v) => v as String),
         args: $checkedConvert(json, 'args', (v) => v as String),
-        config: $checkedConvert(
-            json,
-            'config',
-            (v) =>
-                v == null ? null : new Map<String, dynamic>.from(v as Map))));
+        config: $checkedConvert(json, 'config',
+            (v) => (v as Map)?.map((k, e) => new MapEntry(k as String, e)))));
 
 abstract class _$TaskSerializerMixin {
   String get name;

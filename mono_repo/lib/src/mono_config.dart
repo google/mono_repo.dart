@@ -122,12 +122,21 @@ class Task extends Object with _$TaskSerializerMixin {
     }
 
     if (yamlValue is Map) {
-      var taskNames = yamlValue.keys.where(_tasks.contains).toList();
-      if (taskNames.isEmpty || taskNames.length > 1) {
-        throw new ArgumentError(
-            'Must have one and only one key of $_prettyTaskList.');
+      var taskNames =
+          yamlValue.keys.where(_tasks.contains).cast<String>().toList();
+      if (taskNames.isEmpty) {
+        String key;
+        if (yamlValue.isNotEmpty) {
+          key = yamlValue.keys.first as String;
+        }
+        throw new CheckedFromJsonException(
+            yamlValue, key, 'Task', 'Must have one key of $_prettyTaskList.');
       }
-      var taskName = taskNames.single as String;
+      if (taskNames.length > 1) {
+        throw new CheckedFromJsonException(yamlValue, taskNames.skip(1).first,
+            'Task', 'Must have one and only one key of $_prettyTaskList.');
+      }
+      var taskName = taskNames.single;
       String args;
       switch (taskName) {
         case 'command':

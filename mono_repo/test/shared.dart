@@ -13,18 +13,26 @@ final isUserException = const isInstanceOf<UserException>();
 Matcher throwsUserExceptionWith(String message, [String details]) {
   var items = <Matcher>[
     isUserException,
-    predicate((e) => (e as UserException).message == message,
-        'has message: "$message".')
+    new FeatureMatcher<UserException>('message', (e) => e.message, message)
   ];
 
   if (details != null) {
-    items.add(predicate((e) {
-      printOnFailure((e as UserException).details);
-      return (e as UserException).details == details;
-    }, 'has details: "$details"'));
+    items.add(new FeatureMatcher<UserException>(
+        'details', (e) => e.details, details));
   }
 
   return throwsA(allOf(items));
+}
+
+// TODO(kevmoo) add this to pkg/matcher – is nice!
+class FeatureMatcher<T> extends CustomMatcher {
+  final dynamic Function(T value) _feature;
+
+  FeatureMatcher(String name, this._feature, matcher)
+      : super('`$name`', '`$name`', matcher);
+
+  @override
+  featureValueOf(covariant T actual) => _feature(actual);
 }
 
 Future sharedSetup() async {
