@@ -10,6 +10,7 @@ import 'package:yaml/yaml.dart' as y;
 
 import 'mono_config.dart';
 import 'package_config.dart';
+import 'user_exception.dart';
 
 const recursiveFlag = 'recursive';
 final packageConfigFileName = 'mono_repo.yaml';
@@ -139,23 +140,6 @@ Map<String, MonoConfig> getMonoConfigs(
     }
   }
   return configs;
-}
-
-class UserException implements Exception {
-  final String message;
-  final String details;
-
-  UserException(this.message, {this.details});
-
-  @override
-  String toString() {
-    var msg = 'UserException: $message';
-
-    if (details != null) {
-      msg += '\n$details';
-    }
-    return msg;
-  }
 }
 
 String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {

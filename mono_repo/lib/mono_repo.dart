@@ -7,7 +7,7 @@ import 'dart:async';
 import 'src/runner.dart';
 
 export 'src/runner.dart' show commands;
-export 'src/utils.dart' show UserException;
+export 'src/user_exception.dart' show UserException;
 
 /// Runs the executable as-if [args] was passed on the command-line.
 Future<Null> run(List<String> args) => new MonoRepoRunner().run(args);

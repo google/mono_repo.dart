@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
 import '../mono_config.dart';
+import '../user_exception.dart';
 import '../utils.dart';
 import 'travis.dart';
 
