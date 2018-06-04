@@ -10,10 +10,9 @@ part of 'raw_config.dart';
 // Generator: JsonSerializableGenerator
 // **************************************************************************
 
-RawConfig _$RawConfigFromJson(Map json) => $checkedNew(
-    'RawConfig',
-    json,
-    () => new RawConfig(
+RawConfig _$RawConfigFromJson(Map json) {
+  return $checkedNew('RawConfig', json, () {
+    var val = new RawConfig(
         $checkedConvert(json, 'dart',
             (v) => (v as List)?.map((e) => e as String)?.toList()),
         $checkedConvert(
@@ -21,5 +20,7 @@ RawConfig _$RawConfigFromJson(Map json) => $checkedNew(
             'stages',
             (v) => (v as List)
                 ?.map((e) => e == null ? null : new RawStage.fromJson(e as Map))
-                ?.toList())),
-    fieldKeyMap: const {'sdks': 'dart'});
+                ?.toList()));
+    return val;
+  }, fieldKeyMap: const {'sdks': 'dart'});
+}

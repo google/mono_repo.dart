@@ -10,10 +10,9 @@ part of 'mono_config.dart';
 // Generator: JsonSerializableGenerator
 // **************************************************************************
 
-TravisJob _$TravisJobFromJson(Map json) => $checkedNew(
-    'TravisJob',
-    json,
-    () => new TravisJob(
+TravisJob _$TravisJobFromJson(Map json) {
+  return $checkedNew('TravisJob', json, () {
+    var val = new TravisJob(
         $checkedConvert(json, 'package', (v) => v as String),
         $checkedConvert(json, 'sdk', (v) => v as String),
         $checkedConvert(json, 'stageName', (v) => v as String),
@@ -24,7 +23,10 @@ TravisJob _$TravisJobFromJson(Map json) => $checkedNew(
                 ?.map((e) => e == null
                     ? null
                     : new Task.fromJson(e as Map<String, dynamic>))
-                ?.toList())));
+                ?.toList()));
+    return val;
+  });
+}
 
 abstract class _$TravisJobSerializerMixin {
   String get package;
@@ -39,13 +41,15 @@ abstract class _$TravisJobSerializerMixin {
       };
 }
 
-Task _$TaskFromJson(Map json) => $checkedNew(
-    'Task',
-    json,
-    () => new Task($checkedConvert(json, 'name', (v) => v as String),
+Task _$TaskFromJson(Map json) {
+  return $checkedNew('Task', json, () {
+    var val = new Task($checkedConvert(json, 'name', (v) => v as String),
         args: $checkedConvert(json, 'args', (v) => v as String),
         config: $checkedConvert(json, 'config',
-            (v) => (v as Map)?.map((k, e) => new MapEntry(k as String, e)))));
+            (v) => (v as Map)?.map((k, e) => new MapEntry(k as String, e))));
+    return val;
+  });
+}
 
 abstract class _$TaskSerializerMixin {
   String get name;

@@ -10,8 +10,10 @@ part of 'package_config.dart';
 // Generator: JsonSerializableGenerator
 // **************************************************************************
 
-PackageConfig _$PackageConfigFromJson(Map json) => $checkedNew(
-    'PackageConfig',
-    json,
-    () => new PackageConfig(
-        $checkedConvert(json, 'published', (v) => v as bool)));
+PackageConfig _$PackageConfigFromJson(Map json) {
+  return $checkedNew('PackageConfig', json, () {
+    var val =
+        new PackageConfig($checkedConvert(json, 'published', (v) => v as bool));
+    return val;
+  });
+}
