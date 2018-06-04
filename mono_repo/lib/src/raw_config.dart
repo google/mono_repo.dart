@@ -6,10 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'raw_config.g.dart';
 
-String _quotedStringList(Iterable<String> items) =>
-    items.map((e) => '"$e"').join(', ');
-
-@JsonSerializable(createToJson: false)
+@JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class RawConfig {
   @JsonKey(name: 'dart')
   final List<String> sdks;
@@ -33,22 +30,6 @@ class RawConfig {
           json, 'dart', 'RawConfig', 'The "dart" key is required.');
     }
 
-    // TODO: remove when json_serializable supports throwing on extra values
-    // https://github.com/dart-lang/json_serializable/issues/184
-    var unrecognizedKeys =
-        (json.keys.cast<String>().toSet()..removeAll(_validKeys)).toList()
-          ..sort();
-
-    if (unrecognizedKeys.isNotEmpty) {
-      throw new CheckedFromJsonException(
-          json,
-          unrecognizedKeys.first,
-          'RawConfig',
-          'Unrecognized key(s) ${_quotedStringList(unrecognizedKeys)} in '
-          '.mono_repo.yaml. Allowed values: '
-          '${_quotedStringList(_validKeys)}.');
-    }
-
     var config = _$RawConfigFromJson(json);
 
     var stages = new Set<String>();
@@ -64,11 +45,6 @@ class RawConfig {
 
     return config;
   }
-
-  static final _validKeys = const [
-    'dart',
-    'stages',
-  ];
 }
 
 class RawStage {

@@ -223,12 +223,17 @@ line 7, column 7: Stages are required to have at least one job. "a" is null.
           {
             'a': ['dartfmt']
           },
-        ]
+        ],
+        'more': null
       };
       _expectParseThrows(monoYaml, r'''
-line 2, column 3: Unrecognized key(s) "extra" in .mono_repo.yaml. Allowed values: "dart", "stages".
+Unrecognized keys: [extra, more]; supported keys: [dart, stages]
+line 2, column 3: Unrecognized key "extra"
   "extra": "foo",
-  ^^^^^^^''');
+  ^^^^^^^
+line 18, column 3: Unrecognized key "more"
+  "more": null
+  ^^^^^^''');
     });
 
     test('Duplicate stage names are not allowed', () {

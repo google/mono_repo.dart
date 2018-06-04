@@ -145,14 +145,26 @@ Map<String, MonoConfig> getMonoConfigs(
 String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
   var yamlMap = err.map as y.YamlMap;
 
-  var yamlKey = yamlMap.nodes.keys.singleWhere(
-      (k) => (k as y.YamlScalar).value == err.key,
-      orElse: () => null) as y.YamlScalar;
+  y.YamlScalar _getYamlKey(String key) => yamlMap.nodes.keys
+      .cast<y.YamlScalar>()
+      .singleWhere((k) => k.value == key, orElse: () => null);
+
+  var yamlKey = _getYamlKey(err.key);
 
   String message;
   if (yamlKey == null) {
-    assert(err.message != null);
-    message = '${yamlMap.span.message(err.message.toString())}';
+    if (err.innerError is UnrecognizedKeysException) {
+      var innerError = err.innerError as UnrecognizedKeysException;
+      message = '${innerError.message}';
+      for (var key in innerError.unrecognizedKeys) {
+        var yamlKey = _getYamlKey(key);
+        assert(yamlKey != null);
+        message += '\n${yamlKey.span.message('Unrecognized key "$key"')}';
+      }
+    } else {
+      assert(err.message != null);
+      message = '${yamlMap.span.message(err.message.toString())}';
+    }
   } else {
     if (err.message == null) {
       message = 'Unsupported value for `${err.key}`.';
