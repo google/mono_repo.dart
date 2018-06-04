@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:mono_repo/src/commands/check.dart' hide DependencyType;
-import 'package:mono_repo/src/pubspec.dart';
+import 'package:mono_repo/src/commands/check.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -21,8 +21,9 @@ main() {
 
     var fooDeps = fooReport.pubspec.dependencies;
     expect(fooDeps, hasLength(2));
-    expect((fooDeps['build'] as HostedData).constraint, VersionConstraint.any);
-    expect((fooDeps['implied_any'] as HostedData).constraint,
+    expect(
+        (fooDeps['build'] as HostedDependency).version, VersionConstraint.any);
+    expect((fooDeps['implied_any'] as HostedDependency).version,
         VersionConstraint.any);
 
     var barReport = reports['bar'];
@@ -31,7 +32,7 @@ main() {
 
     expect(barReport.pubspec.dependencies, hasLength(1));
 
-    var gitDep = barReport.pubspec.dependencies['build'] as GitData;
+    var gitDep = barReport.pubspec.dependencies['build'] as GitDependency;
     expect(gitDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
     expect(gitDep.path, 'build');
     expect(gitDep.ref, 'hacking');
@@ -43,7 +44,7 @@ main() {
     expect(bazReport.pubspec.dependencies, hasLength(1));
     expect(bazReport.pubspec.dependencyOverrides, hasLength(1));
 
-    gitDep = bazReport.pubspec.dependencies['build'] as GitData;
+    gitDep = bazReport.pubspec.dependencies['build'] as GitDependency;
     expect(gitDep.url, Uri.parse('https://github.com/dart-lang/build.git'));
     expect(gitDep.path, isNull);
     expect(gitDep.ref, isNull);
@@ -54,9 +55,8 @@ main() {
     expect(flutterReport.pubspec.dependencies, hasLength(2));
     expect(flutterReport.pubspec.devDependencies, hasLength(1));
 
-    var sdkDep = flutterReport.pubspec.dependencies['flutter'] as SdkData;
-    expect(sdkDep.name, 'flutter');
-    expect(sdkDep.type, DependencyType.sdk);
+    var sdkDep = flutterReport.pubspec.dependencies['flutter'] as SdkDependency;
+    expect(sdkDep.sdk, 'flutter');
   });
 
   test('check recursive', () async {

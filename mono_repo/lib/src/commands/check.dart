@@ -9,10 +9,10 @@ import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:path/path.dart' as p;
+import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart' as y;
 
 import '../package_config.dart';
-import '../pubspec.dart';
 import '../utils.dart';
 
 class CheckCommand extends Command<Null> {
@@ -125,8 +125,8 @@ enum DependencyType { direct, dev, indirect }
 
 class SiblingReference {
   final DependencyType type;
-  final DependencyData normalData;
-  final DependencyData overrideData;
+  final Dependency normalData;
+  final Dependency overrideData;
 
   SiblingReference(this.type, this.normalData, this.overrideData);
 
