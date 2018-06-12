@@ -26,7 +26,7 @@ class CheckCommand extends Command<Null> {
   Future<Null> run() => check(recursive: globalResults[recursiveFlag] as bool);
 }
 
-Future<Null> check({String rootDirectory, bool recursive: false}) async {
+Future<Null> check({String rootDirectory, bool recursive = false}) async {
   var reports = await getPackageReports(
       rootDirectory: rootDirectory, recursive: recursive);
 
@@ -37,7 +37,7 @@ Future<Null> check({String rootDirectory, bool recursive: false}) async {
 }
 
 Future<Map<String, PackageReport>> getPackageReports(
-    {String rootDirectory, bool recursive: false}) async {
+    {String rootDirectory, bool recursive = false}) async {
   rootDirectory ??= p.current;
   var packages =
       getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);

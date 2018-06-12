@@ -9,7 +9,7 @@ import 'package:mono_repo/mono_repo.dart';
 import 'package:io/ansi.dart' as ansi;
 import 'package:io/io.dart';
 
-main(List<String> arguments) async {
+void main(List<String> arguments) async {
   try {
     await run(arguments);
   } on UserException catch (e) {

@@ -32,7 +32,7 @@ class FeatureMatcher<T> extends CustomMatcher {
       : super('`$name`', '`$name`', matcher);
 
   @override
-  featureValueOf(covariant T actual) => _feature(actual);
+  Object featureValueOf(covariant T actual) => _feature(actual);
 }
 
 Future sharedSetup() async {

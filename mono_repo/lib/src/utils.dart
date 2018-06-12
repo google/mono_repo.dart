@@ -49,7 +49,7 @@ Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {
 
 /// If the file exists, open it – otherwise infer it from the data on disk.
 Map<String, PackageConfig> getPackageConfig(
-    {String rootDirectory, bool recursive: false}) {
+    {String rootDirectory, bool recursive = false}) {
   rootDirectory ??= p.current;
 
   var packageFileName = p.join(rootDirectory, packageConfigFileName);
@@ -97,7 +97,7 @@ Map<String, PackageConfig> getPackageConfig(
 }
 
 Map<String, MonoConfig> getMonoConfigs(
-    {String rootDirectory, bool recursive: false}) {
+    {String rootDirectory, bool recursive = false}) {
   rootDirectory ??= p.current;
 
   var packages =

@@ -9,13 +9,16 @@ analyzer:
     unused_local_variable: error
 linter:
   rules:
+    - always_declare_return_types
     - annotate_overrides
     - avoid_empty_else
     - avoid_function_literals_in_foreach_calls
     - avoid_init_to_null
     - avoid_null_checks_in_equality_operators
+    - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
     - avoid_returning_null
+    - avoid_types_as_parameter_names
     - avoid_unused_constructor_parameters
     - await_only_futures
     - camel_case_types
@@ -35,13 +38,14 @@ linter:
     - library_names
     - library_prefixes
     - list_remove_unrelated_type
+    - literal_only_boolean_expressions
     - no_adjacent_strings_in_list
     - no_duplicate_case_values
     - non_constant_identifier_names
     - omit_local_variable_types
     - only_throw_errors
     - overridden_fields
-    #- package_api_docs
+    - package_api_docs
     - package_names
     - package_prefixed_library_names
     - prefer_adjacent_string_concatenation
@@ -49,6 +53,7 @@ linter:
     - prefer_conditional_assignment
     - prefer_const_constructors
     - prefer_contains
+    - prefer_equal_for_default_values
     - prefer_final_fields
     - prefer_initializing_formals
     - prefer_interpolation_to_compose_strings
@@ -60,7 +65,6 @@ linter:
     - slash_for_doc_comments
     - super_goes_last
     - test_types_in_equals
-    - test_types_in_equals
     - throw_in_finally
     - type_init_formals
     - unawaited_futures
@@ -71,4 +75,5 @@ linter:
     - unnecessary_statements
     - unnecessary_this
     - unrelated_type_equality_checks
+    - use_rethrow_when_possible
     - valid_regexps

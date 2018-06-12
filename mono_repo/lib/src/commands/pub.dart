@@ -41,7 +41,7 @@ class _PubSubCommand extends Command<Null> {
 }
 
 Future<Null> pub(String pubCommand,
-    {String rootDirectory, bool recursive: false}) async {
+    {String rootDirectory, bool recursive = false}) async {
   rootDirectory ??= p.current;
   var configs =
       getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);

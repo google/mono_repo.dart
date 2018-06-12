@@ -5,7 +5,7 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
 
-main() {
+void main() {
   setUp(sharedSetup);
 
   test('empty', () async {
