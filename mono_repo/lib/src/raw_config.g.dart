@@ -12,7 +12,7 @@ part of 'raw_config.dart';
 
 RawConfig _$RawConfigFromJson(Map json) {
   return $checkedNew('RawConfig', json, () {
-    $checkAllowedKeys(json, const ['dart', 'stages']);
+    $checkKeys(json, allowedKeys: const ['dart', 'stages']);
     var val = new RawConfig(
         $checkedConvert(json, 'dart',
             (v) => (v as List)?.map((e) => e as String)?.toList()),
