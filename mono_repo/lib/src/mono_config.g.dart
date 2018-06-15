@@ -7,7 +7,7 @@
 part of 'mono_config.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
 TravisJob _$TravisJobFromJson(Map json) {

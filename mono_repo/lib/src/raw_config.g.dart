@@ -7,7 +7,7 @@
 part of 'raw_config.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
 RawConfig _$RawConfigFromJson(Map json) {

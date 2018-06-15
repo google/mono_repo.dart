@@ -7,7 +7,7 @@
 part of 'package_config.dart';
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
 PackageConfig _$PackageConfigFromJson(Map json) {

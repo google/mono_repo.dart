@@ -18,13 +18,12 @@ import 'shared.dart';
 String _encodeJson(Object input) =>
     const JsonEncoder.withIndent('  ').convert(input);
 
-Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(allOf(
-    const isInstanceOf<CheckedFromJsonException>(),
-    new FeatureMatcher<CheckedFromJsonException>('prettyPrint', (e) {
+Matcher throwsCheckedFromJsonException(String prettyValue) =>
+    throwsA(const TypeMatcher<CheckedFromJsonException>().having((e) {
       var prettyValue = prettyPrintCheckedFromJsonException(e);
       printOnFailure("r'''\n$prettyValue'''");
       return prettyValue;
-    }, prettyValue)));
+    }, 'prettyPrint', prettyValue));
 
 MonoConfig _parse(map) =>
     new MonoConfig.parse('a', y.loadYaml(_encodeJson(map)) as y.YamlMap);
