@@ -8,31 +8,15 @@ import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-final isUserException = const isInstanceOf<UserException>();
-
 Matcher throwsUserExceptionWith(String message, [String details]) {
-  var items = <Matcher>[
-    isUserException,
-    new FeatureMatcher<UserException>('message', (e) => e.message, message)
-  ];
+  var matcher = const TypeMatcher<UserException>()
+      .having((e) => e.message, 'message', message);
 
   if (details != null) {
-    items.add(new FeatureMatcher<UserException>(
-        'details', (e) => e.details, details));
+    matcher = matcher.having((e) => e.details, 'details', details);
   }
 
-  return throwsA(allOf(items));
-}
-
-// TODO(kevmoo) add this to pkg/matcher – is nice!
-class FeatureMatcher<T> extends CustomMatcher {
-  final dynamic Function(T value) _feature;
-
-  FeatureMatcher(String name, this._feature, matcher)
-      : super('`$name`', '`$name`', matcher);
-
-  @override
-  Object featureValueOf(covariant T actual) => _feature(actual);
+  return throwsA(matcher);
 }
 
 Future sharedSetup() async {
