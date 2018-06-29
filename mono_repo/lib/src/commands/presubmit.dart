@@ -119,8 +119,8 @@ Future<bool> presubmit(
           continue;
         }
 
-        var result = await Process
-            .run(travisShPath, [taskKey], environment: {'PKG': package});
+        var result = await Process.run(travisShPath, [taskKey],
+            environment: {'PKG': package});
         if (result.exitCode == 0) {
           stderr.writeln(green.wrap('(success)'));
         } else {
