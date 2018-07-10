@@ -120,7 +120,7 @@ List<String> _calculateTaskEntries(
   taskEntries.sort();
 
   addEntry('*', [
-    'echo -e "${_wrap(prettyAnsi, red,"Not expecting TASK '\${TASK}'. Error!")}"',
+    'echo -e "${_wrap(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!")}"',
     'EXIT_CODE=1'
   ]);
   return taskEntries;
