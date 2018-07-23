@@ -7,6 +7,9 @@ stages:
     - group:
         - dartfmt
         - dartanalyzer: --fatal-infos --fatal-warnings .
+  - build:
+    - command: pub run build_runner build test
   - unit_test:
-    - test: -x presubmit-only
-    - test: --run-skipped -t presubmit-only
+    - group:
+      - test: -x presubmit-only
+      - test: --run-skipped -t presubmit-only

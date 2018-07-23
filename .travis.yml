@@ -7,17 +7,18 @@ jobs:
       script: ./tool/travis.sh dartfmt dartanalyzer
       env: PKG="mono_repo"
       dart: dev
-    - stage: unit_test
-      script: ./tool/travis.sh test_0
+    - stage: build
+      script: ./tool/travis.sh command
       env: PKG="mono_repo"
       dart: dev
     - stage: unit_test
-      script: ./tool/travis.sh test_1
+      script: ./tool/travis.sh test_0 test_1
       env: PKG="mono_repo"
       dart: dev
 
 stages:
   - smoke_test
+  - build
   - unit_test
 
 # Only building master means that we don't run two builds for each pull request.
@@ -27,3 +28,4 @@ branches:
 cache:
   directories:
     - $HOME/.pub-cache
+    - $HOME/mono_repo/.dart_tool/build
