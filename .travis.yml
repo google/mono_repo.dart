@@ -29,4 +29,4 @@ cache:
   directories:
     - $HOME/.pub-cache
     # HAND EDITS
-    - $HOME/mono_repo/.dart_tool/build
+    - mono_repo/.dart_tool/build
