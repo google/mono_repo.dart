@@ -11,5 +11,5 @@ stages:
     - command: pub run build_runner build test
   - unit_test:
     - group:
-      - test: -x presubmit-only
-      - test: --run-skipped -t presubmit-only
+      - command: pub run build_runner test -- -x presubmit-only
+      - command: pub run build_runner test -- --run-skipped -t presubmit-only

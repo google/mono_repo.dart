@@ -19,10 +19,20 @@ EXIT_CODE=0
 while (( "$#" )); do
   TASK=$1
   case $TASK in
-  command) echo
-    echo -e '\033[1mTASK: command\033[22m'
+  command_0) echo
+    echo -e '\033[1mTASK: command_0\033[22m'
     echo -e 'pub run build_runner build test'
     pub run build_runner build test || EXIT_CODE=$?
+    ;;
+  command_1) echo
+    echo -e '\033[1mTASK: command_1\033[22m'
+    echo -e 'pub run build_runner test -- -x presubmit-only'
+    pub run build_runner test -- -x presubmit-only || EXIT_CODE=$?
+    ;;
+  command_2) echo
+    echo -e '\033[1mTASK: command_2\033[22m'
+    echo -e 'pub run build_runner test -- --run-skipped -t presubmit-only'
+    pub run build_runner test -- --run-skipped -t presubmit-only || EXIT_CODE=$?
     ;;
   dartanalyzer) echo
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
@@ -33,16 +43,6 @@ while (( "$#" )); do
     echo -e '\033[1mTASK: dartfmt\033[22m'
     echo -e 'dartfmt -n --set-exit-if-changed .'
     dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
-    ;;
-  test_0) echo
-    echo -e '\033[1mTASK: test_0\033[22m'
-    echo -e 'pub run test -x presubmit-only'
-    pub run test -x presubmit-only || EXIT_CODE=$?
-    ;;
-  test_1) echo
-    echo -e '\033[1mTASK: test_1\033[22m'
-    echo -e 'pub run test --run-skipped -t presubmit-only'
-    pub run test --run-skipped -t presubmit-only || EXIT_CODE=$?
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
     EXIT_CODE=1
