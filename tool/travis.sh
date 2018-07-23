@@ -21,8 +21,8 @@ while (( "$#" )); do
   case $TASK in
   command_0) echo
     echo -e '\033[1mTASK: command_0\033[22m'
-    echo -e 'pub run build_runner build test'
-    pub run build_runner build test || EXIT_CODE=$?
+    echo -e 'pub run build_runner build test --delete-conflicting-outputs'
+    pub run build_runner build test --delete-conflicting-outputs || EXIT_CODE=$?
     ;;
   command_1) echo
     echo -e '\033[1mTASK: command_1\033[22m'

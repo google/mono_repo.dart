@@ -8,7 +8,7 @@ stages:
         - dartfmt
         - dartanalyzer: --fatal-infos --fatal-warnings .
   - build:
-    - command: pub run build_runner build test
+    - command: pub run build_runner build test --delete-conflicting-outputs
   - unit_test:
     - group:
       - command: pub run build_runner test -- -x presubmit-only
