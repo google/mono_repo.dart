@@ -1,3 +1,7 @@
+## 0.3.3
+
+* Support adding custom cache directories in each project.
+
 ## 0.3.2+1
 
 * Support Dart 2 stable.

@@ -12,7 +12,7 @@ part of 'raw_config.dart';
 
 RawConfig _$RawConfigFromJson(Map json) {
   return $checkedNew('RawConfig', json, () {
-    $checkKeys(json, allowedKeys: const ['dart', 'stages']);
+    $checkKeys(json, allowedKeys: const ['dart', 'stages', 'cache']);
     var val = new RawConfig(
         $checkedConvert(json, 'dart',
             (v) => (v as List)?.map((e) => e as String)?.toList()),
@@ -21,7 +21,17 @@ RawConfig _$RawConfigFromJson(Map json) {
             'stages',
             (v) => (v as List)
                 ?.map((e) => e == null ? null : new RawStage.fromJson(e as Map))
-                ?.toList()));
+                ?.toList()),
+        $checkedConvert(json, 'cache',
+            (v) => v == null ? null : new RawCache.fromJson(v as Map)));
     return val;
   }, fieldKeyMap: const {'sdks': 'dart'});
+}
+
+RawCache _$RawCacheFromJson(Map json) {
+  return $checkedNew('RawCache', json, () {
+    var val = new RawCache($checkedConvert(json, 'directories',
+        (v) => (v as List)?.map((e) => e as String)?.toList()));
+    return val;
+  });
 }

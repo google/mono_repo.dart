@@ -133,6 +133,11 @@ dart:
 stages:
   - format:
     - dartfmt
+
+cache:
+  directories:
+    - .dart_tool
+    - /some_repo_root_dir
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
@@ -147,6 +152,11 @@ dart:
 stages:
   - format:
     - dartfmt: sdk
+
+cache:
+  directories:
+    - .dart_tool
+    - /some_repo_root_dir
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_b
@@ -186,6 +196,9 @@ branches:
 cache:
   directories:
     - $HOME/.pub-cache
+    - /some_repo_root_dir
+    - pkg_a/.dart_tool
+    - pkg_b/.dart_tool
 ''').validate();
 
     await d.file(travisShPath, r'''

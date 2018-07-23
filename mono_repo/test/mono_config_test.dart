@@ -226,7 +226,7 @@ line 7, column 7: Stages are required to have at least one job. "a" is null.
         'more': null
       };
       _expectParseThrows(monoYaml, r'''
-Unrecognized keys: [extra, more]; supported keys: [dart, stages]
+Unrecognized keys: [extra, more]; supported keys: [dart, stages, cache]
 line 2, column 3: Unrecognized key "extra"
   "extra": "foo",
   ^^^^^^^

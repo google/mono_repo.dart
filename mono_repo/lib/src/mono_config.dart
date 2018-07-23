@@ -20,7 +20,9 @@ class MonoConfig {
 
   final List<TravisJob> jobs;
 
-  MonoConfig(this.sdks, this.stageNames, this.jobs);
+  final List<String> cacheDirectories;
+
+  MonoConfig(this.sdks, this.stageNames, this.jobs, this.cacheDirectories);
 
   factory MonoConfig.parse(String package, Map monoYaml) {
     var rawConfig = new RawConfig.fromJson(monoYaml);
@@ -43,7 +45,8 @@ class MonoConfig {
       return stage.name;
     }).toList();
 
-    return new MonoConfig(rawConfig.sdks, stageNames, jobs);
+    return new MonoConfig(rawConfig.sdks, stageNames, jobs,
+        rawConfig.cache?.directories ?? const []);
   }
 }
 

@@ -13,7 +13,9 @@ class RawConfig {
 
   final List<RawStage> stages;
 
-  RawConfig(this.sdks, List<RawStage> stages)
+  final RawCache cache;
+
+  RawConfig(this.sdks, List<RawStage> stages, this.cache)
       : this.stages = stages ??
             [
               new RawStage('unit_test', ['test'])
@@ -45,6 +47,15 @@ class RawConfig {
 
     return config;
   }
+}
+
+@JsonSerializable(createToJson: false)
+class RawCache {
+  final List<String> directories;
+
+  RawCache(this.directories);
+
+  factory RawCache.fromJson(Map json) => _$RawCacheFromJson(json);
 }
 
 class RawStage {
