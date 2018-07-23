@@ -1,3 +1,7 @@
+## 0.3.2+1
+
+* Support Dart 2 stable.
+
 ## 0.3.2
 
 * Support dependencies that specify an SDK – common with Flutter.
