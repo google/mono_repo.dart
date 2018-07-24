@@ -28,5 +28,4 @@ branches:
 cache:
   directories:
     - $HOME/.pub-cache
-    # HAND EDITS
     - mono_repo/.dart_tool/build

@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
@@ -227,6 +228,8 @@ String _travisYml(
   var orderedStages = _calculateOrderedStages(configs.values);
   var jobs = configs.values.expand((config) => config.jobs);
 
+  var cacheDirs = _cacheDirs(configs).map((e) => '    - $e').join('\n');
+
   return '''
 # Created with https://github.com/dart-lang/mono_repo
 language: dart
@@ -242,8 +245,20 @@ branches:
 
 cache:
   directories:
-    - \$HOME/.pub-cache
+$cacheDirs
 ''';
+}
+
+Iterable<String> _cacheDirs(Map<String, MonoConfig> configs) {
+  var items = new SplayTreeSet<String>()..add('\$HOME/.pub-cache');
+
+  for (var entry in configs.entries) {
+    for (var dir in entry.value.cacheDirectories) {
+      items.add(p.posix.join(entry.key, dir));
+    }
+  }
+
+  return items;
 }
 
 /// Calculates the global stages ordering, and throws a [UserException] if it
