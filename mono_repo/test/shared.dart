@@ -97,7 +97,8 @@ dart:
 
 stages:
   - analyze_and_format:
-    - group:
+    - description: "dartanalyzer && dartfmt"
+      group:
         - dartanalyzer: --fatal-infos --fatal-warnings .
         - dartfmt
       dart:
@@ -131,7 +132,8 @@ stages:
       dart:
         - 1.23.0
   - unit_test:
-    - test: --platform chrome
+    - description: "chrome tests"
+      test: --platform chrome
     - test: --preset travis --total-shards 9 --shard-index 0
     - test: --preset travis --total-shards 9 --shard-index 1
     - test: --preset travis --total-shards 9 --shard-index 2

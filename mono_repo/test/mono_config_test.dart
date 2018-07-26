@@ -258,6 +258,7 @@ line 12, column 7: Stages muts be unique. "a" appears more than once.
 
 List get _testConfig1expectedOutput => [
       {
+        "description": "dartanalyzer && dartfmt",
         "package": "a",
         "sdk": "dev",
         "stageName": "analyze_and_format",

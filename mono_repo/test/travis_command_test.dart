@@ -359,17 +359,17 @@ jobs:
       env: PKG="sub_pkg"
       dart: 1.23.0
     - stage: unit_test
-      name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --platform chrome"
+      name: "SDK: dev - DIR: sub_pkg - TASKS: chrome tests"
       script: ./tool/travis.sh test_00
       env: PKG="sub_pkg"
       dart: dev
     - stage: unit_test
-      name: "SDK: stable - DIR: sub_pkg - TASKS: pub run test --platform chrome"
+      name: "SDK: stable - DIR: sub_pkg - TASKS: chrome tests"
       script: ./tool/travis.sh test_00
       env: PKG="sub_pkg"
       dart: stable
     - stage: unit_test
-      name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --platform chrome"
+      name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: chrome tests"
       script: ./tool/travis.sh test_00
       env: PKG="sub_pkg"
       dart: 1.23.0
