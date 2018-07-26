@@ -4,17 +4,17 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
-      name: "SDK: dev&nbsp;&nbsp;&nbsp;&nbsp;DIR: mono_repo&nbsp;&nbsp;&nbsp;&nbsp;Description: dartfmt && dartanalyzer"
+      name: "SDK: dev - DIR: mono_repo - TASKS: dartfmt && dartanalyzer"
       script: ./tool/travis.sh dartfmt dartanalyzer
       env: PKG="mono_repo"
       dart: dev
     - stage: build
-      name: "SDK: dev&nbsp;&nbsp;&nbsp;&nbsp;DIR: mono_repo&nbsp;&nbsp;&nbsp;&nbsp;Description: [pub run build_runner build test --delete-conflicting-outputs]"
+      name: "SDK: dev - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
       script: ./tool/travis.sh command_0
       env: PKG="mono_repo"
       dart: dev
     - stage: unit_test
-      name: "SDK: dev&nbsp;&nbsp;&nbsp;&nbsp;DIR: mono_repo&nbsp;&nbsp;&nbsp;&nbsp;Description: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
+      name: "SDK: dev - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
       script: ./tool/travis.sh command_1 command_2
       env: PKG="mono_repo"
       dart: dev

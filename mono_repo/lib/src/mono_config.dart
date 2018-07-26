@@ -69,7 +69,10 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
 
   /// The description of the job to use for the job in the travis dashboard.
   String get name =>
-      description ?? tasks.map((t) => t.command).toList().toString();
+      description ??
+      (tasks.length > 1
+          ? tasks.map((t) => t.command).toList().toString()
+          : tasks.first.command);
 
   TravisJob(this.package, this.sdk, this.stageName, this.tasks,
       {this.description});
