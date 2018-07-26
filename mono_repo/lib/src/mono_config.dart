@@ -83,11 +83,14 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   factory TravisJob.parse(
       String package, String sdk, String stageName, Object yaml) {
     String description;
+    dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
-      yaml = new Map.of(yaml as Map);
-      description = (yaml as Map).remove('description') as String;
+      withoutDescription = new Map.of(yaml);
+      description = withoutDescription.remove('description') as String;
+    } else {
+      withoutDescription = yaml;
     }
-    var tasks = Task.parseTaskOrGroup(yaml);
+    var tasks = Task.parseTaskOrGroup(withoutDescription);
     return new TravisJob(package, sdk, stageName, tasks,
         description: description);
   }
