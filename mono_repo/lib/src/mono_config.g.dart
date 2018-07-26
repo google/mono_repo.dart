@@ -35,13 +35,22 @@ abstract class _$TravisJobSerializerMixin {
   String get sdk;
   String get stageName;
   List<Task> get tasks;
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'description': description,
-        'package': package,
-        'sdk': sdk,
-        'stageName': stageName,
-        'tasks': tasks
-      };
+  Map<String, dynamic> toJson() {
+    var val = <String, dynamic>{};
+
+    void writeNotNull(String key, dynamic value) {
+      if (value != null) {
+        val[key] = value;
+      }
+    }
+
+    writeNotNull('description', description);
+    val['package'] = package;
+    val['sdk'] = sdk;
+    val['stageName'] = stageName;
+    val['tasks'] = tasks;
+    return val;
+  }
 }
 
 Task _$TaskFromJson(Map json) {

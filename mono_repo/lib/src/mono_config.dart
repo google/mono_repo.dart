@@ -53,6 +53,7 @@ class MonoConfig {
 @JsonSerializable()
 class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
+  @JsonKey(includeIfNull: false)
   final String description;
 
   @override
