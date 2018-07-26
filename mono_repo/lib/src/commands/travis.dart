@@ -307,7 +307,7 @@ String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
         job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
     buffer.writeln('''
     - stage: ${job.stageName}
-      name: "**Dart:** ${job.sdk} **Package:** ${job.package} **Description**: ${job.name}"
+      name: "Dart SDK: ${job.sdk}\nDirectory: ${job.package}\nDescription: ${job.name}"
       script: ./tool/travis.sh $commands
       env: PKG="${job.package}"
       dart: ${job.sdk}''');
