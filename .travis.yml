@@ -4,17 +4,17 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
-      name: "Dart: dev   Package: mono_repo   Description: dartfmt && dartanalyzer"
+      name: "<strong>Dart:</strong> dev <strong>Package:</strong> mono_repo <strong>Description</<strong>: dartfmt && dartanalyzer"
       script: ./tool/travis.sh dartfmt dartanalyzer
       env: PKG="mono_repo"
       dart: dev
     - stage: build
-      name: "Dart: dev   Package: mono_repo   Description: pub run build_runner build test --delete-conflicting-outputs"
+      name: "<strong>Dart:</strong> dev <strong>Package:</strong> mono_repo <strong>Description</<strong>: [pub run build_runner build test --delete-conflicting-outputs]"
       script: ./tool/travis.sh command_0
       env: PKG="mono_repo"
       dart: dev
     - stage: unit_test
-      name: "Dart: dev   Package: mono_repo   Description: pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only"
+      name: "<strong>Dart:</strong> dev <strong>Package:</strong> mono_repo <strong>Description</<strong>: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
       script: ./tool/travis.sh command_1 command_2
       env: PKG="mono_repo"
       dart: dev
