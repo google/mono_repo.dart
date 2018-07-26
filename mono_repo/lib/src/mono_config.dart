@@ -53,7 +53,7 @@ class MonoConfig {
 @JsonSerializable()
 class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
-  final String name;
+  final String description;
 
   @override
   final String package;
@@ -67,20 +67,25 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   final List<Task> tasks;
 
-  TravisJob(this.package, this.sdk, this.stageName, this.tasks, {this.name});
+  /// The description of the job to use for the job in the travis dashboard.
+  String get name => description ?? tasks.map((t) => t.command).join(', ');
+
+  TravisJob(this.package, this.sdk, this.stageName, this.tasks,
+      {this.description});
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
       String package, String sdk, String stageName, Object yaml) {
-    String name;
-    if (yaml is Map && yaml.containsKey('name')) {
+    String description;
+    if (yaml is Map && yaml.containsKey('description')) {
       yaml = new Map.of(yaml as Map);
-      name = (yaml as Map).remove('name') as String;
+      description = (yaml as Map).remove('description') as String;
     }
-    return new TravisJob(package, sdk, stageName, Task.parseTaskOrGroup(yaml),
-        name: name);
+    var tasks = Task.parseTaskOrGroup(yaml);
+    return new TravisJob(package, sdk, stageName, tasks,
+        description: description);
   }
 
   @override
@@ -90,7 +95,7 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   int get hashCode => _equality.hash(_items);
 
-  List get _items => [name, package, sdk, stageName, tasks];
+  List get _items => [description, package, sdk, stageName, tasks];
 }
 
 @JsonSerializable(includeIfNull: false)

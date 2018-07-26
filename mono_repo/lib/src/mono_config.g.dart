@@ -24,19 +24,19 @@ TravisJob _$TravisJobFromJson(Map json) {
                     ? null
                     : new Task.fromJson(e as Map<String, dynamic>))
                 ?.toList()),
-        name: $checkedConvert(json, 'name', (v) => v as String));
+        description: $checkedConvert(json, 'description', (v) => v as String));
     return val;
   });
 }
 
 abstract class _$TravisJobSerializerMixin {
-  String get name;
+  String get description;
   String get package;
   String get sdk;
   String get stageName;
   List<Task> get tasks;
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'name': name,
+        'description': description,
         'package': package,
         'sdk': sdk,
         'stageName': stageName,
