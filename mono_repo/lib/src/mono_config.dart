@@ -53,6 +53,10 @@ class MonoConfig {
 @JsonSerializable()
 class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
+  @JsonKey(includeIfNull: false)
+  final String description;
+
+  @override
   final String package;
 
   @override
@@ -64,14 +68,33 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   final List<Task> tasks;
 
-  TravisJob(this.package, this.sdk, this.stageName, this.tasks);
+  /// The description of the job to use for the job in the travis dashboard.
+  String get name =>
+      description ??
+      (tasks.length > 1
+          ? tasks.map((t) => t.command).toList().toString()
+          : tasks.first.command);
+
+  TravisJob(this.package, this.sdk, this.stageName, this.tasks,
+      {this.description});
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
-          String package, String sdk, String stageName, Object yaml) =>
-      new TravisJob(package, sdk, stageName, Task.parseTaskOrGroup(yaml));
+      String package, String sdk, String stageName, Object yaml) {
+    String description;
+    dynamic withoutDescription;
+    if (yaml is Map && yaml.containsKey('description')) {
+      withoutDescription = new Map.of(yaml);
+      description = withoutDescription.remove('description') as String;
+    } else {
+      withoutDescription = yaml;
+    }
+    var tasks = Task.parseTaskOrGroup(withoutDescription);
+    return new TravisJob(package, sdk, stageName, tasks,
+        description: description);
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -80,7 +103,7 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   int get hashCode => _equality.hash(_items);
 
-  List get _items => [sdk, tasks];
+  List get _items => [description, package, sdk, stageName, tasks];
 }
 
 @JsonSerializable(includeIfNull: false)

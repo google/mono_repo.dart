@@ -1,6 +1,16 @@
 ## 0.3.3
 
 * Support adding custom cache directories in each project.
+* Add custom names for travis jobs based on the actual tasks being ran, as well
+  as the sdk and subdirectory. The job description portion is configurable with
+  the new `description` key for jobs within a stage, for example:
+
+```yaml
+stages:
+  - unit_test:
+    - description: "chrome"
+      test: -p chrome
+```
 
 ## 0.3.2+1
 
@@ -21,7 +31,7 @@
   normal format. This can be used to group multiple tasks in a single travis
   job. All tasks will be ran, but if any of them fail then the whole job will
   fail.
-  
+
   Example usage combining the analyzer/dartfmt tasks:
 
 ```yaml
@@ -74,7 +84,7 @@ stages:
 
   * Print out the full command that executed as part of a task.
 
-  * Support a `List` value for `before_script`. 
+  * Support a `List` value for `before_script`.
 
 ## 0.2.1
 
@@ -82,7 +92,7 @@ stages:
 
   * Write ANSI escape sequences in `./tool/travis.sh` as pre-escaped ASCII
     literals.
-  
+
   * Added `--[no-]pretty-ansi` flag to allow ANSI sequences to be optionally
     omitted.
 
@@ -97,7 +107,7 @@ stages:
 
 * Support git dependencies in packages.
 
-* Use `mono_repo.yaml` as the configuration file name, instead of 
+* Use `mono_repo.yaml` as the configuration file name, instead of
   `packages.yaml`.
 
 ## 0.1.0

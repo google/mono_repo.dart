@@ -4,7 +4,8 @@ dart:
 
 stages:
   - smoke_test:
-    - group:
+    - description: "dartfmt && dartanalyzer"
+      group:
         - dartfmt
         - dartanalyzer: --fatal-infos --fatal-warnings .
   - build:

@@ -305,8 +305,12 @@ String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
   for (var job in jobs) {
     var commands =
         job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
+    var jobName = 'SDK: ${job.sdk} - '
+        'DIR: ${job.package} - '
+        'TASKS: ${job.name}';
     buffer.writeln('''
     - stage: ${job.stageName}
+      name: "$jobName"
       script: ./tool/travis.sh $commands
       env: PKG="${job.package}"
       dart: ${job.sdk}''');
