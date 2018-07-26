@@ -4,6 +4,7 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
+      name: "mono_repo: dartfmt && dartanalyzer"
       script: ./tool/travis.sh dartfmt dartanalyzer
       env: PKG="mono_repo"
       dart: dev

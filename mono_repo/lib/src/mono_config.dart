@@ -53,6 +53,9 @@ class MonoConfig {
 @JsonSerializable()
 class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
+  final String name;
+
+  @override
   final String package;
 
   @override
@@ -64,14 +67,21 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   final List<Task> tasks;
 
-  TravisJob(this.package, this.sdk, this.stageName, this.tasks);
+  TravisJob(this.package, this.sdk, this.stageName, this.tasks, {this.name});
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
-          String package, String sdk, String stageName, Object yaml) =>
-      new TravisJob(package, sdk, stageName, Task.parseTaskOrGroup(yaml));
+      String package, String sdk, String stageName, Object yaml) {
+    String name;
+    if (yaml is Map && yaml.containsKey('name')) {
+      yaml = new Map.of(yaml as Map);
+      name = (yaml as Map).remove('name') as String;
+    }
+    return new TravisJob(package, sdk, stageName, Task.parseTaskOrGroup(yaml),
+        name: name);
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -80,7 +90,7 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
   @override
   int get hashCode => _equality.hash(_items);
 
-  List get _items => [sdk, tasks];
+  List get _items => [name, package, sdk, stageName, tasks];
 }
 
 @JsonSerializable(includeIfNull: false)
