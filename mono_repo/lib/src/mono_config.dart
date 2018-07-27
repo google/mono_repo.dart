@@ -51,21 +51,16 @@ class MonoConfig {
 }
 
 @JsonSerializable()
-class TravisJob extends Object with _$TravisJobSerializerMixin {
-  @override
+class TravisJob {
   @JsonKey(includeIfNull: false)
   final String description;
 
-  @override
   final String package;
 
-  @override
   final String sdk;
 
-  @override
   final String stageName;
 
-  @override
   final List<Task> tasks;
 
   /// The description of the job to use for the job in the travis dashboard.
@@ -96,6 +91,8 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
         description: description);
   }
 
+  Map<String, dynamic> toJson() => _$TravisJobToJson(this);
+
   @override
   bool operator ==(Object other) =>
       other is TravisJob && _equality.equals(_items, other._items);
@@ -107,17 +104,14 @@ class TravisJob extends Object with _$TravisJobSerializerMixin {
 }
 
 @JsonSerializable(includeIfNull: false)
-class Task extends Object with _$TaskSerializerMixin {
+class Task {
   static final _tasks = const ['dartfmt', 'dartanalyzer', 'test', 'command'];
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
-  @override
   final String name;
 
-  @override
   final String args;
 
-  @override
   final Map<String, dynamic> config;
 
   Task(this.name, {this.args, this.config});
@@ -193,6 +187,8 @@ class Task extends Object with _$TaskSerializerMixin {
   }
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TaskToJson(this);
 
   String get command {
     switch (name) {

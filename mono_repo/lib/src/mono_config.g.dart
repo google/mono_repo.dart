@@ -1,7 +1,3 @@
-// Copyright (c) 2017, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'mono_config.dart';
@@ -29,28 +25,21 @@ TravisJob _$TravisJobFromJson(Map json) {
   });
 }
 
-abstract class _$TravisJobSerializerMixin {
-  String get description;
-  String get package;
-  String get sdk;
-  String get stageName;
-  List<Task> get tasks;
-  Map<String, dynamic> toJson() {
-    var val = <String, dynamic>{};
+Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
+  var val = <String, dynamic>{};
 
-    void writeNotNull(String key, dynamic value) {
-      if (value != null) {
-        val[key] = value;
-      }
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
     }
-
-    writeNotNull('description', description);
-    val['package'] = package;
-    val['sdk'] = sdk;
-    val['stageName'] = stageName;
-    val['tasks'] = tasks;
-    return val;
   }
+
+  writeNotNull('description', instance.description);
+  val['package'] = instance.package;
+  val['sdk'] = instance.sdk;
+  val['stageName'] = instance.stageName;
+  val['tasks'] = instance.tasks;
+  return val;
 }
 
 Task _$TaskFromJson(Map json) {
@@ -63,22 +52,17 @@ Task _$TaskFromJson(Map json) {
   });
 }
 
-abstract class _$TaskSerializerMixin {
-  String get name;
-  String get args;
-  Map<String, dynamic> get config;
-  Map<String, dynamic> toJson() {
-    var val = <String, dynamic>{};
+Map<String, dynamic> _$TaskToJson(Task instance) {
+  var val = <String, dynamic>{};
 
-    void writeNotNull(String key, dynamic value) {
-      if (value != null) {
-        val[key] = value;
-      }
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
     }
-
-    writeNotNull('name', name);
-    writeNotNull('args', args);
-    writeNotNull('config', config);
-    return val;
   }
+
+  writeNotNull('name', instance.name);
+  writeNotNull('args', instance.args);
+  writeNotNull('config', instance.config);
+  return val;
 }
