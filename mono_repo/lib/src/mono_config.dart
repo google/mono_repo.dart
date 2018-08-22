@@ -9,7 +9,7 @@ import 'raw_config.dart';
 
 part 'mono_config.g.dart';
 
-final monoFileName = '.mono_repo.yml';
+final monoPkgFileName = 'mono_pkg.yaml';
 final travisFileName = '.travis.yml';
 final travisShPath = './tool/travis.sh';
 

@@ -12,24 +12,25 @@ import 'mono_config.dart';
 import 'package_config.dart';
 import 'user_exception.dart';
 
-final packageConfigFileName = 'mono_repo.yaml';
+final rootConfigFileName = 'mono_repo.yaml';
+const _legacyConfigFileName = '.mono_repo.yml';
 
 Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {
   rootDirectory ??= p.current;
 
-  var packagesFile = new File(p.join(rootDirectory, packageConfigFileName));
+  var packagesFile = new File(p.join(rootDirectory, rootConfigFileName));
 
   try {
     var yaml = y.loadYaml(packagesFile.readAsStringSync());
 
     if (yaml == null) {
       throw new UserException(
-          'Config file "$packageConfigFileName" contains no values.');
+          'Config file "$rootConfigFileName" contains no values.');
     }
 
     if (yaml is! Map) {
       throw new UserException(
-          'Config file "$packageConfigFileName" must contain map values.');
+          'Config file "$rootConfigFileName" must contain map values.');
     }
 
     var sortedKeys = (yaml as Map).keys.toList()..sort();
@@ -41,7 +42,7 @@ Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {
 
     return packages;
   } on CheckedFromJsonException catch (e) {
-    throw new UserException('Error parsing "$packageConfigFileName".',
+    throw new UserException('Error parsing "$rootConfigFileName".',
         details: prettyPrintCheckedFromJsonException(e));
   }
 }
@@ -51,7 +52,7 @@ Map<String, PackageConfig> getPackageConfig(
     {String rootDirectory, bool recursive = false}) {
   rootDirectory ??= p.current;
 
-  var packageFileName = p.join(rootDirectory, packageConfigFileName);
+  var packageFileName = p.join(rootDirectory, rootConfigFileName);
 
   if (FileSystemEntity.isFileSync(packageFileName)) {
     return _openPackageConfig(rootDirectory);
@@ -107,20 +108,27 @@ Map<String, MonoConfig> getMonoConfigs(
   }
 
   var configs = <String, MonoConfig>{};
+  var pkgDirsWithLegacyConfigFiles = <String>[];
 
   for (var pkg in packages.keys) {
-    var travisPath = p.join(rootDirectory, pkg, monoFileName);
-    var travisFile = new File(travisPath);
+    var legacyConfigPath = p.join(rootDirectory, pkg, _legacyConfigFileName);
+    if (FileSystemEntity.isFileSync(legacyConfigPath)) {
+      pkgDirsWithLegacyConfigFiles.add(pkg);
+      continue;
+    }
 
-    if (travisFile.existsSync()) {
-      var travisYaml = y.loadYaml(travisFile.readAsStringSync(),
-          sourceUrl: travisPath) as y.YamlMap;
+    var pkgConfigPath = p.join(rootDirectory, pkg, monoPkgFileName);
+    var pkgConfigFile = new File(pkgConfigPath);
+
+    if (pkgConfigFile.existsSync()) {
+      var pkgConfigYaml = y.loadYaml(pkgConfigFile.readAsStringSync(),
+          sourceUrl: pkgConfigPath) as y.YamlMap;
 
       MonoConfig config;
       try {
-        config = new MonoConfig.parse(pkg, travisYaml);
+        config = new MonoConfig.parse(pkg, pkgConfigYaml);
       } on CheckedFromJsonException catch (e) {
-        throw new UserException('Error parsing $pkg/$monoFileName',
+        throw new UserException('Error parsing $pkg/$monoPkgFileName',
             details: prettyPrintCheckedFromJsonException(e));
       }
 
@@ -132,11 +140,18 @@ Map<String, MonoConfig> getMonoConfigs(
       if (configuredJobs.isNotEmpty) {
         throw new UserException(
             'Tasks with fancy configuration are not supported. '
-            'See `${p.relative(travisPath, from: rootDirectory)}`.');
+            'See `${p.relative(pkgConfigPath, from: rootDirectory)}`.');
       }
 
       configs[pkg] = config;
     }
+  }
+
+  if (pkgDirsWithLegacyConfigFiles.isNotEmpty) {
+    throw new UserException(
+        'Found legacy package configuration file ("$_legacyConfigFileName") in '
+        'these directories: ${pkgDirsWithLegacyConfigFiles.join(', ')}',
+        details: 'Rename these files to "$monoPkgFileName".');
   }
   return configs;
 }

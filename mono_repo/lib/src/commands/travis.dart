@@ -114,7 +114,7 @@ List<String> _calculateTaskEntries(
 
   if (taskEntries.isEmpty) {
     throw new UserException(
-        'No entries created. Check your nested `$monoFileName` files.');
+        'No entries created. Check your nested `$monoPkgFileName` files.');
   }
 
   taskEntries.sort();
