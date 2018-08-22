@@ -1,9 +1,12 @@
 ## 1.0.0
 
-* **BREAKING**
-  The package configuration file is now `mono_pkg.yaml`. If a legacy config file
+**BREAKING CHANGES**
+
+* The package configuration file is now `mono_pkg.yaml`. If a legacy config file
   – `.mono_repo.yml` – is found, the command is canceled and a warning is printed
   telling the user to rename the file.
+
+* Removed the `init` command.
 
 ## 0.3.3
 
