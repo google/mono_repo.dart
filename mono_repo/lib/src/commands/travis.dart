@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:args/command_runner.dart';
 import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
@@ -14,8 +13,9 @@ import 'package:path/path.dart' as p;
 import '../mono_config.dart';
 import '../user_exception.dart';
 import '../utils.dart';
+import 'mono_repo_command.dart';
 
-class TravisCommand extends Command<Null> {
+class TravisCommand extends MonoRepoCommand {
   @override
   String get name => 'travis';
 
@@ -36,8 +36,7 @@ class TravisCommand extends Command<Null> {
 
   @override
   Future<Null> run() => generateTravisConfig(
-      recursive: globalResults[recursiveFlag] as bool,
-      prettyAnsi: argResults['pretty-ansi'] as bool);
+      recursive: recursive, prettyAnsi: argResults['pretty-ansi'] as bool);
 }
 
 Future<Null> generateTravisConfig(

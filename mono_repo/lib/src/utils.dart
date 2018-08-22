@@ -12,7 +12,6 @@ import 'mono_config.dart';
 import 'package_config.dart';
 import 'user_exception.dart';
 
-const recursiveFlag = 'recursive';
 final packageConfigFileName = 'mono_repo.yaml';
 
 Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {

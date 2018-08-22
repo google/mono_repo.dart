@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
@@ -13,9 +12,10 @@ import 'package:pub_semver/pub_semver.dart';
 import '../mono_config.dart';
 import '../user_exception.dart';
 import '../utils.dart';
+import 'mono_repo_command.dart';
 import 'travis.dart';
 
-class PresubmitCommand extends Command<Null> {
+class PresubmitCommand extends MonoRepoCommand {
   @override
   String get name => 'presubmit';
 
@@ -38,7 +38,7 @@ class PresubmitCommand extends Command<Null> {
         packages: argResults['package'] as List<String>,
         tasks: argResults['task'] as List<String>,
         sdkToRun: argResults['sdk'] as String,
-        recursive: globalResults[recursiveFlag] as bool);
+        recursive: recursive);
 
     // Set a bad exit code if it failed.
     if (!passed) exitCode = 1;

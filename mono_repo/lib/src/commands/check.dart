@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:path/path.dart' as p;
@@ -14,8 +13,9 @@ import 'package:yaml/yaml.dart' as y;
 
 import '../package_config.dart';
 import '../utils.dart';
+import 'mono_repo_command.dart';
 
-class CheckCommand extends Command<Null> {
+class CheckCommand extends MonoRepoCommand {
   @override
   String get name => 'check';
 
@@ -23,7 +23,7 @@ class CheckCommand extends Command<Null> {
   String get description => 'Check the state of the repository.';
 
   @override
-  Future<Null> run() => check(recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() => check(recursive: recursive);
 }
 
 Future<Null> check({String rootDirectory, bool recursive = false}) async {

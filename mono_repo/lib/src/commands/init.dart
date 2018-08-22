@@ -5,13 +5,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
 import '../user_exception.dart';
 import '../utils.dart';
+import 'mono_repo_command.dart';
 
-class InitCommand extends Command<Null> {
+class InitCommand extends MonoRepoCommand {
   @override
   String get name => 'init';
 
@@ -23,7 +23,7 @@ class InitCommand extends Command<Null> {
 the packages to target in the current repository.''';
 
   @override
-  Future<Null> run() => init(recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() => init(recursive: recursive);
 }
 
 Future<Null> init({bool recursive = false}) async {
