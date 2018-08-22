@@ -11,7 +11,6 @@ import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart' as y;
 
-import '../package_config.dart';
 import '../utils.dart';
 import 'mono_repo_command.dart';
 
@@ -39,12 +38,12 @@ Future<Null> check({String rootDirectory, bool recursive = false}) async {
 Future<Map<String, PackageReport>> getPackageReports(
     {String rootDirectory, bool recursive = false}) async {
   rootDirectory ??= p.current;
-  var packages =
-      getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);
+  var packages = listPackageDirectories(
+      rootDirectory: rootDirectory, recursive: recursive);
 
   var pubspecs = <String, Pubspec>{};
-  packages.forEach((dir, config) {
-    var pkgPath = p.join(rootDirectory, dir, 'pubspec.yaml');
+  for (var dir in packages) {
+    var pkgPath = p.join(rootDirectory, dir, pubspecFileName);
     var pubspecContent =
         y.loadYaml(new File(pkgPath).readAsStringSync()) as Map;
 
@@ -53,16 +52,16 @@ Future<Map<String, PackageReport>> getPackageReports(
     // TODO: should enforce that all "covered" pubspecs have different names
     // in their pubspec.yaml file? Certainly all published packages
     pubspecs[dir] = pubspec;
-  });
+  }
 
   var pubspecValues = pubspecs.values.toSet();
 
   var reports = <String, PackageReport>{};
 
-  packages.forEach((dir, config) {
-    var report = new PackageReport.create(config, pubspecs[dir], pubspecValues);
+  for (var dir in packages) {
+    var report = new PackageReport.create(pubspecs[dir], pubspecValues);
     reports[dir] = report;
-  });
+  }
 
   return reports;
 }
@@ -92,19 +91,18 @@ void _print(String relativePath, PackageReport report) {
 }
 
 class PackageReport {
-  final PackageConfig config;
   final Pubspec pubspec;
   final Map<String, SiblingReference> siblings;
 
-  bool get published => config.published;
+  // TODO: use `publish_to` when available - dart-lang/pubspec_parse#21
+  bool get published => pubspec.version != null;
 
   String get packageName => pubspec.name;
   Version get version => pubspec.version;
 
-  PackageReport(this.config, this.pubspec, this.siblings);
+  PackageReport(this.pubspec, this.siblings);
 
-  factory PackageReport.create(
-      PackageConfig config, Pubspec pubspec, Set<Pubspec> siblings) {
+  factory PackageReport.create(Pubspec pubspec, Set<Pubspec> siblings) {
     // TODO(kevmoo): check: if any dependency has a path dependency, it'd better
     // be a sibling – right?
 
@@ -117,7 +115,7 @@ class PackageReport {
       }
     }
 
-    return new PackageReport(config, pubspec, sibs);
+    return new PackageReport(pubspec, sibs);
   }
 }
 

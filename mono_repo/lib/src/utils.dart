@@ -9,66 +9,44 @@ import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
 
 import 'mono_config.dart';
-import 'package_config.dart';
 import 'user_exception.dart';
 
-final rootConfigFileName = 'mono_repo.yaml';
+// TODO: Use the root config file to configure top-level Travis settings
+// final rootConfigFileName = 'mono_repo.yaml';
 const _legacyPkgConfigFileName = '.mono_repo.yml';
 
-Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {
-  rootDirectory ??= p.current;
-
-  var packagesFile = new File(p.join(rootDirectory, rootConfigFileName));
-
-  try {
-    var yaml = y.loadYaml(packagesFile.readAsStringSync());
-
-    if (yaml == null) {
-      throw new UserException(
-          'Config file "$rootConfigFileName" contains no values.');
-    }
-
-    if (yaml is! Map) {
-      throw new UserException(
-          'Config file "$rootConfigFileName" must contain map values.');
-    }
-
-    var sortedKeys = (yaml as Map).keys.toList()..sort();
-
-    var packages = <String, PackageConfig>{};
-    for (String k in sortedKeys) {
-      packages[k] = new PackageConfig.fromJson(yaml[k] as Map);
-    }
-
-    return packages;
-  } on CheckedFromJsonException catch (e) {
-    throw new UserException('Error parsing "$rootConfigFileName".',
-        details: prettyPrintCheckedFromJsonException(e));
-  }
-}
+const pubspecFileName = 'pubspec.yaml';
 
 /// If the file exists, open it – otherwise infer it from the data on disk.
-Map<String, PackageConfig> getPackageConfig(
+List<String> listPackageDirectories(
     {String rootDirectory, bool recursive = false}) {
   rootDirectory ??= p.current;
 
-  var packageFileName = p.join(rootDirectory, rootConfigFileName);
-
-  if (FileSystemEntity.isFileSync(packageFileName)) {
-    return _openPackageConfig(rootDirectory);
-  }
-
-  var packages = <String, PackageConfig>{};
+  var packages = <String>[];
 
   void visitDirectory(Directory directory) {
-    var dirs = directory.listSync().where((fse) => fse is Directory).toList()
+    var dirs = directory.listSync().whereType<Directory>().toList()
       ..sort((a, b) => a.path.compareTo(b.path));
-    for (Directory subdir in dirs) {
-      File pubspecFile = subdir.listSync().firstWhere((fse) {
-        return fse is File && p.basename(fse.path) == 'pubspec.yaml';
-      }, orElse: () => null);
+    for (var subdir in dirs) {
+      var relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
 
-      if (pubspecFile != null) {
+      var legacyConfigPath = p.join(subdir.path, _legacyPkgConfigFileName);
+      if (FileSystemEntity.isFileSync(legacyConfigPath)) {
+        throw new UserException(
+            'Found legacy package configuration file '
+            '("$_legacyPkgConfigFileName") in `$relativeSubDirPath`.',
+            details: 'Rename to "$monoPkgFileName".');
+      }
+
+      var pkgConfigFilePath = p.join(subdir.path, monoPkgFileName);
+      if (FileSystemEntity.isFileSync(pkgConfigFilePath)) {
+        var pubspecFile = new File(p.join(subdir.path, pubspecFileName));
+
+        if (!pubspecFile.existsSync()) {
+          throw UserException('A `$monoPkgFileName` file was found, but missing'
+              ' an expected `$pubspecFileName` in `$relativeSubDirPath`.');
+        }
+
         var pubspecContent = y.loadYaml(pubspecFile.readAsStringSync()) as Map;
         if (pubspecContent == null) {
           throw new StateError('The pubspec file at '
@@ -81,10 +59,7 @@ Map<String, PackageConfig> getPackageConfig(
               'No name for the pubspec at `${pubspecFile.path}`.');
         }
 
-        var publishedGuess = pubspecContent.containsKey('version');
-
-        packages[p.relative(subdir.path, from: rootDirectory)] =
-            new PackageConfig(publishedGuess);
+        packages.add(relativeSubDirPath);
       }
 
       if (recursive) visitDirectory(subdir);
@@ -100,59 +75,56 @@ Map<String, MonoConfig> getMonoConfigs(
     {String rootDirectory, bool recursive = false}) {
   rootDirectory ??= p.current;
 
-  var packages =
-      getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);
+  var pkgDirs = listPackageDirectories(
+      rootDirectory: rootDirectory, recursive: recursive);
 
-  if (packages.isEmpty) {
-    throw new UserException('No nested packages found.');
+  if (pkgDirs.isEmpty) {
+    throw new UserException('No packages found.',
+        details: 'Each target package directory must contain '
+            'a `$monoPkgFileName` file.');
   }
 
   var configs = <String, MonoConfig>{};
-  var pkgDirsWithLegacyConfigFiles = <String>[];
 
-  for (var pkg in packages.keys) {
-    var legacyConfigPath = p.join(rootDirectory, pkg, _legacyPkgConfigFileName);
-    if (FileSystemEntity.isFileSync(legacyConfigPath)) {
-      pkgDirsWithLegacyConfigFiles.add(pkg);
-      continue;
-    }
-
+  for (var pkg in pkgDirs) {
     var pkgConfigPath = p.join(rootDirectory, pkg, monoPkgFileName);
     var pkgConfigFile = new File(pkgConfigPath);
 
     if (pkgConfigFile.existsSync()) {
+      var pkgConfigRelativePath =
+          p.relative(pkgConfigPath, from: rootDirectory);
       var pkgConfigYaml = y.loadYaml(pkgConfigFile.readAsStringSync(),
-          sourceUrl: pkgConfigPath) as y.YamlMap;
+          sourceUrl: pkgConfigPath);
 
-      MonoConfig config;
-      try {
-        config = new MonoConfig.parse(pkg, pkgConfigYaml);
-      } on CheckedFromJsonException catch (e) {
-        throw new UserException('Error parsing $pkg/$monoPkgFileName',
-            details: prettyPrintCheckedFromJsonException(e));
+      if (pkgConfigYaml == null) {
+        continue;
+      } else if (pkgConfigYaml is y.YamlMap) {
+        MonoConfig config;
+        try {
+          config = new MonoConfig.parse(pkg, pkgConfigYaml);
+        } on CheckedFromJsonException catch (e) {
+          throw new UserException('Error parsing $pkg/$monoPkgFileName',
+              details: prettyPrintCheckedFromJsonException(e));
+        }
+
+        var configuredJobs = config.jobs
+            .expand((job) => job.tasks)
+            .where((task) => task.config != null)
+            .toList();
+
+        if (configuredJobs.isNotEmpty) {
+          throw new UserException(
+              'Tasks with fancy configuration are not supported. '
+              'See `$pkgConfigRelativePath`.');
+        }
+        configs[pkg] = config;
+      } else {
+        throw UserException(
+            'The contents of `$pkgConfigRelativePath` must be a Map.');
       }
-
-      var configuredJobs = config.jobs
-          .expand((job) => job.tasks)
-          .where((task) => task.config != null)
-          .toList();
-
-      if (configuredJobs.isNotEmpty) {
-        throw new UserException(
-            'Tasks with fancy configuration are not supported. '
-            'See `${p.relative(pkgConfigPath, from: rootDirectory)}`.');
-      }
-
-      configs[pkg] = config;
     }
   }
 
-  if (pkgDirsWithLegacyConfigFiles.isNotEmpty) {
-    throw new UserException(
-        'Found legacy package configuration file ("$_legacyPkgConfigFileName") in '
-        'these directories: ${pkgDirsWithLegacyConfigFiles.join(', ')}',
-        details: 'Rename these files to "$monoPkgFileName".');
-  }
   return configs;
 }
 
