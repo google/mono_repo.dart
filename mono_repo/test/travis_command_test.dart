@@ -33,12 +33,17 @@ void main() {
   test('no package', () async {
     await d.dir('sub_pkg').create();
 
-    expect(() => generateTravisConfig(rootDirectory: d.sandbox),
-        throwsUserExceptionWith('No nested packages found.'));
+    expect(
+        () => generateTravisConfig(rootDirectory: d.sandbox),
+        throwsUserExceptionWith(
+            'No packages found.',
+            'Each target package directory must contain a '
+            '`mono_pkg.yaml` file.'));
   });
 
-  test('no $monoPkgFileName file', () async {
+  test('$monoPkgFileName with non-Map contents', () async {
     await d.dir('sub_pkg', [
+      d.file('mono_pkg.yaml', 'bob'),
       d.file('pubspec.yaml', '''
 name: pkg_name
       ''')
@@ -47,7 +52,22 @@ name: pkg_name
     expect(
         () => generateTravisConfig(rootDirectory: d.sandbox),
         throwsUserExceptionWith(
-            'No entries created. Check your nested `$monoPkgFileName` files.'));
+            'The contents of `sub_pkg/mono_pkg.yaml` must be a Map.', isNull));
+  });
+
+  test('empty $monoPkgFileName file', () async {
+    await d.dir('sub_pkg', [
+      d.file('mono_pkg.yaml', '# just a comment!'),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+    ]).create();
+
+    expect(
+        () => generateTravisConfig(rootDirectory: d.sandbox),
+        throwsUserExceptionWith(
+            'No entries created. Check your nested `$monoPkgFileName` files.',
+            isNull));
   });
 
   test('fails with unsupported configuration', () async {
@@ -62,7 +82,8 @@ name: pkg_name
         () => generateTravisConfig(rootDirectory: d.sandbox),
         throwsUserExceptionWith(
             'Tasks with fancy configuration are not supported. '
-            'See `sub_pkg/$monoPkgFileName`.'));
+            'See `sub_pkg/$monoPkgFileName`.',
+            isNull));
   });
 
   test('fails with legacy file name', () async {
@@ -75,8 +96,10 @@ name: pkg_name
 
     expect(
         () => generateTravisConfig(rootDirectory: d.sandbox),
-        throwsUserExceptionWith('Found legacy package configuration file '
-            '(".mono_repo.yml") in these directories: sub_pkg'));
+        throwsUserExceptionWith(
+            'Found legacy package configuration file '
+            '(".mono_repo.yml") in `sub_pkg`.',
+            'Rename to "mono_pkg.yaml".'));
   });
 
   test('conflicting stage orders are not allowed', () async {
@@ -118,7 +141,8 @@ name: pkg_b
             }),
         throwsUserExceptionWith(
             'Not all packages agree on `stages` ordering, found a cycle '
-            'between the following stages: [analyze, format]'));
+            'between the following stages: [analyze, format]',
+            isNull));
   });
 
   test('complete travis.yml file', () async {

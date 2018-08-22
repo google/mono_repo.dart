@@ -2,9 +2,14 @@
 
 **BREAKING CHANGES**
 
+* The root `mono_config.yaml` file is no longer used to configure which packages
+  are configured. Instead, `mono_pkg.yaml` is required to be in each target
+  package directory. A package is considered published if it has a value for
+  `version` in `pubspec.yaml`. 
+
 * The package configuration file is now `mono_pkg.yaml`. If a legacy config file
-  – `.mono_repo.yml` – is found, the command is canceled and a warning is printed
-  telling the user to rename the file.
+  – `.mono_repo.yml` – is found, the command is canceled and a warning is
+  printed telling the user to rename the file.
 
 * Removed the `init` command.
 

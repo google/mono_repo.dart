@@ -25,7 +25,8 @@ void main() {
           () => presubmit(rootDirectory: d.sandbox),
           throwsUserExceptionWith(
               'No $travisShPath file found, please run the `travis` '
-              'command first.'));
+              'command first.',
+              isNull));
     });
   });
 

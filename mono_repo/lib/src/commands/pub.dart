@@ -43,17 +43,17 @@ class _PubSubCommand extends MonoRepoCommand {
 Future<Null> pub(String pubCommand,
     {String rootDirectory, bool recursive = false}) async {
   rootDirectory ??= p.current;
-  var configs =
-      getPackageConfig(rootDirectory: rootDirectory, recursive: recursive);
+  var pkgDirs = listPackageDirectories(
+      rootDirectory: rootDirectory, recursive: recursive);
 
-  if (configs.isEmpty) {
+  if (pkgDirs.isEmpty) {
     return;
   }
 
   print(lightBlue
-      .wrap('Running `pub $pubCommand` across ${configs.length} package(s).'));
+      .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));
 
-  for (var dir in configs.keys) {
+  for (var dir in pkgDirs) {
     print('');
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
     var workingDir = p.join(rootDirectory, dir);
