@@ -11,6 +11,7 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../utils.dart';
+import 'mono_repo_command.dart';
 
 class PubCommand extends Command<Null> {
   PubCommand() {
@@ -26,7 +27,7 @@ class PubCommand extends Command<Null> {
       'Run `pub get` or `pub upgrade` against all packages.';
 }
 
-class _PubSubCommand extends Command<Null> {
+class _PubSubCommand extends MonoRepoCommand {
   @override
   final String name;
 
@@ -36,8 +37,7 @@ class _PubSubCommand extends Command<Null> {
   String get description => 'Run `pub $name` against all packages.';
 
   @override
-  Future<Null> run() =>
-      pub(name, recursive: globalResults[recursiveFlag] as bool);
+  Future<Null> run() => pub(name, recursive: recursive);
 }
 
 Future<Null> pub(String pubCommand,
