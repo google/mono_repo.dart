@@ -13,7 +13,7 @@ import 'package_config.dart';
 import 'user_exception.dart';
 
 final rootConfigFileName = 'mono_repo.yaml';
-const _legacyConfigFileName = '.mono_repo.yml';
+const _legacyPkgConfigFileName = '.mono_repo.yml';
 
 Map<String, PackageConfig> _openPackageConfig(String rootDirectory) {
   rootDirectory ??= p.current;
@@ -111,7 +111,7 @@ Map<String, MonoConfig> getMonoConfigs(
   var pkgDirsWithLegacyConfigFiles = <String>[];
 
   for (var pkg in packages.keys) {
-    var legacyConfigPath = p.join(rootDirectory, pkg, _legacyConfigFileName);
+    var legacyConfigPath = p.join(rootDirectory, pkg, _legacyPkgConfigFileName);
     if (FileSystemEntity.isFileSync(legacyConfigPath)) {
       pkgDirsWithLegacyConfigFiles.add(pkg);
       continue;
@@ -149,7 +149,7 @@ Map<String, MonoConfig> getMonoConfigs(
 
   if (pkgDirsWithLegacyConfigFiles.isNotEmpty) {
     throw new UserException(
-        'Found legacy package configuration file ("$_legacyConfigFileName") in '
+        'Found legacy package configuration file ("$_legacyPkgConfigFileName") in '
         'these directories: ${pkgDirsWithLegacyConfigFiles.join(', ')}',
         details: 'Rename these files to "$monoPkgFileName".');
   }
