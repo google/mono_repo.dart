@@ -9,7 +9,7 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
-import '../mono_config.dart';
+import '../package_config.dart';
 import '../user_exception.dart';
 import '../utils.dart';
 import 'mono_repo_command.dart';
@@ -80,7 +80,7 @@ Future<bool> presubmit(
 
   // By default run all tasks.
   var allKnownTasks = configs.values.fold(new Set<String>(),
-      (Set<String> exising, MonoConfig config) {
+      (Set<String> exising, PackageConfig config) {
     return exising
       ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name)));
   });

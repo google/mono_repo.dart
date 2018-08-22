@@ -8,7 +8,7 @@
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:mono_repo/src/mono_config.dart';
+import 'package:mono_repo/src/package_config.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart' as y;
 
@@ -25,8 +25,8 @@ Matcher throwsCheckedFromJsonException(String prettyValue) =>
       return prettyValue;
     }, 'prettyPrint', prettyValue));
 
-MonoConfig _parse(map) =>
-    new MonoConfig.parse('a', y.loadYaml(_encodeJson(map)) as y.YamlMap);
+PackageConfig _parse(map) =>
+    new PackageConfig.parse('a', y.loadYaml(_encodeJson(map)) as y.YamlMap);
 
 void _expectParseThrows(Object content, String expectedError) => expect(
     () => _parse(content), throwsCheckedFromJsonException(expectedError));
@@ -49,7 +49,7 @@ void main() {
   test('valid example', () {
     var monoYaml = y.loadYaml(testConfig1) as y.YamlMap;
 
-    var config = new MonoConfig.parse('a', monoYaml);
+    var config = new PackageConfig.parse('a', monoYaml);
 
     expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 

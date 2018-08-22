@@ -8,7 +8,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
 
-import 'mono_config.dart';
+import 'package_config.dart';
 import 'user_exception.dart';
 
 // TODO: Use the root config file to configure top-level Travis settings
@@ -71,7 +71,7 @@ List<String> listPackageDirectories(
   return packages;
 }
 
-Map<String, MonoConfig> getMonoConfigs(
+Map<String, PackageConfig> getMonoConfigs(
     {String rootDirectory, bool recursive = false}) {
   rootDirectory ??= p.current;
 
@@ -84,7 +84,7 @@ Map<String, MonoConfig> getMonoConfigs(
             'a `$monoPkgFileName` file.');
   }
 
-  var configs = <String, MonoConfig>{};
+  var configs = <String, PackageConfig>{};
 
   for (var pkg in pkgDirs) {
     var pkgConfigPath = p.join(rootDirectory, pkg, monoPkgFileName);
@@ -99,9 +99,9 @@ Map<String, MonoConfig> getMonoConfigs(
       if (pkgConfigYaml == null) {
         continue;
       } else if (pkgConfigYaml is y.YamlMap) {
-        MonoConfig config;
+        PackageConfig config;
         try {
-          config = new MonoConfig.parse(pkg, pkgConfigYaml);
+          config = new PackageConfig.parse(pkg, pkgConfigYaml);
         } on CheckedFromJsonException catch (e) {
           throw new UserException('Error parsing $pkg/$monoPkgFileName',
               details: prettyPrintCheckedFromJsonException(e));

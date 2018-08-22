@@ -7,13 +7,13 @@ import 'package:json_annotation/json_annotation.dart';
 
 import 'raw_config.dart';
 
-part 'mono_config.g.dart';
+part 'package_config.g.dart';
 
 final monoPkgFileName = 'mono_pkg.yaml';
 final travisFileName = '.travis.yml';
 final travisShPath = './tool/travis.sh';
 
-class MonoConfig {
+class PackageConfig {
   final List<String> sdks;
 
   final List<String> stageNames;
@@ -22,9 +22,9 @@ class MonoConfig {
 
   final List<String> cacheDirectories;
 
-  MonoConfig(this.sdks, this.stageNames, this.jobs, this.cacheDirectories);
+  PackageConfig(this.sdks, this.stageNames, this.jobs, this.cacheDirectories);
 
-  factory MonoConfig.parse(String package, Map monoYaml) {
+  factory PackageConfig.parse(String package, Map monoYaml) {
     var rawConfig = new RawConfig.fromJson(monoYaml);
 
     // FYI: 'test' is default if there are no tasks defined
@@ -45,7 +45,7 @@ class MonoConfig {
       return stage.name;
     }).toList();
 
-    return new MonoConfig(rawConfig.sdks, stageNames, jobs,
+    return new PackageConfig(rawConfig.sdks, stageNames, jobs,
         rawConfig.cache?.directories ?? const []);
   }
 }

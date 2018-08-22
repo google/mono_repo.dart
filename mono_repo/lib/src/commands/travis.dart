@@ -10,7 +10,7 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
-import '../mono_config.dart';
+import '../package_config.dart';
 import '../user_exception.dart';
 import '../utils.dart';
 import 'mono_repo_command.dart';
@@ -60,7 +60,7 @@ Future<Null> generateTravisConfig(
 }
 
 /// Write `.travis.yml`
-void _writeTravisYml(String rootDirectory, Map<String, MonoConfig> configs,
+void _writeTravisYml(String rootDirectory, Map<String, PackageConfig> configs,
     Map<String, String> commandsToKeys) {
   var travisPath = p.join(rootDirectory, travisFileName);
   var travisFile = new File(travisPath);
@@ -130,7 +130,7 @@ String _wrap(bool doWrap, AnsiCode code, String value) =>
     doWrap ? code.wrap(value, forScript: true) : value;
 
 /// Gives a map of command to unique task key for all [configs].
-Map<String, String> extractCommands(Map<String, MonoConfig> configs) {
+Map<String, String> extractCommands(Map<String, PackageConfig> configs) {
   var commandsToKeys = <String, String>{};
 
   var tasksToConfigure = _travisTasks(configs);
@@ -161,12 +161,12 @@ Map<String, String> extractCommands(Map<String, MonoConfig> configs) {
   return commandsToKeys;
 }
 
-List<Task> _travisTasks(Map<String, MonoConfig> configs) => configs.values
+List<Task> _travisTasks(Map<String, PackageConfig> configs) => configs.values
     .expand((config) => config.jobs)
     .expand((job) => job.tasks)
     .toList();
 
-void _logPkgs(Map<String, MonoConfig> configs) {
+void _logPkgs(Map<String, PackageConfig> configs) {
   for (var pkg in configs.keys) {
     stderr.writeln(styleBold.wrap('package:$pkg'));
   }
@@ -223,7 +223,7 @@ exit \$EXIT_CODE
 ''';
 
 String _travisYml(
-    Map<String, MonoConfig> configs, Map<String, String> commandsToKeys) {
+    Map<String, PackageConfig> configs, Map<String, String> commandsToKeys) {
   var orderedStages = _calculateOrderedStages(configs.values);
   var jobs = configs.values.expand((config) => config.jobs);
 
@@ -248,7 +248,7 @@ $cacheDirs
 ''';
 }
 
-Iterable<String> _cacheDirs(Map<String, MonoConfig> configs) {
+Iterable<String> _cacheDirs(Map<String, PackageConfig> configs) {
   var items = new SplayTreeSet<String>()..add('\$HOME/.pub-cache');
 
   for (var entry in configs.entries) {
@@ -262,7 +262,7 @@ Iterable<String> _cacheDirs(Map<String, MonoConfig> configs) {
 
 /// Calculates the global stages ordering, and throws a [UserException] if it
 /// detects any cycles.
-List<String> _calculateOrderedStages(Iterable<MonoConfig> configs) {
+List<String> _calculateOrderedStages(Iterable<PackageConfig> configs) {
   // Convert the configs to a graph so we can run strongly connected components.
   var edges = <String, Set<String>>{};
   for (var config in configs) {
