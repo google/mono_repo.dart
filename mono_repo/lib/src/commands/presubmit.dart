@@ -10,8 +10,8 @@ import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
 import '../package_config.dart';
+import '../root_config.dart';
 import '../user_exception.dart';
-import '../utils.dart';
 import 'mono_repo_command.dart';
 import 'travis.dart';
 
@@ -71,8 +71,7 @@ Future<bool> presubmit(
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
-  var configs =
-      getMonoConfigs(rootDirectory: rootDirectory, recursive: recursive);
+  var configs = RootConfig(rootDirectory: rootDirectory, recursive: recursive);
   var commandsToKeys = extractCommands(configs);
   // By default, run on all packages.
   if (packages.isEmpty) packages = configs.keys;

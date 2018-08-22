@@ -11,8 +11,8 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../package_config.dart';
+import '../root_config.dart';
 import '../user_exception.dart';
-import '../utils.dart';
 import 'mono_repo_command.dart';
 
 class TravisCommand extends MonoRepoCommand {
@@ -46,8 +46,7 @@ Future<Null> generateTravisConfig(
   rootDirectory ??= p.current;
   recursive ??= false;
   prettyAnsi ??= true;
-  var configs =
-      getMonoConfigs(rootDirectory: rootDirectory, recursive: recursive);
+  var configs = RootConfig(rootDirectory: rootDirectory, recursive: recursive);
 
   _logPkgs(configs);
 
