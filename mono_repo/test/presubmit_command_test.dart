@@ -41,7 +41,7 @@ void main() {
       pkgBPath = p.join(repoPath, 'pkg_b');
       new Directory(pkgBPath).createSync();
 
-      new File(p.join(pkgAPath, monoFileName))
+      new File(p.join(pkgAPath, monoPkgFileName))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgAConfig);
       new File(p.join(pkgAPath, 'pubspec.yaml'))
@@ -51,7 +51,7 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync(basicTest);
 
-      new File(p.join(pkgBPath, monoFileName))
+      new File(p.join(pkgBPath, monoPkgFileName))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgBConfig);
       new File(p.join(pkgBPath, 'pubspec.yaml'))

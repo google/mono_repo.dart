@@ -19,7 +19,7 @@ class InitCommand extends MonoRepoCommand {
   String get description =>
       '''Writes a configuration file that can be user-edited.
 
-`mono_repo` uses the `$packageConfigFileName` file, if it exists, to determine
+`mono_repo` uses the `$rootConfigFileName` file, if it exists, to determine
 the packages to target in the current repository.''';
 
   @override
@@ -27,7 +27,7 @@ the packages to target in the current repository.''';
 }
 
 Future<Null> init({bool recursive = false}) async {
-  var packagesFileName = p.join(p.current, packageConfigFileName);
+  var packagesFileName = p.join(p.current, rootConfigFileName);
   // TODO: check to see if we're in the root of a GIT repo. If not, warn.
 
   if (FileSystemEntity.typeSync(packagesFileName) !=

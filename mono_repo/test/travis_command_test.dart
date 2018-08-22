@@ -37,7 +37,7 @@ void main() {
         throwsUserExceptionWith('No nested packages found.'));
   });
 
-  test('no $monoFileName file', () async {
+  test('no $monoPkgFileName file', () async {
     await d.dir('sub_pkg', [
       d.file('pubspec.yaml', '''
 name: pkg_name
@@ -47,12 +47,12 @@ name: pkg_name
     expect(
         () => generateTravisConfig(rootDirectory: d.sandbox),
         throwsUserExceptionWith(
-            'No entries created. Check your nested `$monoFileName` files.'));
+            'No entries created. Check your nested `$monoPkgFileName` files.'));
   });
 
   test('fails with unsupported configuration', () async {
     await d.dir('sub_pkg', [
-      d.file(monoFileName, testConfig1),
+      d.file(monoPkgFileName, testConfig1),
       d.file('pubspec.yaml', '''
 name: pkg_name
       ''')
@@ -62,12 +62,26 @@ name: pkg_name
         () => generateTravisConfig(rootDirectory: d.sandbox),
         throwsUserExceptionWith(
             'Tasks with fancy configuration are not supported. '
-            'See `sub_pkg/$monoFileName`.'));
+            'See `sub_pkg/$monoPkgFileName`.'));
+  });
+
+  test('fails with legacy file name', () async {
+    await d.dir('sub_pkg', [
+      d.file('.mono_repo.yml', testConfig1),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+    ]).create();
+
+    expect(
+        () => generateTravisConfig(rootDirectory: d.sandbox),
+        throwsUserExceptionWith('Found legacy package configuration file '
+            '(".mono_repo.yml") in these directories: sub_pkg'));
   });
 
   test('conflicting stage orders are not allowed', () async {
     await d.dir('pkg_a', [
-      d.file(monoFileName, r'''
+      d.file(monoPkgFileName, r'''
 dart:
  - dev
 
@@ -83,7 +97,7 @@ name: pkg_a
     ]).create();
 
     await d.dir('pkg_b', [
-      d.file(monoFileName, r'''
+      d.file(monoPkgFileName, r'''
 dart:
  - dev
 
@@ -109,7 +123,7 @@ name: pkg_b
 
   test('complete travis.yml file', () async {
     await d.dir('sub_pkg', [
-      d.file(monoFileName, testConfig2),
+      d.file(monoPkgFileName, testConfig2),
       d.file('pubspec.yaml', '''
 name: pkg_name
       ''')
@@ -125,7 +139,7 @@ name: pkg_name
 
   test('two flavors of dartfmt', () async {
     await d.dir('pkg_a', [
-      d.file(monoFileName, r'''
+      d.file(monoPkgFileName, r'''
 dart:
  - stable
  - dev
@@ -145,7 +159,7 @@ name: pkg_a
     ]).create();
 
     await d.dir('pkg_b', [
-      d.file(monoFileName, r'''
+      d.file(monoPkgFileName, r'''
 dart:
  - dev
 
