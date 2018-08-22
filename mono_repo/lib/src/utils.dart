@@ -17,6 +17,24 @@ const _legacyPkgConfigFileName = '.mono_repo.yml';
 
 const pubspecFileName = 'pubspec.yaml';
 
+y.YamlMap yamlMapOrNull(String rootDir, String relativeFilePath) {
+  var yamlFile = new File(p.join(rootDir, relativeFilePath));
+
+  if (yamlFile.existsSync()) {
+    var pkgConfigYaml =
+        y.loadYaml(yamlFile.readAsStringSync(), sourceUrl: relativeFilePath);
+
+    if (pkgConfigYaml == null) {
+      return null;
+    } else if (pkgConfigYaml is y.YamlMap) {
+      return pkgConfigYaml;
+    } else {
+      throw UserException('The contents of `$relativeFilePath` must be a Map.');
+    }
+  }
+  return null;
+}
+
 /// If the file exists, open it – otherwise infer it from the data on disk.
 List<String> listPackageDirectories(
     {String rootDirectory, bool recursive = false}) {
