@@ -8,7 +8,7 @@ part of 'mono_config.dart';
 
 TravisJob _$TravisJobFromJson(Map json) {
   return $checkedNew('TravisJob', json, () {
-    var val = new TravisJob(
+    var val = TravisJob(
         $checkedConvert(json, 'package', (v) => v as String),
         $checkedConvert(json, 'sdk', (v) => v as String),
         $checkedConvert(json, 'stageName', (v) => v as String),
@@ -16,9 +16,8 @@ TravisJob _$TravisJobFromJson(Map json) {
             json,
             'tasks',
             (v) => (v as List)
-                ?.map((e) => e == null
-                    ? null
-                    : new Task.fromJson(e as Map<String, dynamic>))
+                ?.map((e) =>
+                    e == null ? null : Task.fromJson(e as Map<String, dynamic>))
                 ?.toList()),
         description: $checkedConvert(json, 'description', (v) => v as String));
     return val;
@@ -44,10 +43,10 @@ Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
 
 Task _$TaskFromJson(Map json) {
   return $checkedNew('Task', json, () {
-    var val = new Task($checkedConvert(json, 'name', (v) => v as String),
+    var val = Task($checkedConvert(json, 'name', (v) => v as String),
         args: $checkedConvert(json, 'args', (v) => v as String),
         config: $checkedConvert(json, 'config',
-            (v) => (v as Map)?.map((k, e) => new MapEntry(k as String, e))));
+            (v) => (v as Map)?.map((k, e) => MapEntry(k as String, e))));
     return val;
   });
 }
