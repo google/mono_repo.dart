@@ -232,11 +232,12 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
   directories:
-    - $HOME/.pub-cache
+    - "$HOME/.pub-cache"
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -395,7 +396,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: dartanalyzer ."
       script: ./tool/travis.sh dartanalyzer
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: chrome tests"
       script: ./tool/travis.sh test_00
@@ -410,7 +411,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: chrome tests"
       script: ./tool/travis.sh test_00
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 0"
       script: ./tool/travis.sh test_01
@@ -425,7 +426,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 0"
       script: ./tool/travis.sh test_01
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 1"
       script: ./tool/travis.sh test_02
@@ -440,7 +441,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 1"
       script: ./tool/travis.sh test_02
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 2"
       script: ./tool/travis.sh test_03
@@ -455,7 +456,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 2"
       script: ./tool/travis.sh test_03
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 3"
       script: ./tool/travis.sh test_04
@@ -470,7 +471,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 3"
       script: ./tool/travis.sh test_04
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 4"
       script: ./tool/travis.sh test_05
@@ -485,7 +486,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 4"
       script: ./tool/travis.sh test_05
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 5"
       script: ./tool/travis.sh test_06
@@ -500,7 +501,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 5"
       script: ./tool/travis.sh test_06
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 6"
       script: ./tool/travis.sh test_07
@@ -515,7 +516,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 6"
       script: ./tool/travis.sh test_07
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 7"
       script: ./tool/travis.sh test_08
@@ -530,7 +531,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 7"
       script: ./tool/travis.sh test_08
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 8"
       script: ./tool/travis.sh test_09
@@ -545,7 +546,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test --preset travis --total-shards 9 --shard-index 8"
       script: ./tool/travis.sh test_09
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
     - stage: unit_test
       name: "SDK: dev - DIR: sub_pkg - TASKS: pub run test"
       script: ./tool/travis.sh test_10
@@ -560,7 +561,7 @@ jobs:
       name: "SDK: 1.23.0 - DIR: sub_pkg - TASKS: pub run test"
       script: ./tool/travis.sh test_10
       env: PKG="sub_pkg"
-      dart: 1.23.0
+      dart: "1.23.0"
 
 stages:
   - analyze
@@ -568,9 +569,10 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
   directories:
-    - $HOME/.pub-cache
+    - "$HOME/.pub-cache"
 ''';

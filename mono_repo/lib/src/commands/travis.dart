@@ -13,6 +13,7 @@ import 'package:path/path.dart' as p;
 import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
+import '../yaml.dart';
 import 'mono_repo_command.dart';
 
 class TravisCommand extends MonoRepoCommand {
@@ -226,24 +227,26 @@ String _travisYml(
   var orderedStages = _calculateOrderedStages(configs.values);
   var jobs = configs.values.expand((config) => config.jobs);
 
-  var cacheDirs = _cacheDirs(configs).map((e) => '    - $e').join('\n');
-
   return '''
 # Created with https://github.com/dart-lang/mono_repo
-language: dart
+${toYaml({'language': 'dart'})}
 
-jobs:
-  include:
-${_listJobs(jobs, commandsToKeys)}
-stages:
-${_listStages(orderedStages)}
+${toYaml({
+    'jobs': {'include': _listJobs(jobs, commandsToKeys)}
+  })}
+
+${toYaml({'stages': orderedStages})}
+
 # Only building master means that we don't run two builds for each pull request.
-branches:
-  only: [master]
+${toYaml({
+    'branches': {
+      'only': ['master']
+    }
+  })}
 
-cache:
-  directories:
-$cacheDirs
+${toYaml({
+    'cache': {'directories': _cacheDirs(configs)}
+  })}
 ''';
 }
 
@@ -289,29 +292,22 @@ List<String> _calculateOrderedStages(Iterable<PackageConfig> configs) {
   return components.map((c) => c.first).toList().reversed.toList();
 }
 
-String _listStages(Iterable<String> stages) {
-  var buffer = new StringBuffer();
-  for (var stage in stages) {
-    buffer.writeln('  - $stage');
-  }
-  return buffer.toString();
-}
-
 /// Lists all the jobs, setting their stage, enviroment, and script.
-String _listJobs(Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) {
-  var buffer = new StringBuffer();
+Iterable<Map<String, String>> _listJobs(
+    Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) sync* {
   for (var job in jobs) {
     var commands =
         job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
     var jobName = 'SDK: ${job.sdk} - '
         'DIR: ${job.package} - '
         'TASKS: ${job.name}';
-    buffer.writeln('''
-    - stage: ${job.stageName}
-      name: "$jobName"
-      script: ./tool/travis.sh $commands
-      env: PKG="${job.package}"
-      dart: ${job.sdk}''');
+
+    yield {
+      'stage': job.stageName,
+      'name': jobName,
+      'script': './tool/travis.sh $commands',
+      'env': 'PKG="${job.package}"',
+      'dart': job.sdk
+    };
   }
-  return buffer.toString();
 }
