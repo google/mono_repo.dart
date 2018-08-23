@@ -6,7 +6,6 @@ import 'dart:convert';
 
 import 'package:mono_repo/src/yaml.dart';
 import 'package:test/test.dart';
-import 'package:yaml/yaml.dart' as y;
 
 import 'shared.dart';
 
@@ -14,7 +13,7 @@ void _asciiTest(List<int> bytes) {
   test(bytes.toString(), () {
     var source = ascii.decode(bytes);
     var output = toYaml(source);
-    var yaml = y.loadYaml(output);
+    var yaml = loadYamlOrdered(output);
     expect(yaml, source, reason: bytes.toString());
   });
 }
@@ -49,10 +48,10 @@ void main() {
   group('config files', () {
     for (var entry in {'1': testConfig1, '2': testConfig2}.entries) {
       test(entry.key, () {
-        var decoded = y.loadYaml(entry.value);
+        var decoded = loadYamlOrdered(entry.value);
         var output = toYaml(decoded);
         printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-        var roundTrip = y.loadYaml(output);
+        var roundTrip = loadYamlOrdered(output);
         expect(roundTrip, decoded);
       });
     }
@@ -70,7 +69,7 @@ void _testRoundTrip(Object source) {
   test(testTitle, () {
     var output = toYaml(source);
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-    var yaml = y.loadYaml(output);
+    var yaml = loadYamlOrdered(output);
     expect(yaml, source);
   });
 

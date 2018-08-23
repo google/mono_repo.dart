@@ -61,7 +61,7 @@ Future<Null> generateTravisConfig(
 }
 
 /// Write `.travis.yml`
-void _writeTravisYml(String rootDirectory, Map<String, PackageConfig> configs,
+void _writeTravisYml(String rootDirectory, RootConfig configs,
     Map<String, String> commandsToKeys) {
   var travisPath = p.join(rootDirectory, travisFileName);
   var travisFile = new File(travisPath);
@@ -207,15 +207,20 @@ done
 exit \$EXIT_CODE
 ''';
 
-String _travisYml(
-    Map<String, PackageConfig> configs, Map<String, String> commandsToKeys) {
+String _travisYml(RootConfig configs, Map<String, String> commandsToKeys) {
   var orderedStages = _calculateOrderedStages(configs.values);
   var jobs = configs.values.expand((config) => config.jobs);
+
+  var customTravis = '';
+  if (configs.monoConfig.travis.isNotEmpty) {
+    customTravis = '\n# Custom configuration\n'
+        '${toYaml(configs.monoConfig.travis)}\n';
+  }
 
   return '''
 # Created with https://github.com/dart-lang/mono_repo
 ${toYaml({'language': 'dart'})}
-
+$customTravis
 ${toYaml({
     'jobs': {'include': _listJobs(jobs, commandsToKeys)}
   })}

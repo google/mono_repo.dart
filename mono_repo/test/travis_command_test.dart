@@ -2,14 +2,23 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:io/ansi.dart';
-import 'package:mono_repo/src/commands/travis.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'package:mono_repo/src/package_config.dart';
+import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/yaml.dart';
 
 import 'shared.dart';
+
+Future _testGenerate() async {
+  await overrideAnsiOutput(false, () async {
+    await generateTravisConfig(rootDirectory: d.sandbox);
+  });
+}
 
 void main() {
   test('no package', () async {
@@ -262,6 +271,101 @@ done
 
 exit $EXIT_CODE
 ''').validate();
+  });
+
+  group('mono_repo.yaml', () {
+    Future populateConfig(String monoRepoContent) async {
+      await d.file('mono_repo.yaml', monoRepoContent).create();
+      await d.dir('sub_pkg', [
+        d.file(monoPkgFileName, testConfig2),
+        d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+      ]).create();
+    }
+
+    Future validConfig(
+        String monoRepoContent, Object expectedTravisContent) async {
+      await populateConfig(monoRepoContent);
+
+      await _testGenerate();
+
+      await d.file(travisFileName, expectedTravisContent).validate();
+      await d.file(travisShPath, _config2Shell).validate();
+    }
+
+    test('complete travis.yml file', () async {
+      await validConfig('', _config2Yaml);
+    });
+
+    test('pkg:build integration travis.yml file', () async {
+      await validConfig(r'''
+travis:
+  sudo: required
+  addons:
+    chrome: stable
+
+  after_failure:
+  - tool/report_failure.sh
+''', contains(r'''
+Created with https://github.com/dart-lang/mono_repo
+language: dart
+
+# Custom configuration
+sudo: required
+addons:
+  chrome: stable
+after_failure:
+  - tool/report_failure.sh
+
+jobs:
+  include:
+'''));
+    });
+
+    group('invalid travis value type', () {
+      for (var invalidContent in [
+        true,
+        5,
+        'string',
+        ['array']
+      ]) {
+        test(invalidContent.runtimeType.toString(), () async {
+          var monoConfigContent = toYaml({'travis': invalidContent});
+          await populateConfig(monoConfigContent);
+
+          expect(
+              _testGenerate,
+              throwsUserExceptionWith(
+                  'Error parsing mono_repo.yaml',
+                  startsWith('line 1, column 1 of mono_repo.yaml: '
+                      'Unsupported value for `travis`')));
+        });
+      }
+
+      group('invalid travis keys', () {
+        for (var invalidValues in [
+          ['cache'],
+          ['branches'],
+          ['stages'],
+          ['jobs'],
+          ['language'],
+        ]) {
+          test(invalidValues.toString(), () async {
+            var invalidContent = Map.fromIterable(invalidValues);
+            var monoConfigContent = toYaml({'travis': invalidContent});
+            await populateConfig(monoConfigContent);
+
+            expect(
+                _testGenerate,
+                throwsUserExceptionWith(
+                    'Error parsing mono_repo.yaml',
+                    startsWith('line 1, column 1 of mono_repo.yaml: '
+                        'Contains illegal keys: ${invalidValues.join(', ')}')));
+          });
+        }
+      });
+    });
   });
 }
 

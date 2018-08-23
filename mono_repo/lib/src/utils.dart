@@ -4,36 +4,14 @@
 
 import 'dart:io';
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
-import 'package:yaml/yaml.dart' as y;
 
 import 'package_config.dart';
 import 'user_exception.dart';
 
-// TODO: Use the root config file to configure top-level Travis settings
-// final rootConfigFileName = 'mono_repo.yaml';
 const _legacyPkgConfigFileName = '.mono_repo.yml';
 
 const pubspecFileName = 'pubspec.yaml';
-
-y.YamlMap yamlMapOrNull(String rootDir, String relativeFilePath) {
-  var yamlFile = new File(p.join(rootDir, relativeFilePath));
-
-  if (yamlFile.existsSync()) {
-    var pkgConfigYaml =
-        y.loadYaml(yamlFile.readAsStringSync(), sourceUrl: relativeFilePath);
-
-    if (pkgConfigYaml == null) {
-      return null;
-    } else if (pkgConfigYaml is y.YamlMap) {
-      return pkgConfigYaml;
-    } else {
-      throw UserException('The contents of `$relativeFilePath` must be a Map.');
-    }
-  }
-  return null;
-}
 
 /// If the file exists, open it – otherwise infer it from the data on disk.
 List<String> listPackageDirectories(
@@ -65,18 +43,6 @@ List<String> listPackageDirectories(
               ' an expected `$pubspecFileName` in `$relativeSubDirPath`.');
         }
 
-        var pubspecContent = y.loadYaml(pubspecFile.readAsStringSync()) as Map;
-        if (pubspecContent == null) {
-          throw new StateError('The pubspec file at '
-              '`${pubspecFile.path}` does not appear valid.');
-        }
-
-        var name = pubspecContent['name'] as String;
-        if (name == null) {
-          throw new StateError(
-              'No name for the pubspec at `${pubspecFile.path}`.');
-        }
-
         packages.add(relativeSubDirPath);
       }
 
@@ -87,39 +53,4 @@ List<String> listPackageDirectories(
   visitDirectory(new Directory(rootDirectory));
 
   return packages;
-}
-
-String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
-  var yamlMap = err.map as y.YamlMap;
-
-  y.YamlScalar _getYamlKey(String key) => yamlMap.nodes.keys
-      .cast<y.YamlScalar>()
-      .singleWhere((k) => k.value == key, orElse: () => null);
-
-  var yamlKey = _getYamlKey(err.key);
-
-  String message;
-  if (yamlKey == null) {
-    if (err.innerError is UnrecognizedKeysException) {
-      var innerError = err.innerError as UnrecognizedKeysException;
-      message = '${innerError.message}';
-      for (var key in innerError.unrecognizedKeys) {
-        var yamlKey = _getYamlKey(key);
-        assert(yamlKey != null);
-        message += '\n${yamlKey.span.message('Unrecognized key "$key"')}';
-      }
-    } else {
-      assert(err.message != null);
-      message = '${yamlMap.span.message(err.message.toString())}';
-    }
-  } else {
-    if (err.message == null) {
-      message = 'Unsupported value for `${err.key}`.';
-    } else {
-      message = err.message.toString();
-    }
-    message = yamlKey.span.message(message);
-  }
-
-  return message;
 }

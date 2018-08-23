@@ -1,5 +1,7 @@
 ## 1.0.0
 
+* Add support for configuring top-level Travis options via `mono_repo.yaml`.
+
 **BREAKING CHANGES**
 
 * The root `mono_config.yaml` file is no longer used to configure which packages

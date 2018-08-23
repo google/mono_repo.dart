@@ -9,7 +9,6 @@ import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
-import 'package:yaml/yaml.dart' as y;
 
 import '../utils.dart';
 import 'mono_repo_command.dart';
@@ -44,10 +43,9 @@ Future<Map<String, PackageReport>> getPackageReports(
   var pubspecs = <String, Pubspec>{};
   for (var dir in packages) {
     var pkgPath = p.join(rootDirectory, dir, pubspecFileName);
-    var pubspecContent =
-        y.loadYaml(new File(pkgPath).readAsStringSync()) as Map;
 
-    var pubspec = new Pubspec.fromJson(pubspecContent);
+    var pubspec = new Pubspec.parse(new File(pkgPath).readAsStringSync(),
+        sourceUrl: pkgPath);
 
     // TODO: should enforce that all "covered" pubspecs have different names
     // in their pubspec.yaml file? Certainly all published packages

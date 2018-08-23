@@ -2,6 +2,104 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+
+import 'package:json_annotation/json_annotation.dart';
+import 'package:yaml/yaml.dart' as y;
+
+import 'user_exception.dart';
+
+final _yamlMapExpando = new Expando<y.YamlMap>('yamlMap');
+
+String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
+  var yamlMap = _yamlMapExpando[err.map];
+
+  y.YamlScalar _getYamlKey(String key) => yamlMap.nodes.keys
+      .cast<y.YamlScalar>()
+      .singleWhere((k) => k.value == key, orElse: () => null);
+
+  var yamlKey = _getYamlKey(err.key);
+
+  String message;
+  if (yamlKey == null) {
+    if (err.innerError is UnrecognizedKeysException) {
+      var innerError = err.innerError as UnrecognizedKeysException;
+      message = '${innerError.message}';
+      for (var key in innerError.unrecognizedKeys) {
+        var yamlKey = _getYamlKey(key);
+        assert(yamlKey != null);
+        message += '\n${yamlKey.span.message('Unrecognized key "$key"')}';
+      }
+    } else {
+      assert(err.message != null);
+      message = '${yamlMap.span.message(err.message.toString())}';
+    }
+  } else {
+    if (err.message == null) {
+      message = 'Unsupported value for `${err.key}`.';
+    } else {
+      message = err.message.toString();
+    }
+    message = yamlKey.span.message(message);
+  }
+
+  return message;
+}
+
+Map yamlMapOrNull(String rootDir, String relativeFilePath) {
+  var yamlFile = new File(p.join(rootDir, relativeFilePath));
+
+  if (yamlFile.existsSync()) {
+    var pkgConfigYaml = loadYamlOrdered(yamlFile.readAsStringSync(),
+        sourceUrl: relativeFilePath);
+
+    if (pkgConfigYaml == null) {
+      return null;
+    } else if (pkgConfigYaml is Map) {
+      return pkgConfigYaml;
+    } else {
+      throw UserException('The contents of `$relativeFilePath` must be a Map.');
+    }
+  }
+  return null;
+}
+
+/// Returns [source] parsed as Yaml, but with [Map] instances having keys
+/// ordered by their location in the input.
+///
+/// `package:yaml` follows Yaml 1.2 spec strictly and does not honor the input
+/// ordering for [Map] keys, hence this work-around.
+Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
+  Object convertOrdered(Object yaml) {
+    if (yaml == null || yaml is String || yaml is num || yaml is bool) {
+      return yaml;
+    }
+    if (yaml is y.YamlList) {
+      return yaml.map(convertOrdered).toList();
+    }
+    if (yaml is y.YamlMap) {
+      var keys = yaml.keys.toList();
+      keys.sort((a, b) {
+        var aNode = yaml.nodes[a];
+        var bNode = yaml.nodes[b];
+
+        return aNode.span.compareTo(bNode.span);
+      });
+      var map = Map.fromIterable(keys, value: (k) => convertOrdered(yaml[k]));
+      _yamlMapExpando[map] = yaml;
+      return map;
+    }
+
+    throw UnsupportedError(
+        'Cannot convert output of type ${yaml.runtimeType}.');
+  }
+
+  var yaml = y.loadYaml(source, sourceUrl: sourceUrl);
+  return convertOrdered(yaml);
+}
+
 String toYaml(Object source) {
   var buffer = new StringBuffer();
   _writeYaml(buffer, source, 0, false);

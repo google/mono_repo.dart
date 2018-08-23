@@ -7,14 +7,17 @@ import 'dart:collection';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 
+import 'mono_config.dart';
 import 'package_config.dart';
 import 'user_exception.dart';
 import 'utils.dart';
+import 'yaml.dart';
 
 class RootConfig extends MapBase<String, PackageConfig> {
+  final MonoConfig monoConfig;
   final Map<String, PackageConfig> _configs;
 
-  RootConfig._(this._configs);
+  RootConfig._(this.monoConfig, this._configs);
 
   factory RootConfig({String rootDirectory, bool recursive = false}) {
     rootDirectory ??= p.current;
@@ -60,7 +63,8 @@ class RootConfig extends MapBase<String, PackageConfig> {
       configs[pkg] = config;
     }
 
-    return new RootConfig._(configs);
+    return new RootConfig._(
+        MonoConfig.fromRepo(rootDirectory: rootDirectory), configs);
   }
 
   @override
