@@ -12,24 +12,6 @@ import 'package:mono_repo/src/package_config.dart';
 import 'shared.dart';
 
 void main() {
-  group('safeEcho', () {
-    var values = {
-      'hello': "echo -e 'hello'",
-      "single-quotes 'inside' the string":
-          "echo -e 'single-quotes '\\''inside'\\'' the string'",
-      "'single quotes' at the beginning 'middle' and at the 'end'":
-          "echo -e ''\\''single quotes'\\'' at the beginning '\\''middle'\\'' and at the '\\''end'\\'''",
-      "Repeated single quotes ''' in the '' middle":
-          "echo -e 'Repeated single quotes '\\'''\\'''\\'' in the '\\'''\\'' middle'",
-    };
-
-    values.forEach((input, expected) {
-      test(input, () {
-        expect(safeEcho(false, null, input), expected);
-      });
-    });
-  });
-
   test('no package', () async {
     await d.dir('sub_pkg').create();
 

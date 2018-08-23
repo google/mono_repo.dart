@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 
 import '../package_config.dart';
 import '../root_config.dart';
+import '../shell_utils.dart';
 import '../user_exception.dart';
 import '../yaml.dart';
 import 'mono_repo_command.dart';
@@ -120,14 +121,11 @@ List<String> _calculateTaskEntries(
   taskEntries.sort();
 
   addEntry('*', [
-    'echo -e "${_wrap(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!")}"',
+    'echo -e "${wrapAnsi(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!")}"',
     'EXIT_CODE=1'
   ]);
   return taskEntries;
 }
-
-String _wrap(bool doWrap, AnsiCode code, String value) =>
-    doWrap ? code.wrap(value, forScript: true) : value;
 
 /// Gives a map of command to unique task key for all [configs].
 Map<String, String> extractCommands(Map<String, PackageConfig> configs) {
@@ -179,19 +177,6 @@ String _shellCase(String scriptVariable, List<String> entries) {
 ${entries.join('\n')}
   esac
 ''';
-}
-
-/// Safely escape everything:
-/// 1 - use single quotes.
-/// 2 - if there is a single quote in the string
-///     2.1 end the before the single quote
-///     2.2 echo the single quote escaped
-///     2.3 continue the string
-///
-/// See https://stackoverflow.com/a/20053121/39827
-String safeEcho(bool prettyAnsi, AnsiCode code, String value) {
-  value = value.replaceAll("'", "'\\''");
-  return "echo -e '${_wrap(prettyAnsi, code, value)}'";
 }
 
 String _travisSh(List<String> tasks, bool prettyAnsi) => '''
