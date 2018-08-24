@@ -330,6 +330,118 @@ jobs:
 '''));
     });
 
+    test('only supports a travis key', () async {
+      var monoConfigContent = toYaml({
+        'other': {'stages': 5}
+      });
+      await populateConfig(monoConfigContent);
+      expect(
+          _testGenerate,
+          throwsUserExceptionWith(
+              'Error parsing mono_repo.yaml',
+              startsWith('line 1, column 1 of mono_repo.yaml: '
+                  'Only `travis` key is supported.')));
+    });
+
+    group('stages', () {
+      test('must be a list', () async {
+        var monoConfigContent = toYaml({
+          'travis': {'stages': 5}
+        });
+        await populateConfig(monoConfigContent);
+        expect(
+            _testGenerate,
+            throwsUserExceptionWith(
+                'Error parsing mono_repo.yaml',
+                startsWith('line 2, column 3 of mono_repo.yaml: '
+                    '`stages` must be an array.')));
+      });
+
+      test('must be map items', () async {
+        var monoConfigContent = toYaml({
+          'travis': {
+            'stages': [5]
+          }
+        });
+        await populateConfig(monoConfigContent);
+        expect(
+            _testGenerate,
+            throwsUserExceptionWith(
+                'Error parsing mono_repo.yaml',
+                startsWith('line 2, column 3 of mono_repo.yaml: '
+                    'All values must be Map instances.')));
+      });
+
+      test('map item must be exactly name + if – no less', () async {
+        var monoConfigContent = toYaml({
+          'travis': {
+            'stages': [
+              {'name': 'bob'}
+            ]
+          }
+        });
+        await populateConfig(monoConfigContent);
+        expect(
+            _testGenerate,
+            throwsUserExceptionWith(
+                'Error parsing mono_repo.yaml',
+                startsWith('line 3, column 7 of mono_repo.yaml: '
+                    'Required keys are missing: if.')));
+      });
+
+      test('map item must be exactly name + if – no more', () async {
+        var monoConfigContent = toYaml({
+          'travis': {
+            'stages': [
+              {'name': 'bob', 'if': 'thing', 'bob': 'other'}
+            ]
+          }
+        });
+        await populateConfig(monoConfigContent);
+        expect(
+            _testGenerate,
+            throwsUserExceptionWith(
+                'Error parsing mono_repo.yaml',
+                startsWith(
+                    'Unrecognized keys: [bob]; supported keys: [name, if]')));
+      });
+
+      test('cannot have duplicate names', () async {
+        var monoConfigContent = toYaml({
+          'travis': {
+            'stages': [
+              {'name': 'bob', 'if': 'if'},
+              {'name': 'bob', 'if': 'if'},
+            ]
+          }
+        });
+        await populateConfig(monoConfigContent);
+        expect(
+            _testGenerate,
+            throwsUserExceptionWith(
+                'Error parsing mono_repo.yaml',
+                startsWith('line 2, column 3 of mono_repo.yaml: '
+                    '`bob` appears more than once.')));
+      });
+
+      test('must match a configured stage from pkg_config', () async {
+        var monoConfigContent = toYaml({
+          'travis': {
+            'stages': [
+              {'name': 'bob', 'if': 'if'}
+            ]
+          }
+        });
+        await populateConfig(monoConfigContent);
+        expect(
+            _testGenerate,
+            throwsUserExceptionWith(
+                'Error parsing mono_repo.yaml',
+                startsWith(
+                    'Stage `bob` does not exist in any mono_pkg.yaml files.')));
+      });
+    });
+
     group('invalid travis value type', () {
       for (var invalidContent in [
         true,
@@ -346,32 +458,31 @@ jobs:
               throwsUserExceptionWith(
                   'Error parsing mono_repo.yaml',
                   startsWith('line 1, column 1 of mono_repo.yaml: '
-                      'Unsupported value for `travis`')));
+                      '`travis` must be a Map.')));
         });
       }
+    });
 
-      group('invalid travis keys', () {
-        for (var invalidValues in [
-          ['cache'],
-          ['branches'],
-          ['stages'],
-          ['jobs'],
-          ['language'],
-        ]) {
-          test(invalidValues.toString(), () async {
-            var invalidContent = Map.fromIterable(invalidValues);
-            var monoConfigContent = toYaml({'travis': invalidContent});
-            await populateConfig(monoConfigContent);
+    group('invalid travis keys', () {
+      for (var invalidValues in [
+        ['cache'],
+        ['branches'],
+        ['jobs'],
+        ['language'],
+      ]) {
+        test(invalidValues.toString(), () async {
+          var invalidContent = Map.fromIterable(invalidValues);
+          var monoConfigContent = toYaml({'travis': invalidContent});
+          await populateConfig(monoConfigContent);
 
-            expect(
-                _testGenerate,
-                throwsUserExceptionWith(
-                    'Error parsing mono_repo.yaml',
-                    startsWith('line 1, column 1 of mono_repo.yaml: '
-                        'Contains illegal keys: ${invalidValues.join(', ')}')));
-          });
-        }
-      });
+          expect(
+              _testGenerate,
+              throwsUserExceptionWith(
+                  'Error parsing mono_repo.yaml',
+                  startsWith('line 2, column 3 of mono_repo.yaml: '
+                      'Contains illegal keys: ${invalidValues.join(', ')}')));
+        });
+      }
     });
   });
 }

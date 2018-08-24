@@ -10,6 +10,7 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
+import '../mono_config.dart';
 import '../package_config.dart';
 import '../root_config.dart';
 import '../shell_utils.dart';
@@ -247,10 +248,10 @@ Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
 
 /// Calculates the global stages ordering, and throws a [UserException] if it
 /// detects any cycles.
-List<String> _calculateOrderedStages(Iterable<PackageConfig> configs) {
+List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   // Convert the configs to a graph so we can run strongly connected components.
   var edges = <String, Set<String>>{};
-  for (var config in configs) {
+  for (var config in rootConfig) {
     String previous;
     for (var stage in config.stageNames) {
       edges.putIfAbsent(stage, () => new Set<String>());
@@ -272,10 +273,34 @@ List<String> _calculateOrderedStages(Iterable<PackageConfig> configs) {
     }
   }
 
-  return components.map((c) => c.first).toList().reversed.toList();
+  var conditionalStages = Map<String, ConditionalStage>.from(
+      rootConfig.monoConfig.conditionalStages);
+
+  var orderedStages = components
+      .map((c) {
+        var stageName = c.first;
+
+        var matchingStage = conditionalStages.remove(stageName);
+        if (matchingStage != null) {
+          return matchingStage.toJson();
+        }
+
+        return stageName;
+      })
+      .toList()
+      .reversed
+      .toList();
+
+  if (conditionalStages.isNotEmpty) {
+    throw UserException('Error parsing mono_repo.yaml',
+        details: 'Stage `${conditionalStages.keys.first}` does not exist in '
+            'any mono_pkg.yaml files.');
+  }
+
+  return orderedStages;
 }
 
-/// Lists all the jobs, setting their stage, enviroment, and script.
+/// Lists all the jobs, setting their stage, environment, and script.
 Iterable<Map<String, String>> _listJobs(
     Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) sync* {
   for (var job in jobs) {
