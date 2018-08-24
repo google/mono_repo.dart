@@ -127,9 +127,7 @@ name: pkg_b
     ]).create();
 
     expect(
-        () async => await overrideAnsiOutput(false, () async {
-              await generateTravisConfig(rootDirectory: d.sandbox);
-            }),
+        _testGenerate,
         throwsUserExceptionWith(
             'Not all packages agree on `stages` ordering, found a cycle '
             'between the following stages: [analyze, format]',
@@ -144,9 +142,7 @@ name: pkg_name
       ''')
     ]).create();
 
-    await overrideAnsiOutput(false, () async {
-      await generateTravisConfig(rootDirectory: d.sandbox);
-    });
+    await _testGenerate();
 
     await d.file(travisFileName, _config2Yaml).validate();
     await d.file(travisShPath, _config2Shell).validate();
@@ -192,9 +188,7 @@ name: pkg_b
       ''')
     ]).create();
 
-    await overrideAnsiOutput(false, () async {
-      await generateTravisConfig(rootDirectory: d.sandbox);
-    });
+    await _testGenerate();
 
     await d.file(travisFileName, r'''
 # Created with https://github.com/dart-lang/mono_repo
