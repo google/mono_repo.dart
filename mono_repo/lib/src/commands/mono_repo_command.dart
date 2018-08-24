@@ -3,9 +3,14 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:args/command_runner.dart';
+import 'package:path/path.dart' as p;
+
+import '../root_config.dart';
 
 const recursiveFlag = 'recursive';
 
 abstract class MonoRepoCommand extends Command<Null> {
-  bool get recursive => globalResults[recursiveFlag] as bool;
+  RootConfig rootConfig() => RootConfig(
+      rootDirectory: p.current,
+      recursive: globalResults[recursiveFlag] as bool);
 }

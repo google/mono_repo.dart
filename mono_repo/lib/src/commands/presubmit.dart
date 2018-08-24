@@ -34,11 +34,10 @@ class PresubmitCommand extends MonoRepoCommand {
 
   @override
   Future<Null> run() async {
-    var passed = await presubmit(
+    var passed = await presubmit(rootConfig(),
         packages: argResults['package'] as List<String>,
         tasks: argResults['task'] as List<String>,
-        sdkToRun: argResults['sdk'] as String,
-        recursive: recursive);
+        sdkToRun: argResults['sdk'] as String);
 
     // Set a bad exit code if it failed.
     if (!passed) exitCode = 1;
@@ -55,12 +54,10 @@ final _currentSdk =
         ? 'dev'
         : 'stable';
 
-Future<bool> presubmit(
+Future<bool> presubmit(RootConfig configs,
     {Iterable<String> packages,
     Iterable<String> tasks,
-    String sdkToRun,
-    String rootDirectory,
-    bool recursive}) async {
+    String sdkToRun}) async {
   packages ??= <String>[];
   tasks ??= <String>[];
   sdkToRun ??= _currentSdk;
@@ -71,7 +68,6 @@ Future<bool> presubmit(
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
-  var configs = RootConfig(rootDirectory: rootDirectory, recursive: recursive);
   var commandsToKeys = extractCommands(configs);
   // By default, run on all packages.
   if (packages.isEmpty) packages = configs.keys;

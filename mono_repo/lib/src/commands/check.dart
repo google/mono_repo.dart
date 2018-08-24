@@ -6,7 +6,6 @@ import 'dart:async';
 
 import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
-import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
 
 import '../root_config.dart';
@@ -20,12 +19,11 @@ class CheckCommand extends MonoRepoCommand {
   String get description => 'Check the state of the repository.';
 
   @override
-  Future<Null> run() => check(recursive: recursive);
+  Future<Null> run() => check(rootConfig());
 }
 
-Future<Null> check({String rootDirectory, bool recursive = false}) async {
-  var reports = await getPackageReports(
-      rootDirectory: rootDirectory, recursive: recursive);
+Future<Null> check(RootConfig rootConfig) async {
+  var reports = await getPackageReports(rootConfig);
 
   print(styleBold.wrap('    ** REPORT **'));
   print('');
@@ -34,12 +32,7 @@ Future<Null> check({String rootDirectory, bool recursive = false}) async {
 }
 
 Future<Map<String, PackageReport>> getPackageReports(
-    {String rootDirectory, bool recursive = false}) async {
-  rootDirectory ??= p.current;
-
-  var rootConfig =
-      RootConfig(rootDirectory: rootDirectory, recursive: recursive);
-
+    RootConfig rootConfig) async {
   var pubspecValues = rootConfig.values.map((pc) => pc.pubspec).toSet();
 
   return rootConfig.map((path, pkgConfig) => MapEntry(

@@ -37,26 +37,21 @@ class TravisCommand extends MonoRepoCommand {
   }
 
   @override
-  Future<Null> run() => generateTravisConfig(
-      recursive: recursive, prettyAnsi: argResults['pretty-ansi'] as bool);
+  Future<Null> run() => generateTravisConfig(rootConfig(),
+      prettyAnsi: argResults['pretty-ansi'] as bool);
 }
 
-Future<Null> generateTravisConfig(
-    {String rootDirectory,
-    bool recursive = false,
-    bool prettyAnsi = true}) async {
-  rootDirectory ??= p.current;
-  recursive ??= false;
+Future<Null> generateTravisConfig(RootConfig configs,
+    {bool prettyAnsi = true}) async {
   prettyAnsi ??= true;
-  var configs = RootConfig(rootDirectory: rootDirectory, recursive: recursive);
 
   _logPkgs(configs);
 
   var commandsToKeys = extractCommands(configs);
 
-  _writeTravisYml(rootDirectory, configs, commandsToKeys);
+  _writeTravisYml(configs.rootDirectory, configs, commandsToKeys);
 
-  _writeTravisScript(rootDirectory,
+  _writeTravisScript(configs.rootDirectory,
       _calculateTaskEntries(commandsToKeys, prettyAnsi), prettyAnsi);
 }
 

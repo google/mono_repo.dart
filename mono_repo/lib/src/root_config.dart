@@ -71,10 +71,11 @@ PackageConfig _packageConfigFromDir(
 }
 
 class RootConfig extends MapBase<String, PackageConfig> {
+  final String rootDirectory;
   final MonoConfig monoConfig;
   final Map<String, PackageConfig> _configs;
 
-  RootConfig._(this.monoConfig, this._configs);
+  RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
 
   factory RootConfig({String rootDirectory, bool recursive = false}) {
     rootDirectory ??= p.current;
@@ -107,7 +108,7 @@ class RootConfig extends MapBase<String, PackageConfig> {
               'a `$monoPkgFileName` file.');
     }
 
-    return new RootConfig._(
+    return new RootConfig._(rootDirectory,
         MonoConfig.fromRepo(rootDirectory: rootDirectory), configs);
   }
 

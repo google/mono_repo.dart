@@ -37,14 +37,11 @@ class _PubSubCommand extends MonoRepoCommand {
   String get description => 'Run `pub $name` against all packages.';
 
   @override
-  Future<Null> run() => pub(name, recursive: recursive);
+  Future<Null> run() => pub(name, rootConfig());
 }
 
-Future<Null> pub(String pubCommand,
-    {String rootDirectory, bool recursive = false}) async {
-  rootDirectory ??= p.current;
-  var pkgDirs =
-      RootConfig(rootDirectory: rootDirectory, recursive: recursive).keys;
+Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
+  var pkgDirs = rootConfig.keys;
 
   print(lightBlue
       .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));
@@ -52,7 +49,7 @@ Future<Null> pub(String pubCommand,
   for (var dir in pkgDirs) {
     print('');
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
-    var workingDir = p.join(rootDirectory, dir);
+    var workingDir = p.join(rootConfig.rootDirectory, dir);
 
     var proc = await Process.start(pubPath, [pubCommand],
         mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);

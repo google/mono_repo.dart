@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mono_repo/src/root_config.dart';
 import 'package:test/test.dart';
 
 import 'package:mono_repo/src/commands/check.dart';
@@ -13,7 +14,7 @@ void main() {
     await d.dir('subdir', [d.file('mono_pkg.yaml')]).create();
 
     expect(
-        getPackageReports(rootDirectory: d.sandbox),
+        getPackageReports(RootConfig(rootDirectory: d.sandbox)),
         throwsUserExceptionWith(
             'A `mono_pkg.yaml` file was found, but missing '
             'an expected `pubspec.yaml` in `subdir`.',
@@ -24,7 +25,8 @@ void main() {
     setUp(_setup);
 
     test('check', () async {
-      var reports = await getPackageReports(rootDirectory: d.sandbox);
+      var reports =
+          await getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
       expect(reports, hasLength(4));
 
@@ -74,8 +76,8 @@ void main() {
     });
 
     test('check recursive', () async {
-      var reports =
-          await getPackageReports(rootDirectory: d.sandbox, recursive: true);
+      var reports = await getPackageReports(
+          RootConfig(rootDirectory: d.sandbox, recursive: true));
 
       expect(reports, hasLength(5));
 

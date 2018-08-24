@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:io/ansi.dart';
+import 'package:mono_repo/src/root_config.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -14,9 +15,12 @@ import 'package:mono_repo/src/yaml.dart';
 
 import 'shared.dart';
 
+Future _generateTravisConfig() =>
+    generateTravisConfig(RootConfig(rootDirectory: d.sandbox));
+
 Future _testGenerate() async {
   await overrideAnsiOutput(false, () async {
-    await generateTravisConfig(rootDirectory: d.sandbox);
+    await _generateTravisConfig();
   });
 }
 
@@ -25,7 +29,7 @@ void main() {
     await d.dir('sub_pkg').create();
 
     expect(
-        () => generateTravisConfig(rootDirectory: d.sandbox),
+        _generateTravisConfig,
         throwsUserExceptionWith(
             'No packages found.',
             'Each target package directory must contain a '
@@ -41,7 +45,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        () => generateTravisConfig(rootDirectory: d.sandbox),
+        _generateTravisConfig,
         throwsUserExceptionWith(
             'The contents of `sub_pkg/mono_pkg.yaml` must be a Map.', isNull));
   });
@@ -55,7 +59,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        () => generateTravisConfig(rootDirectory: d.sandbox),
+        _generateTravisConfig,
         throwsUserExceptionWith(
             'No entries created. Check your nested `$monoPkgFileName` files.',
             isNull));
@@ -79,7 +83,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        () => generateTravisConfig(rootDirectory: d.sandbox),
+        _generateTravisConfig,
         throwsUserExceptionWith(
             'Tasks with fancy configuration are not supported. '
             'See `sub_pkg/$monoPkgFileName`.',
@@ -95,7 +99,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        () => generateTravisConfig(rootDirectory: d.sandbox),
+        _generateTravisConfig,
         throwsUserExceptionWith(
             'Found legacy package configuration file '
             '(".mono_repo.yml") in `sub_pkg`.',

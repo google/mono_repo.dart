@@ -6,6 +6,7 @@
 
 import 'dart:io';
 
+import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
@@ -25,7 +26,7 @@ void main() {
       ]).create();
 
       expect(
-          () => presubmit(rootDirectory: d.sandbox),
+          () => presubmit(RootConfig(rootDirectory: d.sandbox)),
           throwsUserExceptionWith(
               'No $travisShPath file found, please run the `travis` '
               'command first.',
@@ -62,7 +63,7 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync('name: pkg_b');
 
-      await generateTravisConfig(rootDirectory: repoPath);
+      await generateTravisConfig(RootConfig(rootDirectory: repoPath));
       await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
           workingDirectory: repoPath);
       await Process.run('pub', ['get'], workingDirectory: pkgAPath);
