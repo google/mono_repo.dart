@@ -3,15 +3,72 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 import 'mono_config.dart';
 import 'package_config.dart';
 import 'user_exception.dart';
-import 'utils.dart';
 import 'yaml.dart';
+
+const _legacyPkgConfigFileName = '.mono_repo.yml';
+const _pubspecFileName = 'pubspec.yaml';
+
+PackageConfig _packageConfigFromDir(
+    String rootDirectory, String pkgRelativePath) {
+  var legacyConfigPath =
+      p.join(rootDirectory, pkgRelativePath, _legacyPkgConfigFileName);
+  if (FileSystemEntity.isFileSync(legacyConfigPath)) {
+    throw new UserException(
+        'Found legacy package configuration file '
+        '("$_legacyPkgConfigFileName") in `$pkgRelativePath`.',
+        details: 'Rename to "$monoPkgFileName".');
+  }
+
+  var pkgConfigRelativePath = p.join(pkgRelativePath, monoPkgFileName);
+
+  var pkgConfigYaml = yamlMapOrNull(rootDirectory, pkgConfigRelativePath);
+
+  if (pkgConfigYaml == null) {
+    return null;
+  }
+
+  var pubspecFile =
+      new File(p.join(rootDirectory, pkgRelativePath, _pubspecFileName));
+
+  if (!pubspecFile.existsSync()) {
+    throw UserException('A `$monoPkgFileName` file was found, but missing'
+        ' an expected `$_pubspecFileName` in `$pkgRelativePath`.');
+  }
+
+  var pubspec = Pubspec.parse(pubspecFile.readAsStringSync(),
+      sourceUrl: pubspecFile.path);
+
+  PackageConfig config;
+  try {
+    config = new PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
+  } on CheckedFromJsonException catch (e) {
+    throw new UserException('Error parsing $pkgRelativePath/$monoPkgFileName',
+        details: prettyPrintCheckedFromJsonException(e));
+  }
+
+  // TODO(kevmoo): Now that we can write yaml, we should support round-tripping
+  // more complex task configurations
+  var configuredJobs = config.jobs
+      .expand((job) => job.tasks)
+      .where((task) => task.config != null)
+      .toList();
+
+  if (configuredJobs.isNotEmpty) {
+    throw new UserException('Tasks with fancy configuration are not supported. '
+        'See `$pkgConfigRelativePath`.');
+  }
+
+  return config;
+}
 
 class RootConfig extends MapBase<String, PackageConfig> {
   final MonoConfig monoConfig;
@@ -22,45 +79,32 @@ class RootConfig extends MapBase<String, PackageConfig> {
   factory RootConfig({String rootDirectory, bool recursive = false}) {
     rootDirectory ??= p.current;
 
-    var pkgDirs = listPackageDirectories(
-        rootDirectory: rootDirectory, recursive: recursive);
+    var configs = <String, PackageConfig>{};
 
-    if (pkgDirs.isEmpty) {
+    void visitDirectory(Directory directory) {
+      var dirs = directory.listSync().whereType<Directory>().toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
+      for (var subdir in dirs) {
+        var relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
+
+        var pkgConfig =
+            _packageConfigFromDir(rootDirectory, relativeSubDirPath);
+        if (pkgConfig != null) {
+          configs[relativeSubDirPath] = pkgConfig;
+        }
+
+        if (recursive) {
+          visitDirectory(subdir);
+        }
+      }
+    }
+
+    visitDirectory(new Directory(rootDirectory));
+
+    if (configs.isEmpty) {
       throw new UserException('No packages found.',
           details: 'Each target package directory must contain '
               'a `$monoPkgFileName` file.');
-    }
-
-    var configs = <String, PackageConfig>{};
-
-    for (var pkg in pkgDirs) {
-      var pkgConfigRelativePath = p.join(pkg, monoPkgFileName);
-
-      var pkgConfigYaml = yamlMapOrNull(rootDirectory, pkgConfigRelativePath);
-
-      if (pkgConfigYaml == null) {
-        continue;
-      }
-
-      PackageConfig config;
-      try {
-        config = new PackageConfig.parse(pkg, pkgConfigYaml);
-      } on CheckedFromJsonException catch (e) {
-        throw new UserException('Error parsing $pkg/$monoPkgFileName',
-            details: prettyPrintCheckedFromJsonException(e));
-      }
-
-      var configuredJobs = config.jobs
-          .expand((job) => job.tasks)
-          .where((task) => task.config != null)
-          .toList();
-
-      if (configuredJobs.isNotEmpty) {
-        throw new UserException(
-            'Tasks with fancy configuration are not supported. '
-            'See `$pkgConfigRelativePath`.');
-      }
-      configs[pkg] = config;
     }
 
     return new RootConfig._(

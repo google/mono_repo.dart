@@ -48,6 +48,13 @@ String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
   return message;
 }
 
+/// If the file at `[rootDir]/[relativeFilePath]` does not exist, `null` is
+/// returned.
+///
+/// Otherwise,
+///   - if its content is a [Map], the map is returned.
+///   - if its content is `null`, an empty [Map] is returned.
+///   - if its content is anything else, a [UserException] is thrown.
 Map yamlMapOrNull(String rootDir, String relativeFilePath) {
   var yamlFile = new File(p.join(rootDir, relativeFilePath));
 
@@ -56,7 +63,7 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
         sourceUrl: relativeFilePath);
 
     if (pkgConfigYaml == null) {
-      return null;
+      return {};
     } else if (pkgConfigYaml is Map) {
       return pkgConfigYaml;
     } else {

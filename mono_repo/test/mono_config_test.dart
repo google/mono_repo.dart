@@ -9,10 +9,12 @@ import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/package_config.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
 
 import 'package:mono_repo/src/yaml.dart';
-import 'shared.dart';
+
+final _dummyPubspec = new Pubspec('_example');
 
 String _encodeJson(Object input) =>
     const JsonEncoder.withIndent('  ').convert(input);
@@ -24,8 +26,8 @@ Matcher throwsCheckedFromJsonException(String prettyValue) =>
       return prettyValue;
     }, 'prettyPrint', prettyValue));
 
-PackageConfig _parse(map) =>
-    new PackageConfig.parse('a', loadYamlOrdered(_encodeJson(map)) as Map);
+PackageConfig _parse(map) => new PackageConfig.parse(
+    'a', _dummyPubspec, loadYamlOrdered(_encodeJson(map)) as Map);
 
 void _expectParseThrows(Object content, String expectedError) => expect(
     () => _parse(content), throwsCheckedFromJsonException(expectedError));
@@ -46,9 +48,9 @@ void main() {
   });
 
   test('valid example', () {
-    var monoYaml = loadYamlOrdered(testConfig1) as Map;
+    var monoYaml = loadYamlOrdered(_testConfig1) as Map;
 
-    var config = new PackageConfig.parse('a', monoYaml);
+    var config = new PackageConfig.parse('a', _dummyPubspec, monoYaml);
 
     expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 
@@ -59,10 +61,11 @@ void main() {
 
   group('error checks', () {
     test('dart key is required', () {
-      _expectParseThrows({}, r'''
-line 1, column 1: The "dart" key is required.
-{}
-^^''');
+      var config = _parse({});
+      expect(config.cacheDirectories, isEmpty);
+      expect(config.jobs, isEmpty);
+      expect(config.stageNames, isEmpty);
+      expect(config.sdks, isEmpty);
     });
 
     test('dart value cannot be null', () {
@@ -254,6 +257,32 @@ line 12, column 7: Stages muts be unique. "a" appears more than once.
     });
   });
 }
+
+final _testConfig1 = r'''
+dart:
+  - dev
+  - stable
+  - 1.23.0
+
+stages:
+  - analyze_and_format:
+    - description: "dartanalyzer && dartfmt"
+      group:
+        - dartanalyzer: --fatal-infos --fatal-warnings .
+        - dartfmt
+      dart:
+        - dev
+    - dartanalyzer: --fatal-infos --fatal-warnings .
+      dart:
+        - 1.23.0
+  - unit_test:
+    - test: --platform chrome
+      xvfb: true
+    - test: --preset travis --total-shards 5 --shard-index 0
+      xvfb: true
+    - test: --preset travis --total-shards 5 --shard-index 1
+    - test #no args
+''';
 
 List get _testConfig1expectedOutput => [
       {

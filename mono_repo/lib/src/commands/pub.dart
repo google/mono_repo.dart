@@ -10,7 +10,7 @@ import 'package:io/ansi.dart';
 
 import 'package:path/path.dart' as p;
 
-import '../utils.dart';
+import '../root_config.dart';
 import 'mono_repo_command.dart';
 
 class PubCommand extends Command<Null> {
@@ -43,12 +43,8 @@ class _PubSubCommand extends MonoRepoCommand {
 Future<Null> pub(String pubCommand,
     {String rootDirectory, bool recursive = false}) async {
   rootDirectory ??= p.current;
-  var pkgDirs = listPackageDirectories(
-      rootDirectory: rootDirectory, recursive: recursive);
-
-  if (pkgDirs.isEmpty) {
-    return;
-  }
+  var pkgDirs =
+      RootConfig(rootDirectory: rootDirectory, recursive: recursive).keys;
 
   print(lightBlue
       .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));

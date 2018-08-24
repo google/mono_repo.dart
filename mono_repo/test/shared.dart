@@ -14,32 +14,6 @@ Matcher throwsUserExceptionWith(Object message, Object details) {
   return throwsA(matcher);
 }
 
-final testConfig1 = r'''
-dart:
-  - dev
-  - stable
-  - 1.23.0
-
-stages:
-  - analyze_and_format:
-    - description: "dartanalyzer && dartfmt"
-      group:
-        - dartanalyzer: --fatal-infos --fatal-warnings .
-        - dartfmt
-      dart:
-        - dev
-    - dartanalyzer: --fatal-infos --fatal-warnings .
-      dart:
-        - 1.23.0
-  - unit_test:
-    - test: --platform chrome
-      xvfb: true
-    - test: --preset travis --total-shards 5 --shard-index 0
-      xvfb: true
-    - test: --preset travis --total-shards 5 --shard-index 1
-    - test #no args
-''';
-
 final testConfig2 = r'''
 dart:
  - dev

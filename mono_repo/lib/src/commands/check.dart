@@ -3,14 +3,13 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
 
-import '../utils.dart';
+import '../root_config.dart';
 import 'mono_repo_command.dart';
 
 class CheckCommand extends MonoRepoCommand {
@@ -37,31 +36,14 @@ Future<Null> check({String rootDirectory, bool recursive = false}) async {
 Future<Map<String, PackageReport>> getPackageReports(
     {String rootDirectory, bool recursive = false}) async {
   rootDirectory ??= p.current;
-  var packages = listPackageDirectories(
-      rootDirectory: rootDirectory, recursive: recursive);
 
-  var pubspecs = <String, Pubspec>{};
-  for (var dir in packages) {
-    var pkgPath = p.join(rootDirectory, dir, pubspecFileName);
+  var rootConfig =
+      RootConfig(rootDirectory: rootDirectory, recursive: recursive);
 
-    var pubspec = new Pubspec.parse(new File(pkgPath).readAsStringSync(),
-        sourceUrl: pkgPath);
+  var pubspecValues = rootConfig.values.map((pc) => pc.pubspec).toSet();
 
-    // TODO: should enforce that all "covered" pubspecs have different names
-    // in their pubspec.yaml file? Certainly all published packages
-    pubspecs[dir] = pubspec;
-  }
-
-  var pubspecValues = pubspecs.values.toSet();
-
-  var reports = <String, PackageReport>{};
-
-  for (var dir in packages) {
-    var report = new PackageReport.create(pubspecs[dir], pubspecValues);
-    reports[dir] = report;
-  }
-
-  return reports;
+  return rootConfig.map((path, pkgConfig) => MapEntry(
+      path, new PackageReport.create(pkgConfig.pubspec, pubspecValues)));
 }
 
 void _print(String relativePath, PackageReport report) {

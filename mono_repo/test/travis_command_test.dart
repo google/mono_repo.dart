@@ -63,7 +63,16 @@ name: pkg_name
 
   test('fails with unsupported configuration', () async {
     await d.dir('sub_pkg', [
-      d.file(monoPkgFileName, testConfig1),
+      d.file(monoPkgFileName, r'''
+dart:
+  - dev
+
+stages:
+  - unit_test:
+    # Doing the hole xvfb thing is broken - for now!
+    - test: --platform chrome
+      xvfb: true
+'''),
       d.file('pubspec.yaml', '''
 name: pkg_name
       ''')
@@ -79,7 +88,7 @@ name: pkg_name
 
   test('fails with legacy file name', () async {
     await d.dir('sub_pkg', [
-      d.file('.mono_repo.yml', testConfig1),
+      d.file('.mono_repo.yml', ''),
       d.file('pubspec.yaml', '''
 name: pkg_name
       ''')

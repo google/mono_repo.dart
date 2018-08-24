@@ -4,6 +4,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 import 'raw_config.dart';
 
@@ -14,18 +15,25 @@ final travisFileName = '.travis.yml';
 final travisShPath = './tool/travis.sh';
 
 class PackageConfig {
+  final String relativePath;
+  final Pubspec pubspec;
+
   final List<String> sdks;
-
   final List<String> stageNames;
-
   final List<TravisJob> jobs;
-
   final List<String> cacheDirectories;
 
-  PackageConfig(this.sdks, this.stageNames, this.jobs, this.cacheDirectories);
+  PackageConfig(this.relativePath, this.pubspec, this.sdks, this.stageNames,
+      this.jobs, this.cacheDirectories);
 
-  factory PackageConfig.parse(String package, Map monoYaml) {
-    var rawConfig = new RawConfig.fromJson(monoYaml);
+  factory PackageConfig.parse(
+      String relativePath, Pubspec pubspec, Map monoPkgYaml) {
+    if (monoPkgYaml.isEmpty) {
+      // It's valid to have an empty `mono_pkg.yaml` file – it just results in
+      // an empty config WRT travis.
+      return new PackageConfig(relativePath, pubspec, [], [], [], []);
+    }
+    var rawConfig = new RawConfig.fromJson(monoPkgYaml);
 
     // FYI: 'test' is default if there are no tasks defined
     var jobs = <TravisJob>[];
@@ -39,14 +47,14 @@ class PackageConfig {
           jobSdks = (job.remove('dart') as List).cast<String>();
         }
         for (var sdk in jobSdks) {
-          jobs.add(new TravisJob.parse(package, sdk, stage.name, job));
+          jobs.add(new TravisJob.parse(relativePath, sdk, stage.name, job));
         }
       }
       return stage.name;
     }).toList();
 
-    return new PackageConfig(rawConfig.sdks, stageNames, jobs,
-        rawConfig.cache?.directories ?? const []);
+    return new PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
+        jobs, rawConfig.cache?.directories ?? const []);
   }
 }
 
@@ -55,6 +63,8 @@ class TravisJob {
   @JsonKey(includeIfNull: false)
   final String description;
 
+  /// Relative path to the directory containing the source package from the root
+  /// of the repository.
   final String package;
 
   final String sdk;

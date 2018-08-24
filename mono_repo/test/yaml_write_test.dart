@@ -45,16 +45,12 @@ void main() {
     });
   });
 
-  group('config files', () {
-    for (var entry in {'1': testConfig1, '2': testConfig2}.entries) {
-      test(entry.key, () {
-        var decoded = loadYamlOrdered(entry.value);
-        var output = toYaml(decoded);
-        printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-        var roundTrip = loadYamlOrdered(output);
-        expect(roundTrip, decoded);
-      });
-    }
+  test('config file', () {
+    var decoded = loadYamlOrdered(testConfig2);
+    var output = toYaml(decoded);
+    printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
+    var roundTrip = loadYamlOrdered(output);
+    expect(roundTrip, decoded);
   });
 }
 

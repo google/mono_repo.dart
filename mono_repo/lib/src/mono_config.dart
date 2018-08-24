@@ -34,7 +34,7 @@ class MonoConfig {
     rootDirectory ??= p.current;
 
     var yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
-    if (yaml == null) {
+    if (yaml == null || yaml.isEmpty) {
       return new MonoConfig({});
     }
 

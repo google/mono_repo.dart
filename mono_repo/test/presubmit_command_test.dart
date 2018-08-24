@@ -19,7 +19,10 @@ import 'shared.dart';
 void main() {
   group('error reporting', () {
     test('no $travisShPath', () async {
-      await d.dir('pkg_a').create();
+      await d.dir('pkg_a', [
+        d.file('mono_pkg.yaml', ''),
+        d.file('pubspec.yaml', '{"name":"_test"}')
+      ]).create();
 
       expect(
           () => presubmit(rootDirectory: d.sandbox),
