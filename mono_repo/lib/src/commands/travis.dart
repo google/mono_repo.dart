@@ -123,7 +123,7 @@ List<String> _calculateTaskEntries(
 }
 
 /// Gives a map of command to unique task key for all [configs].
-Map<String, String> extractCommands(Map<String, PackageConfig> configs) {
+Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
   var commandsToKeys = <String, String>{};
 
   var tasksToConfigure = _travisTasks(configs);
@@ -154,14 +154,12 @@ Map<String, String> extractCommands(Map<String, PackageConfig> configs) {
   return commandsToKeys;
 }
 
-List<Task> _travisTasks(Map<String, PackageConfig> configs) => configs.values
-    .expand((config) => config.jobs)
-    .expand((job) => job.tasks)
-    .toList();
+List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
+    configs.expand((config) => config.jobs).expand((job) => job.tasks).toList();
 
-void _logPkgs(Map<String, PackageConfig> configs) {
-  for (var pkg in configs.keys) {
-    stderr.writeln(styleBold.wrap('package:$pkg'));
+void _logPkgs(Iterable<PackageConfig> configs) {
+  for (var pkg in configs) {
+    stderr.writeln(styleBold.wrap('package:${pkg.relativePath}'));
   }
 }
 
@@ -203,8 +201,8 @@ exit \$EXIT_CODE
 ''';
 
 String _travisYml(RootConfig configs, Map<String, String> commandsToKeys) {
-  var orderedStages = _calculateOrderedStages(configs.values);
-  var jobs = configs.values.expand((config) => config.jobs);
+  var orderedStages = _calculateOrderedStages(configs);
+  var jobs = configs.expand((config) => config.jobs);
 
   var customTravis = '';
   if (configs.monoConfig.travis.isNotEmpty) {
@@ -235,12 +233,12 @@ ${toYaml({
 ''';
 }
 
-Iterable<String> _cacheDirs(Map<String, PackageConfig> configs) {
+Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
   var items = new SplayTreeSet<String>()..add('\$HOME/.pub-cache');
 
-  for (var entry in configs.entries) {
-    for (var dir in entry.value.cacheDirectories) {
-      items.add(p.posix.join(entry.key, dir));
+  for (var entry in configs) {
+    for (var dir in entry.cacheDirectories) {
+      items.add(p.posix.join(entry.relativePath, dir));
     }
   }
 

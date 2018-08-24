@@ -41,7 +41,7 @@ class _PubSubCommand extends MonoRepoCommand {
 }
 
 Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
-  var pkgDirs = rootConfig.keys;
+  var pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
 
   print(lightBlue
       .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));

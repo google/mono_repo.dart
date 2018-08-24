@@ -70,17 +70,17 @@ PackageConfig _packageConfigFromDir(
   return config;
 }
 
-class RootConfig extends MapBase<String, PackageConfig> {
+class RootConfig extends ListBase<PackageConfig> {
   final String rootDirectory;
   final MonoConfig monoConfig;
-  final Map<String, PackageConfig> _configs;
+  final List<PackageConfig> _configs;
 
   RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
 
   factory RootConfig({String rootDirectory, bool recursive = false}) {
     rootDirectory ??= p.current;
 
-    var configs = <String, PackageConfig>{};
+    var configs = <PackageConfig>[];
 
     void visitDirectory(Directory directory) {
       var dirs = directory.listSync().whereType<Directory>().toList()
@@ -91,7 +91,7 @@ class RootConfig extends MapBase<String, PackageConfig> {
         var pkgConfig =
             _packageConfigFromDir(rootDirectory, relativeSubDirPath);
         if (pkgConfig != null) {
-          configs[relativeSubDirPath] = pkgConfig;
+          configs.add(pkgConfig);
         }
 
         if (recursive) {
@@ -113,19 +113,16 @@ class RootConfig extends MapBase<String, PackageConfig> {
   }
 
   @override
-  PackageConfig operator [](Object key) => _configs[key];
+  int get length => _configs.length;
 
   @override
-  Iterable<String> get keys => _configs.keys;
+  set length(int newLength) =>
+      throw UnsupportedError('This List is read-only.');
 
   @override
-  void operator []=(String key, PackageConfig value) =>
-      throw UnsupportedError('This Map is read-only.');
+  PackageConfig operator [](int index) => _configs[index];
 
   @override
-  void clear() => throw UnsupportedError('This Map is read-only.');
-
-  @override
-  PackageConfig remove(Object key) =>
-      throw UnsupportedError('This Map is read-only.');
+  void operator []=(int index, PackageConfig pkg) =>
+      throw UnsupportedError('This List is read-only.');
 }

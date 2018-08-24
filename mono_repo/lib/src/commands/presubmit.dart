@@ -70,11 +70,12 @@ Future<bool> presubmit(RootConfig configs,
 
   var commandsToKeys = extractCommands(configs);
   // By default, run on all packages.
-  if (packages.isEmpty) packages = configs.keys;
+  if (packages.isEmpty)
+    packages = configs.map((pc) => pc.relativePath).toList();
   packages = packages.toList()..sort();
 
   // By default run all tasks.
-  var allKnownTasks = configs.values.fold(new Set<String>(),
+  var allKnownTasks = configs.fold(new Set<String>(),
       (Set<String> exising, PackageConfig config) {
     return exising
       ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name)));
@@ -92,12 +93,12 @@ Future<bool> presubmit(RootConfig configs,
   // Status of the presubmit.
   var passed = true;
   for (var package in packages) {
-    var config = configs[package];
-    if (config == null) {
+    var config =
+        configs.singleWhere((pkg) => pkg.relativePath == package, orElse: () {
       throw new UserException(
           'Unrecognized package `$package`, known packages are:\n'
-          '${configs.keys.map((pkg) => '  $pkg').join('\n')}');
-    }
+          '${configs.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
+    });
 
     stderr.writeln(styleBold.wrap(package));
     for (var job in config.jobs) {

@@ -23,7 +23,7 @@ class CheckCommand extends MonoRepoCommand {
 }
 
 Future<Null> check(RootConfig rootConfig) async {
-  var reports = await getPackageReports(rootConfig);
+  var reports = getPackageReports(rootConfig);
 
   print(styleBold.wrap('    ** REPORT **'));
   print('');
@@ -31,12 +31,10 @@ Future<Null> check(RootConfig rootConfig) async {
   reports.forEach(_print);
 }
 
-Future<Map<String, PackageReport>> getPackageReports(
-    RootConfig rootConfig) async {
-  var pubspecValues = rootConfig.values.map((pc) => pc.pubspec).toSet();
-
-  return rootConfig.map((path, pkgConfig) => MapEntry(
-      path, new PackageReport.create(pkgConfig.pubspec, pubspecValues)));
+Map<String, PackageReport> getPackageReports(RootConfig rootConfig) {
+  var siblings = rootConfig.map((pc) => pc.pubspec).toSet();
+  return Map.fromEntries(rootConfig.map((p) => new MapEntry(
+      p.relativePath, new PackageReport.create(p.pubspec, siblings))));
 }
 
 void _print(String relativePath, PackageReport report) {

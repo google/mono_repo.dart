@@ -14,7 +14,7 @@ void main() {
     await d.dir('subdir', [d.file('mono_pkg.yaml')]).create();
 
     expect(
-        getPackageReports(RootConfig(rootDirectory: d.sandbox)),
+        () => getPackageReports(RootConfig(rootDirectory: d.sandbox)),
         throwsUserExceptionWith(
             'A `mono_pkg.yaml` file was found, but missing '
             'an expected `pubspec.yaml` in `subdir`.',
@@ -24,9 +24,8 @@ void main() {
   group('valid setup', () {
     setUp(_setup);
 
-    test('check', () async {
-      var reports =
-          await getPackageReports(RootConfig(rootDirectory: d.sandbox));
+    test('check', () {
+      var reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
       expect(reports, hasLength(4));
 
@@ -75,8 +74,8 @@ void main() {
       expect(sdkDep.sdk, 'flutter');
     });
 
-    test('check recursive', () async {
-      var reports = await getPackageReports(
+    test('check recursive', () {
+      var reports = getPackageReports(
           RootConfig(rootDirectory: d.sandbox, recursive: true));
 
       expect(reports, hasLength(5));
