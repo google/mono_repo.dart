@@ -2,8 +2,20 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
+
+import 'package:io/ansi.dart';
 import 'package:mono_repo/src/user_exception.dart';
+import 'package:mono_repo/src/root_config.dart';
+import 'package:mono_repo/src/commands/travis.dart';
 import 'package:test/test.dart';
+import 'package:test_descriptor/test_descriptor.dart' as d;
+
+Future testGenerateTravisConfig() async {
+  await overrideAnsiOutput(false, () async {
+    await generateTravisConfig(RootConfig(rootDirectory: d.sandbox));
+  });
+}
 
 Matcher throwsUserExceptionWith(Object message, Object details) {
   var matcher = const TypeMatcher<UserException>()
