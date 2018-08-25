@@ -4,32 +4,20 @@
 
 import 'dart:async';
 
-import 'package:io/ansi.dart';
-import 'package:mono_repo/src/root_config.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'package:mono_repo/src/package_config.dart';
-import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/yaml.dart';
 
 import 'shared.dart';
-
-Future _generateTravisConfig() =>
-    generateTravisConfig(RootConfig(rootDirectory: d.sandbox));
-
-Future _testGenerate() async {
-  await overrideAnsiOutput(false, () async {
-    await _generateTravisConfig();
-  });
-}
 
 void main() {
   test('no package', () async {
     await d.dir('sub_pkg').create();
 
     expect(
-        _generateTravisConfig,
+        testGenerateTravisConfig,
         throwsUserExceptionWith(
             'No packages found.',
             'Each target package directory must contain a '
@@ -45,7 +33,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        _generateTravisConfig,
+        testGenerateTravisConfig,
         throwsUserExceptionWith(
             'The contents of `sub_pkg/mono_pkg.yaml` must be a Map.', isNull));
   });
@@ -59,7 +47,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        _generateTravisConfig,
+        testGenerateTravisConfig,
         throwsUserExceptionWith(
             'No entries created. Check your nested `$monoPkgFileName` files.',
             isNull));
@@ -83,7 +71,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        _generateTravisConfig,
+        testGenerateTravisConfig,
         throwsUserExceptionWith(
             'Tasks with fancy configuration are not supported. '
             'See `sub_pkg/$monoPkgFileName`.',
@@ -99,7 +87,7 @@ name: pkg_name
     ]).create();
 
     expect(
-        _generateTravisConfig,
+        testGenerateTravisConfig,
         throwsUserExceptionWith(
             'Found legacy package configuration file '
             '(".mono_repo.yml") in `sub_pkg`.',
@@ -140,7 +128,7 @@ name: pkg_b
     ]).create();
 
     expect(
-        _testGenerate,
+        testGenerateTravisConfig,
         throwsUserExceptionWith(
             'Not all packages agree on `stages` ordering, found a cycle '
             'between the following stages: [analyze, format]',
@@ -155,7 +143,7 @@ name: pkg_name
       ''')
     ]).create();
 
-    await _testGenerate();
+    await testGenerateTravisConfig();
 
     await d.file(travisFileName, _config2Yaml).validate();
     await d.file(travisShPath, _config2Shell).validate();
@@ -201,7 +189,7 @@ name: pkg_b
       ''')
     ]).create();
 
-    await _testGenerate();
+    await testGenerateTravisConfig();
 
     await d.file(travisFileName, r'''
 # Created with https://github.com/dart-lang/mono_repo
@@ -295,7 +283,7 @@ name: pkg_name
         String monoRepoContent, Object expectedTravisContent) async {
       await populateConfig(monoRepoContent);
 
-      await _testGenerate();
+      await testGenerateTravisConfig();
 
       await d.file(travisFileName, expectedTravisContent).validate();
       await d.file(travisShPath, _config2Shell).validate();
@@ -336,7 +324,7 @@ jobs:
       });
       await populateConfig(monoConfigContent);
       expect(
-          _testGenerate,
+          testGenerateTravisConfig,
           throwsUserExceptionWith(
               'Error parsing mono_repo.yaml',
               startsWith('line 1, column 1 of mono_repo.yaml: '
@@ -350,7 +338,7 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            _testGenerate,
+            testGenerateTravisConfig,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 startsWith('line 2, column 3 of mono_repo.yaml: '
@@ -365,7 +353,7 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            _testGenerate,
+            testGenerateTravisConfig,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 startsWith('line 2, column 3 of mono_repo.yaml: '
@@ -382,7 +370,7 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            _testGenerate,
+            testGenerateTravisConfig,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 startsWith('line 3, column 7 of mono_repo.yaml: '
@@ -399,7 +387,7 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            _testGenerate,
+            testGenerateTravisConfig,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 startsWith(
@@ -417,7 +405,7 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            _testGenerate,
+            testGenerateTravisConfig,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 startsWith('line 2, column 3 of mono_repo.yaml: '
@@ -434,7 +422,7 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            _testGenerate,
+            testGenerateTravisConfig,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 'Stage `bob` was referenced in `mono_repo.yaml`, but it does '
@@ -454,7 +442,7 @@ jobs:
           await populateConfig(monoConfigContent);
 
           expect(
-              _testGenerate,
+              testGenerateTravisConfig,
               throwsUserExceptionWith(
                   'Error parsing mono_repo.yaml',
                   startsWith('line 1, column 1 of mono_repo.yaml: '
@@ -476,7 +464,7 @@ jobs:
           await populateConfig(monoConfigContent);
 
           expect(
-              _testGenerate,
+              testGenerateTravisConfig,
               throwsUserExceptionWith(
                   'Error parsing mono_repo.yaml',
                   startsWith('line 2, column 3 of mono_repo.yaml: '
