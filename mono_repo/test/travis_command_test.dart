@@ -437,8 +437,8 @@ jobs:
             _testGenerate,
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
-                startsWith(
-                    'Stage `bob` does not exist in any mono_pkg.yaml files.')));
+                'Stage `bob` was referenced in `mono_repo.yaml`, but it does '
+                'not exist in any `mono_pkg.yaml` files.'));
       });
     });
 

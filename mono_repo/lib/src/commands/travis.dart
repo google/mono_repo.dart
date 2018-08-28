@@ -293,8 +293,9 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
 
   if (conditionalStages.isNotEmpty) {
     throw UserException('Error parsing mono_repo.yaml',
-        details: 'Stage `${conditionalStages.keys.first}` does not exist in '
-            'any mono_pkg.yaml files.');
+        details: 'Stage `${conditionalStages.keys.first}` was referenced in '
+            '`mono_repo.yaml`, but it does not exist in any '
+            '`mono_pkg.yaml` files.');
   }
 
   return orderedStages;
