@@ -13,22 +13,71 @@ part 'mono_config.g.dart';
 final _monoConfigFileName = 'mono_repo.yaml';
 
 /// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
-const _reservedTravisKeys = ['cache', 'branches', 'stages', 'jobs', 'language'];
+const _reservedTravisKeys = ['cache', 'branches', 'jobs', 'language'];
 
-@JsonSerializable(createToJson: false)
 class MonoConfig {
   final Map<String, dynamic> travis;
+  final Map<String, ConditionalStage> conditionalStages;
 
-  MonoConfig(this.travis) {
+  MonoConfig._(this.travis, this.conditionalStages);
+
+  factory MonoConfig(Map travis) {
     var overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
-      throw ArgumentError.value(travis, 'travis',
-          'Contains illegal keys: ${overlappingKeys.join(', ')}');
+      throw CheckedFromJsonException(travis, overlappingKeys.first.toString(),
+          'MonoConfig', 'Contains illegal keys: ${overlappingKeys.join(', ')}');
     }
+
+    var conditionalStages = <String, ConditionalStage>{};
+    var rawStageValue = travis['stages'];
+    if (rawStageValue != null) {
+      if (rawStageValue is List) {
+        for (var item in rawStageValue) {
+          if (item is Map) {
+            var stage = _$ConditionalStageFromJson(item);
+            if (conditionalStages.containsKey(stage.name)) {
+              throw CheckedFromJsonException(travis, 'stages', 'MonoConfig',
+                  '`${stage.name}` appears more than once.');
+            }
+            conditionalStages[stage.name] = stage;
+          } else {
+            throw CheckedFromJsonException(travis, 'stages', 'MonoConfig',
+                'All values must be Map instances.');
+          }
+        }
+      } else {
+        throw CheckedFromJsonException(
+            travis, 'stages', 'MonoConfig', '`stages` must be an array.');
+      }
+    }
+
+    // Removing this at the last minute so any throw CheckedFromJsonException
+    // will have the right value
+    // ... but the code that writes the values won't write stages seperately
+    travis.remove('stages');
+
+    return new MonoConfig._(
+        travis.map((k, v) => new MapEntry((k as String), v)),
+        conditionalStages);
   }
 
-  factory MonoConfig.fromJson(Map json) => _$MonoConfigFromJson(json);
+  factory MonoConfig.fromJson(Map json) {
+    var nonTravisKeys = json.keys.where((k) => k != 'travis').toList();
+
+    if (nonTravisKeys.isNotEmpty) {
+      throw CheckedFromJsonException(json, nonTravisKeys.first as String,
+          'MonoConfig', 'Only `travis` key is supported.');
+    }
+
+    var travis = json['travis'];
+
+    if (travis is Map) {
+      return MonoConfig(travis);
+    }
+    throw CheckedFromJsonException(
+        json, 'travis', 'MonoConfig', '`travis` must be a Map.');
+  }
 
   factory MonoConfig.fromRepo({String rootDirectory}) {
     rootDirectory ??= p.current;
@@ -45,4 +94,17 @@ class MonoConfig {
           details: prettyPrintCheckedFromJsonException(e));
     }
   }
+}
+
+@JsonSerializable(disallowUnrecognizedKeys: true)
+class ConditionalStage {
+  @JsonKey(required: true, disallowNullValue: true)
+  final String name;
+
+  @JsonKey(name: 'if', required: true, disallowNullValue: true)
+  final String ifCondition;
+
+  ConditionalStage(this.name, this.ifCondition);
+
+  Map<String, dynamic> toJson() => _$ConditionalStageToJson(this);
 }
