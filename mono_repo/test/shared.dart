@@ -17,14 +17,10 @@ Future testGenerateTravisConfig() async {
   });
 }
 
-Matcher throwsUserExceptionWith(Object message, Object details) {
-  var matcher = const TypeMatcher<UserException>()
-      .having((e) => e.message, 'message', message);
-
-  matcher = matcher.having((e) => e.details, 'details', details);
-
-  return throwsA(matcher);
-}
+Matcher throwsUserExceptionWith(Object message, Object details) =>
+    throwsA(const TypeMatcher<UserException>()
+        .having((e) => e.message, 'message', message)
+        .having((e) => e.details, 'details', details));
 
 final testConfig2 = r'''
 dart:
