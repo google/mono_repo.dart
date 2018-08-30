@@ -1,3 +1,8 @@
+## 1.1.0
+
+* Improve presubmit command output to list the full command for each task
+  instead of the name of the task type only.
+
 ## 1.0.0
 
 * Add support for configuring top-level Travis options via `mono_repo.yaml`.
@@ -7,7 +12,7 @@
 * The root `mono_config.yaml` file is no longer used to configure which packages
   are configured. Instead, `mono_pkg.yaml` is required to be in each target
   package directory. A package is considered published if it has a value for
-  `version` in `pubspec.yaml`. 
+  `version` in `pubspec.yaml`.
 
 * The package configuration file is now `mono_pkg.yaml`. If a legacy config file
   – `.mono_repo.yml` – is found, the command is canceled and a warning is
