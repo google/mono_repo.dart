@@ -9,14 +9,14 @@ part of 'mono_config.dart';
 ConditionalStage _$ConditionalStageFromJson(Map json) {
   return $checkedNew('ConditionalStage', json, () {
     $checkKeys(json,
-        allowedKeys: ['name', 'if'],
-        requiredKeys: ['name', 'if'],
-        disallowNullValues: ['name', 'if']);
+        allowedKeys: const ['name', 'if'],
+        requiredKeys: const ['name', 'if'],
+        disallowNullValues: const ['name', 'if']);
     var val = ConditionalStage(
         $checkedConvert(json, 'name', (v) => v as String),
         $checkedConvert(json, 'if', (v) => v as String));
     return val;
-  }, fieldKeyMap: {'ifCondition': 'if'});
+  }, fieldKeyMap: const {'ifCondition': 'if'});
 }
 
 Map<String, dynamic> _$ConditionalStageToJson(ConditionalStage instance) {

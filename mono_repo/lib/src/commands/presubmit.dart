@@ -108,8 +108,8 @@ Future<bool> presubmit(RootConfig configs,
         // Skip tasks that weren't specified
         if (!tasks.contains(task.name)) continue;
 
-        stderr.write(
-            '  Running task ${styleBold.wrap(white.wrap('${task.name}:$sdk'))} ');
+        stderr.write('  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
+            'TASK: ${styleBold.wrap(white.wrap(task.command))} ');
         if (sdk != sdkToRun) {
           stderr.writeln(yellow.wrap('(skipped, mismatched sdk)'));
           continue;
