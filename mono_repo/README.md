@@ -27,6 +27,7 @@ Usage: mono_repo <command> [arguments]
 
 Global options:
 -h, --help              Print this usage information.
+    --version           Prints the version of mono_repo.
     --[no-]recursive    Whether to recursively walk sub-directorys looking for packages.
 
 Available commands:
