@@ -1,3 +1,7 @@
+## 1.2.0
+
+* Add `--version` to executable.
+
 ## 1.1.0
 
 * Improve presubmit command output to list the full command for each task

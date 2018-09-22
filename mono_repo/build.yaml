@@ -3,6 +3,8 @@
 targets:
   $default:
     builders:
+      build_version:
+        enabled: true
       json_serializable:
         generate_for:
           - lib/src/mono_config.dart
