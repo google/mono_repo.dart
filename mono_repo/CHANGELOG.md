@@ -2,6 +2,7 @@
 
 * Add `--version` to executable.
 * Include the version of the package in generated files.
+* Support customizing Travis-CI `branches` in `mono_repo.yaml`.
 
 ## 1.1.0
 

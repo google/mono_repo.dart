@@ -224,6 +224,19 @@ String _travisYml(
         '${toYaml(configs.monoConfig.travis)}\n';
   }
 
+  var defaultBranches = configs.monoConfig.travis.containsKey('branches')
+      ? ''
+      : '''
+\n# Only building master means that we don't run two builds for each pull request.
+${toYaml({
+          'branches': {
+            'only': ['master']
+          }
+        })}
+''';
+
+  print(defaultBranches);
+
   return '''
 # ${_createdWith(pkgVersion)}
 ${toYaml({'language': 'dart'})}
@@ -233,14 +246,7 @@ ${toYaml({
   })}
 
 ${toYaml({'stages': orderedStages})}
-
-# Only building master means that we don't run two builds for each pull request.
-${toYaml({
-    'branches': {
-      'only': ['master']
-    }
-  })}
-
+$defaultBranches
 ${toYaml({
     'cache': {'directories': _cacheDirs(configs)}
   })}
