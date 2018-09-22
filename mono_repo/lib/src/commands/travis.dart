@@ -235,8 +235,6 @@ ${toYaml({
         })}
 ''';
 
-  print(defaultBranches);
-
   return '''
 # ${_createdWith(pkgVersion)}
 ${toYaml({'language': 'dart'})}
