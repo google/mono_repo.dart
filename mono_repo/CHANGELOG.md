@@ -1,6 +1,7 @@
 ## 1.2.0
 
 * Add `--version` to executable.
+* Include the version of the package in generated files.
 
 ## 1.1.0
 

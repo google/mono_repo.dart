@@ -13,7 +13,8 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 Future testGenerateTravisConfig() async {
   await overrideAnsiOutput(false, () async {
-    await generateTravisConfig(RootConfig(rootDirectory: d.sandbox));
+    await generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
+        pkgVersion: '1.2.3');
   });
 }
 
