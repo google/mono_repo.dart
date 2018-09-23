@@ -15,8 +15,12 @@ import '../package_config.dart';
 import '../root_config.dart';
 import '../shell_utils.dart';
 import '../user_exception.dart';
+import '../version.dart';
 import '../yaml.dart';
 import 'mono_repo_command.dart';
+
+String _createdWith(String pkgVersion) =>
+    'Created with package:mono_repo v$pkgVersion';
 
 class TravisCommand extends MonoRepoCommand {
   @override
@@ -42,32 +46,39 @@ class TravisCommand extends MonoRepoCommand {
       prettyAnsi: argResults['pretty-ansi'] as bool);
 }
 
-Future<Null> generateTravisConfig(RootConfig configs,
-    {bool prettyAnsi = true}) async {
+Future<Null> generateTravisConfig(
+  RootConfig configs, {
+  bool prettyAnsi = true,
+  String pkgVersion,
+}) async {
   prettyAnsi ??= true;
+  pkgVersion ??= packageVersion;
 
   _logPkgs(configs);
 
   var commandsToKeys = extractCommands(configs);
 
-  _writeTravisYml(configs.rootDirectory, configs, commandsToKeys);
+  _writeTravisYml(configs.rootDirectory, configs, commandsToKeys, pkgVersion);
 
-  _writeTravisScript(configs.rootDirectory,
-      _calculateTaskEntries(commandsToKeys, prettyAnsi), prettyAnsi);
+  _writeTravisScript(
+      configs.rootDirectory,
+      _calculateTaskEntries(commandsToKeys, prettyAnsi),
+      prettyAnsi,
+      pkgVersion);
 }
 
 /// Write `.travis.yml`
 void _writeTravisYml(String rootDirectory, RootConfig configs,
-    Map<String, String> commandsToKeys) {
+    Map<String, String> commandsToKeys, String pkgVersion) {
   var travisPath = p.join(rootDirectory, travisFileName);
   var travisFile = new File(travisPath);
-  travisFile.writeAsStringSync(_travisYml(configs, commandsToKeys));
+  travisFile.writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
   stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
 }
 
 /// Write `tool/travis.sh`
-void _writeTravisScript(
-    String rootDirectory, List<String> taskEntries, bool prettyAnsi) {
+void _writeTravisScript(String rootDirectory, List<String> taskEntries,
+    bool prettyAnsi, String pkgVersion) {
   var travisFilePath = p.join(rootDirectory, travisShPath);
   var travisScript = new File(travisFilePath);
 
@@ -78,7 +89,8 @@ void _writeTravisScript(
     stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
-  travisScript.writeAsStringSync(_travisSh(taskEntries, prettyAnsi));
+  travisScript
+      .writeAsStringSync(_travisSh(taskEntries, prettyAnsi, pkgVersion));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
@@ -173,9 +185,9 @@ ${entries.join('\n')}
 ''';
 }
 
-String _travisSh(List<String> tasks, bool prettyAnsi) => '''
+String _travisSh(List<String> tasks, bool prettyAnsi, String pkgVersion) => '''
 #!/bin/bash
-# Created with https://github.com/dart-lang/mono_repo
+# ${_createdWith(pkgVersion)}
 
 if [ -z "\$PKG" ]; then
   ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
@@ -201,7 +213,8 @@ done
 exit \$EXIT_CODE
 ''';
 
-String _travisYml(RootConfig configs, Map<String, String> commandsToKeys) {
+String _travisYml(
+    RootConfig configs, Map<String, String> commandsToKeys, String pkgVersion) {
   var orderedStages = _calculateOrderedStages(configs);
   var jobs = configs.expand((config) => config.jobs);
 
@@ -212,7 +225,7 @@ String _travisYml(RootConfig configs, Map<String, String> commandsToKeys) {
   }
 
   return '''
-# Created with https://github.com/dart-lang/mono_repo
+# ${_createdWith(pkgVersion)}
 ${toYaml({'language': 'dart'})}
 $customTravis
 ${toYaml({

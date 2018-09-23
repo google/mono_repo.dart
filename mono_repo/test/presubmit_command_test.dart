@@ -63,7 +63,8 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync('name: pkg_b');
 
-      await generateTravisConfig(RootConfig(rootDirectory: repoPath));
+      await generateTravisConfig(RootConfig(rootDirectory: repoPath),
+          pkgVersion: '1.2.3');
       await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
           workingDirectory: repoPath);
       await Process.run('pub', ['get'], workingDirectory: pkgAPath);
