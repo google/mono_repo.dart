@@ -299,7 +299,10 @@ travis:
   sudo: required
   addons:
     chrome: stable
-
+  branches:
+    only:
+      - master
+      - not_master
   after_failure:
   - tool/report_failure.sh
 ''', contains(r'''
@@ -310,6 +313,10 @@ language: dart
 sudo: required
 addons:
   chrome: stable
+branches:
+  only:
+    - master
+    - not_master
 after_failure:
   - tool/report_failure.sh
 
@@ -454,7 +461,6 @@ jobs:
     group('invalid travis keys', () {
       for (var invalidValues in [
         ['cache'],
-        ['branches'],
         ['jobs'],
         ['language'],
       ]) {

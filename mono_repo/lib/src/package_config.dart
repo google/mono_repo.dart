@@ -44,7 +44,12 @@ class PackageConfig {
         var jobSdks = rawConfig.sdks;
         if (job is Map && job.containsKey('dart')) {
           job = new Map<String, dynamic>.from(job as Map);
-          jobSdks = (job.remove('dart') as List).cast<String>();
+          var jobValue = job.remove('dart');
+          if (jobValue is List) {
+            jobSdks = jobValue.cast<String>();
+          } else {
+            jobSdks = [jobValue as String];
+          }
         }
         for (var sdk in jobSdks) {
           jobs.add(new TravisJob.parse(relativePath, sdk, stage.name, job));
