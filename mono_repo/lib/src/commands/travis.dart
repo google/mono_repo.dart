@@ -224,7 +224,7 @@ String _travisYml(
         '${toYaml(configs.monoConfig.travis)}\n';
   }
 
-  var defaultBranches = configs.monoConfig.travis.containsKey('branches')
+  var branchConfig = configs.monoConfig.travis.containsKey('branches')
       ? ''
       : '''
 \n# Only building master means that we don't run two builds for each pull request.
@@ -244,7 +244,7 @@ ${toYaml({
   })}
 
 ${toYaml({'stages': orderedStages})}
-$defaultBranches
+$branchConfig
 ${toYaml({
     'cache': {'directories': _cacheDirs(configs)}
   })}
