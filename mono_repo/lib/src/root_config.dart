@@ -51,8 +51,12 @@ PackageConfig _packageConfigFromDir(
   try {
     config = new PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
   } on CheckedFromJsonException catch (e) {
+    var details = prettyPrintCheckedFromJsonException(e);
+    if (details == null) {
+      rethrow;
+    }
     throw new UserException('Error parsing $pkgRelativePath/$monoPkgFileName',
-        details: prettyPrintCheckedFromJsonException(e));
+        details: details);
   }
 
   // TODO(kevmoo): Now that we can write yaml, we should support round-tripping
