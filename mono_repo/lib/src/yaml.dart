@@ -15,6 +15,9 @@ final _yamlMapExpando = new Expando<y.YamlMap>('yamlMap');
 
 String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
   var yamlMap = _yamlMapExpando[err.map];
+  if (yamlMap == null) {
+    return null;
+  }
 
   y.YamlScalar _getYamlKey(String key) => yamlMap.nodes.keys
       .cast<y.YamlScalar>()
