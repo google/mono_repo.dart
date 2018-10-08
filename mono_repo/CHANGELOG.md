@@ -1,3 +1,7 @@
+## 1.2.1
+
+* Fix issue running with Dart 2.0.
+
 ## 1.2.0
 
 * Add `--version` to executable.
