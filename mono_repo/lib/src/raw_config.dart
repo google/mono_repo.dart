@@ -16,7 +16,7 @@ class RawConfig {
   final RawCache cache;
 
   RawConfig(this.sdks, List<RawStage> stages, this.cache)
-      : this.stages = stages ??
+      : stages = stages ??
             [
               new RawStage('unit_test', ['test'])
             ] {
