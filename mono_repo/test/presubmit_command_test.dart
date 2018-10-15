@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-@Tags(const ['presubmit-only'])
+@Tags(['presubmit-only'])
 
 import 'dart:io';
 
@@ -42,24 +42,24 @@ void main() {
     setUpAll(() async {
       repoPath = Directory.systemTemp.createTempSync().path;
       pkgAPath = p.join(repoPath, 'pkg_a');
-      new Directory(pkgAPath).createSync();
+      Directory(pkgAPath).createSync();
       pkgBPath = p.join(repoPath, 'pkg_b');
-      new Directory(pkgBPath).createSync();
+      Directory(pkgBPath).createSync();
 
-      new File(p.join(pkgAPath, monoPkgFileName))
+      File(p.join(pkgAPath, monoPkgFileName))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgAConfig);
-      new File(p.join(pkgAPath, 'pubspec.yaml'))
+      File(p.join(pkgAPath, 'pubspec.yaml'))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgAPubspec);
-      new File(p.join(pkgAPath, 'test', 'test.dart'))
+      File(p.join(pkgAPath, 'test', 'test.dart'))
         ..createSync(recursive: true)
         ..writeAsStringSync(basicTest);
 
-      new File(p.join(pkgBPath, monoPkgFileName))
+      File(p.join(pkgBPath, monoPkgFileName))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgBConfig);
-      new File(p.join(pkgBPath, 'pubspec.yaml'))
+      File(p.join(pkgBPath, 'pubspec.yaml'))
         ..createSync(recursive: true)
         ..writeAsStringSync('name: pkg_b');
 
@@ -73,7 +73,7 @@ void main() {
     });
 
     tearDownAll(() {
-      new Directory(repoPath).deleteSync(recursive: true);
+      Directory(repoPath).deleteSync(recursive: true);
     });
 
     test('runs all tasks and packages', () async {
@@ -146,10 +146,9 @@ pkg_b
     group('failing tasks', () {
       File failingTestFile;
       setUp(() {
-        failingTestFile =
-            new File(p.join(pkgAPath, 'test', 'failing_test.dart'))
-              ..createSync()
-              ..writeAsStringSync(failingTest);
+        failingTestFile = File(p.join(pkgAPath, 'test', 'failing_test.dart'))
+          ..createSync()
+          ..writeAsStringSync(failingTest);
       });
       tearDown(() {
         failingTestFile.deleteSync();
@@ -179,7 +178,7 @@ pkg_a
         var start = stdErrString.indexOf('(failure, ') + 10;
         var end = stdErrString.indexOf(')');
         var logPath = stdErrString.substring(start, end);
-        var logFile = new File(logPath);
+        var logFile = File(logPath);
         expect(logFile.existsSync(), isTrue);
         expect(logFile.readAsStringSync(), contains('Some tests failed'));
       });

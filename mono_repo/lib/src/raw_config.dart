@@ -18,29 +18,29 @@ class RawConfig {
   RawConfig(this.sdks, List<RawStage> stages, this.cache)
       : stages = stages ??
             [
-              new RawStage('unit_test', ['test'])
+              RawStage('unit_test', ['test'])
             ] {
     if (sdks == null || sdks.isEmpty) {
-      throw new ArgumentError.value(
+      throw ArgumentError.value(
           null, 'sdks', 'The "dart" key must have at least one value.');
     }
   }
 
   factory RawConfig.fromJson(Map json) {
     if (!json.containsKey('dart')) {
-      throw new CheckedFromJsonException(
+      throw CheckedFromJsonException(
           json, 'dart', 'RawConfig', 'The "dart" key is required.');
     }
 
     var config = _$RawConfigFromJson(json);
 
-    var stages = new Set<String>();
+    var stages = Set<String>();
     for (var i = 0; i < config.stages.length; i++) {
       var name = config.stages[i].name;
       if (!stages.add(name)) {
         var map = (json['stages'] as List)[i] as Map;
 
-        throw new CheckedFromJsonException(map, name, 'RawStage',
+        throw CheckedFromJsonException(map, name, 'RawStage',
             'Stages muts be unique. "$name" appears more than once.');
       }
     }
@@ -67,21 +67,21 @@ class RawStage {
     // (and not "name", as you'd expect) because it corresponds to the
     // `key` in the config map we'd like the error reported on
     if (name == 'test') {
-      throw new ArgumentError.value(
+      throw ArgumentError.value(
           name,
           name,
           'Stages are not allowed to have the name `test` because it '
           'interacts poorly with the default stage by the same name.');
     }
     if (items.isEmpty) {
-      throw new ArgumentError.value(items, name,
+      throw ArgumentError.value(items, name,
           'Stages are required to have at least one job. "$name" is empty.');
     }
   }
 
   factory RawStage.fromJson(Map json) {
     if (json.isEmpty) {
-      throw new CheckedFromJsonException(
+      throw CheckedFromJsonException(
           json,
           null,
           'RawStage',
@@ -89,7 +89,7 @@ class RawStage {
           '(the name of the stage), but no items exist.');
     }
     if (json.length > 1) {
-      throw new CheckedFromJsonException(
+      throw CheckedFromJsonException(
           json,
           json.keys.skip(1).first.toString(),
           'RawStage',
@@ -101,11 +101,11 @@ class RawStage {
 
     var name = entry.key as String;
     if (entry.value == null) {
-      throw new CheckedFromJsonException(json, name, 'RawStage',
+      throw CheckedFromJsonException(json, name, 'RawStage',
           'Stages are required to have at least one job. "$name" is null.');
     }
     if (entry.value is! List) {
-      throw new CheckedFromJsonException(
+      throw CheckedFromJsonException(
           json,
           name,
           'RawStage',
@@ -114,9 +114,9 @@ class RawStage {
     }
 
     try {
-      return new RawStage(entry.key as String, entry.value as List);
+      return RawStage(entry.key as String, entry.value as List);
     } on ArgumentError catch (error) {
-      throw new CheckedFromJsonException(
+      throw CheckedFromJsonException(
           json, error.name, 'RawStage', error.message?.toString());
     }
   }

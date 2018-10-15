@@ -22,7 +22,7 @@ PackageConfig _packageConfigFromDir(
   var legacyConfigPath =
       p.join(rootDirectory, pkgRelativePath, _legacyPkgConfigFileName);
   if (FileSystemEntity.isFileSync(legacyConfigPath)) {
-    throw new UserException(
+    throw UserException(
         'Found legacy package configuration file '
         '("$_legacyPkgConfigFileName") in `$pkgRelativePath`.',
         details: 'Rename to "$monoPkgFileName".');
@@ -37,7 +37,7 @@ PackageConfig _packageConfigFromDir(
   }
 
   var pubspecFile =
-      new File(p.join(rootDirectory, pkgRelativePath, _pubspecFileName));
+      File(p.join(rootDirectory, pkgRelativePath, _pubspecFileName));
 
   if (!pubspecFile.existsSync()) {
     throw UserException('A `$monoPkgFileName` file was found, but missing'
@@ -49,13 +49,13 @@ PackageConfig _packageConfigFromDir(
 
   PackageConfig config;
   try {
-    config = new PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
+    config = PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
   } on CheckedFromJsonException catch (e) {
     var details = prettyPrintCheckedFromJsonException(e);
     if (details == null) {
       rethrow;
     }
-    throw new UserException('Error parsing $pkgRelativePath/$monoPkgFileName',
+    throw UserException('Error parsing $pkgRelativePath/$monoPkgFileName',
         details: details);
   }
 
@@ -67,7 +67,7 @@ PackageConfig _packageConfigFromDir(
       .toList();
 
   if (configuredJobs.isNotEmpty) {
-    throw new UserException('Tasks with fancy configuration are not supported. '
+    throw UserException('Tasks with fancy configuration are not supported. '
         'See `$pkgConfigRelativePath`.');
   }
 
@@ -104,15 +104,15 @@ class RootConfig extends ListBase<PackageConfig> {
       }
     }
 
-    visitDirectory(new Directory(rootDirectory));
+    visitDirectory(Directory(rootDirectory));
 
     if (configs.isEmpty) {
-      throw new UserException('No packages found.',
+      throw UserException('No packages found.',
           details: 'Each target package directory must contain '
               'a `$monoPkgFileName` file.');
     }
 
-    return new RootConfig._(rootDirectory,
+    return RootConfig._(rootDirectory,
         MonoConfig.fromRepo(rootDirectory: rootDirectory), configs);
   }
 

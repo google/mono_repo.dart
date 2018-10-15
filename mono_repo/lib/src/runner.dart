@@ -14,12 +14,8 @@ import 'commands/pub.dart';
 import 'commands/travis.dart';
 import 'version.dart';
 
-final List<Command<Null>> commands = new List<Command<Null>>.unmodifiable([
-  new CheckCommand(),
-  new PresubmitCommand(),
-  new PubCommand(),
-  new TravisCommand()
-]);
+final List<Command<Null>> commands = List<Command<Null>>.unmodifiable(
+    [CheckCommand(), PresubmitCommand(), PubCommand(), TravisCommand()]);
 
 class MonoRepoRunner extends CommandRunner<Null> {
   MonoRepoRunner()

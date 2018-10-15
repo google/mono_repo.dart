@@ -33,8 +33,8 @@ Future<Null> check(RootConfig rootConfig) async {
 
 Map<String, PackageReport> getPackageReports(RootConfig rootConfig) {
   var siblings = rootConfig.map((pc) => pc.pubspec).toSet();
-  return Map.fromEntries(rootConfig.map((p) => new MapEntry(
-      p.relativePath, new PackageReport.create(p.pubspec, siblings))));
+  return Map.fromEntries(rootConfig.map((p) =>
+      MapEntry(p.relativePath, PackageReport.create(p.pubspec, siblings))));
 }
 
 void _print(String relativePath, PackageReport report) {
@@ -79,14 +79,14 @@ class PackageReport {
 
     var sibs = <String, SiblingReference>{};
     for (var sib in siblings) {
-      var ref = new SiblingReference.create(pubspec, sib);
+      var ref = SiblingReference.create(pubspec, sib);
 
       if (ref != null) {
         sibs[sib.name] = ref;
       }
     }
 
-    return new PackageReport(pubspec, sibs);
+    return PackageReport(pubspec, sibs);
   }
 }
 
@@ -105,7 +105,7 @@ class SiblingReference {
         // a match!
         var override = sourcePubspec.dependencyOverrides.entries
             .firstWhere((d) => d.key == dep.key, orElse: () => null);
-        return new SiblingReference(
+        return SiblingReference(
             DependencyType.direct, dep.value, override?.value);
       }
     }
@@ -114,13 +114,12 @@ class SiblingReference {
         // a match!
         var override = sourcePubspec.dependencyOverrides.entries
             .firstWhere((d) => d.key == dep.key, orElse: () => null);
-        return new SiblingReference(
-            DependencyType.dev, dep.value, override?.value);
+        return SiblingReference(DependencyType.dev, dep.value, override?.value);
       }
     }
     for (var dep in sourcePubspec.dependencyOverrides.entries) {
       if (dep.key == sibling.name) {
-        return new SiblingReference(DependencyType.indirect, null, dep.value);
+        return SiblingReference(DependencyType.indirect, null, dep.value);
       }
     }
     return null;

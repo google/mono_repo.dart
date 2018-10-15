@@ -31,9 +31,9 @@ class PackageConfig {
     if (monoPkgYaml.isEmpty) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
-      return new PackageConfig(relativePath, pubspec, [], [], [], []);
+      return PackageConfig(relativePath, pubspec, [], [], [], []);
     }
-    var rawConfig = new RawConfig.fromJson(monoPkgYaml);
+    var rawConfig = RawConfig.fromJson(monoPkgYaml);
 
     // FYI: 'test' is default if there are no tasks defined
     var jobs = <TravisJob>[];
@@ -43,7 +43,7 @@ class PackageConfig {
       for (var job in stageYaml) {
         var jobSdks = rawConfig.sdks;
         if (job is Map && job.containsKey('dart')) {
-          job = new Map<String, dynamic>.from(job as Map);
+          job = Map<String, dynamic>.from(job as Map);
           var jobValue = job.remove('dart');
           if (jobValue is List) {
             jobSdks = jobValue.cast<String>();
@@ -52,13 +52,13 @@ class PackageConfig {
           }
         }
         for (var sdk in jobSdks) {
-          jobs.add(new TravisJob.parse(relativePath, sdk, stage.name, job));
+          jobs.add(TravisJob.parse(relativePath, sdk, stage.name, job));
         }
       }
       return stage.name;
     }).toList();
 
-    return new PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
+    return PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
         jobs, rawConfig.cache?.directories ?? const []);
   }
 }
@@ -96,14 +96,13 @@ class TravisJob {
     String description;
     dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
-      withoutDescription = new Map.of(yaml);
+      withoutDescription = Map.of(yaml);
       description = withoutDescription.remove('description') as String;
     } else {
       withoutDescription = yaml;
     }
     var tasks = Task.parseTaskOrGroup(withoutDescription);
-    return new TravisJob(package, sdk, stageName, tasks,
-        description: description);
+    return TravisJob(package, sdk, stageName, tasks, description: description);
   }
 
   Map<String, dynamic> toJson() => _$TravisJobToJson(this);
@@ -138,22 +137,21 @@ class Task {
       var group = yamlValue['group'];
       if (group != null) {
         if (group is List) {
-          return group.map((taskYaml) => new Task.parse(taskYaml)).toList();
+          return group.map((taskYaml) => Task.parse(taskYaml)).toList();
         } else {
-          throw new ArgumentError.value(
-              group, 'group', 'expected a list of tasks');
+          throw ArgumentError.value(group, 'group', 'expected a list of tasks');
         }
       }
     }
-    return [new Task.parse(yamlValue)];
+    return [Task.parse(yamlValue)];
   }
 
   factory Task.parse(Object yamlValue) {
     if (yamlValue is String) {
       if (yamlValue == 'command') {
-        throw new ArgumentError.value(yamlValue, 'command', 'requires a value');
+        throw ArgumentError.value(yamlValue, 'command', 'requires a value');
       }
-      return new Task(yamlValue);
+      return Task(yamlValue);
     }
 
     if (yamlValue is Map) {
@@ -164,11 +162,11 @@ class Task {
         if (yamlValue.isNotEmpty) {
           key = yamlValue.keys.first as String;
         }
-        throw new CheckedFromJsonException(
+        throw CheckedFromJsonException(
             yamlValue, key, 'Task', 'Must have one key of $_prettyTaskList.');
       }
       if (taskNames.length > 1) {
-        throw new CheckedFromJsonException(yamlValue, taskNames.skip(1).first,
+        throw CheckedFromJsonException(yamlValue, taskNames.skip(1).first,
             'Task', 'Must have one and only one key of $_prettyTaskList.');
       }
       var taskName = taskNames.single;
@@ -181,7 +179,7 @@ class Task {
           } else if (taskValue is List<String>) {
             args = taskValue.join(';');
           } else {
-            throw new ArgumentError.value(taskValue, 'command',
+            throw ArgumentError.value(taskValue, 'command',
                 'only supports a string or array of strings');
           }
           break;
@@ -189,16 +187,16 @@ class Task {
           args = yamlValue[taskName] as String;
       }
 
-      var config = new Map<String, dynamic>.from(yamlValue);
+      var config = Map<String, dynamic>.from(yamlValue);
       config.remove(taskName);
 
       if (config.isEmpty) {
         config = null;
       }
-      return new Task(taskName, args: args, config: config);
+      return Task(taskName, args: args, config: config);
     }
 
-    throw new ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
+    throw ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
   }
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
@@ -225,7 +223,7 @@ class Task {
       case 'command':
         return args;
       default:
-        throw new UnsupportedError('Cannot generate the command for `$name`.');
+        throw UnsupportedError('Cannot generate the command for `$name`.');
     }
   }
 
