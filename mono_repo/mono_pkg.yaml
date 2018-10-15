@@ -7,7 +7,7 @@ stages:
   - smoke_test:
     - description: "dartfmt && dartanalyzer"
       group:
-        - dartfmt
+        - command: dartfmt --fix -n --set-exit-if-changed .
         - dartanalyzer: --fatal-infos --fatal-warnings .
   - build:
     - command: pub run build_runner build test --delete-conflicting-outputs

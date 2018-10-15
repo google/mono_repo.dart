@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v1.2.0
+# Created with package:mono_repo v1.2.1
 
 if [ -z "$PKG" ]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
@@ -21,16 +21,21 @@ while (( "$#" )); do
   case $TASK in
   command_0) echo
     echo -e '\033[1mTASK: command_0\033[22m'
-    echo -e 'pub run build_runner build test --delete-conflicting-outputs'
-    pub run build_runner build test --delete-conflicting-outputs || EXIT_CODE=$?
+    echo -e 'dartfmt --fix -n --set-exit-if-changed .'
+    dartfmt --fix -n --set-exit-if-changed . || EXIT_CODE=$?
     ;;
   command_1) echo
     echo -e '\033[1mTASK: command_1\033[22m'
-    echo -e 'pub run build_runner test -- -x presubmit-only'
-    pub run build_runner test -- -x presubmit-only || EXIT_CODE=$?
+    echo -e 'pub run build_runner build test --delete-conflicting-outputs'
+    pub run build_runner build test --delete-conflicting-outputs || EXIT_CODE=$?
     ;;
   command_2) echo
     echo -e '\033[1mTASK: command_2\033[22m'
+    echo -e 'pub run build_runner test -- -x presubmit-only'
+    pub run build_runner test -- -x presubmit-only || EXIT_CODE=$?
+    ;;
+  command_3) echo
+    echo -e '\033[1mTASK: command_3\033[22m'
     echo -e 'pub run build_runner test -- --run-skipped -t presubmit-only'
     pub run build_runner test -- --run-skipped -t presubmit-only || EXIT_CODE=$?
     ;;
@@ -38,11 +43,6 @@ while (( "$#" )); do
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
     echo -e 'dartanalyzer --fatal-infos --fatal-warnings .'
     dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
-    ;;
-  dartfmt) echo
-    echo -e '\033[1mTASK: dartfmt\033[22m'
-    echo -e 'dartfmt -n --set-exit-if-changed .'
-    dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
     ;;
   *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
     EXIT_CODE=1

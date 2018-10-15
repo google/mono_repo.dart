@@ -1,36 +1,36 @@
-# Created with package:mono_repo v1.2.0
+# Created with package:mono_repo v1.2.1
 language: dart
 
 jobs:
   include:
     - stage: smoke_test
       name: "SDK: stable - DIR: mono_repo - TASKS: dartfmt && dartanalyzer"
-      script: ./tool/travis.sh dartfmt dartanalyzer
+      script: ./tool/travis.sh command_0 dartanalyzer
       env: PKG="mono_repo"
       dart: stable
     - stage: smoke_test
       name: "SDK: dev - DIR: mono_repo - TASKS: dartfmt && dartanalyzer"
-      script: ./tool/travis.sh dartfmt dartanalyzer
+      script: ./tool/travis.sh command_0 dartanalyzer
       env: PKG="mono_repo"
       dart: dev
     - stage: build
       name: "SDK: stable - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
-      script: ./tool/travis.sh command_0
+      script: ./tool/travis.sh command_1
       env: PKG="mono_repo"
       dart: stable
     - stage: build
       name: "SDK: dev - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
-      script: ./tool/travis.sh command_0
+      script: ./tool/travis.sh command_1
       env: PKG="mono_repo"
       dart: dev
     - stage: unit_test
       name: "SDK: stable - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
-      script: ./tool/travis.sh command_1 command_2
+      script: ./tool/travis.sh command_2 command_3
       env: PKG="mono_repo"
       dart: stable
     - stage: unit_test
       name: "SDK: dev - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
-      script: ./tool/travis.sh command_1 command_2
+      script: ./tool/travis.sh command_2 command_3
       env: PKG="mono_repo"
       dart: dev
 
