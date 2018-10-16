@@ -50,7 +50,7 @@ class PresubmitCommand extends MonoRepoCommand {
 ///
 /// This also won't match any exact versions listed in your travis config.
 final _currentSdk =
-    new Version.parse(Platform.version.split(' ').first).isPreRelease
+    Version.parse(Platform.version.split(' ').first).isPreRelease
         ? 'dev'
         : 'stable';
 
@@ -63,8 +63,8 @@ Future<bool> presubmit(RootConfig configs,
   sdkToRun ??= _currentSdk;
   Directory tmpDir;
 
-  if (!new File(travisShPath).existsSync()) {
-    throw new UserException(
+  if (!File(travisShPath).existsSync()) {
+    throw UserException(
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
@@ -75,15 +75,15 @@ Future<bool> presubmit(RootConfig configs,
   packages = packages.toList()..sort();
 
   // By default run all tasks.
-  var allKnownTasks = configs.fold(new Set<String>(),
-      (Set<String> exising, PackageConfig config) {
+  var allKnownTasks =
+      configs.fold(Set<String>(), (Set<String> exising, PackageConfig config) {
     return exising
       ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name)));
   });
   if (tasks.isEmpty) tasks = allKnownTasks;
   var unrecognizedTasks = tasks.where((task) => !allKnownTasks.contains(task));
   if (unrecognizedTasks.isNotEmpty) {
-    throw new UserException(
+    throw UserException(
         'Found ${unrecognizedTasks.length} unrecognized tasks:\n'
         '${unrecognizedTasks.map((task) => '  $task').join('\n')}\n\n'
         'Known tasks are:\n'
@@ -95,7 +95,7 @@ Future<bool> presubmit(RootConfig configs,
   for (var package in packages) {
     var config =
         configs.singleWhere((pkg) => pkg.relativePath == package, orElse: () {
-      throw new UserException(
+      throw UserException(
           'Unrecognized package `$package`, known packages are:\n'
           '${configs.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
     });
@@ -121,8 +121,8 @@ Future<bool> presubmit(RootConfig configs,
           stderr.writeln(green.wrap('(success)'));
         } else {
           tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
-          var file = new File(
-              p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
+          var file =
+              File(p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
           await file.create(recursive: true);
           await file.writeAsString(result.stdout as String);
           stderr.writeln(red.wrap('(failure, ${file.path})'));

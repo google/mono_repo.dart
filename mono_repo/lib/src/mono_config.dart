@@ -57,9 +57,8 @@ class MonoConfig {
     // ... but the code that writes the values won't write stages seperately
     travis.remove('stages');
 
-    return new MonoConfig._(
-        travis.map((k, v) => new MapEntry((k as String), v)),
-        conditionalStages);
+    return MonoConfig._(
+        travis.map((k, v) => MapEntry((k as String), v)), conditionalStages);
   }
 
   factory MonoConfig.fromJson(Map json) {
@@ -84,13 +83,13 @@ class MonoConfig {
 
     var yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return new MonoConfig({});
+      return MonoConfig({});
     }
 
     try {
-      return new MonoConfig.fromJson(yaml);
+      return MonoConfig.fromJson(yaml);
     } on CheckedFromJsonException catch (e) {
-      throw new UserException('Error parsing $_monoConfigFileName',
+      throw UserException('Error parsing $_monoConfigFileName',
           details: prettyPrintCheckedFromJsonException(e));
     }
   }

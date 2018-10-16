@@ -1,11 +1,11 @@
 name: mono_repo
 description: Manage repositories with multiple Dart packages
-version: 1.2.1
+version: 1.2.2-dev
 homepage: https://github.com/dart-lang/mono_repo
 author: Dart Team <misc@dartlang.org>
 
 environment:
-  sdk: '>=2.0.0-dev.54 <3.0.0'
+  sdk: '>=2.0.0 <3.0.0'
 
 dependencies:
   args: ^1.4.0

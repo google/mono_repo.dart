@@ -71,7 +71,7 @@ Future<Null> generateTravisConfig(
 void _writeTravisYml(String rootDirectory, RootConfig configs,
     Map<String, String> commandsToKeys, String pkgVersion) {
   var travisPath = p.join(rootDirectory, travisFileName);
-  var travisFile = new File(travisPath);
+  var travisFile = File(travisPath);
   travisFile.writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
   stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
 }
@@ -80,7 +80,7 @@ void _writeTravisYml(String rootDirectory, RootConfig configs,
 void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     bool prettyAnsi, String pkgVersion) {
   var travisFilePath = p.join(rootDirectory, travisShPath);
-  var travisScript = new File(travisFilePath);
+  var travisScript = File(travisFilePath);
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
@@ -103,7 +103,7 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    var buffer = new StringBuffer('  $label) ${contentLines.first}\n');
+    var buffer = StringBuffer('  $label) ${contentLines.first}\n');
     buffer.writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
 
     var output = buffer.toString();
@@ -122,7 +122,7 @@ List<String> _calculateTaskEntries(
   });
 
   if (taskEntries.isEmpty) {
-    throw new UserException(
+    throw UserException(
         'No entries created. Check your nested `$monoPkgFileName` files.');
   }
 
@@ -252,7 +252,7 @@ ${toYaml({
 }
 
 Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
-  var items = new SplayTreeSet<String>()..add('\$HOME/.pub-cache');
+  var items = SplayTreeSet<String>()..add('\$HOME/.pub-cache');
 
   for (var entry in configs) {
     for (var dir in entry.cacheDirectories) {
@@ -271,7 +271,7 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   for (var config in rootConfig) {
     String previous;
     for (var stage in config.stageNames) {
-      edges.putIfAbsent(stage, () => new Set<String>());
+      edges.putIfAbsent(stage, () => Set<String>());
       if (previous != null) {
         edges[previous].add(stage);
       }
@@ -284,8 +284,7 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       stronglyConnectedComponents(edges.keys, (n) => n, (n) => edges[n]);
   for (var component in components) {
     if (component.length > 1) {
-      throw new UserException(
-          'Not all packages agree on `stages` ordering, found '
+      throw UserException('Not all packages agree on `stages` ordering, found '
           'a cycle between the following stages: $component');
     }
   }

@@ -14,7 +14,7 @@ import 'package:test/test.dart';
 
 import 'package:mono_repo/src/yaml.dart';
 
-final _dummyPubspec = new Pubspec('_example');
+final _dummyPubspec = Pubspec('_example');
 
 String _encodeJson(Object input) =>
     const JsonEncoder.withIndent('  ').convert(input);
@@ -26,7 +26,7 @@ Matcher throwsCheckedFromJsonException(String prettyValue) =>
       return prettyValue;
     }, 'prettyPrint', prettyValue));
 
-PackageConfig _parse(map) => new PackageConfig.parse(
+PackageConfig _parse(map) => PackageConfig.parse(
     'a', _dummyPubspec, loadYamlOrdered(_encodeJson(map)) as Map);
 
 void _expectParseThrows(Object content, String expectedError) => expect(
@@ -50,7 +50,7 @@ void main() {
   test('valid example', () {
     var monoYaml = loadYamlOrdered(_testConfig1) as Map;
 
-    var config = new PackageConfig.parse('a', _dummyPubspec, monoYaml);
+    var config = PackageConfig.parse('a', _dummyPubspec, monoYaml);
 
     expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 

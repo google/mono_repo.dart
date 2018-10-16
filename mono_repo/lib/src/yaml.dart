@@ -11,7 +11,7 @@ import 'package:yaml/yaml.dart' as y;
 
 import 'user_exception.dart';
 
-final _yamlMapExpando = new Expando<y.YamlMap>('yamlMap');
+final _yamlMapExpando = Expando<y.YamlMap>('yamlMap');
 
 String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
   var yamlMap = _yamlMapExpando[err.map];
@@ -59,7 +59,7 @@ String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
 ///   - if its content is `null`, an empty [Map] is returned.
 ///   - if its content is anything else, a [UserException] is thrown.
 Map yamlMapOrNull(String rootDir, String relativeFilePath) {
-  var yamlFile = new File(p.join(rootDir, relativeFilePath));
+  var yamlFile = File(p.join(rootDir, relativeFilePath));
 
   if (yamlFile.existsSync()) {
     var pkgConfigYaml = loadYamlOrdered(yamlFile.readAsStringSync(),
@@ -111,7 +111,7 @@ Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
 }
 
 String toYaml(Object source) {
-  var buffer = new StringBuffer();
+  var buffer = StringBuffer();
   _writeYaml(buffer, source, 0, false);
   return buffer.toString();
 }

@@ -15,8 +15,8 @@ import 'mono_repo_command.dart';
 
 class PubCommand extends Command<Null> {
   PubCommand() {
-    addSubcommand(new _PubSubCommand('get'));
-    addSubcommand(new _PubSubCommand('upgrade'));
+    addSubcommand(_PubSubCommand('get'));
+    addSubcommand(_PubSubCommand('upgrade'));
   }
 
   @override
