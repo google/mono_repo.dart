@@ -8,7 +8,7 @@ part of 'package_config.dart';
 
 TravisJob _$TravisJobFromJson(Map json) {
   return $checkedNew('TravisJob', json, () {
-    var val = TravisJob(
+    final val = TravisJob(
         $checkedConvert(json, 'package', (v) => v as String),
         $checkedConvert(json, 'sdk', (v) => v as String),
         $checkedConvert(json, 'stageName', (v) => v as String),
@@ -25,7 +25,7 @@ TravisJob _$TravisJobFromJson(Map json) {
 }
 
 Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
-  var val = <String, dynamic>{};
+  final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
     if (value != null) {
@@ -43,7 +43,7 @@ Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
 
 Task _$TaskFromJson(Map json) {
   return $checkedNew('Task', json, () {
-    var val = Task($checkedConvert(json, 'name', (v) => v as String),
+    final val = Task($checkedConvert(json, 'name', (v) => v as String),
         args: $checkedConvert(json, 'args', (v) => v as String),
         config: $checkedConvert(json, 'config',
             (v) => (v as Map)?.map((k, e) => MapEntry(k as String, e))));
@@ -52,7 +52,7 @@ Task _$TaskFromJson(Map json) {
 }
 
 Map<String, dynamic> _$TaskToJson(Task instance) {
-  var val = <String, dynamic>{};
+  final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
     if (value != null) {

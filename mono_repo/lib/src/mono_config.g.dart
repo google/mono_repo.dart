@@ -12,7 +12,7 @@ ConditionalStage _$ConditionalStageFromJson(Map json) {
         allowedKeys: const ['name', 'if'],
         requiredKeys: const ['name', 'if'],
         disallowNullValues: const ['name', 'if']);
-    var val = ConditionalStage(
+    final val = ConditionalStage(
         $checkedConvert(json, 'name', (v) => v as String),
         $checkedConvert(json, 'if', (v) => v as String));
     return val;
@@ -20,7 +20,7 @@ ConditionalStage _$ConditionalStageFromJson(Map json) {
 }
 
 Map<String, dynamic> _$ConditionalStageToJson(ConditionalStage instance) {
-  var val = <String, dynamic>{};
+  final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
     if (value != null) {
