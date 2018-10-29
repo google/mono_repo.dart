@@ -9,7 +9,7 @@ part of 'raw_config.dart';
 RawConfig _$RawConfigFromJson(Map json) {
   return $checkedNew('RawConfig', json, () {
     $checkKeys(json, allowedKeys: const ['dart', 'stages', 'cache']);
-    var val = RawConfig(
+    final val = RawConfig(
         $checkedConvert(json, 'dart',
             (v) => (v as List)?.map((e) => e as String)?.toList()),
         $checkedConvert(
@@ -26,7 +26,7 @@ RawConfig _$RawConfigFromJson(Map json) {
 
 RawCache _$RawCacheFromJson(Map json) {
   return $checkedNew('RawCache', json, () {
-    var val = RawCache($checkedConvert(json, 'directories',
+    final val = RawCache($checkedConvert(json, 'directories',
         (v) => (v as List)?.map((e) => e as String)?.toList()));
     return val;
   });
