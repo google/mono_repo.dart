@@ -61,6 +61,12 @@ class PackageConfig {
     return PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
         jobs, rawConfig.cache?.directories ?? const []);
   }
+
+  bool get hasFlutterDependency {
+    return pubspec.dependencies.values.any((dependency) {
+      return dependency is SdkDependency && dependency.sdk == 'flutter';
+    });
+  }
 }
 
 @JsonSerializable()

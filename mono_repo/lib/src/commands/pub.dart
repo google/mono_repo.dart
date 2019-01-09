@@ -41,17 +41,29 @@ class _PubSubCommand extends MonoRepoCommand {
 }
 
 Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
-  var pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
-
   print(lightBlue
-      .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));
+      // `pub` isn't really a fitting name anymore. What do we use?
+      .wrap(
+          'Running `pub $pubCommand` across ${rootConfig.length} package(s).'));
 
-  for (var dir in pkgDirs) {
+  for (var config in rootConfig) {
+    final dir = config.relativePath;
+
+    List<String> arguments;
+    String executable;
+    if (config.hasFlutterDependency) {
+      executable = Platform.isWindows ? 'flutter.bat' : 'flutter';
+      arguments = ['packages', pubCommand];
+    } else {
+      executable = pubPath;
+      arguments = [pubCommand];
+    }
+
     print('');
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
     var workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    var proc = await Process.start(pubPath, [pubCommand],
+    var proc = await Process.start(executable, arguments,
         mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
 
     var exit = await proc.exitCode;
