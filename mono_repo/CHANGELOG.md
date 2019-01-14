@@ -1,3 +1,7 @@
+## 1.2.2
+
+* Updated dependencies.
+
 ## 1.2.1
 
 * Fix issue running with Dart 2.0.
