@@ -280,8 +280,7 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   }
   // Running strongly connected components lets us detect cycles (which aren't
   // allowed), and gives us the reverse order of what we ultimately want.
-  var components =
-      stronglyConnectedComponents(edges.keys, (n) => n, (n) => edges[n]);
+  var components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
   for (var component in components) {
     if (component.length > 1) {
       throw UserException('Not all packages agree on `stages` ordering, found '
