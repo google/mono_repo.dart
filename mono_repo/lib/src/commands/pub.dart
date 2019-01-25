@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
-
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../root_config.dart';
@@ -26,6 +26,20 @@ class PubCommand extends Command<Null> {
   String get description =>
       'Run `pub get` or `pub upgrade` against all packages.';
 }
+
+@visibleForTesting
+typedef StartProcess = Future<Process> Function(
+  String executable,
+  List<String> arguments, {
+  String workingDirectory,
+  Map<String, String> environment,
+  bool includeParentEnvironment,
+  bool runInShell,
+  ProcessStartMode mode,
+});
+
+@visibleForTesting
+StartProcess startProcess = Process.start;
 
 class _PubSubCommand extends MonoRepoCommand {
   @override
@@ -63,8 +77,12 @@ Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
     var workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    var proc = await Process.start(executable, arguments,
-        mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
+    var proc = await startProcess(
+      executable,
+      arguments,
+      mode: ProcessStartMode.inheritStdio,
+      workingDirectory: workingDir,
+    );
 
     var exit = await proc.exitCode;
 

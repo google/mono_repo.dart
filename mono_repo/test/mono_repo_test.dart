@@ -4,11 +4,56 @@
 
 import 'dart:io';
 
+import 'package:mockito/mockito.dart';
+import 'package:mono_repo/src/commands/pub.dart';
 import 'package:test/test.dart';
 import 'package:test_process/test_process.dart';
 
+class _StartProcess extends Mock {
+  Future<Process> call(
+    String executable,
+    List<String> arguments, {
+    String workingDirectory,
+    Map<String, String> environment,
+    bool includeParentEnvironment,
+    bool runInShell,
+    ProcessStartMode mode,
+  });
+}
+
+class _Process extends Mock implements Process {}
+
+_StartProcess _mockProcessStart() {
+  final mock = _StartProcess();
+
+  final currentImpl = startProcess;
+  startProcess = mock;
+  addTearDown(() => startProcess = currentImpl);
+  return mock;
+}
+
 void main() {
   test('pub get gets dependencies', () async {
+    final mockProcess = _Process();
+    when(mockProcess.exitCode).thenAnswer((_) => Future.value(0));
+
+    final mock = _mockProcessStart();
+    when(mock.call(any, any, mode: anyNamed('mode'), workingDirectory: anyNamed('workingDirectory')))
+        .thenAnswer((_) => Future.value(mockProcess));
+
+    var process =
+        await TestProcess.start('pub', ['run', 'mono_repo', 'pub', 'get']);
+
+    var output = await process.stdoutStream().join('\n');
+    print(output);
+
+    verifyInOrder([]);
+    verifyNoMoreInteractions(mock);
+
+    await process.shouldExit(0);
+  });
+
+  test('mono_repo without arguments prints help', () async {
     var process = await TestProcess.start('pub', ['run', 'mono_repo']);
 
     var output = await process.stdoutStream().join('\n');
