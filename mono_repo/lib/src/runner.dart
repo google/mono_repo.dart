@@ -22,12 +22,13 @@ class MonoRepoRunner extends CommandRunner<Null> {
       : super(
             'mono_repo', 'Manage multiple packages in one source repository.') {
     commands.forEach(addCommand);
-    argParser.addFlag('version',
-        negatable: false, help: 'Prints the version of mono_repo.');
-    argParser.addFlag(recursiveFlag,
-        help:
-            'Whether to recursively walk sub-directorys looking for packages.',
-        defaultsTo: false);
+    argParser
+      ..addFlag('version',
+          negatable: false, help: 'Prints the version of mono_repo.')
+      ..addFlag(recursiveFlag,
+          help:
+              'Whether to recursively walk sub-directorys looking for packages.',
+          defaultsTo: false);
   }
 
   @override

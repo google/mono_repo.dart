@@ -23,13 +23,14 @@ class PresubmitCommand extends MonoRepoCommand {
   String get description => 'Run the travis presubmits locally.';
 
   PresubmitCommand() {
-    argParser.addMultiOption('package',
-        help: 'The package(s) to run on, defaults to all packages', abbr: 'p');
-    argParser.addMultiOption('task',
-        help: 'The task(s) to run, defaults to all tasks', abbr: 't');
-    argParser.addOption('sdk',
-        help: 'Which sdk to use for match tasks, defaults to current sdk',
-        defaultsTo: _currentSdk);
+    argParser
+      ..addMultiOption('package',
+          help: 'The package(s) to run on, defaults to all packages', abbr: 'p')
+      ..addMultiOption('task',
+          help: 'The task(s) to run, defaults to all tasks', abbr: 't')
+      ..addOption('sdk',
+          help: 'Which sdk to use for match tasks, defaults to current sdk',
+          defaultsTo: _currentSdk);
   }
 
   @override
