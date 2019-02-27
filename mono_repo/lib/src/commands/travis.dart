@@ -30,15 +30,13 @@ class TravisCommand extends MonoRepoCommand {
   String get description => 'Configure Travis-CI for child packages.';
 
   TravisCommand() : super() {
-    argParser
-      ..addFlag(
-        'pretty-ansi',
-        abbr: 'p',
-        defaultsTo: true,
-        help:
-            'If the generated `$travisShPath` file should include ANSI escapes '
-            'to improve output readability.',
-      );
+    argParser.addFlag(
+      'pretty-ansi',
+      abbr: 'p',
+      defaultsTo: true,
+      help: 'If the generated `$travisShPath` file should include ANSI escapes '
+          'to improve output readability.',
+    );
   }
 
   @override
@@ -71,8 +69,8 @@ Future<Null> generateTravisConfig(
 void _writeTravisYml(String rootDirectory, RootConfig configs,
     Map<String, String> commandsToKeys, String pkgVersion) {
   var travisPath = p.join(rootDirectory, travisFileName);
-  var travisFile = File(travisPath);
-  travisFile.writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
+  File(travisPath)
+      .writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
   stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
 }
 
@@ -84,9 +82,9 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
-    stderr.writeln(
-        yellow.wrap('Make sure to mark `$travisShPath` as executable.'));
-    stderr.writeln(yellow.wrap('  chmod +x $travisShPath'));
+    stderr
+      ..writeln(yellow.wrap('Make sure to mark `$travisShPath` as executable.'))
+      ..writeln(yellow.wrap('  chmod +x $travisShPath'));
   }
 
   travisScript
@@ -103,8 +101,8 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    var buffer = StringBuffer('  $label) ${contentLines.first}\n');
-    buffer.writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
+    var buffer = StringBuffer('  $label) ${contentLines.first}\n')
+      ..writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
 
     var output = buffer.toString();
     if (!taskEntries.contains(output)) {

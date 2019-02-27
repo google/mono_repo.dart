@@ -4,9 +4,8 @@
 
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
-
 import 'package:json_annotation/json_annotation.dart';
+import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
 
 import 'user_exception.dart';
@@ -90,13 +89,13 @@ Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
       return yaml.map(convertOrdered).toList();
     }
     if (yaml is y.YamlMap) {
-      var keys = yaml.keys.toList();
-      keys.sort((a, b) {
-        var aNode = yaml.nodes[a];
-        var bNode = yaml.nodes[b];
+      var keys = yaml.keys.toList()
+        ..sort((a, b) {
+          var aNode = yaml.nodes[a];
+          var bNode = yaml.nodes[b];
 
-        return aNode.span.compareTo(bNode.span);
-      });
+          return aNode.span.compareTo(bNode.span);
+        });
       var map = Map.fromIterable(keys, value: (k) => convertOrdered(yaml[k]));
       _yamlMapExpando[map] = yaml;
       return map;
@@ -165,8 +164,9 @@ void _writeYaml(
         if (first && !parentIsMap) {
           buffer.write('$keyLiteral:');
         } else {
-          buffer.writeln();
-          buffer.write('$spaces$keyLiteral:');
+          buffer
+            ..writeln()
+            ..write('$spaces$keyLiteral:');
         }
 
         if (first) {

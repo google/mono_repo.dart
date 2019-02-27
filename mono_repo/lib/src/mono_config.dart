@@ -58,7 +58,7 @@ class MonoConfig {
     travis.remove('stages');
 
     return MonoConfig._(
-        travis.map((k, v) => MapEntry((k as String), v)), conditionalStages);
+        travis.map((k, v) => MapEntry(k as String, v)), conditionalStages);
   }
 
   factory MonoConfig.fromJson(Map json) {

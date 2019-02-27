@@ -187,8 +187,7 @@ class Task {
           args = yamlValue[taskName] as String;
       }
 
-      var config = Map<String, dynamic>.from(yamlValue);
-      config.remove(taskName);
+      var config = Map<String, dynamic>.from(yamlValue)..remove(taskName);
 
       if (config.isEmpty) {
         config = null;
