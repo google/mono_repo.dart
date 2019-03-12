@@ -16,8 +16,11 @@ TravisJob _$TravisJobFromJson(Map json) {
             json,
             'tasks',
             (v) => (v as List)
-                ?.map((e) =>
-                    e == null ? null : Task.fromJson(e as Map<String, dynamic>))
+                ?.map((e) => e == null
+                    ? null
+                    : Task.fromJson((e as Map)?.map(
+                        (k, e) => MapEntry(k as String, e),
+                      )))
                 ?.toList()),
         description: $checkedConvert(json, 'description', (v) => v as String));
     return val;
@@ -45,8 +48,12 @@ Task _$TaskFromJson(Map json) {
   return $checkedNew('Task', json, () {
     final val = Task($checkedConvert(json, 'name', (v) => v as String),
         args: $checkedConvert(json, 'args', (v) => v as String),
-        config: $checkedConvert(json, 'config',
-            (v) => (v as Map)?.map((k, e) => MapEntry(k as String, e))));
+        config: $checkedConvert(
+            json,
+            'config',
+            (v) => (v as Map)?.map(
+                  (k, e) => MapEntry(k as String, e),
+                )));
     return val;
   });
 }
