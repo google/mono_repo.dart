@@ -8,7 +8,7 @@ jobs:
       script: ./tool/travis.sh dartfmt dartanalyzer_0
       env: PKG="mono_repo"
       dart: dev
-    - stage: smoke_test_2_1
+    - stage: smoke_test
       name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-warnings .]"
       script: ./tool/travis.sh dartfmt dartanalyzer_1
       env: PKG="mono_repo"
@@ -36,7 +36,6 @@ jobs:
 
 stages:
   - smoke_test
-  - smoke_test_2_1
   - build
   - unit_test
 
