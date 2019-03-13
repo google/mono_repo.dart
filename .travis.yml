@@ -1,33 +1,33 @@
-# Created with package:mono_repo v1.2.0
+# Created with package:mono_repo v1.2.2
 language: dart
 
 jobs:
   include:
     - stage: smoke_test
-      name: "SDK: stable - DIR: mono_repo - TASKS: dartfmt && dartanalyzer"
-      script: ./tool/travis.sh dartfmt dartanalyzer
-      env: PKG="mono_repo"
-      dart: stable
-    - stage: smoke_test
-      name: "SDK: dev - DIR: mono_repo - TASKS: dartfmt && dartanalyzer"
-      script: ./tool/travis.sh dartfmt dartanalyzer
+      name: "SDK: dev - DIR: mono_repo - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-infos --fatal-warnings .]"
+      script: ./tool/travis.sh dartfmt dartanalyzer_0
       env: PKG="mono_repo"
       dart: dev
+    - stage: smoke_test_2_1
+      name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-warnings .]"
+      script: ./tool/travis.sh dartfmt dartanalyzer_1
+      env: PKG="mono_repo"
+      dart: "2.1.0"
     - stage: build
-      name: "SDK: stable - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
+      name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
       script: ./tool/travis.sh command_0
       env: PKG="mono_repo"
-      dart: stable
+      dart: "2.1.0"
     - stage: build
       name: "SDK: dev - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
       script: ./tool/travis.sh command_0
       env: PKG="mono_repo"
       dart: dev
     - stage: unit_test
-      name: "SDK: stable - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
+      name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
       script: ./tool/travis.sh command_1 command_2
       env: PKG="mono_repo"
-      dart: stable
+      dart: "2.1.0"
     - stage: unit_test
       name: "SDK: dev - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
       script: ./tool/travis.sh command_1 command_2
@@ -36,6 +36,7 @@ jobs:
 
 stages:
   - smoke_test
+  - smoke_test_2_1
   - build
   - unit_test
 

@@ -1,3 +1,7 @@
+## 1.2.3
+
+* Require at least Dart 2.1.0.
+
 ## 1.2.2
 
 * Updated dependencies.
