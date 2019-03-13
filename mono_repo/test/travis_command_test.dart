@@ -4,11 +4,10 @@
 
 import 'dart:async';
 
-import 'package:test/test.dart';
-import 'package:test_descriptor/test_descriptor.dart' as d;
-
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
+import 'package:test/test.dart';
+import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
 
@@ -266,6 +265,26 @@ done
 
 exit $EXIT_CODE
 ''').validate();
+  });
+
+  test('missing `dart` key', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+stages:
+  - format:
+    - dartfmt
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+    ]).create();
+
+    expect(
+        testGenerateTravisConfig,
+        throwsUserExceptionWith(
+          'Error parsing pkg_a/mono_pkg.yaml',
+          contains('The "dart" key is required.'),
+        ));
   });
 
   group('mono_repo.yaml', () {
