@@ -35,7 +35,7 @@ class PresubmitCommand extends MonoRepoCommand {
 
   @override
   Future<Null> run() async {
-    var passed = await presubmit(rootConfig(),
+    final passed = await presubmit(rootConfig(),
         packages: argResults['package'] as List<String>,
         tasks: argResults['task'] as List<String>,
         sdkToRun: argResults['sdk'] as String);
@@ -69,20 +69,21 @@ Future<bool> presubmit(RootConfig configs,
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
-  var commandsToKeys = extractCommands(configs);
+  final commandsToKeys = extractCommands(configs);
   // By default, run on all packages.
   if (packages.isEmpty)
     packages = configs.map((pc) => pc.relativePath).toList();
   packages = packages.toList()..sort();
 
   // By default run all tasks.
-  var allKnownTasks =
+  final allKnownTasks =
       configs.fold(Set<String>(), (Set<String> exising, PackageConfig config) {
     return exising
       ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name)));
   });
   if (tasks.isEmpty) tasks = allKnownTasks;
-  var unrecognizedTasks = tasks.where((task) => !allKnownTasks.contains(task));
+  final unrecognizedTasks =
+      tasks.where((task) => !allKnownTasks.contains(task));
   if (unrecognizedTasks.isNotEmpty) {
     throw UserException(
         'Found ${unrecognizedTasks.length} unrecognized tasks:\n'
@@ -94,7 +95,7 @@ Future<bool> presubmit(RootConfig configs,
   // Status of the presubmit.
   var passed = true;
   for (var package in packages) {
-    var config =
+    final config =
         configs.singleWhere((pkg) => pkg.relativePath == package, orElse: () {
       throw UserException(
           'Unrecognized package `$package`, known packages are:\n'
@@ -103,9 +104,9 @@ Future<bool> presubmit(RootConfig configs,
 
     stderr.writeln(styleBold.wrap(package));
     for (var job in config.jobs) {
-      var sdk = job.sdk;
+      final sdk = job.sdk;
       for (var task in job.tasks) {
-        var taskKey = commandsToKeys[task.command];
+        final taskKey = commandsToKeys[task.command];
         // Skip tasks that weren't specified
         if (!tasks.contains(task.name)) continue;
 
@@ -116,13 +117,13 @@ Future<bool> presubmit(RootConfig configs,
           continue;
         }
 
-        var result = await Process.run(travisShPath, [taskKey],
+        final result = await Process.run(travisShPath, [taskKey],
             environment: {'PKG': package});
         if (result.exitCode == 0) {
           stderr.writeln(green.wrap('(success)'));
         } else {
           tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
-          var file =
+          final file =
               File(p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
           await file.create(recursive: true);
           await file.writeAsString(result.stdout as String);

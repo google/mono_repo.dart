@@ -33,18 +33,18 @@ class PackageConfig {
       // an empty config WRT travis.
       return PackageConfig(relativePath, pubspec, [], [], [], []);
     }
-    var rawConfig = RawConfig.fromJson(monoPkgYaml);
+    final rawConfig = RawConfig.fromJson(monoPkgYaml);
 
     // FYI: 'test' is default if there are no tasks defined
-    var jobs = <TravisJob>[];
+    final jobs = <TravisJob>[];
 
-    var stageNames = rawConfig.stages.map((stage) {
-      var stageYaml = stage.items;
+    final stageNames = rawConfig.stages.map((stage) {
+      final stageYaml = stage.items;
       for (var job in stageYaml) {
         var jobSdks = rawConfig.sdks;
         if (job is Map && job.containsKey('dart')) {
           job = Map<String, dynamic>.from(job as Map);
-          var jobValue = job.remove('dart');
+          final jobValue = job.remove('dart');
           if (jobValue is List) {
             jobSdks = jobValue.cast<String>();
           } else {
@@ -101,7 +101,7 @@ class TravisJob {
     } else {
       withoutDescription = yaml;
     }
-    var tasks = Task.parseTaskOrGroup(withoutDescription);
+    final tasks = Task.parseTaskOrGroup(withoutDescription);
     return TravisJob(package, sdk, stageName, tasks, description: description);
   }
 
@@ -134,7 +134,7 @@ class Task {
   /// individual task.
   static List<Task> parseTaskOrGroup(Object yamlValue) {
     if (yamlValue is Map) {
-      var group = yamlValue['group'];
+      final group = yamlValue['group'];
       if (group != null) {
         if (group is List) {
           return group.map((taskYaml) => Task.parse(taskYaml)).toList();
@@ -155,7 +155,7 @@ class Task {
     }
 
     if (yamlValue is Map) {
-      var taskNames =
+      final taskNames =
           yamlValue.keys.where(_tasks.contains).cast<String>().toList();
       if (taskNames.isEmpty) {
         String key;
@@ -169,11 +169,11 @@ class Task {
         throw CheckedFromJsonException(yamlValue, taskNames.skip(1).first,
             'Task', 'Must have one and only one key of $_prettyTaskList.');
       }
-      var taskName = taskNames.single;
+      final taskName = taskNames.single;
       String args;
       switch (taskName) {
         case 'command':
-          var taskValue = yamlValue[taskName];
+          final taskValue = yamlValue[taskName];
           if (taskValue is String) {
             args = taskValue;
           } else if (taskValue is List<String>) {

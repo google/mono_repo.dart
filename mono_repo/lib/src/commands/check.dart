@@ -23,7 +23,7 @@ class CheckCommand extends MonoRepoCommand {
 }
 
 Future<Null> check(RootConfig rootConfig) async {
-  var reports = getPackageReports(rootConfig);
+  final reports = getPackageReports(rootConfig);
 
   print(styleBold.wrap('    ** REPORT **'));
   print('');
@@ -32,7 +32,7 @@ Future<Null> check(RootConfig rootConfig) async {
 }
 
 Map<String, PackageReport> getPackageReports(RootConfig rootConfig) {
-  var siblings = rootConfig.map((pc) => pc.pubspec).toSet();
+  final siblings = rootConfig.map((pc) => pc.pubspec).toSet();
   return Map.fromEntries(rootConfig.map((p) =>
       MapEntry(p.relativePath, PackageReport.create(p.pubspec, siblings))));
 }
@@ -77,9 +77,9 @@ class PackageReport {
     // TODO(kevmoo): check: if any dependency has a path dependency, it'd better
     // be a sibling – right?
 
-    var sibs = <String, SiblingReference>{};
+    final sibs = <String, SiblingReference>{};
     for (var sib in siblings) {
-      var ref = SiblingReference.create(pubspec, sib);
+      final ref = SiblingReference.create(pubspec, sib);
 
       if (ref != null) {
         sibs[sib.name] = ref;
@@ -103,7 +103,7 @@ class SiblingReference {
     for (var dep in sourcePubspec.dependencies.entries) {
       if (dep.key == sibling.name) {
         // a match!
-        var override = sourcePubspec.dependencyOverrides.entries
+        final override = sourcePubspec.dependencyOverrides.entries
             .firstWhere((d) => d.key == dep.key, orElse: () => null);
         return SiblingReference(
             DependencyType.direct, dep.value, override?.value);
@@ -112,7 +112,7 @@ class SiblingReference {
     for (var dep in sourcePubspec.devDependencies.entries) {
       if (dep.key == sibling.name) {
         // a match!
-        var override = sourcePubspec.dependencyOverrides.entries
+        final override = sourcePubspec.dependencyOverrides.entries
             .firstWhere((d) => d.key == dep.key, orElse: () => null);
         return SiblingReference(DependencyType.dev, dep.value, override?.value);
       }
@@ -127,7 +127,7 @@ class SiblingReference {
 
   @override
   String toString() {
-    var items = [type.toString().split('.')[1]];
+    final items = [type.toString().split('.')[1]];
 
     if (overrideData != null) {
       items.add('overridden');

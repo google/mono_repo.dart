@@ -54,7 +54,7 @@ Future<Null> generateTravisConfig(
 
   _logPkgs(configs);
 
-  var commandsToKeys = extractCommands(configs);
+  final commandsToKeys = extractCommands(configs);
 
   _writeTravisYml(configs.rootDirectory, configs, commandsToKeys, pkgVersion);
 
@@ -68,7 +68,7 @@ Future<Null> generateTravisConfig(
 /// Write `.travis.yml`
 void _writeTravisYml(String rootDirectory, RootConfig configs,
     Map<String, String> commandsToKeys, String pkgVersion) {
-  var travisPath = p.join(rootDirectory, travisFileName);
+  final travisPath = p.join(rootDirectory, travisFileName);
   File(travisPath)
       .writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
   stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
@@ -77,8 +77,8 @@ void _writeTravisYml(String rootDirectory, RootConfig configs,
 /// Write `tool/travis.sh`
 void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     bool prettyAnsi, String pkgVersion) {
-  var travisFilePath = p.join(rootDirectory, travisShPath);
-  var travisScript = File(travisFilePath);
+  final travisFilePath = p.join(rootDirectory, travisShPath);
+  final travisScript = File(travisFilePath);
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
@@ -95,16 +95,16 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
 
 List<String> _calculateTaskEntries(
     Map<String, String> commandsToKeys, bool prettyAnsi) {
-  var taskEntries = <String>[];
+  final taskEntries = <String>[];
 
   void addEntry(String label, List<String> contentLines) {
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    var buffer = StringBuffer('  $label) ${contentLines.first}\n')
+    final buffer = StringBuffer('  $label) ${contentLines.first}\n')
       ..writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
 
-    var output = buffer.toString();
+    final output = buffer.toString();
     if (!taskEntries.contains(output)) {
       taskEntries.add(output);
     }
@@ -135,13 +135,13 @@ List<String> _calculateTaskEntries(
 
 /// Gives a map of command to unique task key for all [configs].
 Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
-  var commandsToKeys = <String, String>{};
+  final commandsToKeys = <String, String>{};
 
-  var tasksToConfigure = _travisTasks(configs);
-  var taskNames = tasksToConfigure.map((task) => task.name).toSet();
+  final tasksToConfigure = _travisTasks(configs);
+  final taskNames = tasksToConfigure.map((task) => task.name).toSet();
 
   for (var taskName in taskNames) {
-    var commands = tasksToConfigure
+    final commands = tasksToConfigure
         .where((task) => task.name == taskName)
         .map((task) => task.command)
         .toSet();
@@ -213,8 +213,8 @@ exit \$EXIT_CODE
 
 String _travisYml(
     RootConfig configs, Map<String, String> commandsToKeys, String pkgVersion) {
-  var orderedStages = _calculateOrderedStages(configs);
-  var jobs = configs.expand((config) => config.jobs);
+  final orderedStages = _calculateOrderedStages(configs);
+  final jobs = configs.expand((config) => config.jobs);
 
   var customTravis = '';
   if (configs.monoConfig.travis.isNotEmpty) {
@@ -222,7 +222,7 @@ String _travisYml(
         '${toYaml(configs.monoConfig.travis)}\n';
   }
 
-  var branchConfig = configs.monoConfig.travis.containsKey('branches')
+  final branchConfig = configs.monoConfig.travis.containsKey('branches')
       ? ''
       : '''
 \n# Only building master means that we don't run two builds for each pull request.
@@ -250,7 +250,7 @@ ${toYaml({
 }
 
 Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
-  var items = SplayTreeSet<String>()..add('\$HOME/.pub-cache');
+  final items = SplayTreeSet<String>()..add('\$HOME/.pub-cache');
 
   for (var entry in configs) {
     for (var dir in entry.cacheDirectories) {
@@ -265,7 +265,7 @@ Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
 /// detects any cycles.
 List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   // Convert the configs to a graph so we can run strongly connected components.
-  var edges = <String, Set<String>>{};
+  final edges = <String, Set<String>>{};
   for (var config in rootConfig) {
     String previous;
     for (var stage in config.stageNames) {
@@ -278,7 +278,7 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   }
   // Running strongly connected components lets us detect cycles (which aren't
   // allowed), and gives us the reverse order of what we ultimately want.
-  var components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
+  final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
   for (var component in components) {
     if (component.length > 1) {
       throw UserException('Not all packages agree on `stages` ordering, found '
@@ -286,14 +286,14 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
     }
   }
 
-  var conditionalStages = Map<String, ConditionalStage>.from(
+  final conditionalStages = Map<String, ConditionalStage>.from(
       rootConfig.monoConfig.conditionalStages);
 
-  var orderedStages = components
+  final orderedStages = components
       .map((c) {
-        var stageName = c.first;
+        final stageName = c.first;
 
-        var matchingStage = conditionalStages.remove(stageName);
+        final matchingStage = conditionalStages.remove(stageName);
         if (matchingStage != null) {
           return matchingStage.toJson();
         }
@@ -318,9 +318,9 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
 Iterable<Map<String, String>> _listJobs(
     Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) sync* {
   for (var job in jobs) {
-    var commands =
+    final commands =
         job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
-    var jobName = 'SDK: ${job.sdk} - '
+    final jobName = 'SDK: ${job.sdk} - '
         'DIR: ${job.package} - '
         'TASKS: ${job.name}';
 

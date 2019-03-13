@@ -63,9 +63,9 @@ void _testRoundTrip(Object source) {
   }
 
   test(testTitle, () {
-    var output = toYaml(source);
+    final output = toYaml(source);
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-    var yaml = loadYamlOrdered(output);
+    final yaml = loadYamlOrdered(output);
     expect(yaml, source);
   });
 

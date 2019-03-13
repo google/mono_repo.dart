@@ -22,20 +22,20 @@ class MonoConfig {
   MonoConfig._(this.travis, this.conditionalStages);
 
   factory MonoConfig(Map travis) {
-    var overlappingKeys =
+    final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
       throw CheckedFromJsonException(travis, overlappingKeys.first.toString(),
           'MonoConfig', 'Contains illegal keys: ${overlappingKeys.join(', ')}');
     }
 
-    var conditionalStages = <String, ConditionalStage>{};
-    var rawStageValue = travis['stages'];
+    final conditionalStages = <String, ConditionalStage>{};
+    final rawStageValue = travis['stages'];
     if (rawStageValue != null) {
       if (rawStageValue is List) {
         for (var item in rawStageValue) {
           if (item is Map) {
-            var stage = _$ConditionalStageFromJson(item);
+            final stage = _$ConditionalStageFromJson(item);
             if (conditionalStages.containsKey(stage.name)) {
               throw CheckedFromJsonException(travis, 'stages', 'MonoConfig',
                   '`${stage.name}` appears more than once.');
@@ -62,14 +62,14 @@ class MonoConfig {
   }
 
   factory MonoConfig.fromJson(Map json) {
-    var nonTravisKeys = json.keys.where((k) => k != 'travis').toList();
+    final nonTravisKeys = json.keys.where((k) => k != 'travis').toList();
 
     if (nonTravisKeys.isNotEmpty) {
       throw CheckedFromJsonException(json, nonTravisKeys.first as String,
           'MonoConfig', 'Only `travis` key is supported.');
     }
 
-    var travis = json['travis'];
+    final travis = json['travis'];
 
     if (travis is Map) {
       return MonoConfig(travis);
@@ -81,7 +81,7 @@ class MonoConfig {
   factory MonoConfig.fromRepo({String rootDirectory}) {
     rootDirectory ??= p.current;
 
-    var yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
+    final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
       return MonoConfig({});
     }
