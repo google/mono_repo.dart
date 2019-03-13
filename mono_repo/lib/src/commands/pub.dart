@@ -41,7 +41,7 @@ class _PubSubCommand extends MonoRepoCommand {
 }
 
 Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
-  var pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
+  final pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
 
   print(lightBlue
       .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));
@@ -49,12 +49,12 @@ Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
   for (var dir in pkgDirs) {
     print('');
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
-    var workingDir = p.join(rootConfig.rootDirectory, dir);
+    final workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    var proc = await Process.start(pubPath, [pubCommand],
+    final proc = await Process.start(pubPath, [pubCommand],
         mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
 
-    var exit = await proc.exitCode;
+    final exit = await proc.exitCode;
 
     if (exit == 0) {
       print(wrapWith('`$dir`: success!', [styleBold, green]));
@@ -68,7 +68,7 @@ Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
 final String _sdkDir = (() {
   // The Dart executable is in "/path/to/sdk/bin/dart", so two levels up is
   // "/path/to/sdk".
-  var aboveExecutable = p.dirname(p.dirname(Platform.resolvedExecutable));
+  final aboveExecutable = p.dirname(p.dirname(Platform.resolvedExecutable));
   assert(FileSystemEntity.isFileSync(p.join(aboveExecutable, 'version')));
   return aboveExecutable;
 })();

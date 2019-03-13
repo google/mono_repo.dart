@@ -9,6 +9,7 @@ analyzer:
     unused_local_variable: error
 linter:
   rules:
+    - always_declare_return_types
     - annotate_overrides
     - avoid_bool_literals_in_conditional_expressions
     - avoid_classes_with_only_static_members
@@ -65,6 +66,7 @@ linter:
     - prefer_contains
     - prefer_equal_for_default_values
     - prefer_final_fields
+    #- prefer_final_locals
     - prefer_initializing_formals
     - prefer_interpolation_to_compose_strings
     - prefer_is_empty
