@@ -5,16 +5,21 @@ dart:
 
 stages:
   - smoke_test:
-    - description: "dartfmt && dartanalyzer"
-      group:
-        - dartfmt
-        - dartanalyzer: --fatal-infos --fatal-warnings .
+      - group:
+          - dartfmt
+          - dartanalyzer: --fatal-infos --fatal-warnings .
+        dart: [dev]
+  - smoke_test_2_1:
+      - group:
+          - dartfmt
+          - dartanalyzer: --fatal-warnings .
+        dart: [2.1.0]
   - build:
-    - command: pub run build_runner build test --delete-conflicting-outputs
+      - command: pub run build_runner build test --delete-conflicting-outputs
   - unit_test:
-    - group:
-      - command: pub run build_runner test -- -x presubmit-only
-      - command: pub run build_runner test -- --run-skipped -t presubmit-only
+      - group:
+          - command: pub run build_runner test -- -x presubmit-only
+          - command: pub run build_runner test -- --run-skipped -t presubmit-only
 
 cache:
   directories:
