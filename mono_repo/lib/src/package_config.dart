@@ -106,12 +106,15 @@ class TravisJob {
 
   final List<Task> tasks;
 
+  Iterable<String> get _taskCommandsTickQuoted =>
+      tasks.map((t) => '`${t.command}`');
+
   /// The description of the job to use for the job in the travis dashboard.
   String get name =>
       description ??
       (tasks.length > 1
-          ? tasks.map((t) => t.command).toList().toString()
-          : tasks.first.command);
+          ? _taskCommandsTickQuoted.toList().toString()
+          : _taskCommandsTickQuoted.first);
 
   TravisJob(this.package, this.sdk, this.stageName, this.tasks,
       {this.description});
