@@ -169,6 +169,10 @@ List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
 void _logPkgs(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {
     print(styleBold.wrap('package:${pkg.relativePath}'));
+    if (pkg.sdks != null && !pkg.dartSdkConfigUsed) {
+      print(yellow.wrap('  `dart` values (${pkg.sdks.join(', ')}) are not used '
+          'and can be removed.'));
+    }
   }
 }
 
