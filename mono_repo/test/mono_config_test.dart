@@ -67,9 +67,31 @@ void main() {
       expect(config.sdks, isEmpty);
     });
 
+    test('fun', () {
+      _expectParseThrows({
+        'stages': [
+          {
+            'format': ['dartfmt']
+          }
+        ]
+      }, r'''
+line 1, column 1: "dart" is missing.
+  ╷
+1 │ ┌ {
+2 │ │   "stages": [
+3 │ │     {
+4 │ │       "format": [
+5 │ │         "dartfmt"
+6 │ │       ]
+7 │ │     }
+8 │ │   ]
+9 │ └ }
+  ╵''');
+    });
+
     test('dart value cannot be null', () {
       _expectParseThrows({'dart': null}, r'''
-line 2, column 3: The "dart" key must have at least one value.
+line 2, column 3: "dart" must be an array with at least one value.
   ╷
 2 │   "dart": null
   │   ^^^^^^
@@ -78,7 +100,7 @@ line 2, column 3: The "dart" key must have at least one value.
 
     test('dart value cannot be empty', () {
       _expectParseThrows({'dart': []}, r'''
-line 2, column 3: The "dart" key must have at least one value.
+line 2, column 3: "dart" must be an array with at least one value.
   ╷
 2 │   "dart": []
   │   ^^^^^^

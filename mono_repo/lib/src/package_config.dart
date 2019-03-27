@@ -50,6 +50,22 @@ class PackageConfig {
           } else {
             jobSdks = [jobValue as String];
           }
+        } else if (jobSdks == null || jobSdks.isEmpty) {
+          if (monoPkgYaml.containsKey('dart')) {
+            throw CheckedFromJsonException(
+              monoPkgYaml,
+              'dart',
+              'RawConfig',
+              '"dart" must be an array with at least one value.',
+            );
+          }
+
+          throw CheckedFromJsonException(
+            monoPkgYaml,
+            'dart',
+            'RawConfig',
+            '"dart" is missing.',
+          );
         }
         for (var sdk in jobSdks) {
           jobs.add(TravisJob.parse(relativePath, sdk, stage.name, job));
