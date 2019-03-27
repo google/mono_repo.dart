@@ -5,13 +5,13 @@
 import 'dart:async';
 
 import 'package:io/ansi.dart';
-import 'package:mono_repo/src/user_exception.dart';
-import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/root_config.dart';
+import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-Future testGenerateTravisConfig() async {
+Future<void> testGenerateTravisConfig() async {
   await overrideAnsiOutput(false, () async {
     await generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
         pkgVersion: '1.2.3');
