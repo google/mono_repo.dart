@@ -142,7 +142,7 @@ name: pkg_name
       ''')
     ]).create();
 
-    await testGenerateTravisConfig();
+    testGenerateTravisConfig();
 
     await d.file(travisFileName, _config2Yaml).validate();
     await d.file(travisShPath, _config2Shell).validate();
@@ -188,7 +188,7 @@ name: pkg_b
       ''')
     ]).create();
 
-    await testGenerateTravisConfig();
+    testGenerateTravisConfig();
 
     await d.file(travisFileName, r'''
 # Created with package:mono_repo v1.2.3
@@ -306,7 +306,7 @@ name: pkg_a
       ''')
     ]).create();
 
-    await testGenerateTravisConfig();
+    testGenerateTravisConfig();
     await d.file(travisFileName, r'''
 # Created with package:mono_repo v1.2.3
 language: dart
@@ -400,7 +400,7 @@ name: pkg_name
         String monoRepoContent, Object expectedTravisContent) async {
       await populateConfig(monoRepoContent);
 
-      await testGenerateTravisConfig();
+      testGenerateTravisConfig();
 
       await d.file(travisFileName, expectedTravisContent).validate();
       await d.file(travisShPath, _config2Shell).validate();

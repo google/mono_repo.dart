@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
@@ -40,15 +39,15 @@ class TravisCommand extends MonoRepoCommand {
   }
 
   @override
-  Future<Null> run() => generateTravisConfig(rootConfig(),
+  void run() => generateTravisConfig(rootConfig(),
       prettyAnsi: argResults['pretty-ansi'] as bool);
 }
 
-Future<Null> generateTravisConfig(
+void generateTravisConfig(
   RootConfig configs, {
   bool prettyAnsi = true,
   String pkgVersion,
-}) async {
+}) {
   prettyAnsi ??= true;
   pkgVersion ??= packageVersion;
 

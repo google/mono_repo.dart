@@ -34,7 +34,7 @@ class PresubmitCommand extends MonoRepoCommand {
   }
 
   @override
-  Future<Null> run() async {
+  Future<void> run() async {
     final passed = await presubmit(rootConfig(),
         packages: argResults['package'] as List<String>,
         tasks: argResults['task'] as List<String>,

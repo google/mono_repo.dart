@@ -14,10 +14,10 @@ import 'commands/pub.dart';
 import 'commands/travis.dart';
 import 'version.dart';
 
-final List<Command<Null>> commands = List<Command<Null>>.unmodifiable(
+final commands = List<Command<void>>.unmodifiable(
     [CheckCommand(), PresubmitCommand(), PubCommand(), TravisCommand()]);
 
-class MonoRepoRunner extends CommandRunner<Null> {
+class MonoRepoRunner extends CommandRunner<void> {
   MonoRepoRunner()
       : super(
             'mono_repo', 'Manage multiple packages in one source repository.') {
@@ -32,11 +32,11 @@ class MonoRepoRunner extends CommandRunner<Null> {
   }
 
   @override
-  Future<Null> runCommand(ArgResults topLevelResults) async {
+  Future<void> runCommand(ArgResults topLevelResults) async {
     if (topLevelResults.wasParsed('version')) {
       print(packageVersion);
-      return null;
+      return;
     }
-    return super.runCommand(topLevelResults);
+    await super.runCommand(topLevelResults);
   }
 }
