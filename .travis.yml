@@ -33,6 +33,26 @@ jobs:
       script: ./tool/travis.sh command_1 command_2
       env: PKG="mono_repo"
       dart: dev
+    - stage: smoke_test
+      name: "SDK: dev - DIR: test_pkg - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-infos --fatal-warnings .]"
+      script: ./tool/travis.sh dartfmt dartanalyzer_0
+      env: PKG="test_pkg"
+      dart: dev
+    - stage: smoke_test
+      name: "SDK: 2.1.0 - DIR: test_pkg - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-warnings .]"
+      script: ./tool/travis.sh dartfmt dartanalyzer_1
+      env: PKG="test_pkg"
+      dart: "2.1.0"
+    - stage: unit_test
+      name: "SDK: 2.1.0 - DIR: test_pkg - TASKS: pub run test"
+      script: ./tool/travis.sh test
+      env: PKG="test_pkg"
+      dart: "2.1.0"
+    - stage: unit_test
+      name: "SDK: dev - DIR: test_pkg - TASKS: pub run test"
+      script: ./tool/travis.sh test
+      env: PKG="test_pkg"
+      dart: dev
 
 stages:
   - smoke_test
