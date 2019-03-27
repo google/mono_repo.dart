@@ -70,7 +70,7 @@ void _writeTravisYml(String rootDirectory, RootConfig configs,
   final travisPath = p.join(rootDirectory, travisFileName);
   File(travisPath)
       .writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
-  stderr.writeln(styleDim.wrap('Wrote `$travisPath`.'));
+  print(styleDim.wrap('Wrote `$travisPath`.'));
 }
 
 /// Write `tool/travis.sh`
@@ -81,15 +81,14 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
-    stderr
-      ..writeln(yellow.wrap('Make sure to mark `$travisShPath` as executable.'))
-      ..writeln(yellow.wrap('  chmod +x $travisShPath'));
+    print(yellow.wrap('Make sure to mark `$travisShPath` as executable.'));
+    print(yellow.wrap('  chmod +x $travisShPath'));
   }
 
   travisScript
       .writeAsStringSync(_travisSh(taskEntries, prettyAnsi, pkgVersion));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
-  stderr.writeln(styleDim.wrap('Wrote `$travisFilePath`.'));
+  print(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
 
 List<String> _calculateTaskEntries(
@@ -169,7 +168,7 @@ List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
 
 void _logPkgs(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {
-    stderr.writeln(styleBold.wrap('package:${pkg.relativePath}'));
+    print(styleBold.wrap('package:${pkg.relativePath}'));
   }
 }
 

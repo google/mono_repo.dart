@@ -102,7 +102,7 @@ Future<bool> presubmit(RootConfig configs,
           '${configs.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
     });
 
-    stderr.writeln(styleBold.wrap(package));
+    print(styleBold.wrap(package));
     for (var job in config.jobs) {
       final sdk = job.sdk;
       for (var task in job.tasks) {
@@ -110,24 +110,24 @@ Future<bool> presubmit(RootConfig configs,
         // Skip tasks that weren't specified
         if (!tasks.contains(task.name)) continue;
 
-        stderr.write('  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
-            'TASK: ${styleBold.wrap(white.wrap(task.command))} ');
+        print('  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
+            'TASK: ${styleBold.wrap(white.wrap(task.command))}');
         if (sdk != sdkToRun) {
-          stderr.writeln(yellow.wrap('(skipped, mismatched sdk)'));
+          print(yellow.wrap('    skipped, mismatched sdk'));
           continue;
         }
 
         final result = await Process.run(travisShPath, [taskKey],
             environment: {'PKG': package});
         if (result.exitCode == 0) {
-          stderr.writeln(green.wrap('(success)'));
+          print(green.wrap('    success'));
         } else {
           tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
           final file =
               File(p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
           await file.create(recursive: true);
           await file.writeAsString(result.stdout as String);
-          stderr.writeln(red.wrap('(failure, ${file.path})'));
+          print(red.wrap('    failure, ${file.path}'));
           passed = false;
         }
       }
