@@ -13,7 +13,7 @@ import 'package:path/path.dart' as p;
 import '../root_config.dart';
 import 'mono_repo_command.dart';
 
-class PubCommand extends Command<Null> {
+class PubCommand extends Command<void> {
   PubCommand() {
     addSubcommand(_PubSubCommand('get'));
     addSubcommand(_PubSubCommand('upgrade'));
@@ -37,10 +37,10 @@ class _PubSubCommand extends MonoRepoCommand {
   String get description => 'Run `pub $name` against all packages.';
 
   @override
-  Future<Null> run() => pub(name, rootConfig());
+  Future<void> run() => pub(name, rootConfig());
 }
 
-Future<Null> pub(String pubCommand, RootConfig rootConfig) async {
+Future<void> pub(String pubCommand, RootConfig rootConfig) async {
   final pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
 
   print(lightBlue

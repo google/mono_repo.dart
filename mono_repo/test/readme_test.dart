@@ -27,7 +27,7 @@ name: sub_pkg
 ''')
     ]).create();
 
-    await testGenerateTravisConfig();
+    testGenerateTravisConfig();
 
     await d.dir('.', [
       d.file(travisFileName, _travisYml),

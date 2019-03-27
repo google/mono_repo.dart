@@ -19,10 +19,10 @@ class CheckCommand extends MonoRepoCommand {
   String get description => 'Check the state of the repository.';
 
   @override
-  Future<Null> run() => check(rootConfig());
+  Future<void> run() => check(rootConfig());
 }
 
-Future<Null> check(RootConfig rootConfig) async {
+Future<void> check(RootConfig rootConfig) async {
   final reports = getPackageReports(rootConfig);
 
   print(styleBold.wrap('    ** REPORT **'));
