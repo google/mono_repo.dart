@@ -19,19 +19,9 @@ class RawConfig {
       : stages = stages ??
             [
               RawStage('unit_test', ['test'])
-            ] {
-    if (sdks == null || sdks.isEmpty) {
-      throw ArgumentError.value(
-          null, 'sdks', 'The "dart" key must have at least one value.');
-    }
-  }
+            ];
 
   factory RawConfig.fromJson(Map json) {
-    if (!json.containsKey('dart')) {
-      throw CheckedFromJsonException(
-          json, 'dart', 'RawConfig', 'The "dart" key is required.');
-    }
-
     var config = _$RawConfigFromJson(json);
 
     var stages = Set<String>();

@@ -1,6 +1,8 @@
 ## 1.2.3
 
 * Require at least Dart 2.1.0.
+* The `dart` key is no longer required in `mono_pkg.yaml` if all stages specify
+  their own values.
 
 ## 1.2.2
 

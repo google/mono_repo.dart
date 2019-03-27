@@ -283,16 +283,13 @@ name: pkg_a
         testGenerateTravisConfig,
         throwsUserExceptionWith(
           'Error parsing pkg_a/mono_pkg.yaml',
-          contains('The "dart" key is required.'),
+          contains('"dart" is missing.'),
         ));
   });
 
   test('top-level `dart` key value is no-op with group overrides', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
-dart:
-- no_op_dart_var
-
 stages:
 - analyzer_and_format:
   - group:
