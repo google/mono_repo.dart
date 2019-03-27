@@ -2,7 +2,7 @@
 
 * Require at least Dart 2.1.0.
 * The `dart` key is no longer required in `mono_pkg.yaml` if all stages specify
-  their own values.
+  their own values. A warning is printed if values are provided but not used.
 * All output during execution will be sent to STDOUT (instead of STDERR).
 
 ## 1.2.2

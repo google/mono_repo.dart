@@ -301,6 +301,9 @@ name: pkg_a
   test('top-level `dart` key value is no-op with group overrides', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
+dart:
+- unneeded
+
 stages:
 - analyzer_and_format:
   - group:
@@ -321,6 +324,7 @@ name: pkg_a
         testGenerateTravisConfig,
         prints(stringContainsInOrder([
           'package:pkg_a',
+          '`dart` values (unneeded) are not used and can be removed.',
           'Make sure to mark `./tool/travis.sh` as executable.'
         ])));
 
@@ -417,6 +421,8 @@ name: pkg_name
         String monoRepoContent, Object expectedTravisContent) async {
       await populateConfig(monoRepoContent);
 
+      await d.nothing(travisShPath).validate();
+
       expect(
           testGenerateTravisConfig,
           prints(stringContainsInOrder([
@@ -428,7 +434,7 @@ name: pkg_name
       await d.file(travisShPath, _config2Shell).validate();
     }
 
-    test('complete travis.yml file', () async {
+    test('empty travis.yml file', () async {
       await validConfig('', _config2Yaml);
     });
 

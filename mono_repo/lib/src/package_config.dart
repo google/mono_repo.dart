@@ -22,21 +22,31 @@ class PackageConfig {
   final List<String> stageNames;
   final List<TravisJob> jobs;
   final List<String> cacheDirectories;
+  final bool dartSdkConfigUsed;
 
-  PackageConfig(this.relativePath, this.pubspec, this.sdks, this.stageNames,
-      this.jobs, this.cacheDirectories);
+  PackageConfig(
+    this.relativePath,
+    this.pubspec,
+    this.sdks,
+    this.stageNames,
+    this.jobs,
+    this.cacheDirectories,
+    this.dartSdkConfigUsed,
+  );
 
   factory PackageConfig.parse(
       String relativePath, Pubspec pubspec, Map monoPkgYaml) {
     if (monoPkgYaml.isEmpty) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
-      return PackageConfig(relativePath, pubspec, [], [], [], []);
+      return PackageConfig(relativePath, pubspec, [], [], [], [], false);
     }
     final rawConfig = RawConfig.fromJson(monoPkgYaml);
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <TravisJob>[];
+
+    var sdkConfigUsed = false;
 
     final stageNames = rawConfig.stages.map((stage) {
       final stageYaml = stage.items;
@@ -66,6 +76,8 @@ class PackageConfig {
             'RawConfig',
             '"dart" is missing.',
           );
+        } else {
+          sdkConfigUsed = true;
         }
         for (var sdk in jobSdks) {
           jobs.add(TravisJob.parse(relativePath, sdk, stage.name, job));
@@ -75,7 +87,7 @@ class PackageConfig {
     }).toList();
 
     return PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
-        jobs, rawConfig.cache?.directories ?? const []);
+        jobs, rawConfig.cache?.directories ?? const [], sdkConfigUsed);
   }
 }
 
