@@ -142,7 +142,12 @@ name: pkg_name
       ''')
     ]).create();
 
-    testGenerateTravisConfig();
+    expect(
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:sub_pkg',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])));
 
     await d.file(travisFileName, _config2Yaml).validate();
     await d.file(travisShPath, _config2Shell).validate();
@@ -188,7 +193,13 @@ name: pkg_b
       ''')
     ]).create();
 
-    testGenerateTravisConfig();
+    expect(
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:pkg_a',
+          'package:pkg_b',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])));
 
     await d.file(travisFileName, r'''
 # Created with package:mono_repo v1.2.3
@@ -306,7 +317,13 @@ name: pkg_a
       ''')
     ]).create();
 
-    testGenerateTravisConfig();
+    expect(
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:pkg_a',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])));
+
     await d.file(travisFileName, r'''
 # Created with package:mono_repo v1.2.3
 language: dart
@@ -400,7 +417,12 @@ name: pkg_name
         String monoRepoContent, Object expectedTravisContent) async {
       await populateConfig(monoRepoContent);
 
-      testGenerateTravisConfig();
+      expect(
+          testGenerateTravisConfig,
+          prints(stringContainsInOrder([
+            'package:sub_pkg',
+            'Make sure to mark `./tool/travis.sh` as executable.'
+          ])));
 
       await d.file(travisFileName, expectedTravisContent).validate();
       await d.file(travisShPath, _config2Shell).validate();
