@@ -179,7 +179,7 @@ void _logPkgs(Iterable<PackageConfig> configs) {
 String _shellCase(String scriptVariable, List<String> entries) {
   if (entries.isEmpty) return '';
   return '''
-  case \$$scriptVariable in
+  case \${$scriptVariable} in
 ${entries.join('\n')}
   esac
 ''';
@@ -189,17 +189,17 @@ String _travisSh(List<String> tasks, bool prettyAnsi, String pkgVersion) => '''
 #!/bin/bash
 # ${_createdWith(pkgVersion)}
 
-if [ -z "\$PKG" ]; then
+if [[ -z \${PKG} ]]; then
   ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
   exit 1
 fi
 
-if [ "\$#" == "0" ]; then
+if [[ "\$#" == "0" ]]; then
   ${safeEcho(prettyAnsi, red, "At least one task argument must be provided!")}
   exit 1
 fi
 
-pushd \$PKG
+pushd \${PKG} || exit \$?
 pub upgrade || exit \$?
 
 EXIT_CODE=0
@@ -210,7 +210,7 @@ ${_shellCase('TASK', tasks)}
   shift
 done
 
-exit \$EXIT_CODE
+exit \${EXIT_CODE}
 ''';
 
 String _travisYml(
