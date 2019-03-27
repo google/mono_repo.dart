@@ -3,17 +3,16 @@
 // BSD-style license that can be found in the LICENSE file.
 
 @Tags(['presubmit-only'])
-
 import 'dart:io';
 
+import 'package:io/ansi.dart';
+import 'package:mono_repo/src/commands/presubmit.dart';
+import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
-
-import 'package:mono_repo/src/commands/presubmit.dart';
-import 'package:mono_repo/src/commands/travis.dart';
-import 'package:mono_repo/src/package_config.dart';
 
 import 'shared.dart';
 
@@ -63,8 +62,17 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync('name: pkg_b');
 
-      generateTravisConfig(RootConfig(rootDirectory: repoPath),
-          pkgVersion: '1.2.3');
+      overrideAnsiOutput(false, () {
+        expect(
+            () => generateTravisConfig(RootConfig(rootDirectory: repoPath),
+                pkgVersion: '1.2.3'),
+            prints(stringContainsInOrder([
+              'package:pkg_a',
+              'package:pkg_b',
+              'Make sure to mark `./tool/travis.sh` as executable.',
+            ])));
+      });
+
       await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
           workingDirectory: repoPath);
       await Process.run('pub', ['get'], workingDirectory: pkgAPath);
@@ -82,17 +90,25 @@ void main() {
           workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
-      expect(result.stderr, '''
+      expect(result.stdout, '''
 pkg_a
-  SDK: dev TASK: dartanalyzer . (success)
-  SDK: stable TASK: dartanalyzer . (skipped, mismatched sdk)
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed . (success)
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed . (skipped, mismatched sdk)
-  SDK: dev TASK: pub run test (success)
-  SDK: stable TASK: pub run test (skipped, mismatched sdk)
+  SDK: dev TASK: dartanalyzer .
+    success
+  SDK: stable TASK: dartanalyzer .
+    skipped, mismatched sdk
+  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+    success
+  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+    skipped, mismatched sdk
+  SDK: dev TASK: pub run test
+    success
+  SDK: stable TASK: pub run test
+    skipped, mismatched sdk
 pkg_b
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed . (success)
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed . (skipped, mismatched sdk)
+  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+    success
+  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+    skipped, mismatched sdk
 ''');
     }, timeout: const Timeout.factor(2));
 
@@ -111,10 +127,12 @@ pkg_b
           workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
-      expect(result.stderr, '''
+      expect(result.stdout, '''
 pkg_b
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed . (success)
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed . (skipped, mismatched sdk)
+  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+    success
+  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+    skipped, mismatched sdk
 ''');
     });
 
@@ -133,13 +151,17 @@ pkg_b
           workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
-      expect(result.stderr, '''
+      expect(result.stdout, '''
 pkg_a
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed . (success)
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed . (skipped, mismatched sdk)
+  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+    success
+  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+    skipped, mismatched sdk
 pkg_b
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed . (success)
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed . (skipped, mismatched sdk)
+  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+    success
+  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+    skipped, mismatched sdk
 ''');
     });
 
@@ -171,15 +193,19 @@ pkg_b
             workingDirectory: repoPath);
         expect(result.exitCode, 1,
             reason: 'Any failing tasks should give a non-zero exit code');
-        expect(result.stderr, startsWith('''
+        expect(result.stdout, startsWith('''
 pkg_a
-  SDK: dev TASK: pub run test (failure, '''));
-        var stdErrString = result.stderr as String;
-        var start = stdErrString.indexOf('(failure, ') + 10;
-        var end = stdErrString.indexOf(')');
-        var logPath = stdErrString.substring(start, end);
+  SDK: dev TASK: pub run test
+    failure, '''));
+        printOnFailure(result.stdout as String);
+        var stdOutString = result.stdout as String;
+        var testFileName = 'pkg_a_test_dev.txt';
+        var start = stdOutString.indexOf('failure, ') + 9;
+        var end = stdOutString.indexOf(testFileName) + testFileName.length;
+        var logPath = stdOutString.substring(start, end);
         var logFile = File(logPath);
-        expect(logFile.existsSync(), isTrue);
+        expect(logFile.existsSync(), isTrue,
+            reason: 'Log file should exist: $logPath');
         expect(logFile.readAsStringSync(), contains('Some tests failed'));
       });
     });
