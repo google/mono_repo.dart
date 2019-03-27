@@ -1,5 +1,7 @@
-## 1.2.3
+## 2.0.0
 
+* *BREAKING* All commands are recursive by default. To go back to the shallow
+  mode, use `--no-recursive`.
 * Require at least Dart 2.1.0.
 * The `dart` key is no longer required in `mono_pkg.yaml` if all stages specify
   their own values. A warning is printed if values are provided but not used.

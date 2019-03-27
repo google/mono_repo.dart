@@ -32,6 +32,7 @@ Global options:
 -h, --help              Print this usage information.
     --version           Prints the version of mono_repo.
     --[no-]recursive    Whether to recursively walk sub-directorys looking for packages.
+                        (defaults to on)
 
 Available commands:
   check       Check the state of the repository.
