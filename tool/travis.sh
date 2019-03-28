@@ -1,24 +1,24 @@
 #!/bin/bash
-# Created with package:mono_repo v1.2.2
+# Created with package:mono_repo v2.0.0-dev
 
-if [ -z "$PKG" ]; then
+if [[ -z ${PKG} ]]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 fi
 
-if [ "$#" == "0" ]; then
+if [[ "$#" == "0" ]]; then
   echo -e '\033[31mAt least one task argument must be provided!\033[0m'
   exit 1
 fi
 
-pushd $PKG
+pushd ${PKG} || exit $?
 pub upgrade || exit $?
 
 EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
-  case $TASK in
+  case ${TASK} in
   command_0) echo
     echo -e '\033[1mTASK: command_0\033[22m'
     echo -e 'pub run build_runner build test --delete-conflicting-outputs'
@@ -57,4 +57,4 @@ while (( "$#" )); do
   shift
 done
 
-exit $EXIT_CODE
+exit ${EXIT_CODE}

@@ -243,24 +243,24 @@ cache:
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-if [ -z "$PKG" ]; then
+if [[ -z ${PKG} ]]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 fi
 
-if [ "$#" == "0" ]; then
+if [[ "$#" == "0" ]]; then
   echo -e '\033[31mAt least one task argument must be provided!\033[0m'
   exit 1
 fi
 
-pushd $PKG
+pushd ${PKG} || exit $?
 pub upgrade || exit $?
 
 EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
-  case $TASK in
+  case ${TASK} in
   dartfmt) echo
     echo -e '\033[1mTASK: dartfmt\033[22m'
     echo -e 'dartfmt -n --set-exit-if-changed .'
@@ -274,7 +274,7 @@ while (( "$#" )); do
   shift
 done
 
-exit $EXIT_CODE
+exit ${EXIT_CODE}
 ''').validate();
   });
 
@@ -361,24 +361,24 @@ cache:
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-if [ -z "$PKG" ]; then
+if [[ -z ${PKG} ]]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 fi
 
-if [ "$#" == "0" ]; then
+if [[ "$#" == "0" ]]; then
   echo -e '\033[31mAt least one task argument must be provided!\033[0m'
   exit 1
 fi
 
-pushd $PKG
+pushd ${PKG} || exit $?
 pub upgrade || exit $?
 
 EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
-  case $TASK in
+  case ${TASK} in
   dartanalyzer_0) echo
     echo -e '\033[1mTASK: dartanalyzer_0\033[22m'
     echo -e 'dartanalyzer --fatal-warnings --fatal-infos .'
@@ -402,7 +402,7 @@ while (( "$#" )); do
   shift
 done
 
-exit $EXIT_CODE
+exit ${EXIT_CODE}
 ''').validate();
   });
 
@@ -630,24 +630,24 @@ final _config2Shell = r"""
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-if [ -z "$PKG" ]; then
+if [[ -z ${PKG} ]]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 fi
 
-if [ "$#" == "0" ]; then
+if [[ "$#" == "0" ]]; then
   echo -e '\033[31mAt least one task argument must be provided!\033[0m'
   exit 1
 fi
 
-pushd $PKG
+pushd ${PKG} || exit $?
 pub upgrade || exit $?
 
 EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
-  case $TASK in
+  case ${TASK} in
   dartanalyzer) echo
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
     echo -e 'dartanalyzer .'
@@ -721,7 +721,7 @@ while (( "$#" )); do
   shift
 done
 
-exit $EXIT_CODE
+exit ${EXIT_CODE}
 """;
 
 final _config2Yaml = r'''

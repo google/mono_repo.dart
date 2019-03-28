@@ -93,24 +93,24 @@ final _travisSh = r'''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-if [ -z "$PKG" ]; then
+if [[ -z ${PKG} ]]; then
   echo -e '\033[31mPKG environment variable must be set!\033[0m'
   exit 1
 fi
 
-if [ "$#" == "0" ]; then
+if [[ "$#" == "0" ]]; then
   echo -e '\033[31mAt least one task argument must be provided!\033[0m'
   exit 1
 fi
 
-pushd $PKG
+pushd ${PKG} || exit $?
 pub upgrade || exit $?
 
 EXIT_CODE=0
 
 while (( "$#" )); do
   TASK=$1
-  case $TASK in
+  case ${TASK} in
   dartanalyzer) echo
     echo -e '\033[1mTASK: dartanalyzer\033[22m'
     echo -e 'dartanalyzer .'
@@ -134,5 +134,5 @@ while (( "$#" )); do
   shift
 done
 
-exit $EXIT_CODE
+exit ${EXIT_CODE}
 ''';
