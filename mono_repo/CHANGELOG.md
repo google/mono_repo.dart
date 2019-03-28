@@ -1,5 +1,7 @@
-## 1.2.3
+## 2.0.0
 
+* *BREAKING* All commands are recursive by default. To go back to the shallow
+  mode, use `--no-recursive`.
 * Improve style of the generated `tool/travis.sh` script, including fast-failing
   if the `PKG` variable does not map to an existing directory.
 * Require at least Dart 2.1.0.
