@@ -1,5 +1,7 @@
 ## 1.2.3
 
+* Improve style of the generated `tool/travis.sh` script, including fast-failing
+  if the `PKG` variable does not map to an existing directory.
 * Require at least Dart 2.1.0.
 * The `dart` key is no longer required in `mono_pkg.yaml` if all stages specify
   their own values. A warning is printed if values are provided but not used.
