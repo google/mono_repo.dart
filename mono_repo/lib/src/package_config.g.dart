@@ -40,7 +40,7 @@ Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
   val['package'] = instance.package;
   val['sdk'] = instance.sdk;
   val['stageName'] = instance.stageName;
-  val['tasks'] = instance.tasks;
+  val['tasks'] = instance.tasks?.map((e) => e?.toJson())?.toList();
   return val;
 }
 

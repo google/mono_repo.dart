@@ -91,7 +91,7 @@ class PackageConfig {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class TravisJob {
   @JsonKey(includeIfNull: false)
   final String description;
@@ -267,4 +267,4 @@ class Task {
   List get _items => [name, args, config];
 }
 
-final _equality = const DeepCollectionEquality.unordered();
+final _equality = const DeepCollectionEquality();
