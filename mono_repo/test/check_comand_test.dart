@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:mono_repo/src/root_config.dart';
-import 'package:test/test.dart';
 
 import 'package:mono_repo/src/commands/check.dart';
-import 'package:pubspec_parse/pubspec_parse.dart';
+import 'package:mono_repo/src/root_config.dart';
 import 'package:pub_semver/pub_semver.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
+import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
@@ -27,7 +27,7 @@ void main() {
     test('check', () {
       var reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
-      expect(reports, hasLength(4));
+      expect(reports.keys, ['bar', 'baz', 'baz/recursive', 'flutter', 'foo']);
 
       var fooReport = reports['foo'];
       expect(fooReport.packageName, 'foo');
@@ -72,18 +72,18 @@ void main() {
       var sdkDep =
           flutterReport.pubspec.dependencies['flutter'] as SdkDependency;
       expect(sdkDep.sdk, 'flutter');
-    });
-
-    test('check recursive', () {
-      var reports = getPackageReports(
-          RootConfig(rootDirectory: d.sandbox, recursive: true));
-
-      expect(reports, hasLength(5));
 
       var recursiveReport = reports['baz/recursive'];
       expect(recursiveReport.packageName, 'baz.recursive');
       expect(recursiveReport.published, isTrue);
       expect(recursiveReport.pubspec.dependencies, hasLength(1));
+    });
+
+    test('check no recursive', () {
+      var reports = getPackageReports(
+          RootConfig(rootDirectory: d.sandbox, recursive: false));
+
+      expect(reports.keys, ['bar', 'baz', 'flutter', 'foo']);
     });
   });
 }

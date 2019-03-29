@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:graphs/graphs.dart';
@@ -99,8 +100,8 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    final buffer = StringBuffer('  $label) ${contentLines.first}\n')
-      ..writeAll(contentLines.skip(1).map((l) => '    $l'), '\n');
+    final buffer = StringBuffer('$label) ${contentLines.first}\n')
+      ..writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
 
     final output = buffer.toString();
     if (!taskEntries.contains(output)) {
@@ -178,19 +179,19 @@ void _logPkgs(Iterable<PackageConfig> configs) {
 
 String _shellCase(String scriptVariable, List<String> entries) {
   if (entries.isEmpty) return '';
-  return '''
-  case \${$scriptVariable} in
+  return LineSplitter.split('''
+case \${$scriptVariable} in
 ${entries.join('\n')}
-  esac
-''';
+esac
+''').map((l) => '    $l').join('\n');
 }
 
 String _travisSh(List<String> tasks, bool prettyAnsi, String pkgVersion) => '''
 #!/bin/bash
 # ${_createdWith(pkgVersion)}
 
-if [[ -z \${PKG} ]]; then
-  ${safeEcho(prettyAnsi, red, "PKG environment variable must be set!")}
+if [[ -z \${PKGS} ]]; then
+  ${safeEcho(prettyAnsi, red, "PKGS environment variable must be set!")}
   exit 1
 fi
 
@@ -199,15 +200,18 @@ if [[ "\$#" == "0" ]]; then
   exit 1
 fi
 
-pushd "\${PKG}" || exit \$?
-pub upgrade || exit \$?
-
 EXIT_CODE=0
 
-while (( "\$#" )); do
-  TASK=\$1
+for PKG in \${PKGS}; do
+  echo -e "\\033[1mPKG: \${PKG}\\033[22m"
+  pushd "\${PKG}" || exit \$?
+  pub upgrade --no-precompile || exit \$?
+
+  for TASK in "\$@"; do
 ${_shellCase('TASK', tasks)}
-  shift
+  done
+
+  popd
 done
 
 exit \${EXIT_CODE}
@@ -322,16 +326,16 @@ Iterable<Map<String, String>> _listJobs(
   for (var job in jobs) {
     final commands =
         job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
-    final jobName = 'SDK: ${job.sdk} - '
-        'DIR: ${job.package} - '
+    final jobName = 'SDK: ${job.sdk}; '
+        'PKGS: ${job.package}; '
         'TASKS: ${job.name}';
 
     yield {
       'stage': job.stageName,
       'name': jobName,
+      'dart': job.sdk,
+      'env': 'PKGS="${job.package}"',
       'script': './tool/travis.sh $commands',
-      'env': 'PKG="${job.package}"',
-      'dart': job.sdk
     };
   }
 }

@@ -28,7 +28,7 @@ class MonoRepoRunner extends CommandRunner<void> {
       ..addFlag(recursiveFlag,
           help:
               'Whether to recursively walk sub-directorys looking for packages.',
-          defaultsTo: false);
+          defaultsTo: true);
   }
 
   @override

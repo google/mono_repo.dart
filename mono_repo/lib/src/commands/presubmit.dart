@@ -118,7 +118,7 @@ Future<bool> presubmit(RootConfig configs,
         }
 
         final result = await Process.run(travisShPath, [taskKey],
-            environment: {'PKG': package});
+            environment: {'PKGS': package});
         if (result.exitCode == 0) {
           print(green.wrap('    success'));
         } else {

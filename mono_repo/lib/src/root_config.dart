@@ -81,7 +81,8 @@ class RootConfig extends ListBase<PackageConfig> {
 
   RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
 
-  factory RootConfig({String rootDirectory, bool recursive = false}) {
+  factory RootConfig({String rootDirectory, bool recursive = true}) {
+    recursive ??= true;
     rootDirectory ??= p.current;
 
     var configs = <PackageConfig>[];

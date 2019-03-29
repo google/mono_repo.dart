@@ -1,38 +1,58 @@
-# Created with package:mono_repo v1.2.3-dev
+# Created with package:mono_repo v2.0.0-dev
 language: dart
 
 jobs:
   include:
     - stage: smoke_test
-      name: "SDK: dev - DIR: mono_repo - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-infos --fatal-warnings .]"
+      name: "SDK: dev; PKGS: mono_repo; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
+      dart: dev
+      env: PKGS="mono_repo"
       script: ./tool/travis.sh dartfmt dartanalyzer_0
-      env: PKG="mono_repo"
-      dart: dev
     - stage: smoke_test
-      name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: [dartfmt -n --set-exit-if-changed ., dartanalyzer --fatal-warnings .]"
+      name: "SDK: 2.1.0; PKGS: mono_repo; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-warnings .`]"
+      dart: "2.1.0"
+      env: PKGS="mono_repo"
       script: ./tool/travis.sh dartfmt dartanalyzer_1
-      env: PKG="mono_repo"
-      dart: "2.1.0"
     - stage: build
-      name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
-      script: ./tool/travis.sh command_0
-      env: PKG="mono_repo"
+      name: "SDK: 2.1.0; PKGS: mono_repo; TASKS: `pub run build_runner build test --delete-conflicting-outputs`"
       dart: "2.1.0"
+      env: PKGS="mono_repo"
+      script: ./tool/travis.sh command_0
     - stage: build
-      name: "SDK: dev - DIR: mono_repo - TASKS: pub run build_runner build test --delete-conflicting-outputs"
+      name: "SDK: dev; PKGS: mono_repo; TASKS: `pub run build_runner build test --delete-conflicting-outputs`"
+      dart: dev
+      env: PKGS="mono_repo"
       script: ./tool/travis.sh command_0
-      env: PKG="mono_repo"
-      dart: dev
     - stage: unit_test
-      name: "SDK: 2.1.0 - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
-      script: ./tool/travis.sh command_1 command_2
-      env: PKG="mono_repo"
+      name: "SDK: 2.1.0; PKGS: mono_repo; TASKS: [`pub run build_runner test -- -x presubmit-only`, `pub run build_runner test -- --run-skipped -t presubmit-only`]"
       dart: "2.1.0"
-    - stage: unit_test
-      name: "SDK: dev - DIR: mono_repo - TASKS: [pub run build_runner test -- -x presubmit-only, pub run build_runner test -- --run-skipped -t presubmit-only]"
+      env: PKGS="mono_repo"
       script: ./tool/travis.sh command_1 command_2
-      env: PKG="mono_repo"
+    - stage: unit_test
+      name: "SDK: dev; PKGS: mono_repo; TASKS: [`pub run build_runner test -- -x presubmit-only`, `pub run build_runner test -- --run-skipped -t presubmit-only`]"
       dart: dev
+      env: PKGS="mono_repo"
+      script: ./tool/travis.sh command_1 command_2
+    - stage: smoke_test
+      name: "SDK: dev; PKGS: test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
+      dart: dev
+      env: PKGS="test_pkg"
+      script: ./tool/travis.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
+      name: "SDK: 2.1.0; PKGS: test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-warnings .`]"
+      dart: "2.1.0"
+      env: PKGS="test_pkg"
+      script: ./tool/travis.sh dartfmt dartanalyzer_1
+    - stage: unit_test
+      name: "SDK: 2.1.0; PKGS: test_pkg; TASKS: `pub run test`"
+      dart: "2.1.0"
+      env: PKGS="test_pkg"
+      script: ./tool/travis.sh test
+    - stage: unit_test
+      name: "SDK: dev; PKGS: test_pkg; TASKS: `pub run test`"
+      dart: dev
+      env: PKGS="test_pkg"
+      script: ./tool/travis.sh test
 
 stages:
   - smoke_test
