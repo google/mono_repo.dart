@@ -354,10 +354,7 @@ List get _testConfig1expectedOutput => [
         "sdk": "dev",
         "stageName": "unit_test",
         "tasks": [
-          {
-            "name": "test",
-            "args": "--platform chrome"
-          }
+          {"name": "test", "args": "--platform chrome"}
         ]
       },
       {
@@ -365,10 +362,7 @@ List get _testConfig1expectedOutput => [
         "sdk": "stable",
         "stageName": "unit_test",
         "tasks": [
-          {
-            "name": "test",
-            "args": "--platform chrome"
-          }
+          {"name": "test", "args": "--platform chrome"}
         ]
       },
       {
@@ -376,10 +370,7 @@ List get _testConfig1expectedOutput => [
         "sdk": "1.23.0",
         "stageName": "unit_test",
         "tasks": [
-          {
-            "name": "test",
-            "args": "--platform chrome"
-          }
+          {"name": "test", "args": "--platform chrome"}
         ]
       },
       {
