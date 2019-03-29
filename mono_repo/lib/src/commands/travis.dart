@@ -6,6 +6,8 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart'
+    show groupBy, DeepCollectionEquality;
 import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
@@ -244,7 +246,9 @@ ${toYaml({
 ${toYaml({'language': 'dart'})}
 $customTravis
 ${toYaml({
-    'jobs': {'include': _listJobs(jobs, commandsToKeys)}
+    'jobs': {
+      'include': _listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages)
+    }
   })}
 
 ${toYaml({'stages': orderedStages})}
@@ -295,9 +299,13 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   final conditionalStages = Map<String, ConditionalStage>.from(
       rootConfig.monoConfig.conditionalStages);
 
+  final unknownMergedStages = rootConfig.monoConfig.mergeStages.toSet();
+
   final orderedStages = components
       .map((c) {
         final stageName = c.first;
+
+        unknownMergedStages.remove(stageName);
 
         final matchingStage = conditionalStages.remove(stageName);
         if (matchingStage != null) {
@@ -309,6 +317,13 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       .toList()
       .reversed
       .toList();
+
+  if (unknownMergedStages.isNotEmpty) {
+    throw UserException('Error parsing mono_repo.yaml',
+        details: 'Stage `${unknownMergedStages.first}` was referenced in '
+            '`mono_repo.yaml`, but it does not exist in any '
+            '`mono_pkg.yaml` files.');
+  }
 
   if (conditionalStages.isNotEmpty) {
     throw UserException('Error parsing mono_repo.yaml',
@@ -322,20 +337,70 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
 
 /// Lists all the jobs, setting their stage, environment, and script.
 Iterable<Map<String, String>> _listJobs(
-    Iterable<TravisJob> jobs, Map<String, String> commandsToKeys) sync* {
+  Iterable<TravisJob> jobs,
+  Map<String, String> commandsToKeys,
+  Set<String> mergeStages,
+) sync* {
+  final jobEntries = <_TravisJobEntry>[];
+
   for (var job in jobs) {
     final commands =
-        job.tasks.map((task) => commandsToKeys[task.command]).join(' ');
-    final jobName = 'SDK: ${job.sdk}; '
-        'PKGS: ${job.package}; '
-        'TASKS: ${job.name}';
+        job.tasks.map((task) => commandsToKeys[task.command]).toList();
 
-    yield {
-      'stage': job.stageName,
-      'name': jobName,
-      'dart': job.sdk,
-      'env': 'PKGS="${job.package}"',
-      'script': './tool/travis.sh $commands',
-    };
+    jobEntries.add(
+        _TravisJobEntry(job, commands, mergeStages.contains(job.stageName)));
+  }
+
+  final groupedItems =
+      groupBy<_TravisJobEntry, _TravisJobEntry>(jobEntries, (e) => e);
+
+  for (var entry in groupedItems.entries) {
+    if (entry.key.merge) {
+      final packages = entry.value.map((t) => t.job.package).toList();
+      yield entry.key.jobYaml(packages);
+    } else {
+      yield* entry.value
+          .map((jobEntry) => jobEntry.jobYaml([jobEntry.job.package]));
+    }
   }
 }
+
+class _TravisJobEntry {
+  final TravisJob job;
+  final List<String> commands;
+  final bool merge;
+
+  _TravisJobEntry(this.job, this.commands, this.merge);
+
+  String _jobName(List<String> packages) {
+    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
+
+    return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
+        'TASKS: ${job.name}';
+  }
+
+  Map<String, String> jobYaml(List<String> packages) {
+    assert(packages.isNotEmpty);
+    assert(packages.contains(job.package));
+
+    return {
+      'stage': job.stageName,
+      'name': _jobName(packages),
+      'dart': job.sdk,
+      'env': 'PKGS="${packages.join(' ')}"',
+      'script': './tool/travis.sh ${commands.join(' ')}',
+    };
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is _TravisJobEntry &&
+      _equality.equals(_identityItems, other._identityItems);
+
+  @override
+  int get hashCode => _equality.hash(_identityItems);
+
+  List get _identityItems => [job.stageName, job.sdk, commands, merge];
+}
+
+final _equality = const DeepCollectionEquality();

@@ -60,17 +60,17 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "SDK: dev; PKGS: sub_pkg; TASKS: `dartanalyzer .`"
+      name: "SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
       dart: dev
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh dartanalyzer
     - stage: analyze
-      name: "SDK: dev; PKGS: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      name: "SDK: dev; PKG: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh dartfmt
     - stage: unit_test
-      name: "SDK: dev; PKGS: sub_pkg; TASKS: `pub run test`"
+      name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
       dart: dev
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test

@@ -15,13 +15,16 @@ final _monoConfigFileName = 'mono_repo.yaml';
 /// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
 const _reservedTravisKeys = ['cache', 'jobs', 'language'];
 
+const _allowedMonoConfigKeys = ['travis', 'merge_stages'];
+
 class MonoConfig {
   final Map<String, dynamic> travis;
   final Map<String, ConditionalStage> conditionalStages;
+  final Set<String> mergeStages;
 
-  MonoConfig._(this.travis, this.conditionalStages);
+  MonoConfig._(this.travis, this.conditionalStages, this.mergeStages);
 
-  factory MonoConfig(Map travis) {
+  factory MonoConfig(Map travis, Set<String> mergeStages) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
@@ -54,28 +57,47 @@ class MonoConfig {
 
     // Removing this at the last minute so any throw CheckedFromJsonException
     // will have the right value
-    // ... but the code that writes the values won't write stages seperately
+    // ... but the code that writes the values won't write stages separately
     travis.remove('stages');
 
-    return MonoConfig._(
-        travis.map((k, v) => MapEntry(k as String, v)), conditionalStages);
+    return MonoConfig._(travis.map((k, v) => MapEntry(k as String, v)),
+        conditionalStages, mergeStages);
   }
 
   factory MonoConfig.fromJson(Map json) {
-    final nonTravisKeys = json.keys.where((k) => k != 'travis').toList();
+    final unsupportedKeys =
+        json.keys.where((k) => !_allowedMonoConfigKeys.contains(k)).toList();
 
-    if (nonTravisKeys.isNotEmpty) {
-      throw CheckedFromJsonException(json, nonTravisKeys.first as String,
-          'MonoConfig', 'Only `travis` key is supported.');
+    if (unsupportedKeys.isNotEmpty) {
+      throw CheckedFromJsonException(
+        json,
+        unsupportedKeys.first as String,
+        'MonoConfig',
+        'Only ${_allowedMonoConfigKeys.map((s) => '`$s`').join(', ')} keys '
+            'are supported.',
+      );
     }
 
-    final travis = json['travis'];
+    final travis = json['travis'] ?? {};
 
-    if (travis is Map) {
-      return MonoConfig(travis);
+    if (travis is! Map) {
+      throw CheckedFromJsonException(
+          json, 'travis', 'MonoConfig', '`travis` must be a Map.');
     }
-    throw CheckedFromJsonException(
-        json, 'travis', 'MonoConfig', '`travis` must be a Map.');
+
+    final mergeStages = json['merge_stages'] ?? [];
+
+    if (mergeStages is List) {
+      if (mergeStages.any((v) => v is! String)) {
+        throw CheckedFromJsonException(
+            json, 'merge_stages', 'MonoConfig', 'All values must be strings.');
+      }
+
+      return MonoConfig(travis as Map, Set.from(mergeStages));
+    } else {
+      throw CheckedFromJsonException(json, 'merge_stages', 'MonoConfig',
+          '`merge_stages` must be an array.');
+    }
   }
 
   factory MonoConfig.fromRepo({String rootDirectory}) {
@@ -83,7 +105,7 @@ class MonoConfig {
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return MonoConfig({});
+      return MonoConfig({}, Set());
     }
 
     try {
