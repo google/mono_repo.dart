@@ -53,9 +53,9 @@ void main() {
 
     expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 
-    var jobs = config.jobs.toList();
+    var jobs = config.jobs.map((tj) => tj.toJson()).toList();
 
-    expect(_encodeJson(jobs), _encodeJson(_testConfig1expectedOutput));
+    expect(jobs, _testConfig1expectedOutput);
   });
 
   group('error checks', () {
