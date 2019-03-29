@@ -199,7 +199,7 @@ if [[ "\$#" == "0" ]]; then
   exit 1
 fi
 
-pushd \${PKG} || exit \$?
+pushd "\${PKG}" || exit \$?
 pub upgrade || exit \$?
 
 EXIT_CODE=0
