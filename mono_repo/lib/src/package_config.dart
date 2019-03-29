@@ -157,9 +157,7 @@ class Task {
 
   final String args;
 
-  final Map<String, dynamic> config;
-
-  Task(this.name, {this.args, this.config});
+  Task(this.name, {this.args});
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
@@ -223,7 +221,12 @@ class Task {
       if (config.isEmpty) {
         config = null;
       }
-      return Task(taskName, args: args, config: config);
+
+      if (config != null) {
+        throw CheckedFromJsonException(yamlValue, config.keys.first, 'Task',
+            'Extra config options are not currently supported.');
+      }
+      return Task(taskName, args: args);
     }
 
     throw ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
@@ -264,7 +267,7 @@ class Task {
   @override
   int get hashCode => _equality.hash(_items);
 
-  List get _items => [name, args, config];
+  List get _items => [name, args];
 }
 
 final _equality = const DeepCollectionEquality();

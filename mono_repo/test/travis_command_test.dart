@@ -70,11 +70,15 @@ name: pkg_name
     ]).create();
 
     expect(
-        testGenerateTravisConfig,
-        throwsUserExceptionWith(
-            'Tasks with fancy configuration are not supported. '
-            'See `sub_pkg/$monoPkgFileName`.',
-            isNull));
+      testGenerateTravisConfig,
+      throwsUserExceptionWith(
+        'Error parsing sub_pkg/mono_pkg.yaml',
+        startsWith(
+          'line 8, column 7 of sub_pkg/mono_pkg.yaml: '
+              'Extra config options are not currently supported.',
+        ),
+      ),
+    );
   });
 
   test('fails with legacy file name', () async {

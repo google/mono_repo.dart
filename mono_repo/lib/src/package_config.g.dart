@@ -47,13 +47,7 @@ Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
 Task _$TaskFromJson(Map json) {
   return $checkedNew('Task', json, () {
     final val = Task($checkedConvert(json, 'name', (v) => v as String),
-        args: $checkedConvert(json, 'args', (v) => v as String),
-        config: $checkedConvert(
-            json,
-            'config',
-            (v) => (v as Map)?.map(
-                  (k, e) => MapEntry(k as String, e),
-                )));
+        args: $checkedConvert(json, 'args', (v) => v as String));
     return val;
   });
 }
@@ -69,6 +63,5 @@ Map<String, dynamic> _$TaskToJson(Task instance) {
 
   writeNotNull('name', instance.name);
   writeNotNull('args', instance.args);
-  writeNotNull('config', instance.config);
   return val;
 }
