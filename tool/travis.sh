@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v2.0.0-dev
+# Created with package:mono_repo v2.0.0
 
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
@@ -15,7 +15,7 @@ EXIT_CODE=0
 
 for PKG in ${PKGS}; do
   echo -e "\033[1mPKG: ${PKG}\033[22m"
-  pushd ${PKG} || exit $?
+  pushd "${PKG}" || exit $?
   pub upgrade --no-precompile || exit $?
 
   for TASK in "$@"; do
