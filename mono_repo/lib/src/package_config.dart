@@ -218,11 +218,8 @@ class Task {
 
       var config = Map<String, dynamic>.from(yamlValue)..remove(taskName);
 
-      if (config.isEmpty) {
-        config = null;
-      }
-
-      if (config != null) {
+      // TODO(kevmoo): at some point, support custom configuration here
+      if (config.isNotEmpty) {
         throw CheckedFromJsonException(yamlValue, config.keys.first, 'Task',
             'Extra config options are not currently supported.');
       }
