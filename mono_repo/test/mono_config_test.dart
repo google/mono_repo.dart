@@ -42,7 +42,6 @@ void main() {
     expect(oneJob.sdk, 'stable');
     expect(oneJob.tasks.first.name, 'test');
     expect(oneJob.tasks.first.args, isNull);
-    expect(oneJob.tasks.first.config, isNull);
     expect(oneJob.stageName, 'unit_test');
   });
 
@@ -326,9 +325,7 @@ stages:
         - 1.23.0
   - unit_test:
     - test: --platform chrome
-      xvfb: true
     - test: --preset travis --total-shards 5 --shard-index 0
-      xvfb: true
     - test: --preset travis --total-shards 5 --shard-index 1
     - test #no args
 ''';
@@ -357,11 +354,7 @@ List get _testConfig1expectedOutput => [
         "sdk": "dev",
         "stageName": "unit_test",
         "tasks": [
-          {
-            "name": "test",
-            "args": "--platform chrome",
-            "config": {"xvfb": true}
-          }
+          {"name": "test", "args": "--platform chrome"}
         ]
       },
       {
@@ -369,11 +362,7 @@ List get _testConfig1expectedOutput => [
         "sdk": "stable",
         "stageName": "unit_test",
         "tasks": [
-          {
-            "name": "test",
-            "args": "--platform chrome",
-            "config": {"xvfb": true}
-          }
+          {"name": "test", "args": "--platform chrome"}
         ]
       },
       {
@@ -381,11 +370,7 @@ List get _testConfig1expectedOutput => [
         "sdk": "1.23.0",
         "stageName": "unit_test",
         "tasks": [
-          {
-            "name": "test",
-            "args": "--platform chrome",
-            "config": {"xvfb": true}
-          }
+          {"name": "test", "args": "--platform chrome"}
         ]
       },
       {
@@ -395,8 +380,7 @@ List get _testConfig1expectedOutput => [
         "tasks": [
           {
             "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 0",
-            "config": {"xvfb": true}
+            "args": "--preset travis --total-shards 5 --shard-index 0"
           }
         ]
       },
@@ -407,8 +391,7 @@ List get _testConfig1expectedOutput => [
         "tasks": [
           {
             "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 0",
-            "config": {"xvfb": true}
+            "args": "--preset travis --total-shards 5 --shard-index 0"
           }
         ]
       },
@@ -419,8 +402,7 @@ List get _testConfig1expectedOutput => [
         "tasks": [
           {
             "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 0",
-            "config": {"xvfb": true}
+            "args": "--preset travis --total-shards 5 --shard-index 0"
           }
         ]
       },

@@ -59,18 +59,6 @@ PackageConfig _packageConfigFromDir(
         details: details);
   }
 
-  // TODO(kevmoo): Now that we can write yaml, we should support round-tripping
-  // more complex task configurations
-  var configuredJobs = config.jobs
-      .expand((job) => job.tasks)
-      .where((task) => task.config != null)
-      .toList();
-
-  if (configuredJobs.isNotEmpty) {
-    throw UserException('Tasks with fancy configuration are not supported. '
-        'See `$pkgConfigRelativePath`.');
-  }
-
   return config;
 }
 
