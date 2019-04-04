@@ -6,7 +6,8 @@ dart:
 stages:
 - smoke_test:
   - group:
-    - dartfmt
+    # skipping while https://github.com/dart-lang/dart_style/issues/799 is live
+    #- dartfmt
     - dartanalyzer: --fatal-infos --fatal-warnings .
     dart: [dev]
   - group:
