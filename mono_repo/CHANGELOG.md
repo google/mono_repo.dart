@@ -2,6 +2,7 @@
 
 - Job entries in `.travis.yml` are now ordered. This may cause churn, but will
   create a predictable output going forward. 
+- `mono_repo pub` command: add support for all flags.
 
 ## 2.0.0
 

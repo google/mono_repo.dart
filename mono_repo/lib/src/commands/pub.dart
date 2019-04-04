@@ -7,7 +7,7 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
-
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../root_config.dart';
@@ -27,31 +27,77 @@ class PubCommand extends Command<void> {
       'Run `pub get` or `pub upgrade` against all packages.';
 }
 
+const _offline = 'offline';
+const _dryRun = 'dry-run';
+const _precompile = 'precompile';
+
 class _PubSubCommand extends MonoRepoCommand {
   @override
   final String name;
 
-  _PubSubCommand(this.name);
+  _PubSubCommand(this.name) {
+    argParser
+      ..addFlag(_offline,
+          negatable: true,
+          defaultsTo: false,
+          help: 'Use cached packages instead of accessing the network.')
+      ..addFlag(_dryRun,
+          abbr: 'n',
+          defaultsTo: false,
+          negatable: false,
+          help: 'Precompile executables and transformed dependencies.')
+      ..addFlag(_precompile,
+          defaultsTo: true,
+          negatable: true,
+          help: "Report what dependencies would change but don't change any.");
+  }
 
   @override
   String get description => 'Run `pub $name` against all packages.';
 
   @override
-  Future<void> run() => pub(name, rootConfig());
+  Future<void> run() => pub(
+        rootConfig(),
+        name,
+        offline: argResults[_offline] as bool,
+        dryRun: argResults[_dryRun] as bool,
+        preCompile: argResults[_precompile] as bool,
+      );
 }
 
-Future<void> pub(String pubCommand, RootConfig rootConfig) async {
+Future<void> pub(
+  RootConfig rootConfig,
+  String pubCommand, {
+  @required bool offline,
+  @required bool dryRun,
+  @required bool preCompile,
+}) async {
   final pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
 
-  print(lightBlue
-      .wrap('Running `pub $pubCommand` across ${pkgDirs.length} package(s).'));
+  // TODO(kevmoo): use UI-as-code features when min SDK is >= 2.3.0
+  final args = [pubCommand];
+  if (offline) {
+    args.add('--$_offline');
+  }
+
+  if (dryRun) {
+    args.add('--$_dryRun');
+  }
+
+  // Note: the default is `true`
+  if (!preCompile) {
+    args.add('--no-$_precompile');
+  }
+
+  print(lightBlue.wrap(
+      'Running `pub ${args.join(' ')}` across ${pkgDirs.length} package(s).'));
 
   for (var dir in pkgDirs) {
     print('');
     print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    final proc = await Process.start(pubPath, [pubCommand],
+    final proc = await Process.start(pubPath, args,
         mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
 
     final exit = await proc.exitCode;
