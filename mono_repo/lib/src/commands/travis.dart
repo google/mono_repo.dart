@@ -102,8 +102,8 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    final buffer = StringBuffer('$label) ${contentLines.first}\n')
-      ..writeAll(contentLines.skip(1).map((l) => '  $l'), '\n');
+    final buffer = StringBuffer('$label) echo\n')
+      ..writeAll(contentLines.map((l) => '  $l'), '\n');
 
     final output = buffer.toString();
     if (!taskEntries.contains(output)) {
@@ -113,7 +113,6 @@ List<String> _calculateTaskEntries(
 
   commandsToKeys.forEach((command, taskKey) {
     addEntry(taskKey, [
-      'echo',
       safeEcho(prettyAnsi, styleBold, 'TASK: $taskKey'),
       safeEcho(prettyAnsi, resetAll, command),
       '$command || EXIT_CODE=\$?',

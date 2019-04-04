@@ -55,7 +55,8 @@ for PKG in ${PKGS}; do
       echo -e 'pub run test'
       pub run test || EXIT_CODE=$?
       ;;
-    *) echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
+    *) echo
+      echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
       EXIT_CODE=1
       ;;
     esac
