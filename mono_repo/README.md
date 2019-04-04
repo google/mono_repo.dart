@@ -80,7 +80,8 @@ Look at these repositories for examples of `mono_repo` usage:
 * https://github.com/dart-lang/build
 * https://github.com/dart-lang/json_serializable
 * https://github.com/dart-lang/pub-dartlang-dart
-* https://github.com/dart-lang/webdev/
+* https://github.com/dart-lang/source_gen
+* https://github.com/dart-lang/webdev
 
 [Dart packages]: https://www.dartlang.org/guides/libraries/create-library-packages
 [setup your PATH]: (https://www.dartlang.org/tools/pub/cmd/pub-global#running-a-script-from-your-path)
