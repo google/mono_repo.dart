@@ -212,13 +212,13 @@ language: dart
 jobs:
   include:
     - stage: format
-      name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
-      dart: stable
+      name: "SDK: dev; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      dart: dev
       env: PKGS="pkg_a"
       script: ./tool/travis.sh dartfmt
     - stage: format
-      name: "SDK: dev; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
-      dart: dev
+      name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      dart: stable
       env: PKGS="pkg_a"
       script: ./tool/travis.sh dartfmt
     - stage: format
@@ -782,15 +782,20 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "SDK: dev; PKG: sub_pkg; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
-      dart: dev
-      env: PKGS="sub_pkg"
-      script: ./tool/travis.sh dartanalyzer dartfmt
-    - stage: analyze
       name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `dartanalyzer .`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh dartanalyzer
+    - stage: analyze
+      name: "SDK: dev; PKG: sub_pkg; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
+      dart: dev
+      env: PKGS="sub_pkg"
+      script: ./tool/travis.sh dartanalyzer dartfmt
+    - stage: unit_test
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: chrome tests"
+      dart: "1.23.0"
+      env: PKGS="sub_pkg"
+      script: ./tool/travis.sh test_00
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: chrome tests"
       dart: dev
@@ -802,10 +807,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_00
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: chrome tests"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 0`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_00
+      script: ./tool/travis.sh test_01
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 0`"
       dart: dev
@@ -817,10 +822,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_01
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 0`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 1`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_01
+      script: ./tool/travis.sh test_02
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 1`"
       dart: dev
@@ -832,10 +837,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_02
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 1`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 2`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_02
+      script: ./tool/travis.sh test_03
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 2`"
       dart: dev
@@ -847,10 +852,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_03
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 2`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 3`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_03
+      script: ./tool/travis.sh test_04
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 3`"
       dart: dev
@@ -862,10 +867,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_04
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 3`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 4`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_04
+      script: ./tool/travis.sh test_05
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 4`"
       dart: dev
@@ -877,10 +882,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_05
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 4`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 5`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_05
+      script: ./tool/travis.sh test_06
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 5`"
       dart: dev
@@ -892,10 +897,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_06
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 5`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 6`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_06
+      script: ./tool/travis.sh test_07
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 6`"
       dart: dev
@@ -907,10 +912,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_07
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 6`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 7`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_07
+      script: ./tool/travis.sh test_08
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 7`"
       dart: dev
@@ -922,10 +927,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_08
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 7`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 8`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_08
+      script: ./tool/travis.sh test_09
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 8`"
       dart: dev
@@ -937,10 +942,10 @@ jobs:
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_09
     - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis --total-shards 9 --shard-index 8`"
+      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test`"
       dart: "1.23.0"
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_09
+      script: ./tool/travis.sh test_10
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
       dart: dev
@@ -949,11 +954,6 @@ jobs:
     - stage: unit_test
       name: "SDK: stable; PKG: sub_pkg; TASKS: `pub run test`"
       dart: stable
-      env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test_10
-    - stage: unit_test
-      name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test`"
-      dart: "1.23.0"
       env: PKGS="sub_pkg"
       script: ./tool/travis.sh test_10
 
