@@ -1,3 +1,8 @@
+## 2.1.0
+
+- Job entries in `.travis.yml` are now ordered. This may cause churn, but will
+  create a predictable output going forward. 
+
 ## 2.0.0
 
 * *BREAKING* All commands are recursive by default. To go back to the shallow

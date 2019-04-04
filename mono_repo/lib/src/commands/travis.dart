@@ -241,14 +241,37 @@ ${toYaml({
         })}
 ''';
 
+  int stageIndex(String value) => orderedStages.indexWhere((e) {
+        if (e is String) {
+          return e == value;
+        }
+
+        return (e as Map)['name'] == value;
+      });
+
+  final jobList =
+      _listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages).toList()
+        ..sort((a, b) {
+          var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
+
+          if (value == 0) {
+            value = a['env'].compareTo(b['env']);
+          }
+          if (value == 0) {
+            value = a['script'].compareTo(b['script']);
+          }
+          if (value == 0) {
+            value = a['dart'].compareTo(b['dart']);
+          }
+          return value;
+        });
+
   return '''
 # ${_createdWith(pkgVersion)}
 ${toYaml({'language': 'dart'})}
 $customTravis
 ${toYaml({
-    'jobs': {
-      'include': _listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages)
-    }
+    'jobs': {'include': jobList}
   })}
 
 ${toYaml({'stages': orderedStages})}
