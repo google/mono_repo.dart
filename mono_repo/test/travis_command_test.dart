@@ -157,6 +157,29 @@ name: pkg_name
     await d.file(travisShPath, _config2Shell).validate();
   });
 
+  test('complete travis.yml file', () async {
+    await d.dir('sub_pkg', [
+      d.file(monoPkgFileName, testConfig2),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+environment:
+  sdk: '>=2.1.0 <3.0.0'
+''')
+    ]).create();
+
+    await expectLater(
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:sub_pkg',
+          '  There are jobs defined that are not compatible with the package '
+              'SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.',
+          'Make sure to mark `./tool/travis.sh` as executable.',
+        ])));
+
+    await d.file(travisFileName, _config2Yaml).validate();
+    await d.file(travisShPath, _config2Shell).validate();
+  });
+
   test('two flavors of dartfmt', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
