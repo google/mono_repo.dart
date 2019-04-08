@@ -4,19 +4,14 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
-      name: "SDK: 2.1.0; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-warnings .`]"
+      name: "SDK: 2.1.0; PKGS: mono_repo, test_pkg; TASKS: `dartanalyzer --fatal-warnings .`"
       dart: "2.1.0"
       env: PKGS="mono_repo test_pkg"
-      script: ./tool/travis.sh dartfmt dartanalyzer_1
+      script: ./tool/travis.sh dartanalyzer_1
     - stage: smoke_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `dartanalyzer --fatal-infos --fatal-warnings .`"
+      name: "SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
       dart: dev
-      env: PKGS="mono_repo"
-      script: ./tool/travis.sh dartanalyzer_0
-    - stage: smoke_test
-      name: "SDK: dev; PKG: test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
-      dart: dev
-      env: PKGS="test_pkg"
+      env: PKGS="mono_repo test_pkg"
       script: ./tool/travis.sh dartfmt dartanalyzer_0
     - stage: build
       name: "SDK: 2.1.0; PKG: mono_repo; TASKS: `pub run build_runner build test --delete-conflicting-outputs`"

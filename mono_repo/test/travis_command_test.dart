@@ -20,7 +20,7 @@ void main() {
         throwsUserExceptionWith(
             'No packages found.',
             'Each target package directory must contain a '
-            '`mono_pkg.yaml` file.'));
+                '`mono_pkg.yaml` file.'));
   });
 
   test('$monoPkgFileName with non-Map contents', () async {
@@ -75,7 +75,7 @@ name: pkg_name
         'Error parsing sub_pkg/mono_pkg.yaml',
         startsWith(
           'line 8, column 7 of sub_pkg/mono_pkg.yaml: '
-              'Extra config options are not currently supported.',
+          'Extra config options are not currently supported.',
         ),
       ),
     );
@@ -93,7 +93,7 @@ name: pkg_name
         testGenerateTravisConfig,
         throwsUserExceptionWith(
             'Found legacy package configuration file '
-            '(".mono_repo.yml") in `sub_pkg`.',
+                '(".mono_repo.yml") in `sub_pkg`.',
             'Rename to "mono_pkg.yaml".'));
   });
 
@@ -588,7 +588,7 @@ jobs:
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 'Stage `bob` was referenced in `mono_repo.yaml`, but it does '
-                'not exist in any `mono_pkg.yaml` files.'));
+                    'not exist in any `mono_pkg.yaml` files.'));
       });
     });
 
@@ -629,7 +629,7 @@ jobs:
             throwsUserExceptionWith(
                 'Error parsing mono_repo.yaml',
                 'Stage `bob` was referenced in `mono_repo.yaml`, but it does '
-                'not exist in any `mono_pkg.yaml` files.'));
+                    'not exist in any `mono_pkg.yaml` files.'));
       });
     });
 
