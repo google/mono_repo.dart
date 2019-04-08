@@ -111,23 +111,22 @@ for PKG in ${PKGS}; do
   pub upgrade --no-precompile || exit $?
 
   for TASK in "$@"; do
+    echo
+    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
     case ${TASK} in
-    dartanalyzer) echo
-      echo -e '\033[1mTASK: dartanalyzer\033[22m'
-      echo -e 'dartanalyzer .'
+    dartanalyzer)
+      echo 'dartanalyzer .'
       dartanalyzer . || EXIT_CODE=$?
       ;;
-    dartfmt) echo
-      echo -e '\033[1mTASK: dartfmt\033[22m'
-      echo -e 'dartfmt -n --set-exit-if-changed .'
+    dartfmt)
+      echo 'dartfmt -n --set-exit-if-changed .'
       dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
       ;;
-    test) echo
-      echo -e '\033[1mTASK: test\033[22m'
-      echo -e 'pub run test'
+    test)
+      echo 'pub run test'
       pub run test || EXIT_CODE=$?
       ;;
-    *) echo
+    *)
       echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
       EXIT_CODE=1
       ;;

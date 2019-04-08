@@ -102,7 +102,7 @@ List<String> _calculateTaskEntries(
     assert(contentLines.isNotEmpty);
     contentLines.add(';;');
 
-    final buffer = StringBuffer('$label) echo\n')
+    final buffer = StringBuffer('$label)\n')
       ..writeAll(contentLines.map((l) => '  $l'), '\n');
 
     final output = buffer.toString();
@@ -113,8 +113,7 @@ List<String> _calculateTaskEntries(
 
   commandsToKeys.forEach((command, taskKey) {
     addEntry(taskKey, [
-      safeEcho(prettyAnsi, styleBold, 'TASK: $taskKey'),
-      safeEcho(prettyAnsi, resetAll, command),
+      "echo '${wrapAnsi(prettyAnsi, resetAll, command)}'",
       '$command || EXIT_CODE=\$?',
     ]);
   });
@@ -209,6 +208,8 @@ for PKG in \${PKGS}; do
   pub upgrade --no-precompile || exit \$?
 
   for TASK in "\$@"; do
+    echo
+    echo -e "\\033[1mPKG: \${PKG}; TASK: \${TASK}\\033[22m"
 ${_shellCase('TASK', tasks)}
   done
 

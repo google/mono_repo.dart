@@ -1,8 +1,13 @@
 ## 2.1.0
 
+`mono_repo travis`
 - Job entries in `.travis.yml` are now ordered. This may cause churn, but will
   create a predictable output going forward. 
-- `mono_repo pub` command: add support for all flags.
+- While running, print the package when starting each task.
+  Makes it easy to scan results when a job has multiple packages.
+
+`mono_repo pub`
+- Added support for all `pub` flags.
 
 ## 2.0.0
 
