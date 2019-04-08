@@ -146,7 +146,7 @@ name: pkg_name
       ''')
     ]).create();
 
-    expect(
+    await expectLater(
         testGenerateTravisConfig,
         prints(stringContainsInOrder([
           'package:sub_pkg',
@@ -197,7 +197,7 @@ name: pkg_b
       ''')
     ]).create();
 
-    expect(
+    await expectLater(
         testGenerateTravisConfig,
         prints(stringContainsInOrder([
           'package:pkg_a',
@@ -327,7 +327,7 @@ name: pkg_a
       ''')
     ]).create();
 
-    expect(
+    await expectLater(
         testGenerateTravisConfig,
         prints(stringContainsInOrder([
           'package:pkg_a',
@@ -433,7 +433,7 @@ name: pkg_name
 
       await d.nothing(travisShPath).validate();
 
-      expect(
+      await expectLater(
           testGenerateTravisConfig,
           prints(stringContainsInOrder([
             'package:sub_pkg',

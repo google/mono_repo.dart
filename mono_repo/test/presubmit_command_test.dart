@@ -62,8 +62,8 @@ void main() {
         ..createSync(recursive: true)
         ..writeAsStringSync('name: pkg_b');
 
-      overrideAnsiOutput(false, () {
-        expect(
+      await overrideAnsiOutput(false, () async {
+        await expectLater(
             () => generateTravisConfig(RootConfig(rootDirectory: repoPath),
                 pkgVersion: '1.2.3'),
             prints(stringContainsInOrder([
