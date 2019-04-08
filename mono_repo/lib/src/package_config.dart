@@ -4,6 +4,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
 import 'raw_config.dart';
@@ -134,6 +135,15 @@ class TravisJob {
     }
     final tasks = Task.parseTaskOrGroup(withoutDescription);
     return TravisJob(package, sdk, stageName, tasks, description: description);
+  }
+
+  /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
+  Version get explicitSdkVersion {
+    try {
+      return Version.parse(sdk);
+    } on FormatException {
+      return null;
+    }
   }
 
   Map<String, dynamic> toJson() => _$TravisJobToJson(this);

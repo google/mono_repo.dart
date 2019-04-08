@@ -222,6 +222,30 @@ exit \${EXIT_CODE}
 String _travisYml(
     RootConfig configs, Map<String, String> commandsToKeys, String pkgVersion) {
   final orderedStages = _calculateOrderedStages(configs);
+
+  for (var config in configs) {
+    final sdkConstraint = config.pubspec.environment['sdk'];
+
+    if (sdkConstraint == null) {
+      continue;
+    }
+
+    final disallowedExplicitVersions = config.jobs
+        .map((tj) => tj.explicitSdkVersion)
+        .where((v) => v != null)
+        .toSet()
+        .where((v) => !sdkConstraint.allows(v))
+        .toList()
+          ..sort();
+
+    if (disallowedExplicitVersions.isNotEmpty) {
+      final disallowedString =
+          disallowedExplicitVersions.map((v) => '`$v`').join(', ');
+      print(yellow.wrap('  There are jobs defined that are not compatible with '
+          'the package SDK constraint ($sdkConstraint): $disallowedString.'));
+    }
+  }
+
   final jobs = configs.expand((config) => config.jobs);
 
   var customTravis = '';

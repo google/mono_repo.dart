@@ -5,6 +5,8 @@
   create a predictable output going forward. 
 - While running, print the package when starting each task.
   Makes it easy to scan results when a job has multiple packages.
+- Warns if a job specifies a target Dart SDK that is not supported in the
+  corresponding `pubspec.yaml`.
 
 `mono_repo pub`
 - Added support for all `pub` flags.
