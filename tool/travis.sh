@@ -19,43 +19,38 @@ for PKG in ${PKGS}; do
   pub upgrade --no-precompile || exit $?
 
   for TASK in "$@"; do
+    echo
+    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
     case ${TASK} in
-    command_0) echo
-      echo -e '\033[1mTASK: command_0\033[22m'
-      echo -e 'pub run build_runner build test --delete-conflicting-outputs'
+    command_0)
+      echo 'pub run build_runner build test --delete-conflicting-outputs'
       pub run build_runner build test --delete-conflicting-outputs || EXIT_CODE=$?
       ;;
-    command_1) echo
-      echo -e '\033[1mTASK: command_1\033[22m'
-      echo -e 'pub run build_runner test -- -x presubmit-only'
+    command_1)
+      echo 'pub run build_runner test -- -x presubmit-only'
       pub run build_runner test -- -x presubmit-only || EXIT_CODE=$?
       ;;
-    command_2) echo
-      echo -e '\033[1mTASK: command_2\033[22m'
-      echo -e 'pub run build_runner test -- --run-skipped -t presubmit-only'
+    command_2)
+      echo 'pub run build_runner test -- --run-skipped -t presubmit-only'
       pub run build_runner test -- --run-skipped -t presubmit-only || EXIT_CODE=$?
       ;;
-    dartanalyzer_0) echo
-      echo -e '\033[1mTASK: dartanalyzer_0\033[22m'
-      echo -e 'dartanalyzer --fatal-infos --fatal-warnings .'
+    dartanalyzer_0)
+      echo 'dartanalyzer --fatal-infos --fatal-warnings .'
       dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
       ;;
-    dartanalyzer_1) echo
-      echo -e '\033[1mTASK: dartanalyzer_1\033[22m'
-      echo -e 'dartanalyzer --fatal-warnings .'
+    dartanalyzer_1)
+      echo 'dartanalyzer --fatal-warnings .'
       dartanalyzer --fatal-warnings . || EXIT_CODE=$?
       ;;
-    dartfmt) echo
-      echo -e '\033[1mTASK: dartfmt\033[22m'
-      echo -e 'dartfmt -n --set-exit-if-changed .'
+    dartfmt)
+      echo 'dartfmt -n --set-exit-if-changed .'
       dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
       ;;
-    test) echo
-      echo -e '\033[1mTASK: test\033[22m'
-      echo -e 'pub run test'
+    test)
+      echo 'pub run test'
       pub run test || EXIT_CODE=$?
       ;;
-    *) echo
+    *)
       echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
       EXIT_CODE=1
       ;;

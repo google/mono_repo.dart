@@ -265,13 +265,14 @@ for PKG in ${PKGS}; do
   pub upgrade --no-precompile || exit $?
 
   for TASK in "$@"; do
+    echo
+    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
     case ${TASK} in
-    dartfmt) echo
-      echo -e '\033[1mTASK: dartfmt\033[22m'
-      echo -e 'dartfmt -n --set-exit-if-changed .'
+    dartfmt)
+      echo 'dartfmt -n --set-exit-if-changed .'
       dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
       ;;
-    *) echo
+    *)
       echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
       EXIT_CODE=1
       ;;
@@ -386,23 +387,22 @@ for PKG in ${PKGS}; do
   pub upgrade --no-precompile || exit $?
 
   for TASK in "$@"; do
+    echo
+    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
     case ${TASK} in
-    dartanalyzer_0) echo
-      echo -e '\033[1mTASK: dartanalyzer_0\033[22m'
-      echo -e 'dartanalyzer --fatal-warnings --fatal-infos .'
+    dartanalyzer_0)
+      echo 'dartanalyzer --fatal-warnings --fatal-infos .'
       dartanalyzer --fatal-warnings --fatal-infos . || EXIT_CODE=$?
       ;;
-    dartanalyzer_1) echo
-      echo -e '\033[1mTASK: dartanalyzer_1\033[22m'
-      echo -e 'dartanalyzer --fatal-warnings .'
+    dartanalyzer_1)
+      echo 'dartanalyzer --fatal-warnings .'
       dartanalyzer --fatal-warnings . || EXIT_CODE=$?
       ;;
-    dartfmt) echo
-      echo -e '\033[1mTASK: dartfmt\033[22m'
-      echo -e 'dartfmt -n --set-exit-if-changed .'
+    dartfmt)
+      echo 'dartfmt -n --set-exit-if-changed .'
       dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
       ;;
-    *) echo
+    *)
       echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
       EXIT_CODE=1
       ;;
@@ -699,73 +699,62 @@ for PKG in ${PKGS}; do
   pub upgrade --no-precompile || exit $?
 
   for TASK in "$@"; do
+    echo
+    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
     case ${TASK} in
-    dartanalyzer) echo
-      echo -e '\033[1mTASK: dartanalyzer\033[22m'
-      echo -e 'dartanalyzer .'
+    dartanalyzer)
+      echo 'dartanalyzer .'
       dartanalyzer . || EXIT_CODE=$?
       ;;
-    dartfmt) echo
-      echo -e '\033[1mTASK: dartfmt\033[22m'
-      echo -e 'dartfmt -n --set-exit-if-changed .'
+    dartfmt)
+      echo 'dartfmt -n --set-exit-if-changed .'
       dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
       ;;
-    test_00) echo
-      echo -e '\033[1mTASK: test_00\033[22m'
-      echo -e 'pub run test --platform chrome'
+    test_00)
+      echo 'pub run test --platform chrome'
       pub run test --platform chrome || EXIT_CODE=$?
       ;;
-    test_01) echo
-      echo -e '\033[1mTASK: test_01\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 0'
+    test_01)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 0'
       pub run test --preset travis --total-shards 9 --shard-index 0 || EXIT_CODE=$?
       ;;
-    test_02) echo
-      echo -e '\033[1mTASK: test_02\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 1'
+    test_02)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 1'
       pub run test --preset travis --total-shards 9 --shard-index 1 || EXIT_CODE=$?
       ;;
-    test_03) echo
-      echo -e '\033[1mTASK: test_03\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 2'
+    test_03)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 2'
       pub run test --preset travis --total-shards 9 --shard-index 2 || EXIT_CODE=$?
       ;;
-    test_04) echo
-      echo -e '\033[1mTASK: test_04\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 3'
+    test_04)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 3'
       pub run test --preset travis --total-shards 9 --shard-index 3 || EXIT_CODE=$?
       ;;
-    test_05) echo
-      echo -e '\033[1mTASK: test_05\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 4'
+    test_05)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 4'
       pub run test --preset travis --total-shards 9 --shard-index 4 || EXIT_CODE=$?
       ;;
-    test_06) echo
-      echo -e '\033[1mTASK: test_06\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 5'
+    test_06)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 5'
       pub run test --preset travis --total-shards 9 --shard-index 5 || EXIT_CODE=$?
       ;;
-    test_07) echo
-      echo -e '\033[1mTASK: test_07\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 6'
+    test_07)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 6'
       pub run test --preset travis --total-shards 9 --shard-index 6 || EXIT_CODE=$?
       ;;
-    test_08) echo
-      echo -e '\033[1mTASK: test_08\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 7'
+    test_08)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 7'
       pub run test --preset travis --total-shards 9 --shard-index 7 || EXIT_CODE=$?
       ;;
-    test_09) echo
-      echo -e '\033[1mTASK: test_09\033[22m'
-      echo -e 'pub run test --preset travis --total-shards 9 --shard-index 8'
+    test_09)
+      echo 'pub run test --preset travis --total-shards 9 --shard-index 8'
       pub run test --preset travis --total-shards 9 --shard-index 8 || EXIT_CODE=$?
       ;;
-    test_10) echo
-      echo -e '\033[1mTASK: test_10\033[22m'
-      echo -e 'pub run test'
+    test_10)
+      echo 'pub run test'
       pub run test || EXIT_CODE=$?
       ;;
-    *) echo
+    *)
       echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
       EXIT_CODE=1
       ;;
