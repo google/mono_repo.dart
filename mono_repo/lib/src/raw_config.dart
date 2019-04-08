@@ -76,7 +76,7 @@ class RawStage {
           null,
           'RawStage',
           '`stages` expects a list of maps with exactly one key '
-          '(the name of the stage), but no items exist.');
+              '(the name of the stage), but no items exist.');
     }
     if (json.length > 1) {
       throw CheckedFromJsonException(
@@ -84,7 +84,7 @@ class RawStage {
           json.keys.skip(1).first.toString(),
           'RawStage',
           '`stages` expects a list of maps with exactly one key (the name of '
-          'the stage), but the provided value has ${json.length} values.');
+              'the stage), but the provided value has ${json.length} values.');
     }
 
     var entry = json.entries.single;
@@ -100,7 +100,7 @@ class RawStage {
           name,
           'RawStage',
           '`stages` expects a list of maps with exactly one key (the name of '
-          'the stage). The provided value `$json` is not valid.');
+              'the stage). The provided value `$json` is not valid.');
     }
 
     try {
