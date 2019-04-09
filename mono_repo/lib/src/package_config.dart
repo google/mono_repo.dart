@@ -160,7 +160,7 @@ class TravisJob {
 
 @JsonSerializable(includeIfNull: false)
 class Task {
-  static final _tasks = const ['dartfmt', 'dartanalyzer', 'test', 'command'];
+  static const _tasks = ['dartfmt', 'dartanalyzer', 'test', 'command'];
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
   final String name;
