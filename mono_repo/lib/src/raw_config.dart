@@ -31,7 +31,7 @@ class RawConfig {
         var map = (json['stages'] as List)[i] as Map;
 
         throw CheckedFromJsonException(map, name, 'RawStage',
-            'Stages muts be unique. "$name" appears more than once.');
+            'Stages must be unique. "$name" appears more than once.');
       }
     }
 
@@ -49,6 +49,10 @@ class RawCache {
 }
 
 class RawStage {
+  static const _stageErrorPrefix =
+      'Stages must be a list of maps with exactly one key '
+      '(the name of the stage), but';
+
   final String name;
   final List items;
 
@@ -60,7 +64,7 @@ class RawStage {
       throw ArgumentError.value(
           name,
           name,
-          'Stages are not allowed to have the name `test` because it '
+          'Stages are not allowed to have the name "test" because it '
           'interacts poorly with the default stage by the same name.');
     }
     if (items.isEmpty) {
@@ -72,19 +76,14 @@ class RawStage {
   factory RawStage.fromJson(Map json) {
     if (json.isEmpty) {
       throw CheckedFromJsonException(
-          json,
-          null,
-          'RawStage',
-          '`stages` expects a list of maps with exactly one key '
-              '(the name of the stage), but no items exist.');
+          json, null, 'RawStage', '$_stageErrorPrefix no items exist.');
     }
     if (json.length > 1) {
       throw CheckedFromJsonException(
           json,
           json.keys.skip(1).first.toString(),
           'RawStage',
-          '`stages` expects a list of maps with exactly one key (the name of '
-              'the stage), but the provided value has ${json.length} values.');
+          '$_stageErrorPrefix the provided value has ${json.length} values.');
     }
 
     var entry = json.entries.single;
@@ -95,12 +94,8 @@ class RawStage {
           'Stages are required to have at least one job. "$name" is null.');
     }
     if (entry.value is! List) {
-      throw CheckedFromJsonException(
-          json,
-          name,
-          'RawStage',
-          '`stages` expects a list of maps with exactly one key (the name of '
-              'the stage). The provided value `$json` is not valid.');
+      throw CheckedFromJsonException(json, name, 'RawStage',
+          '$_stageErrorPrefix the provided value `$json` is not valid.');
     }
 
     try {

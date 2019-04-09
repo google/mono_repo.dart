@@ -16,7 +16,7 @@ import 'package:test/test.dart';
 final _dummyPubspec = Pubspec('_example');
 
 String _encodeJson(Object input) =>
-    const JsonEncoder.withIndent('  ').convert(input);
+    const JsonEncoder.withIndent(' ').convert(input);
 
 Matcher throwsCheckedFromJsonException(String prettyValue) =>
     throwsA(const TypeMatcher<CheckedFromJsonException>().having((e) {
@@ -67,43 +67,52 @@ void main() {
     });
 
     test('fun', () {
-      _expectParseThrows({
-        'stages': [
-          {
-            'format': ['dartfmt']
-          }
-        ]
-      }, r'''
+      _expectParseThrows(
+        {
+          'stages': [
+            {
+              'format': ['dartfmt']
+            }
+          ]
+        },
+        r'''
 line 1, column 1: "dart" is missing.
   ╷
 1 │ ┌ {
-2 │ │   "stages": [
-3 │ │     {
-4 │ │       "format": [
-5 │ │         "dartfmt"
-6 │ │       ]
-7 │ │     }
-8 │ │   ]
+2 │ │  "stages": [
+3 │ │   {
+4 │ │    "format": [
+5 │ │     "dartfmt"
+6 │ │    ]
+7 │ │   }
+8 │ │  ]
 9 │ └ }
-  ╵''');
+  ╵''',
+      );
     });
 
     test('dart value cannot be null', () {
-      _expectParseThrows({'dart': null}, r'''
-line 2, column 3: "dart" must be an array with at least one value.
+      _expectParseThrows(
+        {'dart': null},
+        r'''
+line 2, column 2: "dart" must be an array with at least one value.
   ╷
-2 │   "dart": null
-  │   ^^^^^^
-  ╵''');
+2 │  "dart": null
+  │  ^^^^^^
+  ╵''',
+      );
     });
 
     test('dart value cannot be empty', () {
-      _expectParseThrows({'dart': []}, r'''
-line 2, column 3: "dart" must be an array with at least one value.
+      _expectParseThrows(
+        {'dart': []},
+        r'''
+line 2, column 2: "dart" must be an array with at least one value.
   ╷
-2 │   "dart": []
-  │   ^^^^^^
-  ╵''');
+2 │  "dart": []
+  │  ^^^^^^
+  ╵''',
+      );
     });
 
     test('Stages named `test` are not allowed', () {
@@ -115,12 +124,15 @@ line 2, column 3: "dart" must be an array with at least one value.
           },
         ]
       };
-      _expectParseThrows(monoYaml, r'''
-line 7, column 7: Stages are not allowed to have the name `test` because it interacts poorly with the default stage by the same name.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 7, column 4: Stages are not allowed to have the name "test" because it interacts poorly with the default stage by the same name.
   ╷
-7 │       "test": [
-  │       ^^^^^^
-  ╵''');
+7 │    "test": [
+  │    ^^^^^^
+  ╵''',
+      );
     });
 
     test('Stages tasks must be a list', () {
@@ -131,12 +143,15 @@ line 7, column 7: Stages are not allowed to have the name `test` because it inte
         ]
       };
 
-      _expectParseThrows(monoYaml, r'''
-line 7, column 7: `stages` expects a list of maps with exactly one key (the name of the stage). The provided value `{a: 42}` is not valid.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 7, column 4: Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
   ╷
-7 │       "a": 42
-  │       ^^^
-  ╵''');
+7 │    "a": 42
+  │    ^^^
+  ╵''',
+      );
     });
 
     test('Stages tasks must be a list', () {
@@ -147,12 +162,15 @@ line 7, column 7: `stages` expects a list of maps with exactly one key (the name
         ]
       };
 
-      _expectParseThrows(monoYaml, r'''
-line 7, column 7: `stages` expects a list of maps with exactly one key (the name of the stage). The provided value `{a: 42}` is not valid.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 7, column 4: Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
   ╷
-7 │       "a": 42
-  │       ^^^
-  ╵''');
+7 │    "a": 42
+  │    ^^^
+  ╵''',
+      );
     });
 
     test(
@@ -169,12 +187,15 @@ line 7, column 7: `stages` expects a list of maps with exactly one key (the name
         ]
       };
 
-      _expectParseThrows(monoYaml, r'''
-line 9, column 11: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 9, column 6: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
   ╷
-9 │           "weird": "thing"
-  │           ^^^^^^^
-  ╵''');
+9 │      "weird": "thing"
+  │      ^^^^^^^
+  ╵''',
+      );
     });
 
     test('Stage tasks entries must have one key in the approved set', () {
@@ -189,12 +210,15 @@ line 9, column 11: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `comm
         ]
       };
 
-      _expectParseThrows(monoYaml, r'''
-line 10, column 11: Must have one and only one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 10, column 6: Must have one and only one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
   ╷
-10│           "command": "other thing"
-  │           ^^^^^^^^^
-  ╵''');
+10│      "command": "other thing"
+  │      ^^^^^^^^^
+  ╵''',
+      );
     });
 
     test('empty stage job', () {
@@ -204,12 +228,15 @@ line 10, column 11: Must have one and only one key of `dartfmt`, `dartanalyzer`,
           {'a': []},
         ]
       };
-      _expectParseThrows(monoYaml, r'''
-line 7, column 7: Stages are required to have at least one job. "a" is empty.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 7, column 4: Stages are required to have at least one job. "a" is empty.
   ╷
-7 │       "a": []
-  │       ^^^
-  ╵''');
+7 │    "a": []
+  │    ^^^
+  ╵''',
+      );
     });
 
     test('multiple keys under a stage', () {
@@ -219,12 +246,15 @@ line 7, column 7: Stages are required to have at least one job. "a" is empty.
           {'a': null, 'b': null},
         ]
       };
-      _expectParseThrows(monoYaml, r'''
-line 8, column 7: `stages` expects a list of maps with exactly one key (the name of the stage), but the provided value has 2 values.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 8, column 4: Stages must be a list of maps with exactly one key (the name of the stage), but the provided value has 2 values.
   ╷
-8 │       "b": null
-  │       ^^^
-  ╵''');
+8 │    "b": null
+  │    ^^^
+  ╵''',
+      );
     });
 
     test('no keys under a stage', () {
@@ -232,12 +262,15 @@ line 8, column 7: `stages` expects a list of maps with exactly one key (the name
         'dart': ['stable'],
         'stages': [{}]
       };
-      _expectParseThrows(monoYaml, r'''
-line 6, column 5: `stages` expects a list of maps with exactly one key (the name of the stage), but no items exist.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 6, column 3: Stages must be a list of maps with exactly one key (the name of the stage), but no items exist.
   ╷
-6 │     {}
-  │     ^^
-  ╵''');
+6 │   {}
+  │   ^^
+  ╵''',
+      );
     });
 
     test('null stage job', () {
@@ -247,12 +280,15 @@ line 6, column 5: `stages` expects a list of maps with exactly one key (the name
           {'a': null},
         ]
       };
-      _expectParseThrows(monoYaml, r'''
-line 7, column 7: Stages are required to have at least one job. "a" is null.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 7, column 4: Stages are required to have at least one job. "a" is null.
   ╷
-7 │       "a": null
-  │       ^^^
-  ╵''');
+7 │    "a": null
+  │    ^^^
+  ╵''',
+      );
     });
 
     test('unsupported keys', () {
@@ -269,18 +305,21 @@ line 7, column 7: Stages are required to have at least one job. "a" is null.
         ],
         'more': null
       };
-      _expectParseThrows(monoYaml, r'''
+      _expectParseThrows(
+        monoYaml,
+        r'''
 Unrecognized keys: [extra, more]; supported keys: [dart, stages, cache]
-line 2, column 3: Unrecognized key "extra"
+line 2, column 2: Unrecognized key "extra"
   ╷
-2 │   "extra": "foo",
-  │   ^^^^^^^
+2 │  "extra": "foo",
+  │  ^^^^^^^
   ╵
-line 18, column 3: Unrecognized key "more"
+line 18, column 2: Unrecognized key "more"
    ╷
-18 │   "more": null
-   │   ^^^^^^
-   ╵''');
+18 │  "more": null
+   │  ^^^^^^
+   ╵''',
+      );
     });
 
     test('Duplicate stage names are not allowed', () {
@@ -296,12 +335,15 @@ line 18, column 3: Unrecognized key "more"
         ]
       };
 
-      _expectParseThrows(monoYaml, r'''
-line 12, column 7: Stages muts be unique. "a" appears more than once.
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 12, column 4: Stages must be unique. "a" appears more than once.
    ╷
-12 │       "a": [
-   │       ^^^
-   ╵''');
+12 │    "a": [
+   │    ^^^
+   ╵''',
+      );
     });
   });
 }
