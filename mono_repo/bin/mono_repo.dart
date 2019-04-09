@@ -5,13 +5,17 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:mono_repo/mono_repo.dart';
+import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart' as ansi;
 import 'package:io/io.dart';
+import 'package:mono_repo/mono_repo.dart';
 
 void main(List<String> arguments) async {
   try {
     await run(arguments);
+  } on ParsedYamlException catch (e) {
+    print(ansi.red.wrap(e.formattedMessage));
+    exitCode = ExitCode.config.code;
   } on UserException catch (e) {
     print(ansi.red.wrap(e.message));
     if (e.details != null) {

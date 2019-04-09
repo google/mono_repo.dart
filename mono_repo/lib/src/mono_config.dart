@@ -5,7 +5,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 
-import 'user_exception.dart';
 import 'yaml.dart';
 
 part 'mono_config.g.dart';
@@ -108,12 +107,7 @@ class MonoConfig {
       return MonoConfig({}, <String>{});
     }
 
-    try {
-      return MonoConfig.fromJson(yaml);
-    } on CheckedFromJsonException catch (e) {
-      throw UserException('Error parsing $_monoConfigFileName',
-          details: prettyPrintCheckedFromJsonException(e));
-    }
+    return createWithCheck(() => MonoConfig.fromJson(yaml));
   }
 }
 

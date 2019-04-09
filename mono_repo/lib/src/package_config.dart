@@ -202,11 +202,21 @@ class Task {
           key = yamlValue.keys.first as String;
         }
         throw CheckedFromJsonException(
-            yamlValue, key, 'Task', 'Must have one key of $_prettyTaskList.');
+          yamlValue,
+          key,
+          'Task',
+          'Must have one key of $_prettyTaskList.',
+          badKey: true,
+        );
       }
       if (taskNames.length > 1) {
-        throw CheckedFromJsonException(yamlValue, taskNames.skip(1).first,
-            'Task', 'Must have one and only one key of $_prettyTaskList.');
+        throw CheckedFromJsonException(
+          yamlValue,
+          taskNames.skip(1).first,
+          'Task',
+          'Must have one and only one key of $_prettyTaskList.',
+          badKey: true,
+        );
       }
       final taskName = taskNames.single;
       String args;
@@ -230,8 +240,13 @@ class Task {
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (config.isNotEmpty) {
-        throw CheckedFromJsonException(yamlValue, config.keys.first, 'Task',
-            'Extra config options are not currently supported.');
+        throw CheckedFromJsonException(
+          yamlValue,
+          config.keys.first,
+          'Task',
+          'Extra config options are not currently supported.',
+          badKey: true,
+        );
       }
       return Task(taskName, args: args);
     }

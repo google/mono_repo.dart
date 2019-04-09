@@ -31,7 +31,8 @@ class RawConfig {
         var map = (json['stages'] as List)[i] as Map;
 
         throw CheckedFromJsonException(map, name, 'RawStage',
-            'Stages must be unique. "$name" appears more than once.');
+            'Stages must be unique. "$name" appears more than once.',
+            badKey: true);
       }
     }
 
@@ -76,14 +77,21 @@ class RawStage {
   factory RawStage.fromJson(Map json) {
     if (json.isEmpty) {
       throw CheckedFromJsonException(
-          json, null, 'RawStage', '$_stageErrorPrefix no items exist.');
+        json,
+        null,
+        'RawStage',
+        '$_stageErrorPrefix no items exist.',
+        badKey: true,
+      );
     }
     if (json.length > 1) {
       throw CheckedFromJsonException(
-          json,
-          json.keys.skip(1).first.toString(),
-          'RawStage',
-          '$_stageErrorPrefix the provided value has ${json.length} values.');
+        json,
+        json.keys.skip(1).first.toString(),
+        'RawStage',
+        '$_stageErrorPrefix the provided value has ${json.length} values.',
+        badKey: true,
+      );
     }
 
     var entry = json.entries.single;
