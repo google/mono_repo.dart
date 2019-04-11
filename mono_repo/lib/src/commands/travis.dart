@@ -301,17 +301,40 @@ ${toYaml({
 ${toYaml({'stages': orderedStages})}
 $branchConfig
 ${toYaml({
-    'cache': {'directories': _cacheDirs(configs)}
+    'cache': {
+      'directories': _cacheDirs(configs, configs.monoConfig.cacheDartTool)
+    }
   })}
 ''';
 }
 
-Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
+Iterable<String> _cacheDirs(
+  Iterable<PackageConfig> configs,
+  bool cacheDartToolGlobal,
+) {
   final items = SplayTreeSet<String>()..add('\$HOME/.pub-cache');
 
   for (var entry in configs) {
+    String dartToolCachePath;
+    if (cacheDartToolGlobal) {
+      items.add(
+          dartToolCachePath = p.posix.join(entry.relativePath, '.dart_tool'));
+    }
     for (var dir in entry.cacheDirectories) {
-      items.add(p.posix.join(entry.relativePath, dir));
+      final value = p.posix.join(entry.relativePath, dir);
+      if (dartToolCachePath != null &&
+          p.posix.isWithin(dartToolCachePath, value)) {
+        print(
+          // TODO(kevmoo) – use shared values for the names of things.
+          yellow.wrap(
+            'You can remove "$dir" cache entry from '
+            '"${entry.relativePath}/mono_pkg.yaml" since "cache_dart_tool" is '
+            '`true` in "mono_repo.yaml".',
+          ),
+        );
+      } else {
+        items.add(value);
+      }
     }
   }
 

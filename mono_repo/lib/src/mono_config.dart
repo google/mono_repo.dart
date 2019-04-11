@@ -14,16 +14,18 @@ final _monoConfigFileName = 'mono_repo.yaml';
 /// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
 const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 
-const _allowedMonoConfigKeys = {'travis', 'merge_stages'};
+const _allowedMonoConfigKeys = {'cache_dart_tool', 'merge_stages', 'travis'};
 
 class MonoConfig {
   final Map<String, dynamic> travis;
   final Map<String, ConditionalStage> conditionalStages;
   final Set<String> mergeStages;
+  final bool cacheDartTool;
 
-  MonoConfig._(this.travis, this.conditionalStages, this.mergeStages);
+  MonoConfig._(this.travis, this.conditionalStages, this.mergeStages,
+      this.cacheDartTool);
 
-  factory MonoConfig(Map travis, Set<String> mergeStages) {
+  factory MonoConfig(Map travis, Set<String> mergeStages, bool cacheDartTool) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
@@ -60,7 +62,7 @@ class MonoConfig {
     travis.remove('stages');
 
     return MonoConfig._(travis.map((k, v) => MapEntry(k as String, v)),
-        conditionalStages, mergeStages);
+        conditionalStages, mergeStages, cacheDartTool);
   }
 
   factory MonoConfig.fromJson(Map json) {
@@ -68,12 +70,12 @@ class MonoConfig {
         json.keys.where((k) => !_allowedMonoConfigKeys.contains(k)).toList();
 
     if (unsupportedKeys.isNotEmpty) {
+      final allowedKeys = _allowedMonoConfigKeys.map((s) => '`$s`').join(', ');
       throw CheckedFromJsonException(
         json,
         unsupportedKeys.first as String,
         'MonoConfig',
-        'Only ${_allowedMonoConfigKeys.map((s) => '`$s`').join(', ')} keys '
-            'are supported.',
+        'Allowed keys: $allowedKeys.',
       );
     }
 
@@ -86,13 +88,15 @@ class MonoConfig {
 
     final mergeStages = json['merge_stages'] ?? [];
 
+    final cacheDartTool = json['cache_dart_tool'] as bool ?? false;
+
     if (mergeStages is List) {
       if (mergeStages.any((v) => v is! String)) {
         throw CheckedFromJsonException(
             json, 'merge_stages', 'MonoConfig', 'All values must be strings.');
       }
 
-      return MonoConfig(travis as Map, Set.from(mergeStages));
+      return MonoConfig(travis as Map, Set.from(mergeStages), cacheDartTool);
     } else {
       throw CheckedFromJsonException(json, 'merge_stages', 'MonoConfig',
           '`merge_stages` must be an array.');
@@ -104,7 +108,7 @@ class MonoConfig {
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return MonoConfig({}, <String>{});
+      return MonoConfig({}, <String>{}, false);
     }
 
     return createWithCheck(() => MonoConfig.fromJson(yaml));

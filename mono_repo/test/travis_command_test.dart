@@ -511,7 +511,7 @@ jobs:
         throwsAParsedYamlException(
           startsWith(
             'line 2, column 3 of mono_repo.yaml: Unsupported value for "other".'
-            ' Only `travis`, `merge_stages` keys are supported.',
+            ' Allowed keys: `cache_dart_tool`, `merge_stages`, `travis`.',
           ),
         ),
       );
