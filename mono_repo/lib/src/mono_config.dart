@@ -13,9 +13,9 @@ part 'mono_config.g.dart';
 final _monoConfigFileName = 'mono_repo.yaml';
 
 /// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
-const _reservedTravisKeys = ['cache', 'jobs', 'language'];
+const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 
-const _allowedMonoConfigKeys = ['travis', 'merge_stages'];
+const _allowedMonoConfigKeys = {'travis', 'merge_stages'};
 
 class MonoConfig {
   final Map<String, dynamic> travis;
@@ -105,7 +105,7 @@ class MonoConfig {
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return MonoConfig({}, Set());
+      return MonoConfig({}, <String>{});
     }
 
     try {

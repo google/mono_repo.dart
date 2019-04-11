@@ -1,5 +1,7 @@
 ## 2.1.0
 
+- Require Dart SDK `>=2.2.0 <3.0.0`.
+
 `mono_repo travis`
 - Job entries in `.travis.yml` are now ordered. This may cause churn, but will
   create a predictable output going forward. 

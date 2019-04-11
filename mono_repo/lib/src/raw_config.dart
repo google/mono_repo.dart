@@ -24,7 +24,7 @@ class RawConfig {
   factory RawConfig.fromJson(Map json) {
     var config = _$RawConfigFromJson(json);
 
-    var stages = Set<String>();
+    var stages = <String>{};
     for (var i = 0; i < config.stages.length; i++) {
       var name = config.stages[i].name;
       if (!stages.add(name)) {

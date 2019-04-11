@@ -326,7 +326,7 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   for (var config in rootConfig) {
     String previous;
     for (var stage in config.stageNames) {
-      edges.putIfAbsent(stage, () => Set<String>());
+      edges.putIfAbsent(stage, () => <String>{});
       if (previous != null) {
         edges[previous].add(stage);
       }
