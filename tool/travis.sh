@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v2.1.0-dev
+# Created with package:mono_repo v2.1.0
 
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
