@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/root_config.dart';
@@ -20,6 +21,12 @@ Matcher throwsUserExceptionWith(Object message, Object details) =>
     throwsA(const TypeMatcher<UserException>()
         .having((e) => e.message, 'message', message)
         .having((e) => e.details, 'details', details));
+
+Matcher throwsAParsedYamlException(matcher) =>
+    throwsA(isA<ParsedYamlException>().having((e) {
+      printOnFailure("r'''\n${e.formattedMessage}'''");
+      return e.formattedMessage;
+    }, 'formattedMessage', matcher));
 
 final testConfig2 = r'''
 dart:

@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'package:checked_yaml/checked_yaml.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' as y;
@@ -12,42 +13,26 @@ import 'user_exception.dart';
 
 final _yamlMapExpando = Expando<y.YamlMap>('yamlMap');
 
-String prettyPrintCheckedFromJsonException(CheckedFromJsonException err) {
-  var yamlMap = _yamlMapExpando[err.map];
+T createWithCheck<T>(T Function() constructor) {
+  try {
+    return constructor();
+  } on CheckedFromJsonException catch (e) {
+    var details = toParsedYamlExceptionOrNull(e);
+    if (details == null) {
+      rethrow;
+    }
+    throw details;
+  }
+}
+
+ParsedYamlException toParsedYamlExceptionOrNull(
+    CheckedFromJsonException exception) {
+  var yamlMap = _yamlMapExpando[exception.map];
   if (yamlMap == null) {
     return null;
   }
 
-  y.YamlScalar _getYamlKey(String key) => yamlMap.nodes.keys
-      .cast<y.YamlScalar>()
-      .singleWhere((k) => k.value == key, orElse: () => null);
-
-  var yamlKey = _getYamlKey(err.key);
-
-  String message;
-  if (yamlKey == null) {
-    if (err.innerError is UnrecognizedKeysException) {
-      var innerError = err.innerError as UnrecognizedKeysException;
-      message = '${innerError.message}';
-      for (var key in innerError.unrecognizedKeys) {
-        var yamlKey = _getYamlKey(key);
-        assert(yamlKey != null);
-        message += '\n${yamlKey.span.message('Unrecognized key "$key"')}';
-      }
-    } else {
-      assert(err.message != null);
-      message = '${yamlMap.span.message(err.message.toString())}';
-    }
-  } else {
-    if (err.message == null) {
-      message = 'Unsupported value for `${err.key}`.';
-    } else {
-      message = err.message.toString();
-    }
-    message = yamlKey.span.message(message);
-  }
-
-  return message;
+  return toParsedYamlException(exception, exceptionMap: yamlMap);
 }
 
 /// If the file at `[rootDir]/[relativeFilePath]` does not exist, `null` is

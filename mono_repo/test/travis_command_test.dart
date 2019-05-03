@@ -71,8 +71,7 @@ name: pkg_name
 
     expect(
       testGenerateTravisConfig,
-      throwsUserExceptionWith(
-        'Error parsing sub_pkg/mono_pkg.yaml',
+      throwsAParsedYamlException(
         startsWith(
           'line 8, column 7 of sub_pkg/mono_pkg.yaml: '
           'Extra config options are not currently supported.',
@@ -323,8 +322,7 @@ name: pkg_a
 
     expect(
         testGenerateTravisConfig,
-        throwsUserExceptionWith(
-          'Error parsing pkg_a/mono_pkg.yaml',
+        throwsAParsedYamlException(
           contains('"dart" is missing.'),
         ));
   });
@@ -509,11 +507,14 @@ jobs:
       });
       await populateConfig(monoConfigContent);
       expect(
-          testGenerateTravisConfig,
-          throwsUserExceptionWith(
-              'Error parsing mono_repo.yaml',
-              startsWith('line 1, column 1 of mono_repo.yaml: '
-                  'Only `travis`, `merge_stages` keys are supported.')));
+        testGenerateTravisConfig,
+        throwsAParsedYamlException(
+          startsWith(
+            'line 2, column 3 of mono_repo.yaml: Unsupported value for "other".'
+            ' Only `travis`, `merge_stages` keys are supported.',
+          ),
+        ),
+      );
     });
 
     group('stages', () {
@@ -523,11 +524,14 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                startsWith('line 2, column 3 of mono_repo.yaml: '
-                    '`stages` must be an array.')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+            startsWith(
+              'line 2, column 11 of mono_repo.yaml: Unsupported value for '
+              '"stages". `stages` must be an array.',
+            ),
+          ),
+        );
       });
 
       test('must be map items', () async {
@@ -538,11 +542,14 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                startsWith('line 2, column 3 of mono_repo.yaml: '
-                    'All values must be Map instances.')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+            startsWith(
+              'line 3, column 5 of mono_repo.yaml: Unsupported value for '
+              '"stages". All values must be Map instances.',
+            ),
+          ),
+        );
       });
 
       test('map item must be exactly name + if – no less', () async {
@@ -556,8 +563,7 @@ jobs:
         await populateConfig(monoConfigContent);
         expect(
             testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
+            throwsAParsedYamlException(
                 startsWith('line 3, column 7 of mono_repo.yaml: '
                     'Required keys are missing: if.')));
       });
@@ -573,10 +579,9 @@ jobs:
         await populateConfig(monoConfigContent);
         expect(
             testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                startsWith(
-                    'Unrecognized keys: [bob]; supported keys: [name, if]')));
+            throwsAParsedYamlException(startsWith(
+                'line 5, column 7 of mono_repo.yaml: Unrecognized keys: [bob]; '
+                'supported keys: [name, if]')));
       });
 
       test('cannot have duplicate names', () async {
@@ -590,11 +595,14 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                startsWith('line 2, column 3 of mono_repo.yaml: '
-                    '`bob` appears more than once.')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+            startsWith(
+              'line 3, column 5 of mono_repo.yaml: Unsupported value for '
+              '"stages". `bob` appears more than once.',
+            ),
+          ),
+        );
       });
 
       test('must match a configured stage from pkg_config', () async {
@@ -622,11 +630,14 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                startsWith('line 1, column 1 of mono_repo.yaml: '
-                    '`merge_stages` must be an array.')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+            startsWith(
+              'line 2, column 3 of mono_repo.yaml: Unsupported value for '
+              '"merge_stages". `merge_stages` must be an array.',
+            ),
+          ),
+        );
       });
 
       test('must be String items', () async {
@@ -635,11 +646,14 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                startsWith('line 1, column 1 of mono_repo.yaml: '
-                    'All values must be strings.')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+            startsWith(
+              'line 2, column 3 of mono_repo.yaml: Unsupported value for '
+              '"merge_stages". All values must be strings.',
+            ),
+          ),
+        );
       });
 
       test('must match a configured stage from pkg_config', () async {
@@ -669,10 +683,10 @@ jobs:
 
           expect(
               testGenerateTravisConfig,
-              throwsUserExceptionWith(
-                  'Error parsing mono_repo.yaml',
-                  startsWith('line 1, column 1 of mono_repo.yaml: '
-                      '`travis` must be a Map.')));
+              throwsAParsedYamlException(
+                contains(
+                    'Unsupported value for "travis". `travis` must be a Map.'),
+              ));
         });
       }
     });
@@ -689,11 +703,15 @@ jobs:
           await populateConfig(monoConfigContent);
 
           expect(
-              testGenerateTravisConfig,
-              throwsUserExceptionWith(
-                  'Error parsing mono_repo.yaml',
-                  startsWith('line 2, column 3 of mono_repo.yaml: '
-                      'Contains illegal keys: ${invalidValues.join(', ')}')));
+            testGenerateTravisConfig,
+            throwsAParsedYamlException(
+              contains(
+                ' of mono_repo.yaml: Unsupported value for '
+                '"${invalidValues.single}". Contains illegal keys: '
+                '${invalidValues.join(', ')}',
+              ),
+            ),
+          );
         });
       }
     });

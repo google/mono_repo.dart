@@ -20,7 +20,7 @@ String _encodeJson(Object input) =>
 
 Matcher throwsCheckedFromJsonException(String prettyValue) =>
     throwsA(const TypeMatcher<CheckedFromJsonException>().having((e) {
-      var prettyValue = prettyPrintCheckedFromJsonException(e);
+      var prettyValue = toParsedYamlExceptionOrNull(e).formattedMessage;
       printOnFailure("r'''\n$prettyValue'''");
       return prettyValue;
     }, 'prettyPrint', prettyValue));
@@ -95,10 +95,10 @@ line 1, column 1: "dart" is missing.
       _expectParseThrows(
         {'dart': null},
         r'''
-line 2, column 2: "dart" must be an array with at least one value.
+line 2, column 10: Unsupported value for "dart". "dart" must be an array with at least one value.
   ╷
 2 │  "dart": null
-  │  ^^^^^^
+  │          ^^^^
   ╵''',
       );
     });
@@ -107,10 +107,10 @@ line 2, column 2: "dart" must be an array with at least one value.
       _expectParseThrows(
         {'dart': []},
         r'''
-line 2, column 2: "dart" must be an array with at least one value.
+line 2, column 10: Unsupported value for "dart". "dart" must be an array with at least one value.
   ╷
 2 │  "dart": []
-  │  ^^^^^^
+  │          ^^
   ╵''',
       );
     });
@@ -127,10 +127,12 @@ line 2, column 2: "dart" must be an array with at least one value.
       _expectParseThrows(
         monoYaml,
         r'''
-line 7, column 4: Stages are not allowed to have the name "test" because it interacts poorly with the default stage by the same name.
+line 7, column 12: Unsupported value for "test". Stages are not allowed to have the name "test" because it interacts poorly with the default stage by the same name.
   ╷
-7 │    "test": [
-  │    ^^^^^^
+7 │      "test": [
+  │ ┌────────────^
+8 │ │     "test"
+9 │ └    ]
   ╵''',
       );
     });
@@ -146,10 +148,12 @@ line 7, column 4: Stages are not allowed to have the name "test" because it inte
       _expectParseThrows(
         monoYaml,
         r'''
-line 7, column 4: Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
+line 7, column 9: Unsupported value for "a". Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
   ╷
-7 │    "a": 42
-  │    ^^^
+7 │      "a": 42
+  │ ┌─────────^
+8 │ │   }
+  │ └──^
   ╵''',
       );
     });
@@ -165,10 +169,12 @@ line 7, column 4: Stages must be a list of maps with exactly one key (the name o
       _expectParseThrows(
         monoYaml,
         r'''
-line 7, column 4: Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
+line 7, column 9: Unsupported value for "a". Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
   ╷
-7 │    "a": 42
-  │    ^^^
+7 │      "a": 42
+  │ ┌─────────^
+8 │ │   }
+  │ └──^
   ╵''',
       );
     });
@@ -231,10 +237,10 @@ line 10, column 6: Must have one and only one key of `dartfmt`, `dartanalyzer`, 
       _expectParseThrows(
         monoYaml,
         r'''
-line 7, column 4: Stages are required to have at least one job. "a" is empty.
+line 7, column 9: Unsupported value for "a". Stages are required to have at least one job. "a" is empty.
   ╷
 7 │    "a": []
-  │    ^^^
+  │         ^^
   ╵''',
       );
     });
@@ -283,10 +289,12 @@ line 6, column 3: Stages must be a list of maps with exactly one key (the name o
       _expectParseThrows(
         monoYaml,
         r'''
-line 7, column 4: Stages are required to have at least one job. "a" is null.
+line 7, column 9: Unsupported value for "a". Stages are required to have at least one job. "a" is null.
   ╷
-7 │    "a": null
-  │    ^^^
+7 │      "a": null
+  │ ┌─────────^
+8 │ │   }
+  │ └──^
   ╵''',
       );
     });
@@ -308,17 +316,11 @@ line 7, column 4: Stages are required to have at least one job. "a" is null.
       _expectParseThrows(
         monoYaml,
         r'''
-Unrecognized keys: [extra, more]; supported keys: [dart, stages, cache]
-line 2, column 2: Unrecognized key "extra"
+line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [dart, stages, cache]
   ╷
 2 │  "extra": "foo",
   │  ^^^^^^^
-  ╵
-line 18, column 2: Unrecognized key "more"
-   ╷
-18 │  "more": null
-   │  ^^^^^^
-   ╵''',
+  ╵''',
       );
     });
 

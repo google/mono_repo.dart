@@ -5,7 +5,6 @@
 import 'dart:collection';
 import 'dart:io';
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
 
@@ -47,19 +46,8 @@ PackageConfig _packageConfigFromDir(
   var pubspec = Pubspec.parse(pubspecFile.readAsStringSync(),
       sourceUrl: pubspecFile.path);
 
-  PackageConfig config;
-  try {
-    config = PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
-  } on CheckedFromJsonException catch (e) {
-    var details = prettyPrintCheckedFromJsonException(e);
-    if (details == null) {
-      rethrow;
-    }
-    throw UserException('Error parsing $pkgRelativePath/$monoPkgFileName',
-        details: details);
-  }
-
-  return config;
+  return createWithCheck(
+      () => PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml));
 }
 
 class RootConfig extends ListBase<PackageConfig> {
