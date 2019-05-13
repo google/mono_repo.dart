@@ -92,12 +92,26 @@ Future<void> pub(
   print(lightBlue.wrap(
       'Running `pub ${args.join(' ')}` across ${pkgDirs.length} package(s).'));
 
-  for (var dir in pkgDirs) {
+  for (var config in rootConfig) {
+    final dir = config.relativePath;
+    List<String> packageArgs;
+    String executable;
+
+    if (config.hasFlutterDependency) {
+      executable = 'flutter';
+      packageArgs = ['packages'] + args;
+    } else {
+      executable = pubPath;
+      packageArgs = args;
+    }
+
     print('');
-    print(wrapWith('Starting `$dir`...', [styleBold, lightBlue]));
+    print(wrapWith(
+        'Starting `$executable ${packageArgs.join(' ')}` in `$dir`...',
+        [styleBold, lightBlue]));
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    final proc = await Process.start(pubPath, args,
+    final proc = await Process.start(executable, packageArgs,
         mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
 
     final exit = await proc.exitCode;
