@@ -114,6 +114,7 @@ for PKG in ${PKGS}; do
 
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
+    echo -e '\033[31mpub upgrade failed\033[0m'
     popd
     continue
   fi

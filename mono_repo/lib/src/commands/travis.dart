@@ -211,6 +211,7 @@ for PKG in \${PKGS}; do
 
   if [[ \${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
+    ${safeEcho(prettyAnsi, red, "pub upgrade failed")}
     popd
     continue
   fi
