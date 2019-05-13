@@ -1,3 +1,8 @@
+## 2.1.1
+
+- Fix issue where `pub` command failing for one package stops test run for
+  other packages grouped into the same Travis task.
+
 ## 2.1.0
 
 - Require Dart SDK `>=2.2.0 <3.0.0`.

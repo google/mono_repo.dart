@@ -108,7 +108,15 @@ EXIT_CODE=0
 for PKG in ${PKGS}; do
   echo -e "\033[1mPKG: ${PKG}\033[22m"
   pushd "${PKG}" || exit $?
-  pub upgrade --no-precompile || exit $?
+
+  PUB_EXIT_CODE=0
+  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
+
+  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
+    EXIT_CODE=1
+    popd
+    continue
+  fi
 
   for TASK in "$@"; do
     echo
