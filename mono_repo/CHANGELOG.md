@@ -2,6 +2,7 @@
 
 - Fix issue where `pub` command failing for one package stops test run for
   other packages grouped into the same Travis task.
+- Use `flutter packages` for `pub` command on packages that depend on Flutter.
 
 ## 2.1.0
 
