@@ -92,9 +92,11 @@ class PackageConfig {
   }
 
   bool get hasFlutterDependency {
-    return pubspec.dependencies.values.any((dependency) {
-      return dependency is SdkDependency && dependency.sdk == 'flutter';
-    });
+    if (pubspec.environment.containsKey('flutter')) {
+      return true;
+    }
+    return pubspec.dependencies.values.any((dependency) =>
+        dependency is SdkDependency && dependency.sdk == 'flutter');
   }
 }
 
