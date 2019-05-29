@@ -71,8 +71,9 @@ Future<bool> presubmit(RootConfig configs,
 
   final commandsToKeys = extractCommands(configs);
   // By default, run on all packages.
-  if (packages.isEmpty)
+  if (packages.isEmpty) {
     packages = configs.map((pc) => pc.relativePath).toList();
+  }
   packages = packages.toList()..sort();
 
   // By default run all tasks.
