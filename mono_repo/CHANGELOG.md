@@ -3,6 +3,11 @@
 - Fix issue where `pub` command failing for one package stops test run for
   other packages grouped into the same Travis task.
 - Use `flutter packages` for `pub` command on packages that depend on Flutter.
+- Any arguments given to `dartfmt` Travis tasks are used instead of the default 
+`-n --set-exit-if-changed .`.
+  - To maintain previous behavior, `dartfmt: sdk` is a special case and still
+  triggers the default arguments.
+
 
 ## 2.1.0
 
