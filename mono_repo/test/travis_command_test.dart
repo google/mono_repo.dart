@@ -375,17 +375,17 @@ jobs:
       name: "SDK: dev; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       env: PKGS="pkg_a"
-      script: ./tool/travis.sh dartfmt
+      script: ./tool/travis.sh dartfmt_0
     - stage: format
       name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       env: PKGS="pkg_a"
-      script: ./tool/travis.sh dartfmt
+      script: ./tool/travis.sh dartfmt_0
     - stage: format
       name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt --dry-run --fix --set-exit-if-changed .`"
       dart: dev
       env: PKGS="pkg_b"
-      script: ./tool/travis.sh dartfmt
+      script: ./tool/travis.sh dartfmt_1
 
 stages:
   - format
