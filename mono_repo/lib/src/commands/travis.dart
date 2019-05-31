@@ -32,26 +32,37 @@ class TravisCommand extends MonoRepoCommand {
   String get description => 'Configure Travis-CI for child packages.';
 
   TravisCommand() : super() {
-    argParser.addFlag(
-      'pretty-ansi',
-      abbr: 'p',
-      defaultsTo: true,
-      help: 'If the generated `$travisShPath` file should include ANSI escapes '
-          'to improve output readability.',
-    );
+    argParser
+      ..addFlag(
+        'pretty-ansi',
+        abbr: 'p',
+        defaultsTo: true,
+        help:
+            'If the generated `$travisShPath` file should include ANSI escapes '
+            'to improve output readability.',
+      )
+      ..addFlag('use-get',
+          defaultsTo: false,
+          negatable: false,
+          help:
+              'If the generated `$travisShPath` file should use `pub get` for '
+              'dependencies instead of `pub upgrade`.');
   }
 
   @override
   void run() => generateTravisConfig(rootConfig(),
-      prettyAnsi: argResults['pretty-ansi'] as bool);
+      prettyAnsi: argResults['pretty-ansi'] as bool,
+      useGet: argResults['use-get'] as bool);
 }
 
 void generateTravisConfig(
   RootConfig configs, {
   bool prettyAnsi = true,
+  bool useGet = false,
   String pkgVersion,
 }) {
   prettyAnsi ??= true;
+  useGet ??= false;
   pkgVersion ??= packageVersion;
 
   _logPkgs(configs);
@@ -64,6 +75,7 @@ void generateTravisConfig(
       configs.rootDirectory,
       _calculateTaskEntries(commandsToKeys, prettyAnsi),
       prettyAnsi,
+      useGet ? 'get' : 'upgrade',
       pkgVersion);
 }
 
@@ -78,7 +90,7 @@ void _writeTravisYml(String rootDirectory, RootConfig configs,
 
 /// Write `tool/travis.sh`
 void _writeTravisScript(String rootDirectory, List<String> taskEntries,
-    bool prettyAnsi, String pkgVersion) {
+    bool prettyAnsi, String pubDependencyCommand, String pkgVersion) {
   final travisFilePath = p.join(rootDirectory, travisShPath);
   final travisScript = File(travisFilePath);
 
@@ -88,8 +100,8 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     print(yellow.wrap('  chmod +x $travisShPath'));
   }
 
-  travisScript
-      .writeAsStringSync(_travisSh(taskEntries, prettyAnsi, pkgVersion));
+  travisScript.writeAsStringSync(
+      _travisSh(taskEntries, prettyAnsi, pubDependencyCommand, pkgVersion));
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   print(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
@@ -186,7 +198,9 @@ esac
 ''').map((l) => '    $l').join('\n');
 }
 
-String _travisSh(List<String> tasks, bool prettyAnsi, String pkgVersion) => '''
+String _travisSh(List<String> tasks, bool prettyAnsi,
+        String pubDependencyCommand, String pkgVersion) =>
+    '''
 #!/bin/bash
 # ${_createdWith(pkgVersion)}
 
@@ -207,11 +221,11 @@ for PKG in \${PKGS}; do
   pushd "\${PKG}" || exit \$?
 
   PUB_EXIT_CODE=0
-  pub upgrade --no-precompile || PUB_EXIT_CODE=\$?
+  pub $pubDependencyCommand --no-precompile || PUB_EXIT_CODE=\$?
 
   if [[ \${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
-    ${safeEcho(prettyAnsi, red, "pub upgrade failed")}
+    ${safeEcho(prettyAnsi, red, "pub $pubDependencyCommand failed")}
     popd
     continue
   fi

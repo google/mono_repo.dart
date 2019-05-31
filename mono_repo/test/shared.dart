@@ -17,6 +17,20 @@ void testGenerateTravisConfig() async {
   });
 }
 
+/// Creates a function similar to [testGenerateTravisConfig], except with
+/// custom arguments gives to [generateTravisConfig].
+///
+/// If no arguments are given, the output should have the exact same behavior
+/// as [generateTravisConfig].
+Function testGenerateCustomTravisConfig(
+        {bool prettyAnsi = true,
+        bool useGet = false,
+        String pkgVersion = '1.2.3'}) =>
+    () => overrideAnsiOutput(false, () {
+          generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
+              prettyAnsi: prettyAnsi, useGet: useGet, pkgVersion: pkgVersion);
+        });
+
 Matcher throwsUserExceptionWith(Object message, Object details) =>
     throwsA(const TypeMatcher<UserException>()
         .having((e) => e.message, 'message', message)
