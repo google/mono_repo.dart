@@ -179,6 +179,28 @@ environment:
     await d.file(travisShPath, _config2Shell).validate();
   });
 
+  test('using `get` in place of `upgrade`', () async {
+    await d.dir('sub_pkg', [
+      d.file(monoPkgFileName, testConfig2),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+    ]).create();
+
+    await expectLater(
+        testGenerateCustomTravisConfig(useGet: true),
+        prints(stringContainsInOrder([
+          'package:sub_pkg',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])));
+
+    // replacement isn't actually how useGet works, but it is a concise test
+    await d
+        .file(travisShPath, _config2Shell.replaceAll('upgrade', 'get'))
+        .validate();
+    await d.file(travisFileName, _config2Yaml).validate();
+  });
+
   test('two flavors of dartfmt', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
