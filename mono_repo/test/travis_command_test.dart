@@ -339,6 +339,148 @@ exit ${EXIT_CODE}
 ''').validate();
   });
 
+  test('two flavors of dartfmt with different arguments', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+dart:
+ - stable
+ - dev
+
+stages:
+  - format:
+    - dartfmt: sdk
+
+cache:
+  directories:
+    - .dart_tool
+    - /some_repo_root_dir
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+    ]).create();
+
+    await d.dir('pkg_b', [
+      d.file(monoPkgFileName, r'''
+dart:
+ - dev
+
+stages:
+  - format:
+    - dartfmt: --dry-run --fix --set-exit-if-changed .
+
+cache:
+  directories:
+    - .dart_tool
+    - /some_repo_root_dir
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_b
+      ''')
+    ]).create();
+
+    await expectLater(
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:pkg_a',
+          'package:pkg_b',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])));
+
+    await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
+language: dart
+
+jobs:
+  include:
+    - stage: format
+      name: "SDK: dev; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      dart: dev
+      env: PKGS="pkg_a"
+      script: ./tool/travis.sh dartfmt_0
+    - stage: format
+      name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      dart: stable
+      env: PKGS="pkg_a"
+      script: ./tool/travis.sh dartfmt_0
+    - stage: format
+      name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt --dry-run --fix --set-exit-if-changed .`"
+      dart: dev
+      env: PKGS="pkg_b"
+      script: ./tool/travis.sh dartfmt_1
+
+stages:
+  - format
+
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - "$HOME/.pub-cache"
+    - /some_repo_root_dir
+    - pkg_a/.dart_tool
+    - pkg_b/.dart_tool
+''').validate();
+
+    await d.file(travisShPath, r'''
+#!/bin/bash
+# Created with package:mono_repo v1.2.3
+
+if [[ -z ${PKGS} ]]; then
+  echo -e '\033[31mPKGS environment variable must be set!\033[0m'
+  exit 1
+fi
+
+if [[ "$#" == "0" ]]; then
+  echo -e '\033[31mAt least one task argument must be provided!\033[0m'
+  exit 1
+fi
+
+EXIT_CODE=0
+
+for PKG in ${PKGS}; do
+  echo -e "\033[1mPKG: ${PKG}\033[22m"
+  pushd "${PKG}" || exit $?
+
+  PUB_EXIT_CODE=0
+  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
+
+  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
+    EXIT_CODE=1
+    echo -e '\033[31mpub upgrade failed\033[0m'
+    popd
+    continue
+  fi
+
+  for TASK in "$@"; do
+    echo
+    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
+    case ${TASK} in
+    dartfmt_0)
+      echo 'dartfmt -n --set-exit-if-changed .'
+      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+      ;;
+    dartfmt_1)
+      echo 'dartfmt --dry-run --fix --set-exit-if-changed .'
+      dartfmt --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
+      ;;
+    *)
+      echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
+      EXIT_CODE=1
+      ;;
+    esac
+  done
+
+  popd
+done
+
+exit ${EXIT_CODE}
+''').validate();
+  });
+
   test('missing `dart` key', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''

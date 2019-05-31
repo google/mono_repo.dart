@@ -269,8 +269,10 @@ class Task {
   String get command {
     switch (name) {
       case 'dartfmt':
-        assert(args == null || args == 'sdk');
-        return 'dartfmt -n --set-exit-if-changed .';
+        if (args == null || args == 'sdk') {
+          return 'dartfmt -n --set-exit-if-changed .';
+        }
+        return 'dartfmt $args';
       case 'dartanalyzer':
         if (args == null) {
           return 'dartanalyzer .';
