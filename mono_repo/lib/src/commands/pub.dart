@@ -25,6 +25,9 @@ class PubCommand extends MonoRepoCommand {
   String get name => 'pub';
 
   @override
+  List<String> get aliases => ['flutter'];
+
+  @override
   Future<void> run() => pub(rootConfig(), argResults.rest);
 }
 
