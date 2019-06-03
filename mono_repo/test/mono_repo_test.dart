@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 import 'package:test_process/test_process.dart';
 
 void main() {
-  test('pub get gets dependencies', () async {
+  test('running without arguments produces expected help output', () async {
     var process = await TestProcess.start('pub', ['run', 'mono_repo']);
 
     var output = await process.stdoutStream().join('\n');
@@ -38,7 +38,7 @@ Available commands:
   check       Check the state of the repository.
   help        Display help information for mono_repo.
   presubmit   Run the travis presubmits locally.
-  pub         Run a `pub` command across all packages
+  pub         Run a `pub` command across all packages.
   travis      Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.''';
