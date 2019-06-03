@@ -129,10 +129,10 @@ class _PubArgParser implements ArgParser {
   ArgResults parse(Iterable<String> args) => _delegate.parse(args);
 
   @override
-  String get usage => '''Any arguments given are passed verbatim to `pub`\n
+  String get usage => '''Any arguments given are passed verbatim to `pub`.\n
 If a particular package uses Flutter, `flutter` is used rather than `pub`:
-- If the arguments begin with `get` or `upgrade`, `flutter packages` is used
-- Otherwise, `flutter` is used''';
+- If the arguments begin with `get` or `upgrade`, `flutter packages` is used.
+- Otherwise, `flutter` is used.''';
 
   @override
   int get usageLineLength => _delegate.usageLineLength;
