@@ -270,10 +270,18 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
         [styleBold, lightBlue]));
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    final proc = await Process.start(executable, packageArgs,
-        mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
+    Process proc;
+    try {
+      proc = await Process.start(executable, packageArgs,
+          mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
+    } on ProcessException {
+      print(wrapWith(
+          'ProcessException: `$executable` couldn\'t be started.'
+          '  Are you sure it is installed?',
+          [styleBold, red]));
+    }
 
-    final exit = await proc.exitCode;
+    final exit = await proc?.exitCode ?? 1;
 
     if (exit == 0) {
       print(wrapWith('`$dir`: success!', [styleBold, green]));
