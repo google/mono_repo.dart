@@ -8,11 +8,14 @@ import 'package:test/test.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:test_process/test_process.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+import 'package:path/path.dart' as p;
 
 void main() {
+  final monoRepoExecutable = p.join(p.current, 'bin', 'mono_repo.dart');
+
   test('help command pub output', () async {
     var process =
-        await TestProcess.start('pub', ['run', 'mono_repo', 'help', 'pub']);
+        await TestProcess.start('dart', [monoRepoExecutable, 'help', 'pub']);
 
     var output = await process.stdoutStream().join('\n');
     expect(output, _helpCommandPubOutput);
@@ -36,13 +39,12 @@ name: pkg_b
     ]).create();
 
     var process = await TestProcess.start(
-        'pub', ['run', 'mono_repo', 'pub', '--help'],
+        'dart', [monoRepoExecutable, 'pub', '--help'],
         workingDirectory: d.sandbox);
 
     var actualOutput = await process.stderrStream().join('\n');
 
-    var expected =
-        Process.runSync('pub', ['--help'], workingDirectory: d.sandbox).stdout;
+    var expected = Process.runSync('pub', ['--help']).stdout;
 
     expect(actualOutput, startsWith('Running `pub --help` across 2 packages.'));
     expect(actualOutput, contains(expected));
@@ -66,7 +68,7 @@ name: pkg_b
     ]).create();
 
     var process = await TestProcess.start(
-        'pub', ['run', 'mono_repo', 'pub', 'get', '--help'],
+        'dart', [monoRepoExecutable, 'pub', 'get', '--help'],
         workingDirectory: d.sandbox);
 
     var actualOutput = await process.stderrStream().join('\n');
@@ -91,7 +93,7 @@ name: pkg_a
     ]).create();
 
     var process = await TestProcess.start(
-        'pub', ['run', 'mono_repo', 'pub', '--help'],
+        'dart', [monoRepoExecutable, 'pub', '--help'],
         workingDirectory: d.sandbox);
 
     var actualOutput = await process.stderrStream().join('\n');
@@ -109,7 +111,7 @@ name: pkg_a
       ''')
     ]).create();
 
-    var process = await TestProcess.start('pub', ['run', 'mono_repo', 'pub'],
+    var process = await TestProcess.start('dart', [monoRepoExecutable, 'pub'],
         workingDirectory: d.sandbox);
 
     var actualOutput = await process.stderrStream().join('\n');
@@ -138,7 +140,7 @@ name: pkg_b
     ]).create();
 
     var process = await TestProcess.start(
-        'pub', ['run', 'mono_repo', 'pub', 'get'],
+        'dart', [monoRepoExecutable, 'pub', 'get'],
         workingDirectory: d.sandbox);
 
     var actualOutput = await process.stderrStream().join('\n');
@@ -169,7 +171,7 @@ name: pkg_b
     ]).create();
 
     var process = await TestProcess.start(
-        'pub', ['run', 'mono_repo', 'pub', '--help'],
+        'dart', [monoRepoExecutable, 'pub', '--help'],
         workingDirectory: d.sandbox);
 
     var actualOutput = await process.stderrStream().join('\n');
@@ -183,10 +185,10 @@ name: pkg_b
 final _helpCommandPubOutput = '''Run a `pub` command across all packages.
 
 Usage: mono_repo pub [arguments]
-Any arguments given are passed verbatim to `pub`
+Any arguments given are passed verbatim to `pub`.
 
 If a particular package uses Flutter, `flutter` is used rather than `pub`:
-- If the arguments begin with `get` or `upgrade`, `flutter packages` is used
-- Otherwise, `flutter` is used
+- If the arguments begin with `get` or `upgrade`, `flutter packages` is used.
+- Otherwise, `flutter` is used.
 
 Run "mono_repo help" to see global options.''';
