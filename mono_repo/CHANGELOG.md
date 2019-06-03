@@ -9,6 +9,16 @@
     triggers the default arguments.
 - Add `--use-get` optional flag for the `travis` command to use `pub get` 
   instead of `pub upgrade` in the generated script.
+- All `pub` commands are now available when running `mono_repo pub`.
+  - All arguments after `pub` are passed to it: try running `mono_repo help
+    pub` and `mono_repo pub help`.
+- Improved Flutter support:
+  - The `pub` command has `flutter` as an alias, so `mono_repo pub` is 
+    equivalent to `mono_repo flutter`.
+  - When using `mono_repo pub`, `flutter` will be used instead for any package 
+    with a dependency on the Flutter SDK.
+  - When using `mono_repo pub get` or `mono_repo pub upgrade`, the `packages`
+    argument needed by `flutter` is added automatically if `flutter` is used.
 
 ## 2.1.0
 
