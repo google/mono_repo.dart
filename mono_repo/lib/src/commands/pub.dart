@@ -19,7 +19,7 @@ class PubCommand extends MonoRepoCommand {
   _PubArgParser _pubArgParser;
 
   @override
-  String get description => 'Run a `pub` command across all packages';
+  String get description => 'Run a `pub` command across all packages.';
 
   @override
   String get name => 'pub';

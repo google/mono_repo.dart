@@ -38,7 +38,7 @@ Available commands:
   check       Check the state of the repository.
   help        Display help information for mono_repo.
   presubmit   Run the travis presubmits locally.
-  pub         Run `pub get` or `pub upgrade` against all packages.
+  pub         Run a `pub` command across all packages
   travis      Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.''';
