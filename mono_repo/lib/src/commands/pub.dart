@@ -266,7 +266,10 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
 
     print('');
     print(wrapWith(
-        'Starting `${[executable, ...packageArgs].join(' ')}` in `$dir`...',
+        'Starting `${[
+          config.hasFlutterDependency ? 'flutter' : 'pub',
+          ...packageArgs
+        ].join(' ')}` in `$dir`...',
         [styleBold, lightBlue]));
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
