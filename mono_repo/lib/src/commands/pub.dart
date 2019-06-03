@@ -251,7 +251,8 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
   final pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
 
   print(lightBlue.wrap(
-      'Running `pub ${args.join(' ')}` across ${pkgDirs.length} package(s).'));
+      'Running `${['pub', ...args].join(' ')}` across ${pkgDirs.length} package'
+      '${pkgDirs.length == 1 ? '' : 's'}.'));
 
   for (var config in rootConfig) {
     final dir = config.relativePath;
@@ -265,7 +266,7 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
 
     print('');
     print(wrapWith(
-        'Starting `$executable ${packageArgs.join(' ')}` in `$dir`...',
+        'Starting `${[executable, ...packageArgs].join(' ')}` in `$dir`...',
         [styleBold, lightBlue]));
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
