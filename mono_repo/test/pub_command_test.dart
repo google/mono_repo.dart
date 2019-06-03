@@ -42,7 +42,7 @@ name: pkg_b
         'dart', [monoRepoExecutable, 'pub', '--help'],
         workingDirectory: d.sandbox);
 
-    var actualOutput = await process.stderrStream().join('\n');
+    var actualOutput = await process.stdoutStream().join('\n');
 
     var expected = Process.runSync('pub', ['--help']).stdout;
 
@@ -71,7 +71,7 @@ name: pkg_b
         'dart', [monoRepoExecutable, 'pub', 'get', '--help'],
         workingDirectory: d.sandbox);
 
-    var actualOutput = await process.stderrStream().join('\n');
+    var actualOutput = await process.stdoutStream().join('\n');
 
     var expected =
         Process.runSync('pub', ['get', '--help'], workingDirectory: d.sandbox)
@@ -96,7 +96,7 @@ name: pkg_a
         'dart', [monoRepoExecutable, 'pub', '--help'],
         workingDirectory: d.sandbox);
 
-    var actualOutput = await process.stderrStream().join('\n');
+    var actualOutput = await process.stdoutStream().join('\n');
 
     expect(actualOutput, startsWith('Running `pub --help` across 1 package.'));
   });
@@ -114,7 +114,7 @@ name: pkg_a
     var process = await TestProcess.start('dart', [monoRepoExecutable, 'pub'],
         workingDirectory: d.sandbox);
 
-    var actualOutput = await process.stderrStream().join('\n');
+    var actualOutput = await process.stdoutStream().join('\n');
 
     expect(actualOutput, startsWith('Running `pub` across 1 package.'));
     expect(actualOutput, contains('Starting `pub` in `'));
@@ -143,7 +143,7 @@ name: pkg_b
         'dart', [monoRepoExecutable, 'pub', 'get'],
         workingDirectory: d.sandbox);
 
-    var actualOutput = await process.stderrStream().join('\n');
+    var actualOutput = await process.stdoutStream().join('\n');
 
     expect(actualOutput, startsWith('Running `pub get` across 2 packages.'));
     expect(actualOutput, contains('Starting `pub get` in `'));
@@ -174,7 +174,7 @@ name: pkg_b
         'dart', [monoRepoExecutable, 'pub', '--help'],
         workingDirectory: d.sandbox);
 
-    var actualOutput = await process.stderrStream().join('\n');
+    var actualOutput = await process.stdoutStream().join('\n');
 
     expect(actualOutput, startsWith('Running `pub --help` across 2 packages.'));
     expect(actualOutput, contains('Starting `pub --help` in `'));
