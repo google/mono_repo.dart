@@ -9,20 +9,21 @@ part of 'package_config.dart';
 TravisJob _$TravisJobFromJson(Map json) {
   return $checkedNew('TravisJob', json, () {
     final val = TravisJob(
-        $checkedConvert(json, 'package', (v) => v as String),
-        $checkedConvert(json, 'sdk', (v) => v as String),
-        $checkedConvert(json, 'stageName', (v) => v as String),
-        $checkedConvert(
-            json,
-            'tasks',
-            (v) => (v as List)
-                ?.map((e) => e == null
-                    ? null
-                    : Task.fromJson((e as Map)?.map(
-                        (k, e) => MapEntry(k as String, e),
-                      )))
-                ?.toList()),
-        description: $checkedConvert(json, 'description', (v) => v as String));
+      $checkedConvert(json, 'package', (v) => v as String),
+      $checkedConvert(json, 'sdk', (v) => v as String),
+      $checkedConvert(json, 'stageName', (v) => v as String),
+      $checkedConvert(
+          json,
+          'tasks',
+          (v) => (v as List)
+              ?.map((e) => e == null
+                  ? null
+                  : Task.fromJson((e as Map)?.map(
+                      (k, e) => MapEntry(k as String, e),
+                    )))
+              ?.toList()),
+      description: $checkedConvert(json, 'description', (v) => v as String),
+    );
     return val;
   });
 }
@@ -46,8 +47,10 @@ Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
 
 Task _$TaskFromJson(Map json) {
   return $checkedNew('Task', json, () {
-    final val = Task($checkedConvert(json, 'name', (v) => v as String),
-        args: $checkedConvert(json, 'args', (v) => v as String));
+    final val = Task(
+      $checkedConvert(json, 'name', (v) => v as String),
+      args: $checkedConvert(json, 'args', (v) => v as String),
+    );
     return val;
   });
 }

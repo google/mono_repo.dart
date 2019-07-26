@@ -13,8 +13,9 @@ ConditionalStage _$ConditionalStageFromJson(Map json) {
         requiredKeys: const ['name', 'if'],
         disallowNullValues: const ['name', 'if']);
     final val = ConditionalStage(
-        $checkedConvert(json, 'name', (v) => v as String),
-        $checkedConvert(json, 'if', (v) => v as String));
+      $checkedConvert(json, 'name', (v) => v as String),
+      $checkedConvert(json, 'if', (v) => v as String),
+    );
     return val;
   }, fieldKeyMap: const {'ifCondition': 'if'});
 }
