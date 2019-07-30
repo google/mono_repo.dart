@@ -275,10 +275,13 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
 
     Process proc;
     try {
-      proc = await Process.start(executable, packageArgs,
-          mode: ProcessStartMode.inheritStdio,
-          workingDirectory: workingDir,
-          runInShell: true);
+      proc = await Process.start(
+        executable,
+        packageArgs,
+        mode: ProcessStartMode.inheritStdio,
+        workingDirectory: workingDir,
+        runInShell: true,
+      );
     } on ProcessException {
       print(wrapWith(
           'ProcessException: `$executable` couldn\'t be started.'
