@@ -1,4 +1,4 @@
-## 2.1.1
+## 2.2.0
 
 - Fix issue where `pub` command failing for one package stops test run for
   other packages grouped into the same Travis task.
