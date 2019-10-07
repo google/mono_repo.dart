@@ -289,10 +289,16 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d.file(travisShPath, r'''
+    await d
+        .file(
+            travisShPath,
+            '''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
+$_windowsBoilerplate
+'''
+            r'''
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
   exit 1
@@ -338,7 +344,8 @@ for PKG in ${PKGS}; do
 done
 
 exit ${EXIT_CODE}
-''').validate();
+''')
+        .validate();
   });
 
   test('two flavors of dartfmt with different arguments', () async {
@@ -430,10 +437,16 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d.file(travisShPath, r'''
+    await d
+        .file(
+            travisShPath,
+            '''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
+$_windowsBoilerplate
+'''
+            r'''
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
   exit 1
@@ -483,7 +496,8 @@ for PKG in ${PKGS}; do
 done
 
 exit ${EXIT_CODE}
-''').validate();
+''')
+        .validate();
   });
 
   test('missing `dart` key', () async {
@@ -571,10 +585,16 @@ cache:
   directories:
     - "$HOME/.pub-cache"
 ''').validate();
-    await d.file(travisShPath, r'''
+    await d
+        .file(
+            travisShPath,
+            '''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
+$_windowsBoilerplate
+'''
+            r'''
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
   exit 1
@@ -628,7 +648,8 @@ for PKG in ${PKGS}; do
 done
 
 exit ${EXIT_CODE}
-''').validate();
+''')
+        .validate();
   });
 
   group('mono_repo.yaml', () {
@@ -912,10 +933,13 @@ jobs:
   });
 }
 
-final _config2Shell = r"""
+final _config2Shell = '''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
+$_windowsBoilerplate
+'''
+    r"""
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
   exit 1
@@ -1438,4 +1462,29 @@ branches:
 cache:
   directories:
     - "$HOME/.pub-cache"
+''';
+
+final _windowsBoilerplate = r'''
+# Support built in commands on windows out of the box.
+function pub {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command pub.bat "$@"
+    else
+        command pub "$@"
+    fi
+}
+function dartfmt {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartfmt.bat "$@"
+    else
+        command dartfmt "$@"
+    fi
+}
+function dartanalyzer {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartanalyzer.bat "$@"
+    else
+        command dartanalyzer "$@"
+    fi
+}
 ''';
