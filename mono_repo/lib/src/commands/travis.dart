@@ -317,6 +317,9 @@ ${toYaml({
           if (value == 0) {
             value = a['dart'].compareTo(b['dart']);
           }
+          if (value == 0) {
+            value = a['os'].compareTo(b['os']);
+          }
           return value;
         });
 
@@ -478,7 +481,7 @@ class _TravisJobEntry {
   @override
   int get hashCode => _equality.hash(_identityItems);
 
-  List get _identityItems => [job.stageName, job.sdk, commands, merge];
+  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
 final _equality = const DeepCollectionEquality();

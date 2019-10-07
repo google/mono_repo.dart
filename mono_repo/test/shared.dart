@@ -48,6 +48,10 @@ dart:
  - stable
  - 1.23.0
 
+os:
+  - linux
+  - windows
+
 stages:
   - analyze:
     - group:
@@ -55,9 +59,13 @@ stages:
         - dartfmt
       dart:
         - dev
+      os:
+        - osx
     - dartanalyzer:
       dart:
         - 1.23.0
+      os:
+        - windows
   - unit_test:
     - description: "chrome tests"
       test: --platform chrome
