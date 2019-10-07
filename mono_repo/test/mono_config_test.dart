@@ -316,7 +316,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
       _expectParseThrows(
         monoYaml,
         r'''
-line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [dart, stages, cache]
+line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, dart, stages, cache]
   ╷
 2 │  "extra": "foo",
   │  ^^^^^^^
@@ -355,6 +355,8 @@ dart:
   - dev
   - stable
   - 1.23.0
+os:
+  - linux
 
 stages:
   - analyze_and_format:
@@ -364,9 +366,14 @@ stages:
         - dartfmt
       dart:
         - dev
+      os:
+        - windows
+        - linux
     - dartanalyzer: --fatal-infos --fatal-warnings .
       dart:
         - 1.23.0
+      os:
+        - osx
   - unit_test:
     - test: --platform chrome
     - test: --preset travis --total-shards 5 --shard-index 0
@@ -377,6 +384,7 @@ stages:
 List get _testConfig1expectedOutput => [
       {
         "description": "dartanalyzer && dartfmt",
+        "os": "windows",
         "package": "a",
         "sdk": "dev",
         "stageName": "analyze_and_format",
@@ -386,6 +394,18 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "description": "dartanalyzer && dartfmt",
+        "os": "linux",
+        "package": "a",
+        "sdk": "dev",
+        "stageName": "analyze_and_format",
+        "tasks": [
+          {"name": "dartanalyzer", "args": "--fatal-infos --fatal-warnings ."},
+          {"name": "dartfmt"}
+        ]
+      },
+      {
+        "os": "osx",
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "analyze_and_format",
@@ -394,6 +414,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
@@ -402,6 +423,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
@@ -410,6 +432,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
@@ -418,6 +441,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
@@ -429,6 +453,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
@@ -440,6 +465,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
@@ -451,6 +477,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
@@ -462,6 +489,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
@@ -473,6 +501,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",
@@ -484,6 +513,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "dev",
         "stageName": "unit_test",
@@ -492,6 +522,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "stable",
         "stageName": "unit_test",
@@ -500,6 +531,7 @@ List get _testConfig1expectedOutput => [
         ]
       },
       {
+        "os": "linux",
         "package": "a",
         "sdk": "1.23.0",
         "stageName": "unit_test",

@@ -48,6 +48,10 @@ dart:
  - stable
  - 1.23.0
 
+os:
+  - linux
+  - windows
+
 stages:
   - analyze:
     - group:
@@ -55,9 +59,13 @@ stages:
         - dartfmt
       dart:
         - dev
+      os:
+        - osx
     - dartanalyzer:
       dart:
         - 1.23.0
+      os:
+        - windows
   - unit_test:
     - description: "chrome tests"
       test: --platform chrome
@@ -71,4 +79,29 @@ stages:
     - test: --preset travis --total-shards 9 --shard-index 7
     - test: --preset travis --total-shards 9 --shard-index 8
     - test
+''';
+
+final windowsBoilerplate = r'''
+# Support built in commands on windows out of the box.
+function pub {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command pub.bat "$@"
+    else
+        command pub "$@"
+    fi
+}
+function dartfmt {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartfmt.bat "$@"
+    else
+        command dartfmt "$@"
+    fi
+}
+function dartanalyzer {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartanalyzer.bat "$@"
+    else
+        command dartanalyzer "$@"
+    fi
+}
 ''';

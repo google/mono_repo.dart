@@ -9,6 +9,7 @@ part of 'package_config.dart';
 TravisJob _$TravisJobFromJson(Map json) {
   return $checkedNew('TravisJob', json, () {
     final val = TravisJob(
+      $checkedConvert(json, 'os', (v) => v as String),
       $checkedConvert(json, 'package', (v) => v as String),
       $checkedConvert(json, 'sdk', (v) => v as String),
       $checkedConvert(json, 'stageName', (v) => v as String),
@@ -38,6 +39,7 @@ Map<String, dynamic> _$TravisJobToJson(TravisJob instance) {
   }
 
   writeNotNull('description', instance.description);
+  val['os'] = instance.os;
   val['package'] = instance.package;
   val['sdk'] = instance.sdk;
   val['stageName'] = instance.stageName;

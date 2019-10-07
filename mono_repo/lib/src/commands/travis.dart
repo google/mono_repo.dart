@@ -193,6 +193,10 @@ void _logPkgs(Iterable<PackageConfig> configs) {
       print(yellow.wrap('  `dart` values (${pkg.sdks.join(', ')}) are not used '
           'and can be removed.'));
     }
+    if (pkg.oses != null && !pkg.osConfigUsed) {
+      print(yellow.wrap('  `os` values (${pkg.oses.join(', ')}) are not used '
+          'and can be removed.'));
+    }
   }
 }
 
@@ -210,6 +214,29 @@ String _travisSh(List<String> tasks, bool prettyAnsi,
     '''
 #!/bin/bash
 # ${_createdWith(pkgVersion)}
+
+# Support built in commands on windows out of the box.
+function pub {
+       if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+        command pub.bat "\$@"
+    else
+        command pub "\$@"
+    fi
+}
+function dartfmt {
+       if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+        command dartfmt.bat "\$@"
+    else
+        command dartfmt "\$@"
+    fi
+}
+function dartanalyzer {
+       if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+        command dartanalyzer.bat "\$@"
+    else
+        command dartanalyzer "\$@"
+    fi
+}
 
 if [[ -z \${PKGS} ]]; then
   ${safeEcho(prettyAnsi, red, "PKGS environment variable must be set!")}
@@ -316,6 +343,9 @@ ${toYaml({
           }
           if (value == 0) {
             value = a['dart'].compareTo(b['dart']);
+          }
+          if (value == 0) {
+            value = a['os'].compareTo(b['os']);
           }
           return value;
         });
@@ -464,6 +494,7 @@ class _TravisJobEntry {
       'stage': job.stageName,
       'name': _jobName(packages),
       'dart': job.sdk,
+      'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
       'script': './tool/travis.sh ${commands.join(' ')}',
     };
@@ -477,7 +508,7 @@ class _TravisJobEntry {
   @override
   int get hashCode => _equality.hash(_identityItems);
 
-  List get _identityItems => [job.stageName, job.sdk, commands, merge];
+  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
 final _equality = const DeepCollectionEquality();

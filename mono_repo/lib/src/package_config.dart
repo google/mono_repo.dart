@@ -19,20 +19,24 @@ class PackageConfig {
   final String relativePath;
   final Pubspec pubspec;
 
+  final List<String> oses;
   final List<String> sdks;
   final List<String> stageNames;
   final List<TravisJob> jobs;
   final List<String> cacheDirectories;
   final bool dartSdkConfigUsed;
+  final bool osConfigUsed;
 
   PackageConfig(
     this.relativePath,
     this.pubspec,
+    this.oses,
     this.sdks,
     this.stageNames,
     this.jobs,
     this.cacheDirectories,
     this.dartSdkConfigUsed,
+    this.osConfigUsed,
   );
 
   factory PackageConfig.parse(
@@ -40,7 +44,8 @@ class PackageConfig {
     if (monoPkgYaml.isEmpty) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
-      return PackageConfig(relativePath, pubspec, [], [], [], [], false);
+      return PackageConfig(
+          relativePath, pubspec, [], [], [], [], [], false, false);
     }
     final rawConfig = RawConfig.fromJson(monoPkgYaml);
 
@@ -48,6 +53,7 @@ class PackageConfig {
     final jobs = <TravisJob>[];
 
     var sdkConfigUsed = false;
+    var osConfigUsed = false;
 
     final stageNames = rawConfig.stages.map((stage) {
       final stageYaml = stage.items;
@@ -80,15 +86,39 @@ class PackageConfig {
         } else {
           sdkConfigUsed = true;
         }
+
+        var jobOses = rawConfig.oses;
+        if (job is Map && job.containsKey('os')) {
+          job = Map<String, dynamic>.from(job as Map);
+          final jobValue = job.remove('os');
+          if (jobValue is List) {
+            jobOses = jobValue.cast<String>();
+          } else {
+            jobOses = [jobValue as String];
+          }
+        } else {
+          osConfigUsed = true;
+        }
+
         for (var sdk in jobSdks) {
-          jobs.add(TravisJob.parse(relativePath, sdk, stage.name, job));
+          for (var os in jobOses) {
+            jobs.add(TravisJob.parse(os, relativePath, sdk, stage.name, job));
+          }
         }
       }
       return stage.name;
     }).toList();
 
-    return PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
-        jobs, rawConfig.cache?.directories ?? const [], sdkConfigUsed);
+    return PackageConfig(
+        relativePath,
+        pubspec,
+        rawConfig.oses,
+        rawConfig.sdks,
+        stageNames,
+        jobs,
+        rawConfig.cache?.directories ?? const [],
+        sdkConfigUsed,
+        osConfigUsed);
   }
 
   bool get hasFlutterDependency {
@@ -104,6 +134,8 @@ class PackageConfig {
 class TravisJob {
   @JsonKey(includeIfNull: false)
   final String description;
+
+  final String os;
 
   /// Relative path to the directory containing the source package from the root
   /// of the repository.
@@ -125,14 +157,14 @@ class TravisJob {
           ? _taskCommandsTickQuoted.toList().toString()
           : _taskCommandsTickQuoted.first);
 
-  TravisJob(this.package, this.sdk, this.stageName, this.tasks,
+  TravisJob(this.os, this.package, this.sdk, this.stageName, this.tasks,
       {this.description});
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
-      String package, String sdk, String stageName, Object yaml) {
+      String os, String package, String sdk, String stageName, Object yaml) {
     String description;
     dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
@@ -142,7 +174,8 @@ class TravisJob {
       withoutDescription = yaml;
     }
     final tasks = Task.parseTaskOrGroup(withoutDescription);
-    return TravisJob(package, sdk, stageName, tasks, description: description);
+    return TravisJob(os, package, sdk, stageName, tasks,
+        description: description);
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
