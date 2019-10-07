@@ -296,7 +296,7 @@ cache:
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-$_windowsBoilerplate
+$windowsBoilerplate
 '''
             r'''
 if [[ -z ${PKGS} ]]; then
@@ -444,7 +444,7 @@ cache:
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-$_windowsBoilerplate
+$windowsBoilerplate
 '''
             r'''
 if [[ -z ${PKGS} ]]; then
@@ -592,7 +592,7 @@ cache:
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-$_windowsBoilerplate
+$windowsBoilerplate
 '''
             r'''
 if [[ -z ${PKGS} ]]; then
@@ -937,7 +937,7 @@ final _config2Shell = '''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
-$_windowsBoilerplate
+$windowsBoilerplate
 '''
     r"""
 if [[ -z ${PKGS} ]]; then
@@ -1462,29 +1462,4 @@ branches:
 cache:
   directories:
     - "$HOME/.pub-cache"
-''';
-
-final _windowsBoilerplate = r'''
-# Support built in commands on windows out of the box.
-function pub {
-       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-        command pub.bat "$@"
-    else
-        command pub "$@"
-    fi
-}
-function dartfmt {
-       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-        command dartfmt.bat "$@"
-    else
-        command dartfmt "$@"
-    fi
-}
-function dartanalyzer {
-       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-        command dartanalyzer.bat "$@"
-    else
-        command dartanalyzer "$@"
-    fi
-}
 ''';
