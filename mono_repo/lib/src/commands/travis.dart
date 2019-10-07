@@ -193,6 +193,10 @@ void _logPkgs(Iterable<PackageConfig> configs) {
       print(yellow.wrap('  `dart` values (${pkg.sdks.join(', ')}) are not used '
           'and can be removed.'));
     }
+    if (pkg.oses != null && !pkg.osConfigUsed) {
+      print(yellow.wrap('  `os` values (${pkg.oses.join(', ')}) are not used '
+          'and can be removed.'));
+    }
   }
 }
 

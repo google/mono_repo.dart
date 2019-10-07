@@ -19,20 +19,24 @@ class PackageConfig {
   final String relativePath;
   final Pubspec pubspec;
 
+  final List<String> oses;
   final List<String> sdks;
   final List<String> stageNames;
   final List<TravisJob> jobs;
   final List<String> cacheDirectories;
   final bool dartSdkConfigUsed;
+  final bool osConfigUsed;
 
   PackageConfig(
     this.relativePath,
     this.pubspec,
+    this.oses,
     this.sdks,
     this.stageNames,
     this.jobs,
     this.cacheDirectories,
     this.dartSdkConfigUsed,
+    this.osConfigUsed,
   );
 
   factory PackageConfig.parse(
@@ -40,7 +44,8 @@ class PackageConfig {
     if (monoPkgYaml.isEmpty) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
-      return PackageConfig(relativePath, pubspec, [], [], [], [], false);
+      return PackageConfig(
+          relativePath, pubspec, [], [], [], [], [], false, false);
     }
     final rawConfig = RawConfig.fromJson(monoPkgYaml);
 
@@ -48,6 +53,7 @@ class PackageConfig {
     final jobs = <TravisJob>[];
 
     var sdkConfigUsed = false;
+    var osConfigUsed = false;
 
     final stageNames = rawConfig.stages.map((stage) {
       final stageYaml = stage.items;
@@ -91,7 +97,7 @@ class PackageConfig {
             jobOses = [jobValue as String];
           }
         } else {
-          sdkConfigUsed = true;
+          osConfigUsed = true;
         }
 
         for (var sdk in jobSdks) {
@@ -103,8 +109,16 @@ class PackageConfig {
       return stage.name;
     }).toList();
 
-    return PackageConfig(relativePath, pubspec, rawConfig.sdks, stageNames,
-        jobs, rawConfig.cache?.directories ?? const [], sdkConfigUsed);
+    return PackageConfig(
+        relativePath,
+        pubspec,
+        rawConfig.oses,
+        rawConfig.sdks,
+        stageNames,
+        jobs,
+        rawConfig.cache?.directories ?? const [],
+        sdkConfigUsed,
+        osConfigUsed);
   }
 
   bool get hasFlutterDependency {
