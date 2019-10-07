@@ -80,8 +80,24 @@ class PackageConfig {
         } else {
           sdkConfigUsed = true;
         }
+
+        var jobOses = rawConfig.oses;
+        if (job is Map && job.containsKey('os')) {
+          job = Map<String, dynamic>.from(job as Map);
+          final jobValue = job.remove('os');
+          if (jobValue is List) {
+            jobOses = jobValue.cast<String>();
+          } else {
+            jobOses = [jobValue as String];
+          }
+        } else {
+          sdkConfigUsed = true;
+        }
+
         for (var sdk in jobSdks) {
-          jobs.add(TravisJob.parse(relativePath, sdk, stage.name, job));
+          for (var os in jobOses) {
+            jobs.add(TravisJob.parse(os, relativePath, sdk, stage.name, job));
+          }
         }
       }
       return stage.name;
@@ -105,6 +121,8 @@ class TravisJob {
   @JsonKey(includeIfNull: false)
   final String description;
 
+  final String os;
+
   /// Relative path to the directory containing the source package from the root
   /// of the repository.
   final String package;
@@ -125,14 +143,14 @@ class TravisJob {
           ? _taskCommandsTickQuoted.toList().toString()
           : _taskCommandsTickQuoted.first);
 
-  TravisJob(this.package, this.sdk, this.stageName, this.tasks,
+  TravisJob(this.os, this.package, this.sdk, this.stageName, this.tasks,
       {this.description});
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
-      String package, String sdk, String stageName, Object yaml) {
+      String os, String package, String sdk, String stageName, Object yaml) {
     String description;
     dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
@@ -142,7 +160,8 @@ class TravisJob {
       withoutDescription = yaml;
     }
     final tasks = Task.parseTaskOrGroup(withoutDescription);
-    return TravisJob(package, sdk, stageName, tasks, description: description);
+    return TravisJob(os, package, sdk, stageName, tasks,
+        description: description);
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.

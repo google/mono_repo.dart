@@ -464,6 +464,7 @@ class _TravisJobEntry {
       'stage': job.stageName,
       'name': _jobName(packages),
       'dart': job.sdk,
+      'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
       'script': './tool/travis.sh ${commands.join(' ')}',
     };

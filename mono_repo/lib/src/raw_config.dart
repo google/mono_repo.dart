@@ -8,6 +8,9 @@ part 'raw_config.g.dart';
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class RawConfig {
+  @JsonKey(name: 'os', defaultValue: ['linux'])
+  final List<String> oses;
+
   @JsonKey(name: 'dart')
   final List<String> sdks;
 
@@ -15,7 +18,7 @@ class RawConfig {
 
   final RawCache cache;
 
-  RawConfig(this.sdks, List<RawStage> stages, this.cache)
+  RawConfig(this.oses, this.sdks, List<RawStage> stages, this.cache)
       : stages = stages ??
             [
               RawStage('unit_test', ['test'])

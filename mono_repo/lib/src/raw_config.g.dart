@@ -8,8 +8,11 @@ part of 'raw_config.dart';
 
 RawConfig _$RawConfigFromJson(Map json) {
   return $checkedNew('RawConfig', json, () {
-    $checkKeys(json, allowedKeys: const ['dart', 'stages', 'cache']);
+    $checkKeys(json, allowedKeys: const ['os', 'dart', 'stages', 'cache']);
     final val = RawConfig(
+      $checkedConvert(json, 'os',
+              (v) => (v as List)?.map((e) => e as String)?.toList()) ??
+          ['linux'],
       $checkedConvert(
           json, 'dart', (v) => (v as List)?.map((e) => e as String)?.toList()),
       $checkedConvert(
@@ -22,7 +25,7 @@ RawConfig _$RawConfigFromJson(Map json) {
           json, 'cache', (v) => v == null ? null : RawCache.fromJson(v as Map)),
     );
     return val;
-  }, fieldKeyMap: const {'sdks': 'dart'});
+  }, fieldKeyMap: const {'oses': 'os', 'sdks': 'dart'});
 }
 
 RawCache _$RawCacheFromJson(Map json) {

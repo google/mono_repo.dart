@@ -1,3 +1,12 @@
+## 2.3.0
+
+- Add support for `os` configuration.
+  - This generally works in the same way as the `dart` sdk option, except
+    that it is not required.
+  - The default is to only run on `linux`.
+  - Supports a top level `os` list in `mono_pkg.yaml` files.
+  - Supports overriding the `os` per task.
+
 ## 2.2.0
 
 - Fix issue where `pub` command failing for one package stops test run for
