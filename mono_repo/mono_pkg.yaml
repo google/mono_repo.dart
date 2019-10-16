@@ -18,6 +18,9 @@ stages:
   - group:
     - command: pub run build_runner test -- -x presubmit-only
     - command: pub run build_runner test -- --run-skipped -t presubmit-only
+    os:
+      - linux
+      - windows
 
 cache:
   directories:

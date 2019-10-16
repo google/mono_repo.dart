@@ -11,6 +11,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
+import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
 
 final _dummyPubspec = Pubspec('_example');
@@ -32,6 +33,8 @@ void _expectParseThrows(Object content, String expectedError) => expect(
     () => _parse(content), throwsCheckedFromJsonException(expectedError));
 
 void main() {
+  glyph.ascii = false;
+
   test('no stages - end up with one `unit_test` stage with one `test` task',
       () {
     var config = _parse({
