@@ -1,5 +1,28 @@
 #!/bin/bash
-# Created with package:mono_repo v2.2.0
+# Created with package:mono_repo v2.3.0
+
+# Support built in commands on windows out of the box.
+function pub {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command pub.bat "$@"
+    else
+        command pub "$@"
+    fi
+}
+function dartfmt {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartfmt.bat "$@"
+    else
+        command dartfmt "$@"
+    fi
+}
+function dartanalyzer {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartanalyzer.bat "$@"
+    else
+        command dartanalyzer "$@"
+    fi
+}
 
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
@@ -36,12 +59,8 @@ for PKG in ${PKGS}; do
       pub run build_runner build test --delete-conflicting-outputs || EXIT_CODE=$?
       ;;
     command_1)
-      echo 'pub run build_runner test -- -x presubmit-only'
-      pub run build_runner test -- -x presubmit-only || EXIT_CODE=$?
-      ;;
-    command_2)
-      echo 'pub run build_runner test -- --run-skipped -t presubmit-only'
-      pub run build_runner test -- --run-skipped -t presubmit-only || EXIT_CODE=$?
+      echo 'pub run build_runner test -- -P presubmit'
+      pub run build_runner test -- -P presubmit || EXIT_CODE=$?
       ;;
     dartanalyzer_0)
       echo 'dartanalyzer --fatal-infos --fatal-warnings .'

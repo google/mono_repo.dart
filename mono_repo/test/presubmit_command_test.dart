@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 @Tags(['presubmit-only'])
+@OnPlatform({'windows': Skip('Cant run shell scripts on windows')})
 import 'dart:io';
 
 import 'package:io/ansi.dart';
@@ -15,6 +16,8 @@ import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
+
+final pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
 
 void main() {
   group('error reporting', () {
@@ -75,9 +78,9 @@ void main() {
 
       await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
           workingDirectory: repoPath);
-      await Process.run('pub', ['get'], workingDirectory: pkgAPath);
-      await Process.run(
-          'pub', ['global', 'activate', '-s', 'path', Directory.current.path]);
+      await Process.run(pubBinary, ['get'], workingDirectory: pkgAPath);
+      await Process.run(pubBinary,
+          ['global', 'activate', '-s', 'path', Directory.current.path]);
     });
 
     tearDownAll(() {
@@ -86,7 +89,7 @@ void main() {
 
     test('runs all tasks and packages', () async {
       var result = await Process.run(
-          'pub', ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
+          pubBinary, ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
           workingDirectory: repoPath);
       expect(result.exitCode, 0,
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
@@ -114,7 +117,7 @@ pkg_b
 
     test('can filter by package', () async {
       var result = await Process.run(
-          'pub',
+          pubBinary,
           [
             'global',
             'run',
@@ -138,7 +141,7 @@ pkg_b
 
     test('can filter by task', () async {
       var result = await Process.run(
-          'pub',
+          pubBinary,
           [
             'global',
             'run',
@@ -178,7 +181,7 @@ pkg_b
 
       test('cause an error and are reported', () async {
         var result = await Process.run(
-            'pub',
+            pubBinary,
             [
               'global',
               'run',

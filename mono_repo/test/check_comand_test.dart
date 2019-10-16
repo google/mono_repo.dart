@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:mono_repo/src/commands/check.dart';
 import 'package:mono_repo/src/root_config.dart';
+import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
@@ -27,7 +28,8 @@ void main() {
     test('check', () {
       var reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
-      expect(reports.keys, ['bar', 'baz', 'baz/recursive', 'flutter', 'foo']);
+      expect(reports.keys,
+          ['bar', 'baz', p.join('baz', 'recursive'), 'flutter', 'foo']);
 
       var fooReport = reports['foo'];
       expect(fooReport.packageName, 'foo');
@@ -73,7 +75,7 @@ void main() {
           flutterReport.pubspec.dependencies['flutter'] as SdkDependency;
       expect(sdkDep.sdk, 'flutter');
 
-      var recursiveReport = reports['baz/recursive'];
+      var recursiveReport = reports[p.join('baz', 'recursive')];
       expect(recursiveReport.packageName, 'baz.recursive');
       expect(recursiveReport.published, isTrue);
       expect(recursiveReport.pubspec.dependencies, hasLength(1));

@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 @Tags(['presubmit-only'])
+@OnPlatform({'windows': Skip('newlines are different')})
 
 import 'package:build_verify/build_verify.dart';
 import 'package:test/test.dart';

@@ -7,9 +7,11 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:test_process/test_process.dart';
 
+final pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
+
 void main() {
   test('pub get gets dependencies', () async {
-    var process = await TestProcess.start('pub', ['run', 'mono_repo']);
+    var process = await TestProcess.start(pubBinary, ['run', 'mono_repo']);
 
     var output = await process.stdoutStream().join('\n');
     expect(output, _helpOutput);
@@ -20,7 +22,8 @@ void main() {
   test('readme contains latest task output', () {
     var readme = File('README.md');
 
-    expect(readme.readAsStringSync(), contains('```\n$_helpOutput\n```'));
+    expect(readme.readAsStringSync().replaceAll('\r', ''),
+        contains('```\n$_helpOutput\n```'));
   });
 }
 
