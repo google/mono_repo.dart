@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 @Tags(['presubmit-only'])
+@OnPlatform({'windows': Skip('Cant run shell scripts on windows')})
 import 'dart:io';
 
 import 'package:io/ansi.dart';

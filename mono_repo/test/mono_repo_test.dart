@@ -22,7 +22,7 @@ void main() {
   test('readme contains latest task output', () {
     var readme = File('README.md');
 
-    expect(readme.readAsStringSync().replaceAll(r'\r', ''),
+    expect(readme.readAsStringSync().replaceAll('\r', ''),
         contains('```\n$_helpOutput\n```'));
   });
 }

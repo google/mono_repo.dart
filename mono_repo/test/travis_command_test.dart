@@ -78,7 +78,7 @@ name: pkg_name
       testGenerateTravisConfig,
       throwsAParsedYamlException(
         startsWith(
-          'line 8, column 7 of sub_pkg/mono_pkg.yaml: '
+          'line 8, column 7 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
           'Extra config options are not currently supported.',
         ),
       ),

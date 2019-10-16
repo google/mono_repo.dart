@@ -75,7 +75,7 @@ void main() {
           flutterReport.pubspec.dependencies['flutter'] as SdkDependency;
       expect(sdkDep.sdk, 'flutter');
 
-      var recursiveReport = reports['baz/recursive'];
+      var recursiveReport = reports[p.join('baz', 'recursive')];
       expect(recursiveReport.packageName, 'baz.recursive');
       expect(recursiveReport.published, isTrue);
       expect(recursiveReport.pubspec.dependencies, hasLength(1));
