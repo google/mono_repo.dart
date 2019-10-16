@@ -6,12 +6,16 @@ import 'dart:async';
 
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
+import 'package:path/path.dart' as p;
+import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
 
 void main() {
+  glyph.ascii = false;
+
   test('no package', () async {
     await d.dir('sub_pkg').create();
 
@@ -34,7 +38,8 @@ name: pkg_name
     expect(
         testGenerateTravisConfig,
         throwsUserExceptionWith(
-            'The contents of `sub_pkg/mono_pkg.yaml` must be a Map.', isNull));
+            'The contents of `${p.join('sub_pkg', 'mono_pkg.yaml')}` must be a Map.',
+            isNull));
   });
 
   test('empty $monoPkgFileName file', () async {
