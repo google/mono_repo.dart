@@ -40,29 +40,29 @@ jobs:
       env: PKGS="mono_repo"
       script: ./tool/travis.sh command_0
     - stage: unit_test
-      name: "SDK: 2.3.0; PKG: mono_repo; TASKS: [`pub run build_runner test -- -x presubmit-only`, `pub run build_runner test -- --run-skipped -t presubmit-only`]"
+      name: "SDK: 2.3.0; PKG: mono_repo; TASKS: `pub run build_runner test -- -P presubmit`"
       dart: "2.3.0"
       os: linux
       env: PKGS="mono_repo"
-      script: ./tool/travis.sh command_1 command_2
+      script: ./tool/travis.sh command_1
     - stage: unit_test
-      name: "SDK: 2.3.0; PKG: mono_repo; TASKS: [`pub run build_runner test -- -x presubmit-only`, `pub run build_runner test -- --run-skipped -t presubmit-only`]"
+      name: "SDK: 2.3.0; PKG: mono_repo; TASKS: `pub run build_runner test -- -P presubmit`"
       dart: "2.3.0"
       os: windows
       env: PKGS="mono_repo"
-      script: ./tool/travis.sh command_1 command_2
+      script: ./tool/travis.sh command_1
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: [`pub run build_runner test -- -x presubmit-only`, `pub run build_runner test -- --run-skipped -t presubmit-only`]"
+      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run build_runner test -- -P presubmit`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
-      script: ./tool/travis.sh command_1 command_2
+      script: ./tool/travis.sh command_1
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: [`pub run build_runner test -- -x presubmit-only`, `pub run build_runner test -- --run-skipped -t presubmit-only`]"
+      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run build_runner test -- -P presubmit`"
       dart: dev
       os: windows
       env: PKGS="mono_repo"
-      script: ./tool/travis.sh command_1 command_2
+      script: ./tool/travis.sh command_1
     - stage: unit_test
       name: "SDK: 2.3.0; PKG: test_pkg; TASKS: `pub run test`"
       dart: "2.3.0"

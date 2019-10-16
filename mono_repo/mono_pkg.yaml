@@ -18,9 +18,7 @@ stages:
       - linux
       - windows
 - unit_test:
-  - group:
-    - command: pub run build_runner test -- -x presubmit-only
-    - command: pub run build_runner test -- --run-skipped -t presubmit-only
+  - command: pub run build_runner test -- -P presubmit
     os:
       - linux
       - windows
