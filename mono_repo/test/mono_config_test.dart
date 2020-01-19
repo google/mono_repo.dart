@@ -223,10 +223,10 @@ line 9, column 6: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `comma
         monoYaml,
         r'''
 line 10, column 6: Must have one and only one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
-  ╷
-10│      "command": "other thing"
-  │      ^^^^^^^^^
-  ╵''',
+   ╷
+10 │      "command": "other thing"
+   │      ^^^^^^^^^
+   ╵''',
       );
     });
 
