@@ -11,9 +11,9 @@ import 'raw_config.dart';
 
 part 'package_config.g.dart';
 
-final monoPkgFileName = 'mono_pkg.yaml';
-final travisFileName = '.travis.yml';
-final travisShPath = './tool/travis.sh';
+const monoPkgFileName = 'mono_pkg.yaml';
+const travisFileName = '.travis.yml';
+const travisShPath = './tool/travis.sh';
 
 class PackageConfig {
   final String relativePath;
@@ -335,4 +335,4 @@ class Task {
   List get _items => [name, args];
 }
 
-final _equality = const DeepCollectionEquality();
+const _equality = DeepCollectionEquality();

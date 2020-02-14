@@ -25,10 +25,12 @@ class MonoRepoRunner extends CommandRunner<void> {
     argParser
       ..addFlag('version',
           negatable: false, help: 'Prints the version of mono_repo.')
-      ..addFlag(recursiveFlag,
-          help:
-              'Whether to recursively walk sub-directorys looking for packages.',
-          defaultsTo: true);
+      ..addFlag(
+        recursiveFlag,
+        help:
+            'Whether to recursively walk sub-directorys looking for packages.',
+        defaultsTo: true,
+      );
   }
 
   @override

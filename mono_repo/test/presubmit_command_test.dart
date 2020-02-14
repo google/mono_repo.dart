@@ -202,7 +202,7 @@ pkg_a
     failure, '''));
         printOnFailure(result.stdout as String);
         final stdOutString = result.stdout as String;
-        final testFileName = 'pkg_a_test_dev.txt';
+        const testFileName = 'pkg_a_test_dev.txt';
         final start = stdOutString.indexOf('failure, ') + 9;
         final end = stdOutString.indexOf(testFileName) + testFileName.length;
         final logPath = stdOutString.substring(start, end);
@@ -215,7 +215,7 @@ pkg_a
   });
 }
 
-final pkgAConfig = '''
+const pkgAConfig = '''
 dart:
   - dev
   - stable
@@ -228,7 +228,7 @@ stages:
     - test
 ''';
 
-final pkgBConfig = '''
+const pkgBConfig = '''
 dart:
   - dev
   - stable
@@ -238,13 +238,13 @@ stages:
     - dartfmt
 ''';
 
-final pkgAPubspec = '''
+const pkgAPubspec = '''
 name: pkg_name
 dev_dependencies:
   test: any
 ''';
 
-final basicTest = '''
+const basicTest = '''
 import 'package:test/test.dart';
 
 main() {
@@ -254,7 +254,7 @@ main() {
 }
 ''';
 
-final failingTest = '''
+const failingTest = '''
 import 'package:test/test.dart';
 
 main() {

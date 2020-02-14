@@ -9,7 +9,7 @@ import 'yaml.dart';
 
 part 'mono_config.g.dart';
 
-final _monoConfigFileName = 'mono_repo.yaml';
+const _monoConfigFileName = 'mono_repo.yaml';
 
 /// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
 const _reservedTravisKeys = {'cache', 'jobs', 'language'};

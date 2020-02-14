@@ -27,7 +27,7 @@ name: sub_pkg
 ''')
     ]).create();
 
-    testGenerateTravisConfig();
+    await testGenerateTravisConfig();
 
     await d.dir('.', [
       d.file(travisFileName, _travisYml),
@@ -36,7 +36,7 @@ name: sub_pkg
   });
 }
 
-final _pkgConfig = r'''
+const _pkgConfig = r'''
 # This key is required. It specifies the Dart SDKs your tests will run under
 # You can provide one or more value.
 # See https://docs.travis-ci.com/user/languages/dart#choosing-dart-versions-to-test-against
@@ -53,7 +53,7 @@ stages:
     - test
 ''';
 
-final _travisYml = r'''
+const _travisYml = r'''
 # Created with package:mono_repo v1.2.3
 language: dart
 

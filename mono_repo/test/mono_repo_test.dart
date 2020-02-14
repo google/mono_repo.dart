@@ -27,7 +27,7 @@ void main() {
   });
 }
 
-final _helpOutput = '''Manage multiple packages in one source repository.
+const _helpOutput = '''Manage multiple packages in one source repository.
 
 Usage: mono_repo <command> [arguments]
 

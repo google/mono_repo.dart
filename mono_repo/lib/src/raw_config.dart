@@ -111,7 +111,8 @@ class RawStage {
 
     try {
       return RawStage(entry.key as String, entry.value as List);
-    } on ArgumentError catch (error) {
+    } on ArgumentError catch (error) // ignore: avoid_catching_errors
+    {
       throw CheckedFromJsonException(
           json, error.name, 'RawStage', error.message?.toString());
     }

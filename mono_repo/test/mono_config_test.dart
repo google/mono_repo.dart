@@ -353,7 +353,7 @@ line 12, column 4: Stages must be unique. "a" appears more than once.
   });
 }
 
-final _testConfig1 = r'''
+const _testConfig1 = r'''
 dart:
   - dev
   - stable

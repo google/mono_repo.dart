@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:convert';
 
 import 'package:mono_repo/src/yaml.dart';
@@ -58,7 +60,8 @@ void _testRoundTrip(Object source) {
   String testTitle;
   try {
     testTitle = jsonEncode(source);
-  } on JsonUnsupportedObjectError {
+  } on JsonUnsupportedObjectError // ignore: avoid_catching_errors
+  {
     testTitle = source.toString();
   }
 
