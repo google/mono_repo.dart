@@ -15,7 +15,7 @@ import 'shared.dart';
 
 void main() {
   test('validate readme content', () {
-    var readmeContent = File('README.md').readAsStringSync();
+    final readmeContent = File('README.md').readAsStringSync();
     expect(readmeContent.replaceAll('\r', ''), contains(_pkgConfig));
   });
 

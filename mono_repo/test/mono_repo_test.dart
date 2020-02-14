@@ -11,16 +11,16 @@ final pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
 
 void main() {
   test('pub get gets dependencies', () async {
-    var process = await TestProcess.start(pubBinary, ['run', 'mono_repo']);
+    final process = await TestProcess.start(pubBinary, ['run', 'mono_repo']);
 
-    var output = await process.stdoutStream().join('\n');
+    final output = await process.stdoutStream().join('\n');
     expect(output, _helpOutput);
 
     await process.shouldExit(0);
   });
 
   test('readme contains latest task output', () {
-    var readme = File('README.md');
+    final readme = File('README.md');
 
     expect(readme.readAsStringSync().replaceAll('\r', ''),
         contains('```\n$_helpOutput\n```'));

@@ -11,9 +11,9 @@ import 'shared.dart';
 
 void _asciiTest(List<int> bytes) {
   test(bytes.toString(), () {
-    var source = ascii.decode(bytes);
-    var output = toYaml(source);
-    var yaml = loadYamlOrdered(output);
+    final source = ascii.decode(bytes);
+    final output = toYaml(source);
+    final yaml = loadYamlOrdered(output);
     expect(yaml, source, reason: bytes.toString());
   });
 }
@@ -46,10 +46,10 @@ void main() {
   });
 
   test('config file', () {
-    var decoded = loadYamlOrdered(testConfig2);
-    var output = toYaml(decoded);
+    final decoded = loadYamlOrdered(testConfig2);
+    final output = toYaml(decoded);
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-    var roundTrip = loadYamlOrdered(output);
+    final roundTrip = loadYamlOrdered(output);
     expect(roundTrip, decoded);
   });
 }

@@ -18,7 +18,7 @@ const _pubspecFileName = 'pubspec.yaml';
 
 PackageConfig _packageConfigFromDir(
     String rootDirectory, String pkgRelativePath) {
-  var legacyConfigPath =
+  final legacyConfigPath =
       p.join(rootDirectory, pkgRelativePath, _legacyPkgConfigFileName);
   if (FileSystemEntity.isFileSync(legacyConfigPath)) {
     throw UserException(
@@ -27,15 +27,15 @@ PackageConfig _packageConfigFromDir(
         details: 'Rename to "$monoPkgFileName".');
   }
 
-  var pkgConfigRelativePath = p.join(pkgRelativePath, monoPkgFileName);
+  final pkgConfigRelativePath = p.join(pkgRelativePath, monoPkgFileName);
 
-  var pkgConfigYaml = yamlMapOrNull(rootDirectory, pkgConfigRelativePath);
+  final pkgConfigYaml = yamlMapOrNull(rootDirectory, pkgConfigRelativePath);
 
   if (pkgConfigYaml == null) {
     return null;
   }
 
-  var pubspecFile =
+  final pubspecFile =
       File(p.join(rootDirectory, pkgRelativePath, _pubspecFileName));
 
   if (!pubspecFile.existsSync()) {
@@ -43,7 +43,7 @@ PackageConfig _packageConfigFromDir(
         ' an expected `$_pubspecFileName` in `$pkgRelativePath`.');
   }
 
-  var pubspec = Pubspec.parse(pubspecFile.readAsStringSync(),
+  final pubspec = Pubspec.parse(pubspecFile.readAsStringSync(),
       sourceUrl: pubspecFile.path);
 
   return createWithCheck(
@@ -61,15 +61,15 @@ class RootConfig extends ListBase<PackageConfig> {
     recursive ??= true;
     rootDirectory ??= p.current;
 
-    var configs = <PackageConfig>[];
+    final configs = <PackageConfig>[];
 
     void visitDirectory(Directory directory) {
-      var dirs = directory.listSync().whereType<Directory>().toList()
+      final dirs = directory.listSync().whereType<Directory>().toList()
         ..sort((a, b) => a.path.compareTo(b.path));
       for (var subdir in dirs) {
-        var relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
+        final relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
 
-        var pkgConfig =
+        final pkgConfig =
             _packageConfigFromDir(rootDirectory, relativeSubDirPath);
         if (pkgConfig != null) {
           configs.add(pkgConfig);

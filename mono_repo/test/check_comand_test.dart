@@ -26,23 +26,23 @@ void main() {
     setUp(_setup);
 
     test('check', () {
-      var reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
+      final reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
       expect(reports.keys,
           ['bar', 'baz', p.join('baz', 'recursive'), 'flutter', 'foo']);
 
-      var fooReport = reports['foo'];
+      final fooReport = reports['foo'];
       expect(fooReport.packageName, 'foo');
       expect(fooReport.published, isFalse);
 
-      var fooDeps = fooReport.pubspec.dependencies;
+      final fooDeps = fooReport.pubspec.dependencies;
       expect(fooDeps, hasLength(2));
       expect((fooDeps['build'] as HostedDependency).version,
           VersionConstraint.any);
       expect((fooDeps['implied_any'] as HostedDependency).version,
           VersionConstraint.any);
 
-      var barReport = reports['bar'];
+      final barReport = reports['bar'];
       expect(barReport.packageName, 'bar');
       expect(barReport.published, isFalse);
 
@@ -53,7 +53,7 @@ void main() {
       expect(gitDep.path, 'build');
       expect(gitDep.ref, 'hacking');
 
-      var bazReport = reports['baz'];
+      final bazReport = reports['baz'];
       expect(bazReport.packageName, 'baz');
       expect(bazReport.published, isFalse);
 
@@ -65,24 +65,24 @@ void main() {
       expect(gitDep.path, isNull);
       expect(gitDep.ref, isNull);
 
-      var flutterReport = reports['flutter'];
+      final flutterReport = reports['flutter'];
       expect(flutterReport.packageName, 'flutter');
       expect(flutterReport.published, isFalse);
       expect(flutterReport.pubspec.dependencies, hasLength(2));
       expect(flutterReport.pubspec.devDependencies, hasLength(1));
 
-      var sdkDep =
+      final sdkDep =
           flutterReport.pubspec.dependencies['flutter'] as SdkDependency;
       expect(sdkDep.sdk, 'flutter');
 
-      var recursiveReport = reports[p.join('baz', 'recursive')];
+      final recursiveReport = reports[p.join('baz', 'recursive')];
       expect(recursiveReport.packageName, 'baz.recursive');
       expect(recursiveReport.published, isTrue);
       expect(recursiveReport.pubspec.dependencies, hasLength(1));
     });
 
     test('check no recursive', () {
-      var reports = getPackageReports(
+      final reports = getPackageReports(
           RootConfig(rootDirectory: d.sandbox, recursive: false));
 
       expect(reports.keys, ['bar', 'baz', 'flutter', 'foo']);

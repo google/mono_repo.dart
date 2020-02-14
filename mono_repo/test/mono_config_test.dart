@@ -21,7 +21,7 @@ String _encodeJson(Object input) =>
 
 Matcher throwsCheckedFromJsonException(String prettyValue) =>
     throwsA(const TypeMatcher<CheckedFromJsonException>().having((e) {
-      var prettyValue = toParsedYamlExceptionOrNull(e).formattedMessage;
+      final prettyValue = toParsedYamlExceptionOrNull(e).formattedMessage;
       printOnFailure("r'''\n$prettyValue'''");
       return prettyValue;
     }, 'prettyPrint', prettyValue));
@@ -37,11 +37,11 @@ void main() {
 
   test('no stages - end up with one `unit_test` stage with one `test` task',
       () {
-    var config = _parse({
+    final config = _parse({
       'dart': ['stable']
     });
 
-    var oneJob = config.jobs.single;
+    final oneJob = config.jobs.single;
     expect(oneJob.sdk, 'stable');
     expect(oneJob.tasks.first.name, 'test');
     expect(oneJob.tasks.first.args, isNull);
@@ -49,20 +49,20 @@ void main() {
   });
 
   test('valid example', () {
-    var monoYaml = loadYamlOrdered(_testConfig1) as Map;
+    final monoYaml = loadYamlOrdered(_testConfig1) as Map;
 
-    var config = PackageConfig.parse('a', _dummyPubspec, monoYaml);
+    final config = PackageConfig.parse('a', _dummyPubspec, monoYaml);
 
     expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 
-    var jobs = config.jobs.map((tj) => tj.toJson()).toList();
+    final jobs = config.jobs.map((tj) => tj.toJson()).toList();
 
     expect(jobs, _testConfig1expectedOutput);
   });
 
   group('error checks', () {
     test('dart key is required', () {
-      var config = _parse({});
+      final config = _parse({});
       expect(config.cacheDirectories, isEmpty);
       expect(config.jobs, isEmpty);
       expect(config.stageNames, isEmpty);
@@ -119,7 +119,7 @@ line 2, column 10: Unsupported value for "dart". "dart" must be an array with at
     });
 
     test('Stages named `test` are not allowed', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {
@@ -141,7 +141,7 @@ line 7, column 12: Unsupported value for "test". Stages are not allowed to have 
     });
 
     test('Stages tasks must be a list', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {'a': 42},
@@ -162,7 +162,7 @@ line 7, column 9: Unsupported value for "a". Stages must be a list of maps with 
     });
 
     test('Stages tasks must be a list', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {'a': 42},
@@ -185,7 +185,7 @@ line 7, column 9: Unsupported value for "a". Stages must be a list of maps with 
     test(
         'Stages tasks must be a list with map with one key in the approved set',
         () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {
@@ -208,7 +208,7 @@ line 9, column 6: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `comma
     });
 
     test('Stage tasks entries must have one key in the approved set', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {
@@ -231,7 +231,7 @@ line 10, column 6: Must have one and only one key of `dartfmt`, `dartanalyzer`, 
     });
 
     test('empty stage job', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {'a': []},
@@ -249,7 +249,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
     });
 
     test('multiple keys under a stage', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {'a': null, 'b': null},
@@ -267,7 +267,7 @@ line 8, column 4: Stages must be a list of maps with exactly one key (the name o
     });
 
     test('no keys under a stage', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [{}]
       };
@@ -283,7 +283,7 @@ line 6, column 3: Stages must be a list of maps with exactly one key (the name o
     });
 
     test('null stage job', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {'a': null},
@@ -303,7 +303,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
     });
 
     test('unsupported keys', () {
-      var monoYaml = {
+      final monoYaml = {
         'extra': 'foo',
         'dart': ['stable'],
         'stages': [
@@ -328,7 +328,7 @@ line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, dart, s
     });
 
     test('Duplicate stage names are not allowed', () {
-      var monoYaml = {
+      final monoYaml = {
         'dart': ['stable'],
         'stages': [
           {
