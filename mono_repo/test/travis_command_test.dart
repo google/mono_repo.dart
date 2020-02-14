@@ -722,7 +722,7 @@ jobs:
     });
 
     test('only supports a travis key', () async {
-      var monoConfigContent = toYaml({
+      final monoConfigContent = toYaml({
         'other': {'stages': 5}
       });
       await populateConfig(monoConfigContent);
@@ -739,7 +739,7 @@ jobs:
 
     group('stages', () {
       test('must be a list', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'travis': {'stages': 5}
         });
         await populateConfig(monoConfigContent);
@@ -755,7 +755,7 @@ jobs:
       });
 
       test('must be map items', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'travis': {
             'stages': [5]
           }
@@ -773,7 +773,7 @@ jobs:
       });
 
       test('map item must be exactly name + if – no less', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'travis': {
             'stages': [
               {'name': 'bob'}
@@ -789,7 +789,7 @@ jobs:
       });
 
       test('map item must be exactly name + if – no more', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'travis': {
             'stages': [
               {'name': 'bob', 'if': 'thing', 'bob': 'other'}
@@ -805,7 +805,7 @@ jobs:
       });
 
       test('cannot have duplicate names', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'travis': {
             'stages': [
               {'name': 'bob', 'if': 'if'},
@@ -826,7 +826,7 @@ jobs:
       });
 
       test('must match a configured stage from pkg_config', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'travis': {
             'stages': [
               {'name': 'bob', 'if': 'if'}
@@ -845,7 +845,7 @@ jobs:
 
     group('merge_stages', () {
       test('must be a list', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'merge_stages': {'stages': 5}
         });
         await populateConfig(monoConfigContent);
@@ -861,7 +861,7 @@ jobs:
       });
 
       test('must be String items', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'merge_stages': [5]
         });
         await populateConfig(monoConfigContent);
@@ -877,7 +877,7 @@ jobs:
       });
 
       test('must match a configured stage from pkg_config', () async {
-        var monoConfigContent = toYaml({
+        final monoConfigContent = toYaml({
           'merge_stages': ['bob']
         });
         await populateConfig(monoConfigContent);
@@ -898,7 +898,7 @@ jobs:
         ['array']
       ]) {
         test(invalidContent.runtimeType.toString(), () async {
-          var monoConfigContent = toYaml({'travis': invalidContent});
+          final monoConfigContent = toYaml({'travis': invalidContent});
           await populateConfig(monoConfigContent);
 
           expect(
@@ -918,8 +918,8 @@ jobs:
         ['language'],
       ]) {
         test(invalidValues.toString(), () async {
-          var invalidContent = Map.fromIterable(invalidValues);
-          var monoConfigContent = toYaml({'travis': invalidContent});
+          final invalidContent = Map.fromIterable(invalidValues);
+          final monoConfigContent = toYaml({'travis': invalidContent});
           await populateConfig(monoConfigContent);
 
           expect(

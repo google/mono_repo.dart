@@ -277,7 +277,7 @@ class Task {
           args = yamlValue[taskName] as String;
       }
 
-      var config = Map<String, dynamic>.from(yamlValue)..remove(taskName);
+      final config = Map<String, dynamic>.from(yamlValue)..remove(taskName);
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (config.isNotEmpty) {

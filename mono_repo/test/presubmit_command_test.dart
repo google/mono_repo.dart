@@ -88,7 +88,7 @@ void main() {
     });
 
     test('runs all tasks and packages', () async {
-      var result = await Process.run(
+      final result = await Process.run(
           pubBinary, ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
           workingDirectory: repoPath);
       expect(result.exitCode, 0,
@@ -116,7 +116,7 @@ pkg_b
     }, timeout: const Timeout.factor(2));
 
     test('can filter by package', () async {
-      var result = await Process.run(
+      final result = await Process.run(
           pubBinary,
           [
             'global',
@@ -140,7 +140,7 @@ pkg_b
     });
 
     test('can filter by task', () async {
-      var result = await Process.run(
+      final result = await Process.run(
           pubBinary,
           [
             'global',
@@ -180,7 +180,7 @@ pkg_b
       });
 
       test('cause an error and are reported', () async {
-        var result = await Process.run(
+        final result = await Process.run(
             pubBinary,
             [
               'global',
@@ -201,12 +201,12 @@ pkg_a
   SDK: dev TASK: pub run test
     failure, '''));
         printOnFailure(result.stdout as String);
-        var stdOutString = result.stdout as String;
-        var testFileName = 'pkg_a_test_dev.txt';
-        var start = stdOutString.indexOf('failure, ') + 9;
-        var end = stdOutString.indexOf(testFileName) + testFileName.length;
-        var logPath = stdOutString.substring(start, end);
-        var logFile = File(logPath);
+        final stdOutString = result.stdout as String;
+        final testFileName = 'pkg_a_test_dev.txt';
+        final start = stdOutString.indexOf('failure, ') + 9;
+        final end = stdOutString.indexOf(testFileName) + testFileName.length;
+        final logPath = stdOutString.substring(start, end);
+        final logFile = File(logPath);
         expect(logFile.existsSync(), isTrue,
             reason: 'Log file should exist: $logPath');
         expect(logFile.readAsStringSync(), contains('Some tests failed'));

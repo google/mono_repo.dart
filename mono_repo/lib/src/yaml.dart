@@ -17,7 +17,7 @@ T createWithCheck<T>(T Function() constructor) {
   try {
     return constructor();
   } on CheckedFromJsonException catch (e) {
-    var details = toParsedYamlExceptionOrNull(e);
+    final details = toParsedYamlExceptionOrNull(e);
     if (details == null) {
       rethrow;
     }
@@ -27,7 +27,7 @@ T createWithCheck<T>(T Function() constructor) {
 
 ParsedYamlException toParsedYamlExceptionOrNull(
     CheckedFromJsonException exception) {
-  var yamlMap = _yamlMapExpando[exception.map];
+  final yamlMap = _yamlMapExpando[exception.map];
   if (yamlMap == null) {
     return null;
   }
@@ -43,10 +43,10 @@ ParsedYamlException toParsedYamlExceptionOrNull(
 ///   - if its content is `null`, an empty [Map] is returned.
 ///   - if its content is anything else, a [UserException] is thrown.
 Map yamlMapOrNull(String rootDir, String relativeFilePath) {
-  var yamlFile = File(p.join(rootDir, relativeFilePath));
+  final yamlFile = File(p.join(rootDir, relativeFilePath));
 
   if (yamlFile.existsSync()) {
-    var pkgConfigYaml = loadYamlOrdered(yamlFile.readAsStringSync(),
+    final pkgConfigYaml = loadYamlOrdered(yamlFile.readAsStringSync(),
         sourceUrl: relativeFilePath);
 
     if (pkgConfigYaml == null) {
@@ -74,14 +74,14 @@ Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
       return yaml.map(convertOrdered).toList();
     }
     if (yaml is y.YamlMap) {
-      var keys = yaml.keys.toList()
+      final keys = yaml.keys.toList()
         ..sort((a, b) {
-          var aNode = yaml.nodes[a];
-          var bNode = yaml.nodes[b];
+          final aNode = yaml.nodes[a];
+          final bNode = yaml.nodes[b];
 
           return aNode.span.compareTo(bNode.span);
         });
-      var map = Map.fromIterable(keys, value: (k) => convertOrdered(yaml[k]));
+      final map = Map.fromIterable(keys, value: (k) => convertOrdered(yaml[k]));
       _yamlMapExpando[map] = yaml;
       return map;
     }
@@ -90,12 +90,12 @@ Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
         'Cannot convert output of type ${yaml.runtimeType}.');
   }
 
-  var yaml = y.loadYaml(source, sourceUrl: sourceUrl);
+  final yaml = y.loadYaml(source, sourceUrl: sourceUrl);
   return convertOrdered(yaml);
 }
 
 String toYaml(Object source) {
-  var buffer = StringBuffer();
+  final buffer = StringBuffer();
   _writeYaml(buffer, source, 0, false);
   return buffer.toString();
 }
@@ -109,8 +109,8 @@ String _escapeString(String source) {
       !_yamlSpecialStrings.contains(source.toLowerCase())) {
     return source;
   }
-  var output = source.replaceAllMapped(_escapeRegExp, (match) {
-    var value = match[0];
+  final output = source.replaceAllMapped(_escapeRegExp, (match) {
+    final value = match[0];
     return _escapeMap[value] ?? _getHexLiteral(value);
   }).replaceAll('"', r'\"');
 
@@ -252,7 +252,7 @@ final _escapeRegExp = RegExp('[\\x00-\\x07\\x0E-\\x1F$_escapeMapRegexp]');
 
 /// Given single-character string, return the hex-escaped equivalent.
 String _getHexLiteral(String input) {
-  var rune = input.runes.single;
-  var value = rune.toRadixString(16).toUpperCase().padLeft(2, '0');
+  final rune = input.runes.single;
+  final value = rune.toRadixString(16).toUpperCase().padLeft(2, '0');
   return '\\x$value';
 }

@@ -25,13 +25,13 @@ class RawConfig {
             ];
 
   factory RawConfig.fromJson(Map json) {
-    var config = _$RawConfigFromJson(json);
+    final config = _$RawConfigFromJson(json);
 
-    var stages = <String>{};
+    final stages = <String>{};
     for (var i = 0; i < config.stages.length; i++) {
-      var name = config.stages[i].name;
+      final name = config.stages[i].name;
       if (!stages.add(name)) {
-        var map = (json['stages'] as List)[i] as Map;
+        final map = (json['stages'] as List)[i] as Map;
 
         throw CheckedFromJsonException(map, name, 'RawStage',
             'Stages must be unique. "$name" appears more than once.',
@@ -97,9 +97,9 @@ class RawStage {
       );
     }
 
-    var entry = json.entries.single;
+    final entry = json.entries.single;
 
-    var name = entry.key as String;
+    final name = entry.key as String;
     if (entry.value == null) {
       throw CheckedFromJsonException(json, name, 'RawStage',
           'Stages are required to have at least one job. "$name" is null.');
