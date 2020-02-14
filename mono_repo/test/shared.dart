@@ -10,7 +10,7 @@ import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-void testGenerateTravisConfig() async {
+Future<void> testGenerateTravisConfig() async {
   overrideAnsiOutput(false, () {
     generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
         pkgVersion: '1.2.3');
@@ -42,7 +42,7 @@ Matcher throwsAParsedYamlException(matcher) =>
       return e.formattedMessage;
     }, 'formattedMessage', matcher));
 
-final testConfig2 = r'''
+const testConfig2 = r'''
 dart:
  - dev
  - stable
@@ -81,7 +81,7 @@ stages:
     - test
 ''';
 
-final windowsBoilerplate = r'''
+const windowsBoilerplate = r'''
 # Support built in commands on windows out of the box.
 function pub {
        if [[ $TRAVIS_OS_NAME == "windows" ]]; then

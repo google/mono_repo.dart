@@ -10,7 +10,7 @@ import 'package:io/ansi.dart' as ansi;
 import 'package:io/io.dart';
 import 'package:mono_repo/mono_repo.dart';
 
-void main(List<String> arguments) async {
+Future<void> main(List<String> arguments) async {
   try {
     await run(arguments);
   } on ParsedYamlException catch (e) {

@@ -35,11 +35,11 @@ name: pkg_name
       ''')
     ]).create();
 
+    final path = p.join('sub_pkg', 'mono_pkg.yaml');
     expect(
         testGenerateTravisConfig,
         throwsUserExceptionWith(
-            'The contents of `${p.join('sub_pkg', 'mono_pkg.yaml')}` must be a Map.',
-            isNull));
+            'The contents of `$path` must be a Map.', isNull));
   });
 
   test('empty $monoPkgFileName file', () async {
@@ -938,7 +938,7 @@ jobs:
   });
 }
 
-final _config2Shell = '''
+const _config2Shell = '''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
@@ -1040,7 +1040,7 @@ done
 exit ${EXIT_CODE}
 """;
 
-final _config2Yaml = r'''
+const _config2Yaml = r'''
 # Created with package:mono_repo v1.2.3
 language: dart
 

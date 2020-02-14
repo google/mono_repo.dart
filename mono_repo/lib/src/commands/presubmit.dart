@@ -77,11 +77,11 @@ Future<bool> presubmit(RootConfig configs,
   packages = packages.toList()..sort();
 
   // By default run all tasks.
-  final allKnownTasks =
-      configs.fold(<String>{}, (Set<String> exising, PackageConfig config) {
-    return exising
-      ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name)));
-  });
+  final allKnownTasks = configs.fold(
+    <String>{},
+    (Set<String> exising, PackageConfig config) => exising
+      ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name))),
+  );
   if (tasks.isEmpty) tasks = allKnownTasks;
   final unrecognizedTasks =
       tasks.where((task) => !allKnownTasks.contains(task));

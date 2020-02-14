@@ -144,10 +144,9 @@ List<String> _calculateTaskEntries(
 
   taskEntries.sort();
 
-  addEntry('*', [
-    'echo -e "${wrapAnsi(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!")}"',
-    'EXIT_CODE=1'
-  ]);
+  final echoContent =
+      wrapAnsi(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!");
+  addEntry('*', ['echo -e "$echoContent"', 'EXIT_CODE=1']);
   return taskEntries;
 }
 
@@ -511,4 +510,4 @@ class _TravisJobEntry {
   List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
-final _equality = const DeepCollectionEquality();
+const _equality = DeepCollectionEquality();
