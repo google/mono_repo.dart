@@ -1,6 +1,8 @@
 # Created with package:mono_repo v2.3.1-dev
 language: dart
 
+os: windows
+
 jobs:
   include:
     - stage: smoke_test
