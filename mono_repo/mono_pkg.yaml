@@ -16,12 +16,14 @@ stages:
   - command: pub run build_runner build test --delete-conflicting-outputs
     os:
       - linux
-      - windows
+      # TODO(kevmoo) Re-enable windows - dart-lang/mono_repo#183
+      #- windows
 - unit_test:
   - command: pub run build_runner test -- -P presubmit
     os:
       - linux
-      - windows
+      # TODO(kevmoo) Re-enable windows - dart-lang/mono_repo#183
+      #- windows
 
 cache:
   directories:

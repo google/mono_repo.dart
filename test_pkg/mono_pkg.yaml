@@ -16,4 +16,5 @@ stages:
   - test:
     os:
       - linux
-      - windows
+      # TODO(kevmoo) Re-enable windows - dart-lang/mono_repo#183
+      #- windows
