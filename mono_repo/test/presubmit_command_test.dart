@@ -54,7 +54,7 @@ void main() {
       File(p.join(pkgAPath, 'pubspec.yaml'))
         ..createSync(recursive: true)
         ..writeAsStringSync(pkgAPubspec);
-      File(p.join(pkgAPath, 'test', 'test.dart'))
+      File(p.join(pkgAPath, 'test', 'some_test.dart'))
         ..createSync(recursive: true)
         ..writeAsStringSync(basicTest);
 
