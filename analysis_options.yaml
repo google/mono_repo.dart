@@ -68,8 +68,7 @@ linter:
     - prefer_const_declarations
     - prefer_contains
     - prefer_equal_for_default_values
-    # Need json_serializable to support ignoring
-    #- prefer_expression_function_bodies
+    - prefer_expression_function_bodies
     - prefer_final_fields
     - prefer_final_locals
     - prefer_function_declarations_over_variables
@@ -86,6 +85,7 @@ linter:
     - prefer_single_quotes
     - prefer_typing_uninitialized_variables
     - prefer_void_to_null
+    - provide_deprecation_message
     - recursive_getters
     - slash_for_doc_comments
     - sort_pub_dependencies
@@ -107,5 +107,6 @@ linter:
     - unnecessary_this
     - unrelated_type_equality_checks
     - use_rethrow_when_possible
+    - use_string_buffers
     - valid_regexps
     - void_checks
