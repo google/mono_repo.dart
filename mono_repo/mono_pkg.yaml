@@ -18,7 +18,7 @@ stages:
       - linux
       - windows
 - unit_test:
-  - command: pub run build_runner test -- -P presubmit
+  - command: pub run build_runner test --delete-conflicting-outputs -- -P presubmit
     os:
       - linux
       - windows
