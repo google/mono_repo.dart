@@ -38,17 +38,13 @@ class _PubSubCommand extends MonoRepoCommand {
   _PubSubCommand(this.name) {
     argParser
       ..addFlag(_offline,
-          negatable: true,
-          defaultsTo: false,
           help: 'Use cached packages instead of accessing the network.')
       ..addFlag(_dryRun,
           abbr: 'n',
-          defaultsTo: false,
           negatable: false,
           help: 'Precompile executables and transformed dependencies.')
       ..addFlag(_precompile,
           defaultsTo: true,
-          negatable: true,
           help: "Report what dependencies would change but don't change any.");
   }
 

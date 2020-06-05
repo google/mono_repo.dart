@@ -42,7 +42,6 @@ class TravisCommand extends MonoRepoCommand {
             'to improve output readability.',
       )
       ..addFlag('use-get',
-          defaultsTo: false,
           negatable: false,
           help:
               'If the generated `$travisShPath` file should use `pub get` for '
