@@ -36,7 +36,7 @@ Matcher throwsUserExceptionWith(Object message, Object details) =>
         .having((e) => e.message, 'message', message)
         .having((e) => e.details, 'details', details));
 
-Matcher throwsAParsedYamlException(matcher) =>
+Matcher throwsAParsedYamlException(Object matcher) =>
     throwsA(isA<ParsedYamlException>().having((e) {
       printOnFailure("r'''\n${e.formattedMessage}'''");
       return e.formattedMessage;
