@@ -95,7 +95,7 @@ Future<void> pub(
 
     if (config.hasFlutterDependency) {
       executable = 'flutter';
-      packageArgs = ['packages']..addAll(args);
+      packageArgs = ['packages', ...args];
     } else {
       executable = pubPath;
       packageArgs = args;
