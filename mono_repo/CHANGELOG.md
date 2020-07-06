@@ -1,6 +1,6 @@
 ## 2.3.1
 
-- Require Dart SDK `>=2.6.0 <3.0.0`.
+- Require Dart SDK `>=2.7.0 <3.0.0`.
 
 ## 2.3.0
 
