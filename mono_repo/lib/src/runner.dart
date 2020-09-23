@@ -3,6 +3,8 @@
 // BSD-style license that can be found in the LICENSE file.
 
 
+import 'dart:async';
+
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
