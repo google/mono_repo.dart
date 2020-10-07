@@ -59,8 +59,11 @@ class MonoConfig {
     // ... but the code that writes the values won't write stages separately
     travis.remove('stages');
 
-    return MonoConfig._(travis.map((k, v) => MapEntry(k as String, v)),
-        conditionalStages, mergeStages);
+    return MonoConfig._(
+      travis.map((k, v) => MapEntry(k as String, v)),
+      conditionalStages,
+      mergeStages,
+    );
   }
 
   factory MonoConfig.fromJson(Map json) {
@@ -81,7 +84,11 @@ class MonoConfig {
 
     if (travis is! Map) {
       throw CheckedFromJsonException(
-          json, 'travis', 'MonoConfig', '`travis` must be a Map.');
+        json,
+        'travis',
+        'MonoConfig',
+        '`travis` must be a Map.',
+      );
     }
 
     final mergeStages = json['merge_stages'] ?? [];
@@ -89,13 +96,21 @@ class MonoConfig {
     if (mergeStages is List) {
       if (mergeStages.any((v) => v is! String)) {
         throw CheckedFromJsonException(
-            json, 'merge_stages', 'MonoConfig', 'All values must be strings.');
+          json,
+          'merge_stages',
+          'MonoConfig',
+          'All values must be strings.',
+        );
       }
 
       return MonoConfig(travis as Map, Set.from(mergeStages));
     } else {
-      throw CheckedFromJsonException(json, 'merge_stages', 'MonoConfig',
-          '`merge_stages` must be an array.');
+      throw CheckedFromJsonException(
+        json,
+        'merge_stages',
+        'MonoConfig',
+        '`merge_stages` must be an array.',
+      );
     }
   }
 

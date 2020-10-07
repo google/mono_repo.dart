@@ -17,14 +17,17 @@ const _legacyPkgConfigFileName = '.mono_repo.yml';
 const _pubspecFileName = 'pubspec.yaml';
 
 PackageConfig _packageConfigFromDir(
-    String rootDirectory, String pkgRelativePath) {
+  String rootDirectory,
+  String pkgRelativePath,
+) {
   final legacyConfigPath =
       p.join(rootDirectory, pkgRelativePath, _legacyPkgConfigFileName);
   if (FileSystemEntity.isFileSync(legacyConfigPath)) {
     throw UserException(
-        'Found legacy package configuration file '
-        '("$_legacyPkgConfigFileName") in `$pkgRelativePath`.',
-        details: 'Rename to "$monoPkgFileName".');
+      'Found legacy package configuration file '
+      '("$_legacyPkgConfigFileName") in `$pkgRelativePath`.',
+      details: 'Rename to "$monoPkgFileName".',
+    );
   }
 
   final pkgConfigRelativePath = p.join(pkgRelativePath, monoPkgFileName);
@@ -39,15 +42,20 @@ PackageConfig _packageConfigFromDir(
       File(p.join(rootDirectory, pkgRelativePath, _pubspecFileName));
 
   if (!pubspecFile.existsSync()) {
-    throw UserException('A `$monoPkgFileName` file was found, but missing'
-        ' an expected `$_pubspecFileName` in `$pkgRelativePath`.');
+    throw UserException(
+      'A `$monoPkgFileName` file was found, but missing'
+      ' an expected `$_pubspecFileName` in `$pkgRelativePath`.',
+    );
   }
 
-  final pubspec = Pubspec.parse(pubspecFile.readAsStringSync(),
-      sourceUrl: pubspecFile.path);
+  final pubspec = Pubspec.parse(
+    pubspecFile.readAsStringSync(),
+    sourceUrl: pubspecFile.path,
+  );
 
   return createWithCheck(
-      () => PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml));
+    () => PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml),
+  );
 }
 
 class RootConfig extends ListBase<PackageConfig> {
@@ -84,13 +92,18 @@ class RootConfig extends ListBase<PackageConfig> {
     visitDirectory(Directory(rootDirectory));
 
     if (configs.isEmpty) {
-      throw UserException('No packages found.',
-          details: 'Each target package directory must contain '
-              'a `$monoPkgFileName` file.');
+      throw UserException(
+        'No packages found.',
+        details: 'Each target package directory must contain '
+            'a `$monoPkgFileName` file.',
+      );
     }
 
-    return RootConfig._(rootDirectory,
-        MonoConfig.fromRepo(rootDirectory: rootDirectory), configs);
+    return RootConfig._(
+      rootDirectory,
+      MonoConfig.fromRepo(rootDirectory: rootDirectory),
+      configs,
+    );
   }
 
   @override
