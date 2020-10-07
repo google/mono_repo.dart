@@ -104,8 +104,12 @@ class GeneratedTravisConfig {
 
     final yml = _travisYml(configs, commandsToKeys, pkgVersion);
 
-    final sh = _travisSh(_calculateTaskEntries(commandsToKeys, prettyAnsi),
-        prettyAnsi, useGet ? 'get' : 'upgrade', pkgVersion);
+    final sh = _travisSh(
+      _calculateTaskEntries(commandsToKeys, prettyAnsi),
+      prettyAnsi,
+      useGet ? 'get' : 'upgrade',
+      pkgVersion,
+    );
 
     return GeneratedTravisConfig._(yml, sh);
   }
@@ -171,7 +175,9 @@ void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
 }
 
 List<String> _calculateTaskEntries(
-    Map<String, String> commandsToKeys, bool prettyAnsi) {
+  Map<String, String> commandsToKeys,
+  bool prettyAnsi,
+) {
   final taskEntries = <String>[];
 
   void addEntry(String label, List<String> contentLines) {
@@ -312,7 +318,10 @@ exit \${EXIT_CODE}
 ''';
 
 String _travisYml(
-    RootConfig configs, Map<String, String> commandsToKeys, String pkgVersion) {
+  RootConfig configs,
+  Map<String, String> commandsToKeys,
+  String pkgVersion,
+) {
   final orderedStages = _calculateOrderedStages(configs);
 
   for (var config in configs) {
@@ -433,13 +442,16 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
   for (var component in components) {
     if (component.length > 1) {
-      throw UserException('Not all packages agree on `stages` ordering, found '
-          'a cycle between the following stages: $component');
+      throw UserException(
+        'Not all packages agree on `stages` ordering, found '
+        'a cycle between the following stages: $component',
+      );
     }
   }
 
   final conditionalStages = Map<String, ConditionalStage>.from(
-      rootConfig.monoConfig.conditionalStages);
+    rootConfig.monoConfig.conditionalStages,
+  );
 
   final unknownMergedStages = rootConfig.monoConfig.mergeStages.toSet();
 
@@ -461,17 +473,21 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       .toList();
 
   if (unknownMergedStages.isNotEmpty) {
-    throw UserException('Error parsing mono_repo.yaml',
-        details: 'Stage `${unknownMergedStages.first}` was referenced in '
-            '`mono_repo.yaml`, but it does not exist in any '
-            '`mono_pkg.yaml` files.');
+    throw UserException(
+      'Error parsing mono_repo.yaml',
+      details: 'Stage `${unknownMergedStages.first}` was referenced in '
+          '`mono_repo.yaml`, but it does not exist in any '
+          '`mono_pkg.yaml` files.',
+    );
   }
 
   if (conditionalStages.isNotEmpty) {
-    throw UserException('Error parsing mono_repo.yaml',
-        details: 'Stage `${conditionalStages.keys.first}` was referenced in '
-            '`mono_repo.yaml`, but it does not exist in any '
-            '`mono_pkg.yaml` files.');
+    throw UserException(
+      'Error parsing mono_repo.yaml',
+      details: 'Stage `${conditionalStages.keys.first}` was referenced in '
+          '`mono_repo.yaml`, but it does not exist in any '
+          '`mono_pkg.yaml` files.',
+    );
   }
 
   return orderedStages;
