@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
+import 'package:mono_repo/src/commands/travis.dart' show windowsBoilerplate;
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -339,6 +340,7 @@ cache:
 # Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
+
 '''
             r'''
 if [[ -z ${PKGS} ]]; then
@@ -487,6 +489,7 @@ cache:
 # Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
+
 '''
             r'''
 if [[ -z ${PKGS} ]]; then
@@ -635,6 +638,7 @@ cache:
 # Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
+
 '''
             r'''
 if [[ -z ${PKGS} ]]; then
@@ -980,6 +984,7 @@ const _config2Shell = '''
 # Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
+
 '''
     r"""
 if [[ -z ${PKGS} ]]; then

@@ -271,28 +271,7 @@ String _travisSh(List<String> tasks, bool prettyAnsi,
 #!/bin/bash
 # ${_createdWith(pkgVersion)}
 
-# Support built in commands on windows out of the box.
-function pub {
-       if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-        command pub.bat "\$@"
-    else
-        command pub "\$@"
-    fi
-}
-function dartfmt {
-       if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-        command dartfmt.bat "\$@"
-    else
-        command dartfmt "\$@"
-    fi
-}
-function dartanalyzer {
-       if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-        command dartanalyzer.bat "\$@"
-    else
-        command dartanalyzer "\$@"
-    fi
-}
+$windowsBoilerplate
 
 if [[ -z \${PKGS} ]]; then
   ${safeEcho(prettyAnsi, red, "PKGS environment variable must be set!")}
@@ -568,3 +547,27 @@ class _TravisJobEntry {
 }
 
 const _equality = DeepCollectionEquality();
+
+const windowsBoilerplate = r'''
+# Support built in commands on windows out of the box.
+function pub {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command pub.bat "$@"
+    else
+        command pub "$@"
+    fi
+}
+function dartfmt {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartfmt.bat "$@"
+    else
+        command dartfmt "$@"
+    fi
+}
+function dartanalyzer {
+       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+        command dartanalyzer.bat "$@"
+    else
+        command dartanalyzer "$@"
+    fi
+}''';
