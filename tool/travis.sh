@@ -55,10 +55,14 @@ for PKG in ${PKGS}; do
     echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
     case ${TASK} in
     command_0)
+      echo 'cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate'
+      cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate || EXIT_CODE=$?
+      ;;
+    command_1)
       echo 'pub run build_runner build test --delete-conflicting-outputs'
       pub run build_runner build test --delete-conflicting-outputs || EXIT_CODE=$?
       ;;
-    command_1)
+    command_2)
       echo 'pub run build_runner test --delete-conflicting-outputs -- -P presubmit'
       pub run build_runner test --delete-conflicting-outputs -- -P presubmit || EXIT_CODE=$?
       ;;
