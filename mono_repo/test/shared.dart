@@ -10,10 +10,10 @@ import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-Future<void> testGenerateTravisConfig() async {
+Future<void> testGenerateTravisConfig({bool validateOnly = false}) async {
   overrideAnsiOutput(false, () {
     generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
-        pkgVersion: '1.2.3');
+        pkgVersion: '1.2.3', validateOnly: validateOnly);
   });
 }
 

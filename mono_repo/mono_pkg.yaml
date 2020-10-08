@@ -8,6 +8,8 @@ stages:
   - group:
     - dartfmt
     - dartanalyzer: --fatal-infos --fatal-warnings .
+    # A bit weird, this should really be a global task but we don't have those.
+    - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
     dart: [dev]
   - group:
     - dartanalyzer: --fatal-warnings .
