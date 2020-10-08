@@ -54,7 +54,7 @@ stages:
 ''';
 
 const _travisYml = r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -94,7 +94,7 @@ cache:
 
 final _travisSh = '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
