@@ -291,7 +291,7 @@ name: pkg_b
         ])));
 
     await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -336,7 +336,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -439,7 +439,7 @@ name: pkg_b
         ])));
 
     await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -484,7 +484,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -597,7 +597,7 @@ name: pkg_a
         ])));
 
     await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -632,7 +632,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -739,7 +739,7 @@ travis:
   after_failure:
   - tool/report_failure.sh
 ''', contains(r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 # Custom configuration
@@ -977,7 +977,7 @@ jobs:
 
 const _config2Shell = '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -1078,7 +1078,7 @@ exit ${EXIT_CODE}
 """;
 
 const _config2Yaml = r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
