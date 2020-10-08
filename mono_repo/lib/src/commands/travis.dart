@@ -81,7 +81,7 @@ void generateTravisConfig(
   }
 }
 
-/// Container class for the generated yaml and shell scripts for travis.
+/// The generated yaml and shell script content for travis.
 class GeneratedTravisConfig {
   final String travisYml;
   final String travisSh;
