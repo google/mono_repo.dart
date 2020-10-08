@@ -167,15 +167,6 @@ name: pkg_name
           throwsA(isA<UserException>()));
     });
 
-    test('throws if the previous config doesn\'t match', () async {
-      await d.file(travisFileName, '').create();
-      await d.dir('tool', [
-        d.file('travis.sh', ''),
-      ]).create();
-      await expectLater(testGenerateTravisConfig(validateOnly: true),
-          throwsA(isA<UserException>()));
-    });
-
     test('doesn\'t throw if the previous config is up to date', () async {
       await expectLater(
           testGenerateTravisConfig,
