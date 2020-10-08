@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -142,6 +143,42 @@ name: pkg_b
             isNull));
   });
 
+  group('--validate', () {
+    setUp(() async {
+      await d.dir('sub_pkg', [
+        d.file(monoPkgFileName, testConfig2),
+        d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+      ]).create();
+    });
+
+    test('throws if there is no generated config', () async {
+      await expectLater(testGenerateTravisConfig(validateOnly: true),
+          throwsA(isA<UserException>()));
+    });
+
+    test('throws if the previous config doesn\'t match', () async {
+      await d.file(travisFileName, '').create();
+      await d.dir('tool', [
+        d.file('travis.sh', ''),
+      ]).create();
+      await expectLater(testGenerateTravisConfig(validateOnly: true),
+          throwsA(isA<UserException>()));
+    });
+
+    test('doesn\'t throw if the previous config is up to date', () async {
+      await expectLater(
+          testGenerateTravisConfig,
+          prints(stringContainsInOrder([
+            'package:sub_pkg',
+            'Make sure to mark `./tool/travis.sh` as executable.'
+          ])));
+      // Just check that this doesn't throw.
+      await testGenerateTravisConfig(validateOnly: true);
+    });
+  });
+
   test('complete travis.yml file', () async {
     await d.dir('sub_pkg', [
       d.file(monoPkgFileName, testConfig2),
@@ -254,7 +291,7 @@ name: pkg_b
         ])));
 
     await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -299,7 +336,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -402,7 +439,7 @@ name: pkg_b
         ])));
 
     await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -447,7 +484,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -560,7 +597,7 @@ name: pkg_a
         ])));
 
     await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:
@@ -595,7 +632,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -702,7 +739,7 @@ travis:
   after_failure:
   - tool/report_failure.sh
 ''', contains(r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 # Custom configuration
@@ -940,7 +977,7 @@ jobs:
 
 const _config2Shell = '''
 #!/bin/bash
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 
 $windowsBoilerplate
 '''
@@ -1041,7 +1078,7 @@ exit ${EXIT_CODE}
 """;
 
 const _config2Yaml = r'''
-# Created with package:mono_repo v1.2.3
+# Created with package:mono_repo v2.4.0
 language: dart
 
 jobs:

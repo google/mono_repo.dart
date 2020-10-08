@@ -1,5 +1,11 @@
-## 2.3.1
+## 2.4.0
 
+- Adds a `--validate` option to the `travis` command.
+  - You can configure this to run from any of your `mono_pkg.yaml` files using
+    a command job like this:
+    
+    `command: "cd ../ && pub global run mono_repo travis --validate"`.
+  - We may make this easier to configure in the future.
 - Require Dart SDK `>=2.7.0 <3.0.0`.
 
 ## 2.3.0

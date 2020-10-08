@@ -45,51 +45,110 @@ class TravisCommand extends MonoRepoCommand {
           negatable: false,
           help:
               'If the generated `$travisShPath` file should use `pub get` for '
-              'dependencies instead of `pub upgrade`.');
+              'dependencies instead of `pub upgrade`.')
+      ..addFlag('validate',
+          negatable: false,
+          help: 'Validates that the existing travis config is up to date with '
+              'the current configuration. Does not write any files.');
   }
 
   @override
   void run() => generateTravisConfig(rootConfig(),
       prettyAnsi: argResults['pretty-ansi'] as bool,
-      useGet: argResults['use-get'] as bool);
+      useGet: argResults['use-get'] as bool,
+      validateOnly: argResults['validate'] as bool);
 }
 
 void generateTravisConfig(
   RootConfig configs, {
   bool prettyAnsi = true,
   bool useGet = false,
+  bool validateOnly = false,
   String pkgVersion,
 }) {
   prettyAnsi ??= true;
   useGet ??= false;
   pkgVersion ??= packageVersion;
+  validateOnly ??= false;
+  final travisConfig = GeneratedTravisConfig.generate(configs,
+      prettyAnsi: prettyAnsi, useGet: useGet);
+  if (validateOnly) {
+    _checkTravisYml(configs.rootDirectory, travisConfig);
+    _checkTravisScript(configs.rootDirectory, travisConfig);
+  } else {
+    _writeTravisYml(configs.rootDirectory, travisConfig);
+    _writeTravisScript(configs.rootDirectory, travisConfig);
+  }
+}
 
-  _logPkgs(configs);
+/// The generated yaml and shell script content for travis.
+class GeneratedTravisConfig {
+  final String travisYml;
+  final String travisSh;
 
-  final commandsToKeys = extractCommands(configs);
+  GeneratedTravisConfig._(this.travisYml, this.travisSh);
 
-  _writeTravisYml(configs.rootDirectory, configs, commandsToKeys, pkgVersion);
+  factory GeneratedTravisConfig.generate(
+    RootConfig configs, {
+    bool prettyAnsi = true,
+    bool useGet = false,
+    String pkgVersion,
+  }) {
+    prettyAnsi ??= true;
+    useGet ??= false;
+    pkgVersion ??= packageVersion;
 
-  _writeTravisScript(
-      configs.rootDirectory,
-      _calculateTaskEntries(commandsToKeys, prettyAnsi),
-      prettyAnsi,
-      useGet ? 'get' : 'upgrade',
-      pkgVersion);
+    _logPkgs(configs);
+
+    final commandsToKeys = extractCommands(configs);
+
+    final yml = _travisYml(configs, commandsToKeys, pkgVersion);
+
+    final sh = _travisSh(_calculateTaskEntries(commandsToKeys, prettyAnsi),
+        prettyAnsi, useGet ? 'get' : 'upgrade', pkgVersion);
+
+    return GeneratedTravisConfig._(yml, sh);
+  }
+}
+
+/// Thrown if generated config does not match existing config when running with
+/// the `--validate` option.
+class TravisConfigOutOfDateException extends UserException {
+  TravisConfigOutOfDateException()
+      : super('Generated travis config is out of date',
+            details: 'Rerun `mono_repo travis` to update generated config');
+}
+
+/// Check existing `.travis.yml` versus the content in [config].
+///
+/// Throws a [TravisConfigOutOfDateException] if they do not match.
+void _checkTravisYml(String rootDirectory, GeneratedTravisConfig config) {
+  final yamlFile = File(p.join(rootDirectory, travisFileName));
+  if (!yamlFile.existsSync() ||
+      yamlFile.readAsStringSync() != config.travisYml) {
+    throw TravisConfigOutOfDateException();
+  }
 }
 
 /// Write `.travis.yml`
-void _writeTravisYml(String rootDirectory, RootConfig configs,
-    Map<String, String> commandsToKeys, String pkgVersion) {
+void _writeTravisYml(String rootDirectory, GeneratedTravisConfig config) {
   final travisPath = p.join(rootDirectory, travisFileName);
-  File(travisPath)
-      .writeAsStringSync(_travisYml(configs, commandsToKeys, pkgVersion));
+  File(travisPath).writeAsStringSync(config.travisYml);
   print(styleDim.wrap('Wrote `$travisPath`.'));
 }
 
+/// Checks the existing `tool/travis.sh` versus the content in [config].
+///
+/// Throws a [TravisConfigOutOfDateException] if they do not match.
+void _checkTravisScript(String rootDirectory, GeneratedTravisConfig config) {
+  final shFile = File(p.join(rootDirectory, travisShPath));
+  if (!shFile.existsSync() || shFile.readAsStringSync() != config.travisSh) {
+    throw TravisConfigOutOfDateException();
+  }
+}
+
 /// Write `tool/travis.sh`
-void _writeTravisScript(String rootDirectory, List<String> taskEntries,
-    bool prettyAnsi, String pubDependencyCommand, String pkgVersion) {
+void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
   final travisFilePath = p.join(rootDirectory, travisShPath);
   final travisScript = File(travisFilePath);
 
@@ -106,8 +165,7 @@ void _writeTravisScript(String rootDirectory, List<String> taskEntries,
     }
   }
 
-  travisScript.writeAsStringSync(
-      _travisSh(taskEntries, prettyAnsi, pubDependencyCommand, pkgVersion));
+  travisScript.writeAsStringSync(config.travisSh);
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   print(styleDim.wrap('Wrote `$travisFilePath`.'));
 }
