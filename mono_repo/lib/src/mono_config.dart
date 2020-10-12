@@ -40,8 +40,8 @@ class MonoConfig {
     if (rawStageValue != null) {
       if (rawStageValue is List) {
         for (var item in rawStageValue) {
-          if (item is Map) {
-            final stage = _$ConditionalStageFromJson(item);
+          if (item is Map || item is String) {
+            final stage = ConditionalStage.fromJson(item);
             if (conditionalStages.containsKey(stage.name)) {
               throw CheckedFromJsonException(
                 travis,
@@ -56,7 +56,7 @@ class MonoConfig {
               travis,
               'stages',
               'MonoConfig',
-              'All values must be Map instances.',
+              'All values must be String or Map instances.',
             );
           }
         }
@@ -150,7 +150,19 @@ class ConditionalStage {
   @JsonKey(name: 'if', required: true, disallowNullValue: true)
   final String ifCondition;
 
-  ConditionalStage(this.name, this.ifCondition);
+  ConditionalStage(this.name, [this.ifCondition]);
 
-  Map<String, dynamic> toJson() => _$ConditionalStageToJson(this);
+  factory ConditionalStage.fromJson(Object json) {
+    if (json is String) {
+      return ConditionalStage(json);
+    }
+    return _$ConditionalStageFromJson(json as Map);
+  }
+
+  Object toJson() {
+    if (ifCondition == null) {
+      return name;
+    }
+    return _$ConditionalStageToJson(this);
+  }
 }

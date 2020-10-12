@@ -1,6 +1,9 @@
-## 2.4.1-dev
+## 2.5.0-dev
 
-* Respect the ordering of `stages` if configured in `mono_repo.yaml`.
+* `mono_repo.yaml`:
+  * Respect the ordering of `stages`, if configured.
+  * Allow `stages` values to be just a string – allows defining an explicit
+    ordering of stages. 
 
 ## 2.4.0
 

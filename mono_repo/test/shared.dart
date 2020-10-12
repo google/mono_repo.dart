@@ -10,7 +10,7 @@ import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-const createdWithText = 'Created with package:mono_repo v2.4.1-dev';
+const createdWithText = 'Created with package:mono_repo v2.5.0-dev';
 
 Future<void> testGenerateTravisConfig({bool validateOnly = false}) async {
   overrideAnsiOutput(false, () {

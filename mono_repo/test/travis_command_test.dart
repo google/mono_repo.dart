@@ -795,7 +795,7 @@ jobs:
         );
       });
 
-      test('must be map items', () async {
+      test('must be string or map items', () async {
         final monoConfigContent = toYaml({
           'travis': {
             'stages': [5]
@@ -807,7 +807,7 @@ jobs:
           throwsAParsedYamlException(
             startsWith(
               'line 3, column 5 of mono_repo.yaml: Unsupported value for '
-              '"stages". All values must be Map instances.',
+              '"stages". All values must be String or Map instances.',
             ),
           ),
         );
@@ -888,12 +888,7 @@ jobs:
       test('order is honored', () async {
         final monoConfigContent = toYaml({
           'travis': {
-            'stages': [
-              {'name': 'a', 'if': 'if'},
-              {'name': 'b', 'if': 'if'},
-              {'name': 'c', 'if': 'if'},
-              {'name': 'd', 'if': 'if'},
-            ]
+            'stages': ['a', 'b', 'c', 'd']
           }
         });
         await d.file('mono_repo.yaml', monoConfigContent).create();
@@ -935,14 +930,10 @@ name: pkg_name
             ])));
         await d.file(travisFileName, contains(r'''
 stages:
-  - name: a
-    if: if
-  - name: b
-    if: if
-  - name: c
-    if: if
-  - name: d
-    if: if
+  - a
+  - b
+  - c
+  - d
 ''')).validate();
       });
     });
