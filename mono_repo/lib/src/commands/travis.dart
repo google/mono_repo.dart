@@ -442,9 +442,10 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
   for (var component in components) {
     if (component.length > 1) {
+      final items = component.map((e) => '`$e`').join(', ');
       throw UserException(
         'Not all packages agree on `stages` ordering, found '
-        'a cycle between the following stages: $component',
+        'a cycle between the following stages: $items.',
       );
     }
   }
