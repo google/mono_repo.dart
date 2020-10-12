@@ -472,19 +472,15 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       .reversed
       .toList();
 
-  if (unknownMergedStages.isNotEmpty) {
-    throw UserException(
-      'Error parsing mono_repo.yaml',
-      details: 'Stage `${unknownMergedStages.first}` was referenced in '
-          '`mono_repo.yaml`, but it does not exist in any '
-          '`mono_pkg.yaml` files.',
-    );
-  }
+  final leftOvers = [
+    ...unknownMergedStages,
+    ...conditionalStages.keys,
+  ];
 
-  if (conditionalStages.isNotEmpty) {
+  if (leftOvers.isNotEmpty) {
     throw UserException(
       'Error parsing mono_repo.yaml',
-      details: 'Stage `${conditionalStages.keys.first}` was referenced in '
+      details: 'Stage `${leftOvers.first}` was referenced in '
           '`mono_repo.yaml`, but it does not exist in any '
           '`mono_pkg.yaml` files.',
     );
