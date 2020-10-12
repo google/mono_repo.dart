@@ -27,8 +27,12 @@ class MonoConfig {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
-      throw CheckedFromJsonException(travis, overlappingKeys.first.toString(),
-          'MonoConfig', 'Contains illegal keys: ${overlappingKeys.join(', ')}');
+      throw CheckedFromJsonException(
+        travis,
+        overlappingKeys.first.toString(),
+        'MonoConfig',
+        'Contains illegal keys: ${overlappingKeys.join(', ')}',
+      );
     }
 
     final conditionalStages = <String, ConditionalStage>{};
@@ -39,18 +43,30 @@ class MonoConfig {
           if (item is Map) {
             final stage = _$ConditionalStageFromJson(item);
             if (conditionalStages.containsKey(stage.name)) {
-              throw CheckedFromJsonException(travis, 'stages', 'MonoConfig',
-                  '`${stage.name}` appears more than once.');
+              throw CheckedFromJsonException(
+                travis,
+                'stages',
+                'MonoConfig',
+                '`${stage.name}` appears more than once.',
+              );
             }
             conditionalStages[stage.name] = stage;
           } else {
-            throw CheckedFromJsonException(travis, 'stages', 'MonoConfig',
-                'All values must be Map instances.');
+            throw CheckedFromJsonException(
+              travis,
+              'stages',
+              'MonoConfig',
+              'All values must be Map instances.',
+            );
           }
         }
       } else {
         throw CheckedFromJsonException(
-            travis, 'stages', 'MonoConfig', '`stages` must be an array.');
+          travis,
+          'stages',
+          'MonoConfig',
+          '`stages` must be an array.',
+        );
       }
     }
 
