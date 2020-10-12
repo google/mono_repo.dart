@@ -1,3 +1,7 @@
+## 2.4.1-dev
+
+* Respect the ordering of `stages` if configured in `mono_repo.yaml`.
+
 ## 2.4.0
 
 - Adds a `--validate` option to the `travis` command.
