@@ -140,7 +140,7 @@ name: pkg_b
         testGenerateTravisConfig,
         throwsUserExceptionWith(
             'Not all packages agree on `stages` ordering, found a cycle '
-            'between the following stages: [analyze, format]',
+            'between the following stages: `analyze`, `format`.',
             isNull));
   });
 
