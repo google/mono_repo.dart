@@ -4,11 +4,12 @@
 
 @Tags(['presubmit-only'])
 @OnPlatform({'windows': Skip('newlines are different')})
-
 import 'package:build_verify/build_verify.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('ensure_build',
-      () => expectBuildClean(packageRelativeDirectory: 'mono_repo'));
+  test(
+    'ensure_build',
+    () => expectBuildClean(packageRelativeDirectory: 'mono_repo'),
+  );
 }

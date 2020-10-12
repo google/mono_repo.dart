@@ -19,12 +19,13 @@ final _dummyPubspec = Pubspec('_example');
 String _encodeJson(Object input) =>
     const JsonEncoder.withIndent(' ').convert(input);
 
-Matcher throwsCheckedFromJsonException(String prettyValue) =>
-    throwsA(const TypeMatcher<CheckedFromJsonException>().having((e) {
-      final prettyValue = toParsedYamlExceptionOrNull(e).formattedMessage;
-      printOnFailure("r'''\n$prettyValue'''");
-      return prettyValue;
-    }, 'prettyPrint', prettyValue));
+Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(
+      const TypeMatcher<CheckedFromJsonException>().having((e) {
+        final prettyValue = toParsedYamlExceptionOrNull(e).formattedMessage;
+        printOnFailure("r'''\n$prettyValue'''");
+        return prettyValue;
+      }, 'prettyPrint', prettyValue),
+    );
 
 PackageConfig _parse(map) => PackageConfig.parse(
     'a', _dummyPubspec, loadYamlOrdered(_encodeJson(map)) as Map);

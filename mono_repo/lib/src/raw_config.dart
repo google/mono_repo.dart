@@ -114,7 +114,11 @@ class RawStage {
     } on ArgumentError catch (error) // ignore: avoid_catching_errors
     {
       throw CheckedFromJsonException(
-          json, error.name, 'RawStage', error.message?.toString());
+        json,
+        error.name,
+        'RawStage',
+        error.message?.toString(),
+      );
     }
   }
 

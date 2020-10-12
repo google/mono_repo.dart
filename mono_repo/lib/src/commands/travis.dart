@@ -52,10 +52,12 @@ class TravisCommand extends MonoRepoCommand {
   }
 
   @override
-  void run() => generateTravisConfig(rootConfig(),
-      prettyAnsi: argResults['pretty-ansi'] as bool,
-      useGet: argResults['use-get'] as bool,
-      validateOnly: argResults['validate'] as bool);
+  void run() => generateTravisConfig(
+        rootConfig(),
+        prettyAnsi: argResults['pretty-ansi'] as bool,
+        useGet: argResults['use-get'] as bool,
+        validateOnly: argResults['validate'] as bool,
+      );
 }
 
 void generateTravisConfig(
@@ -160,10 +162,17 @@ void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
     print(yellow.wrap('Make sure to mark `$travisShPath` as executable.'));
     print(yellow.wrap('  chmod +x $travisShPath'));
     if (Platform.isWindows) {
-      print(yellow.wrap('It appears you are using Windows, and may not have '
-          'access to chmod.'));
-      print(yellow.wrap('If you are using git, the following will emulate the '
-          'Unix permissions change:'));
+      print(
+        yellow.wrap(
+          'It appears you are using Windows, and may not have access to chmod.',
+        ),
+      );
+      print(
+        yellow.wrap(
+          'If you are using git, the following will emulate the Unix '
+          'permissions change:',
+        ),
+      );
       print(yellow.wrap('  git update-index --add --chmod=+x $travisShPath'));
     }
   }
@@ -251,12 +260,20 @@ void _logPkgs(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {
     print(styleBold.wrap('package:${pkg.relativePath}'));
     if (pkg.sdks != null && !pkg.dartSdkConfigUsed) {
-      print(yellow.wrap('  `dart` values (${pkg.sdks.join(', ')}) are not used '
-          'and can be removed.'));
+      print(
+        yellow.wrap(
+          '  `dart` values (${pkg.sdks.join(', ')}) are not used '
+          'and can be removed.',
+        ),
+      );
     }
     if (pkg.oses != null && !pkg.osConfigUsed) {
-      print(yellow.wrap('  `os` values (${pkg.oses.join(', ')}) are not used '
-          'and can be removed.'));
+      print(
+        yellow.wrap(
+          '  `os` values (${pkg.oses.join(', ')}) are not used '
+          'and can be removed.',
+        ),
+      );
     }
   }
 }
@@ -341,8 +358,12 @@ String _travisYml(
     if (disallowedExplicitVersions.isNotEmpty) {
       final disallowedString =
           disallowedExplicitVersions.map((v) => '`$v`').join(', ');
-      print(yellow.wrap('  There are jobs defined that are not compatible with '
-          'the package SDK constraint ($sdkConstraint): $disallowedString.'));
+      print(
+        yellow.wrap(
+          '  There are jobs defined that are not compatible with '
+          'the package SDK constraint ($sdkConstraint): $disallowedString.',
+        ),
+      );
     }
   }
 
@@ -519,8 +540,9 @@ Iterable<Map<String, String>> _listJobs(
       final packages = entry.value.map((t) => t.job.package).toList();
       yield entry.key.jobYaml(packages);
     } else {
-      yield* entry.value
-          .map((jobEntry) => jobEntry.jobYaml([jobEntry.job.package]));
+      yield* entry.value.map(
+        (jobEntry) => jobEntry.jobYaml([jobEntry.job.package]),
+      );
     }
   }
 }

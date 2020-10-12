@@ -28,11 +28,13 @@ void main() {
       ]).create();
 
       expect(
-          () => presubmit(RootConfig(rootDirectory: d.sandbox)),
-          throwsUserExceptionWith(
-              'No $travisShPath file found, please run the `travis` '
-              'command first.',
-              isNull));
+        () => presubmit(RootConfig(rootDirectory: d.sandbox)),
+        throwsUserExceptionWith(
+          'No $travisShPath file found, please run the `travis` '
+          'command first.',
+          isNull,
+        ),
+      );
     });
   });
 
@@ -67,13 +69,18 @@ void main() {
 
       await overrideAnsiOutput(false, () async {
         await expectLater(
-            () => generateTravisConfig(RootConfig(rootDirectory: repoPath),
-                pkgVersion: '1.2.3'),
-            prints(stringContainsInOrder([
-              'package:pkg_a',
-              'package:pkg_b',
-              'Make sure to mark `./tool/travis.sh` as executable.',
-            ])));
+          () => generateTravisConfig(RootConfig(rootDirectory: repoPath),
+              pkgVersion: '1.2.3'),
+          prints(
+            stringContainsInOrder(
+              [
+                'package:pkg_a',
+                'package:pkg_b',
+                'Make sure to mark `./tool/travis.sh` as executable.',
+              ],
+            ),
+          ),
+        );
       });
 
       await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
@@ -87,13 +94,15 @@ void main() {
       Directory(repoPath).deleteSync(recursive: true);
     });
 
-    test('runs all tasks and packages', () async {
-      final result = await Process.run(
-          pubBinary, ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
-          workingDirectory: repoPath);
-      expect(result.exitCode, 0,
-          reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
-      expect(result.stdout, '''
+    test(
+      'runs all tasks and packages',
+      () async {
+        final result = await Process.run(
+            pubBinary, ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
+            workingDirectory: repoPath);
+        expect(result.exitCode, 0,
+            reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
+        expect(result.stdout, '''
 pkg_a
   SDK: dev TASK: dartanalyzer .
     success
@@ -113,7 +122,9 @@ pkg_b
   SDK: stable TASK: dartfmt -n --set-exit-if-changed .
     skipped, mismatched sdk
 ''');
-    }, timeout: const Timeout.factor(2));
+      },
+      timeout: const Timeout.factor(2),
+    );
 
     test('can filter by package', () async {
       final result = await Process.run(
@@ -196,10 +207,13 @@ pkg_b
             workingDirectory: repoPath);
         expect(result.exitCode, 1,
             reason: 'Any failing tasks should give a non-zero exit code');
-        expect(result.stdout, startsWith('''
+        expect(
+          result.stdout,
+          startsWith('''
 pkg_a
   SDK: dev TASK: pub run test
-    failure, '''));
+    failure, '''),
+        );
         printOnFailure(result.stdout as String);
         final stdOutString = result.stdout as String;
         const testFileName = 'pkg_a_test_dev.txt';

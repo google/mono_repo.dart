@@ -22,8 +22,10 @@ void main() {
   test('readme contains latest task output', () {
     final readme = File('README.md');
 
-    expect(readme.readAsStringSync().replaceAll('\r', ''),
-        contains('```\n$_helpOutput\n```'));
+    expect(
+      readme.readAsStringSync().replaceAll('\r', ''),
+      contains('```\n$_helpOutput\n```'),
+    );
   });
 }
 

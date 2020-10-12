@@ -33,8 +33,14 @@ Future<void> check(RootConfig rootConfig) async {
 
 Map<String, PackageReport> getPackageReports(RootConfig rootConfig) {
   final siblings = rootConfig.map((pc) => pc.pubspec).toSet();
-  return Map.fromEntries(rootConfig.map((p) =>
-      MapEntry(p.relativePath, PackageReport.create(p.pubspec, siblings))));
+  return Map.fromEntries(
+    rootConfig.map(
+      (p) => MapEntry(
+        p.relativePath,
+        PackageReport.create(p.pubspec, siblings),
+      ),
+    ),
+  );
 }
 
 void _print(String relativePath, PackageReport report) {
@@ -69,6 +75,7 @@ class PackageReport {
   bool get published => pubspec.version != null;
 
   String get packageName => pubspec.name;
+
   Version get version => pubspec.version;
 
   PackageReport(this.pubspec, this.siblings);

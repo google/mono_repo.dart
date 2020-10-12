@@ -22,11 +22,13 @@ void main() {
     await d.dir('sub_pkg').create();
 
     expect(
-        testGenerateTravisConfig,
-        throwsUserExceptionWith(
-            'No packages found.',
-            'Each target package directory must contain a '
-                '`mono_pkg.yaml` file.'));
+      testGenerateTravisConfig,
+      throwsUserExceptionWith(
+        'No packages found.',
+        'Each target package directory must contain a '
+            '`mono_pkg.yaml` file.',
+      ),
+    );
   });
 
   test('$monoPkgFileName with non-Map contents', () async {
@@ -39,9 +41,9 @@ name: pkg_name
 
     final path = p.join('sub_pkg', 'mono_pkg.yaml');
     expect(
-        testGenerateTravisConfig,
-        throwsUserExceptionWith(
-            'The contents of `$path` must be a Map.', isNull));
+      testGenerateTravisConfig,
+      throwsUserExceptionWith('The contents of `$path` must be a Map.', isNull),
+    );
   });
 
   test('empty $monoPkgFileName file', () async {
@@ -53,10 +55,12 @@ name: pkg_name
     ]).create();
 
     expect(
-        testGenerateTravisConfig,
-        throwsUserExceptionWith(
-            'No entries created. Check your nested `$monoPkgFileName` files.',
-            isNull));
+      testGenerateTravisConfig,
+      throwsUserExceptionWith(
+        'No entries created. Check your nested `$monoPkgFileName` files.',
+        isNull,
+      ),
+    );
   });
 
   test('fails with unsupported configuration', () async {
@@ -96,11 +100,13 @@ name: pkg_name
     ]).create();
 
     expect(
-        testGenerateTravisConfig,
-        throwsUserExceptionWith(
-            'Found legacy package configuration file '
-                '(".mono_repo.yml") in `sub_pkg`.',
-            'Rename to "mono_pkg.yaml".'));
+      testGenerateTravisConfig,
+      throwsUserExceptionWith(
+        'Found legacy package configuration file '
+            '(".mono_repo.yml") in `sub_pkg`.',
+        'Rename to "mono_pkg.yaml".',
+      ),
+    );
   });
 
   test('conflicting stage orders are not allowed', () async {
@@ -137,11 +143,13 @@ name: pkg_b
     ]).create();
 
     expect(
-        testGenerateTravisConfig,
-        throwsUserExceptionWith(
-            'Not all packages agree on `stages` ordering, found a cycle '
-            'between the following stages: `analyze`, `format`.',
-            isNull));
+      testGenerateTravisConfig,
+      throwsUserExceptionWith(
+        'Not all packages agree on `stages` ordering, found a cycle '
+        'between the following stages: `analyze`, `format`.',
+        isNull,
+      ),
+    );
   });
 
   group('--validate', () {
@@ -155,8 +163,10 @@ name: pkg_name
     });
 
     test('throws if there is no generated config', () async {
-      await expectLater(testGenerateTravisConfig(validateOnly: true),
-          throwsA(isA<UserException>()));
+      await expectLater(
+        testGenerateTravisConfig(validateOnly: true),
+        throwsA(isA<UserException>()),
+      );
     });
 
     test('throws if the previous config doesn\'t match', () async {
@@ -164,8 +174,10 @@ name: pkg_name
       await d.dir('tool', [
         d.file('travis.sh', ''),
       ]).create();
-      await expectLater(testGenerateTravisConfig(validateOnly: true),
-          throwsA(isA<UserException>()));
+      await expectLater(
+        testGenerateTravisConfig(validateOnly: true),
+        throwsA(isA<UserException>()),
+      );
     });
 
     test("doesn't throw if the previous config is up to date", () async {
@@ -194,11 +206,12 @@ name: pkg_name
     ]).create();
 
     await expectLater(
-        testGenerateTravisConfig,
-        prints(stringContainsInOrder([
-          'package:sub_pkg',
-          'Make sure to mark `./tool/travis.sh` as executable.'
-        ])));
+      testGenerateTravisConfig,
+      prints(stringContainsInOrder([
+        'package:sub_pkg',
+        'Make sure to mark `./tool/travis.sh` as executable.'
+      ])),
+    );
     await d.file(travisFileName, _config2Yaml).validate();
     await d.file(travisShPath, _config2Shell).validate();
   });
@@ -214,13 +227,14 @@ environment:
     ]).create();
 
     await expectLater(
-        testGenerateTravisConfig,
-        prints(stringContainsInOrder([
-          'package:sub_pkg',
-          '  There are jobs defined that are not compatible with the package '
-              'SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.',
-          'Make sure to mark `./tool/travis.sh` as executable.',
-        ])));
+      testGenerateTravisConfig,
+      prints(stringContainsInOrder([
+        'package:sub_pkg',
+        '  There are jobs defined that are not compatible with the package '
+            'SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.',
+        'Make sure to mark `./tool/travis.sh` as executable.',
+      ])),
+    );
 
     await d.file(travisFileName, _config2Yaml).validate();
     await d.file(travisShPath, _config2Shell).validate();
@@ -235,11 +249,12 @@ name: pkg_name
     ]).create();
 
     await expectLater(
-        testGenerateCustomTravisConfig(useGet: true),
-        prints(stringContainsInOrder([
-          'package:sub_pkg',
-          'Make sure to mark `./tool/travis.sh` as executable.'
-        ])));
+      testGenerateCustomTravisConfig(useGet: true),
+      prints(stringContainsInOrder([
+        'package:sub_pkg',
+        'Make sure to mark `./tool/travis.sh` as executable.'
+      ])),
+    );
 
     // replacement isn't actually how useGet works, but it is a concise test
     await d
@@ -289,12 +304,13 @@ name: pkg_b
     ]).create();
 
     await expectLater(
-        testGenerateTravisConfig,
-        prints(stringContainsInOrder([
-          'package:pkg_a',
-          'package:pkg_b',
-          'Make sure to mark `./tool/travis.sh` as executable.'
-        ])));
+      testGenerateTravisConfig,
+      prints(stringContainsInOrder([
+        'package:pkg_a',
+        'package:pkg_b',
+        'Make sure to mark `./tool/travis.sh` as executable.'
+      ])),
+    );
 
     await d.file(travisFileName, '''
 # $createdWithText
@@ -438,12 +454,13 @@ name: pkg_b
     ]).create();
 
     await expectLater(
-        testGenerateTravisConfig,
-        prints(stringContainsInOrder([
-          'package:pkg_a',
-          'package:pkg_b',
-          'Make sure to mark `./tool/travis.sh` as executable.'
-        ])));
+      testGenerateTravisConfig,
+      prints(stringContainsInOrder([
+        'package:pkg_a',
+        'package:pkg_b',
+        'Make sure to mark `./tool/travis.sh` as executable.'
+      ])),
+    );
 
     await d.file(travisFileName, '''
 # $createdWithText
@@ -563,10 +580,11 @@ name: pkg_a
     ]).create();
 
     expect(
-        testGenerateTravisConfig,
-        throwsAParsedYamlException(
-          contains('"dart" is missing.'),
-        ));
+      testGenerateTravisConfig,
+      throwsAParsedYamlException(
+        contains('"dart" is missing.'),
+      ),
+    );
   });
 
   test('top-level `dart` and `os` key values are a no-op with group overrides',
@@ -597,12 +615,13 @@ name: pkg_a
     ]).create();
 
     await expectLater(
-        testGenerateTravisConfig,
-        prints(stringContainsInOrder([
-          'package:pkg_a',
-          '`dart` values (unneeded) are not used and can be removed.',
-          'Make sure to mark `./tool/travis.sh` as executable.'
-        ])));
+      testGenerateTravisConfig,
+      prints(stringContainsInOrder([
+        'package:pkg_a',
+        '`dart` values (unneeded) are not used and can be removed.',
+        'Make sure to mark `./tool/travis.sh` as executable.'
+      ])),
+    );
 
     await d.file(travisFileName, '''
 # $createdWithText
@@ -715,17 +734,20 @@ name: pkg_name
     }
 
     Future validConfig(
-        String monoRepoContent, Object expectedTravisContent) async {
+      String monoRepoContent,
+      Object expectedTravisContent,
+    ) async {
       await populateConfig(monoRepoContent);
 
       await d.nothing(travisShPath).validate();
 
       await expectLater(
-          testGenerateTravisConfig,
-          prints(stringContainsInOrder([
-            'package:sub_pkg',
-            'Make sure to mark `./tool/travis.sh` as executable.'
-          ])));
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:sub_pkg',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])),
+      );
 
       await d.file(travisFileName, expectedTravisContent).validate();
       await d.file(travisShPath, _config2Shell).validate();
@@ -736,7 +758,8 @@ name: pkg_name
     });
 
     test('pkg:build integration travis.yml file', () async {
-      await validConfig(r'''
+      await validConfig(
+        r'''
 travis:
   sudo: required
   addons:
@@ -747,7 +770,8 @@ travis:
       - not_master
   after_failure:
   - tool/report_failure.sh
-''', contains('''
+''',
+        contains('''
 # $createdWithText
 language: dart
 
@@ -764,7 +788,8 @@ after_failure:
 
 jobs:
   include:
-'''));
+'''),
+      );
     });
 
     test('only supports a travis key', () async {
@@ -828,10 +853,11 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsAParsedYamlException(
-                startsWith('line 3, column 7 of mono_repo.yaml: '
-                    'Required keys are missing: if.')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+              startsWith('line 3, column 7 of mono_repo.yaml: '
+                  'Required keys are missing: if.')),
+        );
       });
 
       test('map item must be exactly name + if – no more', () async {
@@ -844,10 +870,14 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsAParsedYamlException(startsWith(
-                'line 5, column 7 of mono_repo.yaml: Unrecognized keys: [bob]; '
-                'supported keys: [name, if]')));
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(
+            startsWith(
+              'line 5, column 7 of mono_repo.yaml: Unrecognized keys: [bob]; '
+              'supported keys: [name, if]',
+            ),
+          ),
+        );
       });
 
       test('cannot have duplicate names', () async {
@@ -928,11 +958,12 @@ name: pkg_name
         ]).create();
 
         await expectLater(
-            testGenerateTravisConfig,
-            prints(stringContainsInOrder([
-              'package:sub_pkg',
-              'Make sure to mark `./tool/travis.sh` as executable.'
-            ])));
+          testGenerateTravisConfig,
+          prints(stringContainsInOrder([
+            'package:sub_pkg',
+            'Make sure to mark `./tool/travis.sh` as executable.'
+          ])),
+        );
         await d.file(travisFileName, contains(r'''
 stages:
   - a
@@ -1004,11 +1035,12 @@ stages:
           await populateConfig(monoConfigContent);
 
           expect(
-              testGenerateTravisConfig,
-              throwsAParsedYamlException(
-                contains(
-                    'Unsupported value for "travis". `travis` must be a Map.'),
-              ));
+            testGenerateTravisConfig,
+            throwsAParsedYamlException(
+              contains(
+                  'Unsupported value for "travis". `travis` must be a Map.'),
+            ),
+          );
         });
       }
     });

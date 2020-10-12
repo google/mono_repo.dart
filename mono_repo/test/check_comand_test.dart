@@ -15,11 +15,13 @@ void main() {
     await d.dir('subdir', [d.file('mono_pkg.yaml')]).create();
 
     expect(
-        () => getPackageReports(RootConfig(rootDirectory: d.sandbox)),
-        throwsUserExceptionWith(
-            'A `mono_pkg.yaml` file was found, but missing '
-            'an expected `pubspec.yaml` in `subdir`.',
-            isNull));
+      () => getPackageReports(RootConfig(rootDirectory: d.sandbox)),
+      throwsUserExceptionWith(
+        'A `mono_pkg.yaml` file was found, but missing '
+        'an expected `pubspec.yaml` in `subdir`.',
+        isNull,
+      ),
+    );
   });
 
   group('valid setup', () {

@@ -14,8 +14,10 @@ const createdWithText = 'Created with package:mono_repo v2.5.0-dev';
 
 Future<void> testGenerateTravisConfig({bool validateOnly = false}) async {
   overrideAnsiOutput(false, () {
-    generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
-        pkgVersion: '1.2.3', validateOnly: validateOnly);
+    generateTravisConfig(
+      RootConfig(rootDirectory: d.sandbox),
+      validateOnly: validateOnly,
+    );
   });
 }
 
@@ -29,20 +31,29 @@ Function testGenerateCustomTravisConfig(
         bool useGet = false,
         String pkgVersion = '1.2.3'}) =>
     () => overrideAnsiOutput(false, () {
-          generateTravisConfig(RootConfig(rootDirectory: d.sandbox),
-              prettyAnsi: prettyAnsi, useGet: useGet, pkgVersion: pkgVersion);
+          generateTravisConfig(
+            RootConfig(rootDirectory: d.sandbox),
+            prettyAnsi: prettyAnsi,
+            useGet: useGet,
+          );
         });
 
-Matcher throwsUserExceptionWith(Object message, Object details) =>
-    throwsA(const TypeMatcher<UserException>()
-        .having((e) => e.message, 'message', message)
-        .having((e) => e.details, 'details', details));
+Matcher throwsUserExceptionWith(Object message, Object details) => throwsA(
+      const TypeMatcher<UserException>()
+          .having((e) => e.message, 'message', message)
+          .having((e) => e.details, 'details', details),
+    );
 
-Matcher throwsAParsedYamlException(Object matcher) =>
-    throwsA(isA<ParsedYamlException>().having((e) {
-      printOnFailure("r'''\n${e.formattedMessage}'''");
-      return e.formattedMessage;
-    }, 'formattedMessage', matcher));
+Matcher throwsAParsedYamlException(Object matcher) => throwsA(
+      isA<ParsedYamlException>().having(
+        (e) {
+          printOnFailure("r'''\n${e.formattedMessage}'''");
+          return e.formattedMessage;
+        },
+        'formattedMessage',
+        matcher,
+      ),
+    );
 
 const testConfig2 = r'''
 dart:

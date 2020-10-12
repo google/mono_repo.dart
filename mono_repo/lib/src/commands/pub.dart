@@ -102,9 +102,12 @@ Future<void> pub(
     }
 
     print('');
-    print(wrapWith(
+    print(
+      wrapWith(
         'Starting `$executable ${packageArgs.join(' ')}` in `$dir`...',
-        [styleBold, lightBlue]));
+        [styleBold, lightBlue],
+      ),
+    );
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
     final proc = await Process.start(executable, packageArgs,
