@@ -291,8 +291,8 @@ name: pkg_b
           'Make sure to mark `./tool/travis.sh` as executable.'
         ])));
 
-    await d.file(travisFileName, r'''
-# Created with package:mono_repo v2.4.0
+    await d.file(travisFileName, '''
+# $createdWithText
 language: dart
 
 jobs:
@@ -326,7 +326,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - "\$HOME/.pub-cache"
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -337,7 +337,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v2.4.0
+# $createdWithText
 
 $windowsBoilerplate
 
@@ -440,8 +440,8 @@ name: pkg_b
           'Make sure to mark `./tool/travis.sh` as executable.'
         ])));
 
-    await d.file(travisFileName, r'''
-# Created with package:mono_repo v2.4.0
+    await d.file(travisFileName, '''
+# $createdWithText
 language: dart
 
 jobs:
@@ -475,7 +475,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - "\$HOME/.pub-cache"
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -486,7 +486,7 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v2.4.0
+# $createdWithText
 
 $windowsBoilerplate
 
@@ -599,8 +599,8 @@ name: pkg_a
           'Make sure to mark `./tool/travis.sh` as executable.'
         ])));
 
-    await d.file(travisFileName, r'''
-# Created with package:mono_repo v2.4.0
+    await d.file(travisFileName, '''
+# $createdWithText
 language: dart
 
 jobs:
@@ -628,14 +628,14 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - "\$HOME/.pub-cache"
 ''').validate();
     await d
         .file(
             travisShPath,
             '''
 #!/bin/bash
-# Created with package:mono_repo v2.4.0
+# $createdWithText
 
 $windowsBoilerplate
 
@@ -742,8 +742,8 @@ travis:
       - not_master
   after_failure:
   - tool/report_failure.sh
-''', contains(r'''
-# Created with package:mono_repo v2.4.0
+''', contains('''
+# $createdWithText
 language: dart
 
 # Custom configuration
@@ -1046,7 +1046,7 @@ stages:
 
 const _config2Shell = '''
 #!/bin/bash
-# Created with package:mono_repo v2.4.0
+# $createdWithText
 
 $windowsBoilerplate
 
@@ -1147,8 +1147,8 @@ done
 exit ${EXIT_CODE}
 """;
 
-const _config2Yaml = r'''
-# Created with package:mono_repo v2.4.0
+const _config2Yaml = '''
+# $createdWithText
 language: dart
 
 jobs:
@@ -1573,5 +1573,5 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - "\$HOME/.pub-cache"
 ''';
