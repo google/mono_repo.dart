@@ -168,15 +168,20 @@ name: pkg_name
           throwsA(isA<UserException>()));
     });
 
-    test('doesn\'t throw if the previous config is up to date', () async {
+    test("doesn't throw if the previous config is up to date", () async {
       await expectLater(
-          testGenerateTravisConfig,
-          prints(stringContainsInOrder([
-            'package:sub_pkg',
-            'Make sure to mark `./tool/travis.sh` as executable.'
-          ])));
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder([
+          'package:sub_pkg',
+          'Make sure to mark `./tool/travis.sh` as executable.'
+        ])),
+      );
+
       // Just check that this doesn't throw.
-      await testGenerateTravisConfig(validateOnly: true);
+      await expectLater(
+        testGenerateTravisConfig,
+        prints(stringContainsInOrder(['package:sub_pkg'])),
+      );
     });
   });
 

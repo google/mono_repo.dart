@@ -27,7 +27,18 @@ name: sub_pkg
 ''')
     ]).create();
 
-    await testGenerateTravisConfig();
+    await expectLater(
+      testGenerateTravisConfig,
+      prints(
+        stringContainsInOrder(
+          [
+            'package:sub_pkg\n',
+            'Make sure to mark `./tool/travis.sh` as executable.\n',
+            '  chmod +x ./tool/travis.sh\n',
+          ],
+        ),
+      ),
+    );
 
     await d.dir('.', [
       d.file(travisFileName, _travisYml),
