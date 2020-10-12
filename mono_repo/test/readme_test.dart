@@ -53,8 +53,8 @@ stages:
     - test
 ''';
 
-const _travisYml = r'''
-# Created with package:mono_repo v2.4.0
+const _travisYml = '''
+# $createdWithText
 language: dart
 
 jobs:
@@ -89,12 +89,12 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - "\$HOME/.pub-cache"
 ''';
 
 final _travisSh = '''
 #!/bin/bash
-# Created with package:mono_repo v2.4.0
+# $createdWithText
 
 $windowsBoilerplate
 
