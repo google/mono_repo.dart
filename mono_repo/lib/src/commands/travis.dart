@@ -12,7 +12,6 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
-import '../mono_config.dart';
 import '../package_config.dart';
 import '../root_config.dart';
 import '../shell_utils.dart';
@@ -427,9 +426,25 @@ Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
 List<Object> _calculateOrderedStages(RootConfig rootConfig) {
   // Convert the configs to a graph so we can run strongly connected components.
   final edges = <String, Set<String>>{};
+
+  String previous;
+  for (var stage in rootConfig.monoConfig.conditionalStages.keys) {
+    edges.putIfAbsent(stage, () => <String>{});
+    if (previous != null) {
+      edges[previous].add(stage);
+    }
+    previous = stage;
+  }
+
+  final rootMentionedStages = <String>{
+    ...rootConfig.monoConfig.conditionalStages.keys,
+    ...rootConfig.monoConfig.mergeStages,
+  };
+
   for (var config in rootConfig) {
     String previous;
     for (var stage in config.stageNames) {
+      rootMentionedStages.remove(stage);
       edges.putIfAbsent(stage, () => <String>{});
       if (previous != null) {
         edges[previous].add(stage);
@@ -437,6 +452,17 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       previous = stage;
     }
   }
+
+  if (rootMentionedStages.isNotEmpty) {
+    final items = rootMentionedStages.map((e) => '`$e`').join(', ');
+
+    throw UserException(
+      'Error parsing mono_repo.yaml',
+      details: 'One or more stage was referenced in `mono_repo.yaml` that do '
+          'not exist in any `mono_pkg.yaml` files: $items.',
+    );
+  }
+
   // Running strongly connected components lets us detect cycles (which aren't
   // allowed), and gives us the reverse order of what we ultimately want.
   final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
@@ -450,19 +476,12 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
     }
   }
 
-  final conditionalStages = Map<String, ConditionalStage>.from(
-    rootConfig.monoConfig.conditionalStages,
-  );
-
-  final unknownMergedStages = rootConfig.monoConfig.mergeStages.toSet();
-
   final orderedStages = components
       .map((c) {
         final stageName = c.first;
 
-        unknownMergedStages.remove(stageName);
-
-        final matchingStage = conditionalStages.remove(stageName);
+        final matchingStage =
+            rootConfig.monoConfig.conditionalStages[stageName];
         if (matchingStage != null) {
           return matchingStage.toJson();
         }
@@ -472,20 +491,6 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       .toList()
       .reversed
       .toList();
-
-  final leftOvers = [
-    ...unknownMergedStages,
-    ...conditionalStages.keys,
-  ];
-
-  if (leftOvers.isNotEmpty) {
-    throw UserException(
-      'Error parsing mono_repo.yaml',
-      details: 'Stage `${leftOvers.first}` was referenced in '
-          '`mono_repo.yaml`, but it does not exist in any '
-          '`mono_pkg.yaml` files.',
-    );
-  }
 
   return orderedStages;
 }

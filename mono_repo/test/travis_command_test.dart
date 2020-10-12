@@ -876,11 +876,74 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
+          testGenerateTravisConfig,
+          throwsUserExceptionWith(
+            'Error parsing mono_repo.yaml',
+            'One or more stage was referenced in `mono_repo.yaml` that do not '
+                'exist in any `mono_pkg.yaml` files: `bob`.',
+          ),
+        );
+      });
+
+      test('order is honored', () async {
+        final monoConfigContent = toYaml({
+          'travis': {
+            'stages': [
+              {'name': 'a', 'if': 'if'},
+              {'name': 'b', 'if': 'if'},
+              {'name': 'c', 'if': 'if'},
+              {'name': 'd', 'if': 'if'},
+            ]
+          }
+        });
+        await d.file('mono_repo.yaml', monoConfigContent).create();
+        await d.dir('sub_pkg1', [
+          d.file(monoPkgFileName, r'''
+dart:
+  - dev
+stages:
+  - a:
+    - dartfmt
+  - c:
+    - test
+'''),
+          d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+        ]).create();
+
+        await d.dir('sub_pkg2', [
+          d.file(monoPkgFileName, r'''
+dart:
+  - dev
+stages:
+  - b:
+    - dartfmt
+  - d:
+    - test
+'''),
+          d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+        ]).create();
+
+        await expectLater(
             testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                'Stage `bob` was referenced in `mono_repo.yaml`, but it does '
-                    'not exist in any `mono_pkg.yaml` files.'));
+            prints(stringContainsInOrder([
+              'package:sub_pkg',
+              'Make sure to mark `./tool/travis.sh` as executable.'
+            ])));
+        await d.file(travisFileName, contains(r'''
+stages:
+  - name: a
+    if: if
+  - name: b
+    if: if
+  - name: c
+    if: if
+  - name: d
+    if: if
+''')).validate();
       });
     });
 
@@ -923,11 +986,13 @@ jobs:
         });
         await populateConfig(monoConfigContent);
         expect(
-            testGenerateTravisConfig,
-            throwsUserExceptionWith(
-                'Error parsing mono_repo.yaml',
-                'Stage `bob` was referenced in `mono_repo.yaml`, but it does '
-                    'not exist in any `mono_pkg.yaml` files.'));
+          testGenerateTravisConfig,
+          throwsUserExceptionWith(
+            'Error parsing mono_repo.yaml',
+            'One or more stage was referenced in `mono_repo.yaml` that do not '
+                'exist in any `mono_pkg.yaml` files: `bob`.',
+          ),
+        );
       });
     });
 
