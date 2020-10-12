@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
@@ -20,8 +21,11 @@ import '../version.dart';
 import '../yaml.dart';
 import 'mono_repo_command.dart';
 
-String _createdWith(String pkgVersion) =>
-    'Created with package:mono_repo v$pkgVersion';
+final skipCreatedWithSentinel = Object();
+
+String _createdWith() => Zone.current[skipCreatedWithSentinel] == true
+    ? ''
+    : '# Created with package:mono_repo v$packageVersion\n';
 
 class TravisCommand extends MonoRepoCommand {
   @override
@@ -65,14 +69,15 @@ void generateTravisConfig(
   bool prettyAnsi = true,
   bool useGet = false,
   bool validateOnly = false,
-  String pkgVersion,
 }) {
   prettyAnsi ??= true;
   useGet ??= false;
-  pkgVersion ??= packageVersion;
   validateOnly ??= false;
-  final travisConfig = GeneratedTravisConfig.generate(configs,
-      prettyAnsi: prettyAnsi, useGet: useGet);
+  final travisConfig = GeneratedTravisConfig.generate(
+    configs,
+    prettyAnsi: prettyAnsi,
+    useGet: useGet,
+  );
   if (validateOnly) {
     _checkTravisYml(configs.rootDirectory, travisConfig);
     _checkTravisScript(configs.rootDirectory, travisConfig);
@@ -93,23 +98,20 @@ class GeneratedTravisConfig {
     RootConfig configs, {
     bool prettyAnsi = true,
     bool useGet = false,
-    String pkgVersion,
   }) {
     prettyAnsi ??= true;
     useGet ??= false;
-    pkgVersion ??= packageVersion;
 
     _logPkgs(configs);
 
     final commandsToKeys = extractCommands(configs);
 
-    final yml = _travisYml(configs, commandsToKeys, pkgVersion);
+    final yml = _travisYml(configs, commandsToKeys);
 
     final sh = _travisSh(
       _calculateTaskEntries(commandsToKeys, prettyAnsi),
       prettyAnsi,
       useGet ? 'get' : 'upgrade',
-      pkgVersion,
     );
 
     return GeneratedTravisConfig._(yml, sh);
@@ -287,12 +289,14 @@ esac
 ''').map((l) => '    $l').join('\n');
 }
 
-String _travisSh(List<String> tasks, bool prettyAnsi,
-        String pubDependencyCommand, String pkgVersion) =>
+String _travisSh(
+  List<String> tasks,
+  bool prettyAnsi,
+  String pubDependencyCommand,
+) =>
     '''
 #!/bin/bash
-# ${_createdWith(pkgVersion)}
-
+${_createdWith()}
 $windowsBoilerplate
 
 if [[ -z \${PKGS} ]]; then
@@ -336,7 +340,6 @@ exit \${EXIT_CODE}
 String _travisYml(
   RootConfig configs,
   Map<String, String> commandsToKeys,
-  String pkgVersion,
 ) {
   final orderedStages = _calculateOrderedStages(configs);
 
@@ -415,8 +418,7 @@ ${toYaml({
         });
 
   return '''
-# ${_createdWith(pkgVersion)}
-${toYaml({'language': 'dart'})}
+${_createdWith()}${toYaml({'language': 'dart'})}
 $customTravis
 ${toYaml({
     'jobs': {'include': jobList}

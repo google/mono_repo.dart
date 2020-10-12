@@ -65,7 +65,6 @@ stages:
 ''';
 
 const _travisYml = '''
-# $createdWithText
 language: dart
 
 jobs:
@@ -103,9 +102,8 @@ cache:
     - "\$HOME/.pub-cache"
 ''';
 
-final _travisSh = '''
+const _travisSh = '''
 #!/bin/bash
-# $createdWithText
 
 $windowsBoilerplate
 

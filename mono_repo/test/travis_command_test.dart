@@ -163,8 +163,8 @@ name: pkg_name
     });
 
     test('throws if there is no generated config', () async {
-      await expectLater(
-        testGenerateTravisConfig(validateOnly: true),
+      expect(
+        () => testGenerateTravisConfig(validateOnly: true),
         throwsA(isA<UserException>()),
       );
     });
@@ -174,8 +174,8 @@ name: pkg_name
       await d.dir('tool', [
         d.file('travis.sh', ''),
       ]).create();
-      await expectLater(
-        testGenerateTravisConfig(validateOnly: true),
+      expect(
+        () => testGenerateTravisConfig(validateOnly: true),
         throwsA(isA<UserException>()),
       );
     });
@@ -248,8 +248,8 @@ name: pkg_name
       ''')
     ]).create();
 
-    await expectLater(
-      testGenerateCustomTravisConfig(useGet: true),
+    expect(
+      () => testGenerateTravisConfig(useGet: true),
       prints(stringContainsInOrder([
         'package:sub_pkg',
         'Make sure to mark `./tool/travis.sh` as executable.'
@@ -312,8 +312,7 @@ name: pkg_b
       ])),
     );
 
-    await d.file(travisFileName, '''
-# $createdWithText
+    await d.file(travisFileName, r'''
 language: dart
 
 jobs:
@@ -347,7 +346,7 @@ branches:
 
 cache:
   directories:
-    - "\$HOME/.pub-cache"
+    - "$HOME/.pub-cache"
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -358,7 +357,6 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# $createdWithText
 
 $windowsBoilerplate
 
@@ -462,8 +460,7 @@ name: pkg_b
       ])),
     );
 
-    await d.file(travisFileName, '''
-# $createdWithText
+    await d.file(travisFileName, r'''
 language: dart
 
 jobs:
@@ -497,7 +494,7 @@ branches:
 
 cache:
   directories:
-    - "\$HOME/.pub-cache"
+    - "$HOME/.pub-cache"
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -508,7 +505,6 @@ cache:
             travisShPath,
             '''
 #!/bin/bash
-# $createdWithText
 
 $windowsBoilerplate
 
@@ -623,8 +619,7 @@ name: pkg_a
       ])),
     );
 
-    await d.file(travisFileName, '''
-# $createdWithText
+    await d.file(travisFileName, r'''
 language: dart
 
 jobs:
@@ -652,14 +647,13 @@ branches:
 
 cache:
   directories:
-    - "\$HOME/.pub-cache"
+    - "$HOME/.pub-cache"
 ''').validate();
     await d
         .file(
             travisShPath,
             '''
 #!/bin/bash
-# $createdWithText
 
 $windowsBoilerplate
 
@@ -772,7 +766,6 @@ travis:
   - tool/report_failure.sh
 ''',
         contains('''
-# $createdWithText
 language: dart
 
 # Custom configuration
@@ -1074,7 +1067,6 @@ stages:
 
 const _config2Shell = '''
 #!/bin/bash
-# $createdWithText
 
 $windowsBoilerplate
 
@@ -1175,8 +1167,7 @@ done
 exit ${EXIT_CODE}
 """;
 
-const _config2Yaml = '''
-# $createdWithText
+const _config2Yaml = r'''
 language: dart
 
 jobs:
@@ -1601,5 +1592,5 @@ branches:
 
 cache:
   directories:
-    - "\$HOME/.pub-cache"
+    - "$HOME/.pub-cache"
 ''';

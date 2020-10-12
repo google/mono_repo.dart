@@ -69,8 +69,7 @@ void main() {
 
       await overrideAnsiOutput(false, () async {
         await expectLater(
-          () => generateTravisConfig(RootConfig(rootDirectory: repoPath),
-              pkgVersion: '1.2.3'),
+          () => generateTravisConfig(RootConfig(rootDirectory: repoPath)),
           prints(
             stringContainsInOrder(
               [

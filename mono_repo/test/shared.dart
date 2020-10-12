@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/commands/travis.dart';
@@ -10,33 +12,23 @@ import 'package:mono_repo/src/user_exception.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-const createdWithText = 'Created with package:mono_repo v2.5.0-dev';
-
-Future<void> testGenerateTravisConfig({bool validateOnly = false}) async {
-  overrideAnsiOutput(false, () {
-    generateTravisConfig(
-      RootConfig(rootDirectory: d.sandbox),
-      validateOnly: validateOnly,
-    );
-  });
+void testGenerateTravisConfig({
+  bool validateOnly = false,
+  bool useGet = false,
+}) {
+  Zone.current.fork(
+    zoneValues: {skipCreatedWithSentinel: true},
+  ).run(
+    () => overrideAnsiOutput(
+      false,
+      () => generateTravisConfig(
+        RootConfig(rootDirectory: d.sandbox),
+        useGet: useGet,
+        validateOnly: validateOnly,
+      ),
+    ),
+  );
 }
-
-/// Creates a function similar to [testGenerateTravisConfig], except with
-/// custom arguments gives to [generateTravisConfig].
-///
-/// If no arguments are given, the output should have the exact same behavior
-/// as [generateTravisConfig].
-Function testGenerateCustomTravisConfig(
-        {bool prettyAnsi = true,
-        bool useGet = false,
-        String pkgVersion = '1.2.3'}) =>
-    () => overrideAnsiOutput(false, () {
-          generateTravisConfig(
-            RootConfig(rootDirectory: d.sandbox),
-            prettyAnsi: prettyAnsi,
-            useGet: useGet,
-          );
-        });
 
 Matcher throwsUserExceptionWith(Object message, Object details) => throwsA(
       const TypeMatcher<UserException>()
