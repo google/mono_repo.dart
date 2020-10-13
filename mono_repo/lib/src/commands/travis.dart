@@ -590,26 +590,17 @@ class _TravisJobEntry {
 
 const _equality = DeepCollectionEquality();
 
-const windowsBoilerplate = r'''
+final windowsBoilerplate = '''
 # Support built in commands on windows out of the box.
-function pub {
-       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-        command pub.bat "$@"
-    else
-        command pub "$@"
-    fi
-}
-function dartfmt {
-       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-        command dartfmt.bat "$@"
-    else
-        command dartfmt "$@"
-    fi
-}
-function dartanalyzer {
-       if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-        command dartanalyzer.bat "$@"
-    else
-        command dartanalyzer "$@"
-    fi
+${dartCommandContent('pub')}
+${dartCommandContent('dartfmt')}
+${dartCommandContent('dartanalyzer')}''';
+
+String dartCommandContent(String commandName) => '''
+function $commandName {
+  if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+    command $commandName.bat "\$@"
+  else
+    command $commandName "\$@"
+  fi
 }''';
