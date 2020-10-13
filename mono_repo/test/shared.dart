@@ -15,19 +15,28 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 void testGenerateTravisConfig({
   bool validateOnly = false,
   bool useGet = false,
+  Object printMatcher,
 }) {
-  Zone.current.fork(
-    zoneValues: {skipCreatedWithSentinel: true},
-  ).run(
-    () => overrideAnsiOutput(
-      false,
-      () => generateTravisConfig(
-        RootConfig(rootDirectory: d.sandbox),
-        useGet: useGet,
-        validateOnly: validateOnly,
+  printMatcher ??= isEmpty;
+  final printOutput = <String>[];
+  try {
+    Zone.current.fork(
+        zoneValues: {skipCreatedWithSentinel: true},
+        specification: ZoneSpecification(print: (z1, zd, z2, value) {
+          printOutput.add(value);
+        })).run(
+      () => overrideAnsiOutput(
+        false,
+        () => generateTravisConfig(
+          RootConfig(rootDirectory: d.sandbox),
+          useGet: useGet,
+          validateOnly: validateOnly,
+        ),
       ),
-    ),
-  );
+    );
+  } finally {
+    expect(printOutput.join('\n'), printMatcher);
+  }
 }
 
 Matcher throwsUserExceptionWith(Object message, Object details) => throwsA(
