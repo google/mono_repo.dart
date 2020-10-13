@@ -14,16 +14,26 @@ const _monoConfigFileName = 'mono_repo.yaml';
 /// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
 const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 
-const _allowedMonoConfigKeys = {'travis', 'merge_stages'};
+const _allowedMonoConfigKeys = {
+  'merge_stages',
+  'self_validate',
+  'travis',
+};
 
 class MonoConfig {
+  final bool selfValidate;
   final Map<String, dynamic> travis;
   final Map<String, ConditionalStage> conditionalStages;
   final Set<String> mergeStages;
 
-  MonoConfig._(this.travis, this.conditionalStages, this.mergeStages);
+  MonoConfig._(
+    this.travis,
+    this.conditionalStages,
+    this.mergeStages,
+    this.selfValidate,
+  );
 
-  factory MonoConfig(Map travis, Set<String> mergeStages) {
+  factory MonoConfig(Map travis, Set<String> mergeStages, bool selfValidate) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
@@ -79,6 +89,7 @@ class MonoConfig {
       travis.map((k, v) => MapEntry(k as String, v)),
       conditionalStages,
       mergeStages,
+      selfValidate,
     );
   }
 
@@ -107,6 +118,16 @@ class MonoConfig {
       );
     }
 
+    final selfValidate = json['self_validate'] ?? false;
+    if (selfValidate is! bool) {
+      throw CheckedFromJsonException(
+        json,
+        'self_validate',
+        'MonoConfig',
+        'Value must be `true` or `false`.',
+      );
+    }
+
     final mergeStages = json['merge_stages'] ?? [];
 
     if (mergeStages is List) {
@@ -119,7 +140,11 @@ class MonoConfig {
         );
       }
 
-      return MonoConfig(travis as Map, Set.from(mergeStages));
+      return MonoConfig(
+        travis as Map,
+        Set.from(mergeStages),
+        selfValidate as bool,
+      );
     } else {
       throw CheckedFromJsonException(
         json,
@@ -135,7 +160,7 @@ class MonoConfig {
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return MonoConfig({}, <String>{});
+      return MonoConfig({}, <String>{}, false);
     }
 
     return createWithCheck(() => MonoConfig.fromJson(yaml));

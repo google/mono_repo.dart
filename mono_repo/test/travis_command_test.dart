@@ -823,18 +823,21 @@ name: pkg_name
       ]).create();
     }
 
-    Future validConfig(
+    Future<void> validConfig(
       String monoRepoContent,
       Object expectedTravisContent,
     ) async {
       await populateConfig(monoRepoContent);
 
+      await d.nothing(travisFileName).validate();
       await d.nothing(travisShPath).validate();
+      await d.nothing(travisSelfValidateScriptPath).validate();
 
       testGenerateTravisConfig(
         printMatcher: stringContainsInOrder([
           'package:sub_pkg',
-          'Make sure to mark `tool/travis.sh` as executable.'
+          'Make sure to mark `tool/travis.sh` as executable.',
+          '  chmod +x tool/travis.sh'
         ]),
       );
 
@@ -887,12 +890,12 @@ jobs:
       await populateConfig(monoConfigContent);
       expect(
         testGenerateTravisConfig,
-        throwsAParsedYamlException(
-          startsWith(
-            'line 2, column 3 of mono_repo.yaml: Unsupported value for "other".'
-            ' Only `travis`, `merge_stages` keys are supported.',
-          ),
-        ),
+        throwsAParsedYamlException(r'''
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `merge_stages`, `self_validate`, `travis` keys are supported.
+  ╷
+2 │   stages: 5
+  │   ^^^^^^^^^
+  ╵'''),
       );
     });
 
@@ -1155,6 +1158,77 @@ stages:
           );
         });
       }
+    });
+
+    group('self_validate', () {
+      test('value must be bool', () async {
+        final monoConfigContent = toYaml({'self_validate': 'not a bool!'});
+        await populateConfig(monoConfigContent);
+
+        expect(
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(r'''
+line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Value must be `true` or `false`.
+  ╷
+1 │ self_validate: "not a bool!"
+  │                ^^^^^^^^^^^^^
+  ╵'''),
+        );
+      });
+
+      test('used with a valid configuration', () async {
+        final monoConfigContent = toYaml({'self_validate': true});
+
+        await populateConfig(monoConfigContent);
+
+        testGenerateTravisConfig(
+          printMatcher: stringContainsInOrder(
+            [
+              'package:sub_pkg',
+              'Make sure to mark `tool/travis.sh` as executable.',
+              '  chmod +x tool/travis.sh',
+              'Make sure to mark `tool/mono_repo_self_validate.sh` as executable.',
+              '  chmod +x tool/mono_repo_self_validate.sh',
+            ],
+          ),
+        );
+
+        await d
+            .file(
+                travisFileName,
+                stringContainsInOrder([
+                  r'''
+language: dart
+
+jobs:
+  include:
+    - stage: mono_repo_self_validate
+      name: mono_repo self validate
+      os: linux
+      script: tool/mono_repo_self_validate.sh
+''',
+                  r'''
+stages:
+  - mono_repo_self_validate
+  - analyze
+  - unit_test
+
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - "$HOME/.pub-cache"
+'''
+                ]))
+            .validate();
+        await d.file(travisShPath, travisShellOutput).validate();
+        await d
+            .file(travisSelfValidateScriptPath, contains('travis --validate'))
+            .validate();
+      });
     });
   });
 }

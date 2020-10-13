@@ -1,12 +1,16 @@
 ## 2.5.0-dev
 
 * Provide a better error when parsing a poorly formatted Yaml file.
-* `mono_pkg.yaml`:
-  * Task `command` entry: correctly handle a `List` containing strings.
 * `mono_repo.yaml`:
+  * **NEW!** Added support for `self_validate` boolean value.
+    If `true`, creates a shell script and associated task to install the same
+    version of `mono_repo` during CI and run `mono_repo travis --validate` to
+    ensure all files are up-to-date.
   * Respect the ordering of `stages`, if configured.
   * Allow `stages` values to be just a string – allows defining an explicit
     ordering of stages. 
+* `mono_pkg.yaml`:
+  * Task `command` entry: correctly handle a `List` containing strings.
 
 ## 2.4.0
 

@@ -11,6 +11,7 @@ import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
+import 'travis/travis_self_validate.dart';
 import 'travis/travis_shell.dart';
 import 'travis/travis_yaml.dart';
 
@@ -66,22 +67,34 @@ void generateTravisConfig(
     useGet: useGet,
   );
   if (validateOnly) {
-    _checkTravisYml(configs.rootDirectory, travisConfig);
-    _checkTravisScript(configs.rootDirectory, travisConfig);
+    _validateFile(
+      configs.rootDirectory,
+      travisConfig.travisYml,
+      travisFileName,
+    );
+    _validateFile(configs.rootDirectory, travisConfig.travisSh, travisShPath);
+    if (configs.monoConfig.selfValidate) {
+      _validateFile(
+        configs.rootDirectory,
+        travisConfig.selfValidateSh,
+        travisSelfValidateScriptPath,
+      );
+    } else {
+      // TODO: print a warning if it exists? Fail? Hrm...
+    }
   } else {
     _writeTravisYml(configs.rootDirectory, travisConfig);
-    _writeTravisScript(configs.rootDirectory, travisConfig);
-  }
-}
-
-/// Check existing `.travis.yml` versus the content in [config].
-///
-/// Throws a [TravisConfigOutOfDateException] if they do not match.
-void _checkTravisYml(String rootDirectory, GeneratedTravisConfig config) {
-  final yamlFile = File(p.join(rootDirectory, travisFileName));
-  if (!yamlFile.existsSync() ||
-      yamlFile.readAsStringSync() != config.travisYml) {
-    throw TravisConfigOutOfDateException();
+    _writeScript(configs.rootDirectory, travisShPath, travisConfig.travisSh);
+    if (configs.monoConfig.selfValidate) {
+      _writeScript(
+        configs.rootDirectory,
+        travisSelfValidateScriptPath,
+        travisConfig.selfValidateSh,
+      );
+    } else {
+      // TODO: check if self-validate script exists – and tell user they
+      // can/should deleted it
+    }
   }
 }
 
@@ -89,8 +102,9 @@ void _checkTravisYml(String rootDirectory, GeneratedTravisConfig config) {
 class GeneratedTravisConfig {
   final String travisYml;
   final String travisSh;
+  final String selfValidateSh;
 
-  GeneratedTravisConfig._(this.travisYml, this.travisSh);
+  GeneratedTravisConfig._(this.travisYml, this.travisSh, this.selfValidateSh);
 
   factory GeneratedTravisConfig.generate(
     RootConfig configs, {
@@ -112,7 +126,12 @@ class GeneratedTravisConfig {
       useGet ? 'get' : 'upgrade',
     );
 
-    return GeneratedTravisConfig._(yml, sh);
+    String selfValidateSh;
+    if (configs.monoConfig.selfValidate) {
+      selfValidateSh = generateSelfValidate();
+    }
+
+    return GeneratedTravisConfig._(yml, sh, selfValidateSh);
   }
 }
 
@@ -120,8 +139,10 @@ class GeneratedTravisConfig {
 /// the `--validate` option.
 class TravisConfigOutOfDateException extends UserException {
   TravisConfigOutOfDateException()
-      : super('Generated travis config is out of date',
-            details: 'Rerun `mono_repo travis` to update generated config');
+      : super(
+          'Generated travis config is out of date',
+          details: 'Rerun `mono_repo travis` to update generated config',
+        );
 }
 
 /// Write `.travis.yml`
@@ -131,40 +152,43 @@ void _writeTravisYml(String rootDirectory, GeneratedTravisConfig config) {
   print(styleDim.wrap('Wrote `$travisYamlPath`.'));
 }
 
-/// Checks the existing `tool/travis.sh` versus the content in [config].
+/// Checks [expectedPath] versus the content in [expectedContent].
 ///
 /// Throws a [TravisConfigOutOfDateException] if they do not match.
-void _checkTravisScript(String rootDirectory, GeneratedTravisConfig config) {
-  final shFile = File(p.join(rootDirectory, travisShPath));
-  if (!shFile.existsSync() || shFile.readAsStringSync() != config.travisSh) {
+void _validateFile(
+  String rootDirectory,
+  String expectedContent,
+  String expectedPath,
+) {
+  final shFile = File(p.join(rootDirectory, expectedPath));
+  if (!shFile.existsSync() || shFile.readAsStringSync() != expectedContent) {
     throw TravisConfigOutOfDateException();
   }
 }
 
-/// Write `tool/travis.sh`
-void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
-  final travisScriptPath = p.join(rootDirectory, travisShPath);
-  final travisScript = File(travisScriptPath);
+void _writeScript(String rootDirectory, String scriptPath, String content) {
+  final fullPath = p.join(rootDirectory, scriptPath);
+  final scriptFile = File(fullPath);
 
-  if (!travisScript.existsSync()) {
-    travisScript.createSync(recursive: true);
+  if (!scriptFile.existsSync()) {
+    scriptFile.createSync(recursive: true);
     for (var line in [
-      'Make sure to mark `$travisShPath` as executable.',
-      '  chmod +x $travisShPath',
+      'Make sure to mark `$scriptPath` as executable.',
+      '  chmod +x $scriptPath',
       if (Platform.isWindows) ...[
         'It appears you are using Windows, and may not have access to chmod.',
         'If you are using git, the following will emulate the Unix permissions '
             'change:',
-        '  git update-index --add --chmod=+x $travisShPath'
+        '  git update-index --add --chmod=+x $scriptPath'
       ],
     ]) {
       print(yellow.wrap(line));
     }
   }
 
-  travisScript.writeAsStringSync(config.travisSh);
-  // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
-  print(styleDim.wrap('Wrote `$travisScriptPath`.'));
+  scriptFile.writeAsStringSync(content);
+  // TODO: be clever w/ `scriptFile.statSync().mode` to see if it's executable
+  print(styleDim.wrap('Wrote `$fullPath`.'));
 }
 
 /// Gives a map of command to unique task key for all [configs].
