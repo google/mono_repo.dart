@@ -31,8 +31,8 @@ name: sub_pkg
       printMatcher: stringContainsInOrder(
         [
           'package:sub_pkg\n',
-          'Make sure to mark `./tool/travis.sh` as executable.\n',
-          '  chmod +x ./tool/travis.sh\n',
+          'Make sure to mark `tool/travis.sh` as executable.\n',
+          '  chmod +x tool/travis.sh\n',
         ],
       ),
     );
@@ -71,19 +71,19 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh dartanalyzer
+      script: tool/travis.sh dartanalyzer
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh dartfmt
+      script: tool/travis.sh dartfmt
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: ./tool/travis.sh test
+      script: tool/travis.sh test
 
 stages:
   - analyze

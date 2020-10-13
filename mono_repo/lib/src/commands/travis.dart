@@ -139,9 +139,9 @@ void _checkTravisYml(String rootDirectory, GeneratedTravisConfig config) {
 
 /// Write `.travis.yml`
 void _writeTravisYml(String rootDirectory, GeneratedTravisConfig config) {
-  final travisPath = p.join(rootDirectory, travisFileName);
-  File(travisPath).writeAsStringSync(config.travisYml);
-  print(styleDim.wrap('Wrote `$travisPath`.'));
+  final travisYamlPath = p.join(rootDirectory, travisFileName);
+  File(travisYamlPath).writeAsStringSync(config.travisYml);
+  print(styleDim.wrap('Wrote `$travisYamlPath`.'));
 }
 
 /// Checks the existing `tool/travis.sh` versus the content in [config].
@@ -156,8 +156,8 @@ void _checkTravisScript(String rootDirectory, GeneratedTravisConfig config) {
 
 /// Write `tool/travis.sh`
 void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
-  final travisFilePath = p.join(rootDirectory, travisShPath);
-  final travisScript = File(travisFilePath);
+  final travisScriptPath = p.join(rootDirectory, travisShPath);
+  final travisScript = File(travisScriptPath);
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
@@ -181,7 +181,7 @@ void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
 
   travisScript.writeAsStringSync(config.travisSh);
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
-  print(styleDim.wrap('Wrote `$travisFilePath`.'));
+  print(styleDim.wrap('Wrote `$travisScriptPath`.'));
 }
 
 List<String> _calculateTaskEntries(
@@ -573,7 +573,7 @@ class _TravisJobEntry {
       'dart': job.sdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
-      'script': './tool/travis.sh ${commands.join(' ')}',
+      'script': '$travisShPath ${commands.join(' ')}',
     };
   }
 
