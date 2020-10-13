@@ -1071,7 +1071,7 @@ stages:
   });
 }
 
-const _config2Shell = '''
+final _config2Shell = '''
 #!/bin/bash
 
 $windowsBoilerplate

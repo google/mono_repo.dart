@@ -99,7 +99,7 @@ cache:
     - "\$HOME/.pub-cache"
 ''';
 
-const _travisSh = '''
+final _travisSh = '''
 #!/bin/bash
 
 $windowsBoilerplate
