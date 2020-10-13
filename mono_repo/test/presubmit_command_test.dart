@@ -82,11 +82,16 @@ void main() {
         );
       });
 
-      await Process.run('chmod', ['+x', p.join('tool', 'travis.sh')],
-          workingDirectory: repoPath);
+      await Process.run(
+        'chmod',
+        ['+x', p.join('tool', 'travis.sh')],
+        workingDirectory: repoPath,
+      );
       await Process.run(pubBinary, ['get'], workingDirectory: pkgAPath);
-      await Process.run(pubBinary,
-          ['global', 'activate', '-s', 'path', Directory.current.path]);
+      await Process.run(
+        pubBinary,
+        ['global', 'activate', '-s', 'path', Directory.current.path],
+      );
     });
 
     tearDownAll(() {
@@ -138,8 +143,11 @@ pkg_b
             'pkg_b'
           ],
           workingDirectory: repoPath);
-      expect(result.exitCode, 0,
-          reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
+      expect(
+        result.exitCode,
+        0,
+        reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}',
+      );
       expect(result.stdout, '''
 pkg_b
   SDK: dev TASK: dartfmt -n --set-exit-if-changed .
@@ -220,8 +228,11 @@ pkg_a
         final end = stdOutString.indexOf(testFileName) + testFileName.length;
         final logPath = stdOutString.substring(start, end);
         final logFile = File(logPath);
-        expect(logFile.existsSync(), isTrue,
-            reason: 'Log file should exist: $logPath');
+        expect(
+          logFile.existsSync(),
+          isTrue,
+          reason: 'Log file should exist: $logPath',
+        );
         expect(logFile.readAsStringSync(), contains('Some tests failed'));
       });
     });
