@@ -75,7 +75,7 @@ void main() {
               [
                 'package:pkg_a',
                 'package:pkg_b',
-                'Make sure to mark `./tool/travis.sh` as executable.',
+                'Make sure to mark `tool/travis.sh` as executable.',
               ],
             ),
           ),
