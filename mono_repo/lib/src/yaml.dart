@@ -46,8 +46,10 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
   final yamlFile = File(p.join(rootDir, relativeFilePath));
 
   if (yamlFile.existsSync()) {
-    final pkgConfigYaml = loadYamlOrdered(yamlFile.readAsStringSync(),
-        sourceUrl: relativeFilePath);
+    final pkgConfigYaml = loadYamlOrdered(
+      yamlFile.readAsStringSync(),
+      sourceUrl: relativeFilePath,
+    );
 
     if (pkgConfigYaml == null) {
       return {};
@@ -121,7 +123,11 @@ bool _isSimple(Object source) =>
     source == null || source is bool || source is num || source is String;
 
 void _writeYaml(
-    StringBuffer buffer, Object source, int indent, bool parentIsMap) {
+  StringBuffer buffer,
+  Object source,
+  int indent,
+  bool parentIsMap,
+) {
   final spaces = '  ' * indent;
   if (source is String) {
     buffer.write(_escapeString(source));

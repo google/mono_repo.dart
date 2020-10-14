@@ -164,7 +164,12 @@ class TravisJob {
       _$TravisJobFromJson(json);
 
   factory TravisJob.parse(
-      String os, String package, String sdk, String stageName, Object yaml) {
+    String os,
+    String package,
+    String sdk,
+    String stageName,
+    Object yaml,
+  ) {
     String description;
     dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
@@ -174,8 +179,14 @@ class TravisJob {
       withoutDescription = yaml;
     }
     final tasks = Task.parseTaskOrGroup(withoutDescription);
-    return TravisJob(os, package, sdk, stageName, tasks,
-        description: description);
+    return TravisJob(
+      os,
+      package,
+      sdk,
+      stageName,
+      tasks,
+      description: description,
+    );
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
