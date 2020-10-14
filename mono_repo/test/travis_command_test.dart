@@ -743,8 +743,8 @@ name: pkg_a
 
       expect(
         testGenerateTravisConfig,
-        throwsAParsedYamlException(r'''
-line 6, column 14 of pkg_a/mono_pkg.yaml: Unsupported value for "command". Only supports a string or array of strings
+        throwsAParsedYamlException('''
+line 6, column 14 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "command". Only supports a string or array of strings
   ╷
 6 │   - command: {a:b}
   │              ^^^^^
@@ -767,8 +767,8 @@ stages:
 
     expect(
       testGenerateTravisConfig,
-      throwsAParsedYamlException(r'''
-line 6, column 18 of pkg_a/mono_pkg.yaml: Mapping values are not allowed here. Did you miss a colon earlier?
+      throwsAParsedYamlException('''
+line 6, column 18 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Mapping values are not allowed here. Did you miss a colon earlier?
   ╷
 6 │   - before_script: "echo hi"
   │                  ^
