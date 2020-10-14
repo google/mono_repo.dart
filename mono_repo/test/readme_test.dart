@@ -4,7 +4,7 @@
 
 import 'dart:io';
 
-import 'package:mono_repo/src/commands/travis.dart' show windowsBoilerplate;
+import 'package:mono_repo/src/commands/travis/travis_shell.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;

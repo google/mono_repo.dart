@@ -2,30 +2,17 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:collection';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:collection/collection.dart'
-    show groupBy, DeepCollectionEquality;
-import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../package_config.dart';
 import '../root_config.dart';
-import '../shell_utils.dart';
 import '../user_exception.dart';
-import '../version.dart';
-import '../yaml.dart';
 import 'mono_repo_command.dart';
-
-final skipCreatedWithSentinel = Object();
-
-String _createdWith() => Zone.current[skipCreatedWithSentinel] == true
-    ? ''
-    : '# Created with package:mono_repo v$packageVersion\n';
+import 'travis/travis_shell.dart';
+import 'travis/travis_yaml.dart';
 
 class TravisCommand extends MonoRepoCommand {
   @override
@@ -87,6 +74,17 @@ void generateTravisConfig(
   }
 }
 
+/// Check existing `.travis.yml` versus the content in [config].
+///
+/// Throws a [TravisConfigOutOfDateException] if they do not match.
+void _checkTravisYml(String rootDirectory, GeneratedTravisConfig config) {
+  final yamlFile = File(p.join(rootDirectory, travisFileName));
+  if (!yamlFile.existsSync() ||
+      yamlFile.readAsStringSync() != config.travisYml) {
+    throw TravisConfigOutOfDateException();
+  }
+}
+
 /// The generated yaml and shell script content for travis.
 class GeneratedTravisConfig {
   final String travisYml;
@@ -106,10 +104,10 @@ class GeneratedTravisConfig {
 
     final commandsToKeys = extractCommands(configs);
 
-    final yml = _travisYml(configs, commandsToKeys);
+    final yml = generateTravisYml(configs, commandsToKeys);
 
-    final sh = _travisSh(
-      _calculateTaskEntries(commandsToKeys, prettyAnsi),
+    final sh = generateTravisSh(
+      calculateTaskEntries(commandsToKeys, prettyAnsi),
       prettyAnsi,
       useGet ? 'get' : 'upgrade',
     );
@@ -124,17 +122,6 @@ class TravisConfigOutOfDateException extends UserException {
   TravisConfigOutOfDateException()
       : super('Generated travis config is out of date',
             details: 'Rerun `mono_repo travis` to update generated config');
-}
-
-/// Check existing `.travis.yml` versus the content in [config].
-///
-/// Throws a [TravisConfigOutOfDateException] if they do not match.
-void _checkTravisYml(String rootDirectory, GeneratedTravisConfig config) {
-  final yamlFile = File(p.join(rootDirectory, travisFileName));
-  if (!yamlFile.existsSync() ||
-      yamlFile.readAsStringSync() != config.travisYml) {
-    throw TravisConfigOutOfDateException();
-  }
 }
 
 /// Write `.travis.yml`
@@ -182,45 +169,6 @@ void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
   travisScript.writeAsStringSync(config.travisSh);
   // TODO: be clever w/ `travisScript.statSync().mode` to see if it's executable
   print(styleDim.wrap('Wrote `$travisScriptPath`.'));
-}
-
-List<String> _calculateTaskEntries(
-  Map<String, String> commandsToKeys,
-  bool prettyAnsi,
-) {
-  final taskEntries = <String>[];
-
-  void addEntry(String label, List<String> contentLines) {
-    assert(contentLines.isNotEmpty);
-    contentLines.add(';;');
-
-    final buffer = StringBuffer('$label)\n')
-      ..writeAll(contentLines.map((l) => '  $l'), '\n');
-
-    final output = buffer.toString();
-    if (!taskEntries.contains(output)) {
-      taskEntries.add(output);
-    }
-  }
-
-  commandsToKeys.forEach((command, taskKey) {
-    addEntry(taskKey, [
-      "echo '${wrapAnsi(prettyAnsi, resetAll, command)}'",
-      '$command || EXIT_CODE=\$?',
-    ]);
-  });
-
-  if (taskEntries.isEmpty) {
-    throw UserException(
-        'No entries created. Check your nested `$monoPkgFileName` files.');
-  }
-
-  taskEntries.sort();
-
-  final echoContent =
-      wrapAnsi(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!");
-  addEntry('*', ['echo -e "$echoContent"', 'EXIT_CODE=1']);
-  return taskEntries;
 }
 
 /// Gives a map of command to unique task key for all [configs].
@@ -279,328 +227,3 @@ void _logPkgs(Iterable<PackageConfig> configs) {
     }
   }
 }
-
-String _shellCase(String scriptVariable, List<String> entries) {
-  if (entries.isEmpty) return '';
-  return LineSplitter.split('''
-case \${$scriptVariable} in
-${entries.join('\n')}
-esac
-''').map((l) => '    $l').join('\n');
-}
-
-String _travisSh(
-  List<String> tasks,
-  bool prettyAnsi,
-  String pubDependencyCommand,
-) =>
-    '''
-#!/bin/bash
-${_createdWith()}
-$windowsBoilerplate
-
-if [[ -z \${PKGS} ]]; then
-  ${safeEcho(prettyAnsi, red, "PKGS environment variable must be set!")}
-  exit 1
-fi
-
-if [[ "\$#" == "0" ]]; then
-  ${safeEcho(prettyAnsi, red, "At least one task argument must be provided!")}
-  exit 1
-fi
-
-EXIT_CODE=0
-
-for PKG in \${PKGS}; do
-  echo -e "\\033[1mPKG: \${PKG}\\033[22m"
-  pushd "\${PKG}" || exit \$?
-
-  PUB_EXIT_CODE=0
-  pub $pubDependencyCommand --no-precompile || PUB_EXIT_CODE=\$?
-
-  if [[ \${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    ${safeEcho(prettyAnsi, red, "pub $pubDependencyCommand failed")}
-    popd
-    continue
-  fi
-
-  for TASK in "\$@"; do
-    echo
-    echo -e "\\033[1mPKG: \${PKG}; TASK: \${TASK}\\033[22m"
-${_shellCase('TASK', tasks)}
-  done
-
-  popd
-done
-
-exit \${EXIT_CODE}
-''';
-
-String _travisYml(
-  RootConfig configs,
-  Map<String, String> commandsToKeys,
-) {
-  final orderedStages = _calculateOrderedStages(configs);
-
-  for (var config in configs) {
-    final sdkConstraint = config.pubspec.environment['sdk'];
-
-    if (sdkConstraint == null) {
-      continue;
-    }
-
-    final disallowedExplicitVersions = config.jobs
-        .map((tj) => tj.explicitSdkVersion)
-        .where((v) => v != null)
-        .toSet()
-        .where((v) => !sdkConstraint.allows(v))
-        .toList()
-          ..sort();
-
-    if (disallowedExplicitVersions.isNotEmpty) {
-      final disallowedString =
-          disallowedExplicitVersions.map((v) => '`$v`').join(', ');
-      print(
-        yellow.wrap(
-          '  There are jobs defined that are not compatible with '
-          'the package SDK constraint ($sdkConstraint): $disallowedString.',
-        ),
-      );
-    }
-  }
-
-  final jobs = configs.expand((config) => config.jobs);
-
-  var customTravis = '';
-  if (configs.monoConfig.travis.isNotEmpty) {
-    customTravis = '\n# Custom configuration\n'
-        '${toYaml(configs.monoConfig.travis)}\n';
-  }
-
-  final branchConfig = configs.monoConfig.travis.containsKey('branches')
-      ? ''
-      : '''
-\n# Only building master means that we don't run two builds for each pull request.
-${toYaml({
-          'branches': {
-            'only': ['master']
-          }
-        })}
-''';
-
-  int stageIndex(String value) => orderedStages.indexWhere((e) {
-        if (e is String) {
-          return e == value;
-        }
-
-        return (e as Map)['name'] == value;
-      });
-
-  final jobList =
-      _listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages).toList()
-        ..sort((a, b) {
-          var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
-
-          if (value == 0) {
-            value = a['env'].compareTo(b['env']);
-          }
-          if (value == 0) {
-            value = a['script'].compareTo(b['script']);
-          }
-          if (value == 0) {
-            value = a['dart'].compareTo(b['dart']);
-          }
-          if (value == 0) {
-            value = a['os'].compareTo(b['os']);
-          }
-          return value;
-        });
-
-  return '''
-${_createdWith()}${toYaml({'language': 'dart'})}
-$customTravis
-${toYaml({
-    'jobs': {'include': jobList}
-  })}
-
-${toYaml({'stages': orderedStages})}
-$branchConfig
-${toYaml({
-    'cache': {'directories': _cacheDirs(configs)}
-  })}
-''';
-}
-
-Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
-  final items = SplayTreeSet<String>()..add('\$HOME/.pub-cache');
-
-  for (var entry in configs) {
-    for (var dir in entry.cacheDirectories) {
-      items.add(p.posix.join(entry.relativePath, dir));
-    }
-  }
-
-  return items;
-}
-
-/// Calculates the global stages ordering, and throws a [UserException] if it
-/// detects any cycles.
-List<Object> _calculateOrderedStages(RootConfig rootConfig) {
-  // Convert the configs to a graph so we can run strongly connected components.
-  final edges = <String, Set<String>>{};
-
-  String previous;
-  for (var stage in rootConfig.monoConfig.conditionalStages.keys) {
-    edges.putIfAbsent(stage, () => <String>{});
-    if (previous != null) {
-      edges[previous].add(stage);
-    }
-    previous = stage;
-  }
-
-  final rootMentionedStages = <String>{
-    ...rootConfig.monoConfig.conditionalStages.keys,
-    ...rootConfig.monoConfig.mergeStages,
-  };
-
-  for (var config in rootConfig) {
-    String previous;
-    for (var stage in config.stageNames) {
-      rootMentionedStages.remove(stage);
-      edges.putIfAbsent(stage, () => <String>{});
-      if (previous != null) {
-        edges[previous].add(stage);
-      }
-      previous = stage;
-    }
-  }
-
-  if (rootMentionedStages.isNotEmpty) {
-    final items = rootMentionedStages.map((e) => '`$e`').join(', ');
-
-    throw UserException(
-      'Error parsing mono_repo.yaml',
-      details: 'One or more stage was referenced in `mono_repo.yaml` that do '
-          'not exist in any `mono_pkg.yaml` files: $items.',
-    );
-  }
-
-  // Running strongly connected components lets us detect cycles (which aren't
-  // allowed), and gives us the reverse order of what we ultimately want.
-  final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
-  for (var component in components) {
-    if (component.length > 1) {
-      final items = component.map((e) => '`$e`').join(', ');
-      throw UserException(
-        'Not all packages agree on `stages` ordering, found '
-        'a cycle between the following stages: $items.',
-      );
-    }
-  }
-
-  final orderedStages = components
-      .map((c) {
-        final stageName = c.first;
-
-        final matchingStage =
-            rootConfig.monoConfig.conditionalStages[stageName];
-        if (matchingStage != null) {
-          return matchingStage.toJson();
-        }
-
-        return stageName;
-      })
-      .toList()
-      .reversed
-      .toList();
-
-  return orderedStages;
-}
-
-/// Lists all the jobs, setting their stage, environment, and script.
-Iterable<Map<String, String>> _listJobs(
-  Iterable<TravisJob> jobs,
-  Map<String, String> commandsToKeys,
-  Set<String> mergeStages,
-) sync* {
-  final jobEntries = <_TravisJobEntry>[];
-
-  for (var job in jobs) {
-    final commands =
-        job.tasks.map((task) => commandsToKeys[task.command]).toList();
-
-    jobEntries.add(
-        _TravisJobEntry(job, commands, mergeStages.contains(job.stageName)));
-  }
-
-  final groupedItems =
-      groupBy<_TravisJobEntry, _TravisJobEntry>(jobEntries, (e) => e);
-
-  for (var entry in groupedItems.entries) {
-    if (entry.key.merge) {
-      final packages = entry.value.map((t) => t.job.package).toList();
-      yield entry.key.jobYaml(packages);
-    } else {
-      yield* entry.value.map(
-        (jobEntry) => jobEntry.jobYaml([jobEntry.job.package]),
-      );
-    }
-  }
-}
-
-class _TravisJobEntry {
-  final TravisJob job;
-  final List<String> commands;
-  final bool merge;
-
-  _TravisJobEntry(this.job, this.commands, this.merge);
-
-  String _jobName(List<String> packages) {
-    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
-
-    return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
-        'TASKS: ${job.name}';
-  }
-
-  Map<String, String> jobYaml(List<String> packages) {
-    assert(packages.isNotEmpty);
-    assert(packages.contains(job.package));
-
-    return {
-      'stage': job.stageName,
-      'name': _jobName(packages),
-      'dart': job.sdk,
-      'os': job.os,
-      'env': 'PKGS="${packages.join(' ')}"',
-      'script': '$travisShPath ${commands.join(' ')}',
-    };
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      other is _TravisJobEntry &&
-      _equality.equals(_identityItems, other._identityItems);
-
-  @override
-  int get hashCode => _equality.hash(_identityItems);
-
-  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
-}
-
-const _equality = DeepCollectionEquality();
-
-final windowsBoilerplate = '''
-# Support built in commands on windows out of the box.
-${dartCommandContent('pub')}
-${dartCommandContent('dartfmt')}
-${dartCommandContent('dartanalyzer')}''';
-
-String dartCommandContent(String commandName) => '''
-function $commandName {
-  if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-    command $commandName.bat "\$@"
-  else
-    command $commandName "\$@"
-  fi
-}''';
