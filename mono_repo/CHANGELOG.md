@@ -1,5 +1,7 @@
 ## 2.5.0-dev
 
+* `mono_pkg.yaml`:
+  * Task `command` entry: correctly handle a `List` containing strings.
 * `mono_repo.yaml`:
   * Respect the ordering of `stages`, if configured.
   * Allow `stages` values to be just a string – allows defining an explicit

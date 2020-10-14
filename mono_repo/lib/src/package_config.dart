@@ -277,11 +277,16 @@ class Task {
           final taskValue = yamlValue[taskName];
           if (taskValue is String) {
             args = taskValue;
-          } else if (taskValue is List<String>) {
-            args = taskValue.join(';');
+          } else if (taskValue is List &&
+              taskValue.every((element) => element is String)) {
+            args = taskValue.join(' && ');
           } else {
-            throw ArgumentError.value(taskValue, 'command',
-                'only supports a string or array of strings');
+            throw CheckedFromJsonException(
+              yamlValue,
+              taskName,
+              'command',
+              'Only supports a string or array of strings',
+            );
           }
           break;
         default:

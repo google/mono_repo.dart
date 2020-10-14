@@ -724,6 +724,35 @@ exit ${EXIT_CODE}
         .validate();
   });
 
+  test(
+    'command values must be either a String or a List containing strings',
+    () async {
+      await d.dir('pkg_a', [
+        d.file(monoPkgFileName, r'''
+dart:
+- dev
+
+stages:
+- unit_test:
+  - command: {a:b}
+'''),
+        d.file('pubspec.yaml', '''
+name: pkg_a
+''')
+      ]).create();
+
+      expect(
+        testGenerateTravisConfig,
+        throwsAParsedYamlException(r'''
+line 6, column 14 of pkg_a/mono_pkg.yaml: Unsupported value for "command". Only supports a string or array of strings
+  ╷
+6 │   - command: {a:b}
+  │              ^^^^^
+  ╵'''),
+      );
+    },
+  );
+
   group('mono_repo.yaml', () {
     Future populateConfig(String monoRepoContent) async {
       await d.file('mono_repo.yaml', monoRepoContent).create();
