@@ -14,13 +14,8 @@ stages:
   - group:
     - dartanalyzer: --fatal-warnings .
     dart: [2.7.0]
-- build:
-  - command: pub run build_runner build test --delete-conflicting-outputs
-    os:
-      - linux
-      - windows
 - unit_test:
-  - command: pub run build_runner test --delete-conflicting-outputs -- -P presubmit
+  - command: pub run test -P presubmit
     os:
       - linux
       - windows
