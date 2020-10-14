@@ -1,5 +1,6 @@
 ## 2.5.0-dev
 
+* Provide a better error when parsing a poorly formatted Yaml file.
 * `mono_pkg.yaml`:
   * Task `command` entry: correctly handle a `List` containing strings.
 * `mono_repo.yaml`:

@@ -753,6 +753,29 @@ line 6, column 14 of pkg_a/mono_pkg.yaml: Unsupported value for "command". Only 
     },
   );
 
+  test('bad yaml', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+dart:
+- dev
+
+stages:
+- unit_test
+  - before_script: "echo hi"
+''')
+    ]).create();
+
+    expect(
+      testGenerateTravisConfig,
+      throwsAParsedYamlException(r'''
+line 6, column 18 of pkg_a/mono_pkg.yaml: Mapping values are not allowed here. Did you miss a colon earlier?
+  ╷
+6 │   - before_script: "echo hi"
+  │                  ^
+  ╵'''),
+    );
+  });
+
   group('mono_repo.yaml', () {
     Future populateConfig(String monoRepoContent) async {
       await d.file('mono_repo.yaml', monoRepoContent).create();

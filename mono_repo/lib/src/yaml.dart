@@ -92,8 +92,16 @@ Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
         'Cannot convert output of type ${yaml.runtimeType}.');
   }
 
-  final yaml = y.loadYaml(source, sourceUrl: sourceUrl);
+  final yaml = _wrapLoadYaml(source, sourceUrl: sourceUrl);
   return convertOrdered(yaml);
+}
+
+Object _wrapLoadYaml(String source, {dynamic sourceUrl}) {
+  try {
+    return y.loadYaml(source, sourceUrl: sourceUrl);
+  } on y.YamlException catch (e) {
+    throw ParsedYamlException.fromYamlException(e);
+  }
 }
 
 String toYaml(Object source) {
