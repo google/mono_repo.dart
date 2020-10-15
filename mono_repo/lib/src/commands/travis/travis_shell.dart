@@ -23,7 +23,7 @@ function $commandName {
 }''';
 
 String generateTravisSh(
-  List<String> tasks,
+  Map<String, String> commandsToKeys,
   bool prettyAnsi,
   String pubDependencyCommand,
 ) =>
@@ -61,7 +61,7 @@ for PKG in \${PKGS}; do
   for TASK in "\$@"; do
     echo
     echo -e "\\033[1mPKG: \${PKG}; TASK: \${TASK}\\033[22m"
-${_shellCase('TASK', tasks)}
+${_shellCase('TASK', _calculateTaskEntries(commandsToKeys, prettyAnsi))}
   done
 
   popd
@@ -70,7 +70,7 @@ done
 exit \${EXIT_CODE}
 ''';
 
-List<String> calculateTaskEntries(
+List<String> _calculateTaskEntries(
   Map<String, String> commandsToKeys,
   bool prettyAnsi,
 ) {

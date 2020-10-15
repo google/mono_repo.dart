@@ -107,7 +107,7 @@ class GeneratedTravisConfig {
     final yml = generateTravisYml(configs, commandsToKeys);
 
     final sh = generateTravisSh(
-      calculateTaskEntries(commandsToKeys, prettyAnsi),
+      commandsToKeys,
       prettyAnsi,
       useGet ? 'get' : 'upgrade',
     );
@@ -148,21 +148,17 @@ void _writeTravisScript(String rootDirectory, GeneratedTravisConfig config) {
 
   if (!travisScript.existsSync()) {
     travisScript.createSync(recursive: true);
-    print(yellow.wrap('Make sure to mark `$travisShPath` as executable.'));
-    print(yellow.wrap('  chmod +x $travisShPath'));
-    if (Platform.isWindows) {
-      print(
-        yellow.wrap(
-          'It appears you are using Windows, and may not have access to chmod.',
-        ),
-      );
-      print(
-        yellow.wrap(
-          'If you are using git, the following will emulate the Unix '
-          'permissions change:',
-        ),
-      );
-      print(yellow.wrap('  git update-index --add --chmod=+x $travisShPath'));
+    for (var line in [
+      'Make sure to mark `$travisShPath` as executable.',
+      '  chmod +x $travisShPath',
+      if (Platform.isWindows) ...[
+        'It appears you are using Windows, and may not have access to chmod.',
+        'If you are using git, the following will emulate the Unix permissions '
+            'change:',
+        '  git update-index --add --chmod=+x $travisShPath'
+      ],
+    ]) {
+      print(yellow.wrap(line));
     }
   }
 
