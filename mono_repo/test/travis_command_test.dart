@@ -1047,7 +1047,8 @@ name: pkg_name
 
         testGenerateTravisConfig(
           printMatcher: stringContainsInOrder([
-            'package:sub_pkg',
+            'package:sub_pkg1',
+            'package:sub_pkg2',
             'Make sure to mark `tool/travis.sh` as executable.'
           ]),
         );
@@ -1056,6 +1057,76 @@ stages:
   - a
   - b
   - c
+  - d
+''')).validate();
+      });
+
+      test('if conditions work', () async {
+        const monoConfigContent = r'''
+travis:
+  sudo: required
+  addons:
+    chrome: stable
+  before_install:
+  - tool/travis_setup.sh
+  after_failure:
+  - tool/report_failure.sh
+  stages:
+    - analyze_and_format
+    - a
+    - name: e2e_test_cron
+      if: type IN (api, cron)
+    - d
+  branches:
+    only:
+      - master
+
+merge_stages:
+- analyze_and_format
+''';
+        await d.file('mono_repo.yaml', monoConfigContent).create();
+        await d.dir('sub_pkg1', [
+          d.file(monoPkgFileName, r'''
+dart:
+  - dev
+stages:
+  - a:
+    - dartfmt
+  - e2e_test_cron:
+    - test
+'''),
+          d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+        ]).create();
+
+        await d.dir('sub_pkg2', [
+          d.file(monoPkgFileName, r'''
+dart:
+  - dev
+stages:
+  - analyze_and_format:
+    - dartfmt
+  - d:
+    - test
+'''),
+          d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+        ]).create();
+
+        testGenerateTravisConfig(
+          printMatcher: stringContainsInOrder([
+            'package:sub_pkg1',
+            'package:sub_pkg2',
+          ]),
+        );
+        await d.file(travisFileName, contains(r'''
+stages:
+  - analyze_and_format
+  - a
+  - name: e2e_test_cron
+    if: "type IN (api, cron)"
   - d
 ''')).validate();
       });
