@@ -71,25 +71,26 @@ ${toYaml({
         return (e as Map)['name'] == value;
       });
 
-  final jobList =
-      _listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages).toList()
-        ..sort((a, b) {
-          var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
+  final jobList = [
+    ..._listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages),
+    if (configs.monoConfig.selfValidate) _selfValidateTaskConfig,
+  ]..sort((a, b) {
+      var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
 
-          if (value == 0) {
-            value = a['env'].compareTo(b['env']);
-          }
-          if (value == 0) {
-            value = a['script'].compareTo(b['script']);
-          }
-          if (value == 0) {
-            value = a['dart'].compareTo(b['dart']);
-          }
-          if (value == 0) {
-            value = a['os'].compareTo(b['os']);
-          }
-          return value;
-        });
+      if (value == 0) {
+        value = a['env'].compareTo(b['env']);
+      }
+      if (value == 0) {
+        value = a['script'].compareTo(b['script']);
+      }
+      if (value == 0) {
+        value = a['dart'].compareTo(b['dart']);
+      }
+      if (value == 0) {
+        value = a['os'].compareTo(b['os']);
+      }
+      return value;
+    });
 
   return '''
 ${createdWith()}${toYaml({'language': 'dart'})}
@@ -179,15 +180,17 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
 
         final matchingStage =
             rootConfig.monoConfig.conditionalStages[stageName];
-        if (matchingStage != null) {
-          return matchingStage.toJson();
-        }
 
-        return stageName;
+        return matchingStage?.toJson() ?? stageName;
       })
       .toList()
       .reversed
       .toList();
+
+  if (rootConfig.monoConfig.selfValidate &&
+      !orderedStages.contains(_selfValidateStageName)) {
+    orderedStages.insert(0, _selfValidateStageName);
+  }
 
   return orderedStages;
 }
@@ -262,4 +265,12 @@ class _TravisJobEntry {
   List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
+const _selfValidateStageName = 'mono_repo_self_validate';
+
+const _selfValidateTaskConfig = {
+  'stage': _selfValidateStageName,
+  'name': 'mono_repo self validate',
+  'os': 'linux',
+  'script': travisSelfValidateScriptPath,
+};
 const _equality = DeepCollectionEquality();
