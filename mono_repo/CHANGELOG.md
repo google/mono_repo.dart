@@ -1,3 +1,11 @@
+## 2.6.0-dev
+
+* `mono_repo.yaml`:
+  * **NEW!** Added support for `pub_action` value.
+    Can be one of `get` or `upgrade` (default) to change the package request
+    behavior in each action.
+* **DEPRECATED** `--use-get` command-line flag. Use `pub_action` instead.
+
 ## 2.5.0
 
 * Provide a better error when parsing a poorly formatted Yaml file.

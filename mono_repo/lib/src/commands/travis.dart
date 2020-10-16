@@ -15,6 +15,9 @@ import 'travis/travis_self_validate.dart';
 import 'travis/travis_shell.dart';
 import 'travis/travis_yaml.dart';
 
+const _pubGetFlagDeprecatedMessage =
+    'Use `pub_action: get` value in `mono_repo.yaml` instead.';
+
 class TravisCommand extends MonoRepoCommand {
   @override
   String get name => 'travis';
@@ -34,7 +37,7 @@ class TravisCommand extends MonoRepoCommand {
       )
       ..addFlag('use-get',
           negatable: false,
-          help:
+          help: 'DEPRECATED! $_pubGetFlagDeprecatedMessage\n'
               'If the generated `$travisShPath` file should use `pub get` for '
               'dependencies instead of `pub upgrade`.')
       ..addFlag('validate',
@@ -47,7 +50,9 @@ class TravisCommand extends MonoRepoCommand {
   void run() => generateTravisConfig(
         rootConfig(),
         prettyAnsi: argResults['pretty-ansi'] as bool,
-        useGet: argResults['use-get'] as bool,
+        useGet: argResults.wasParsed('use-get')
+            ? argResults['use-get'] as bool
+            : null,
         validateOnly: argResults['validate'] as bool,
       );
 }
@@ -55,11 +60,10 @@ class TravisCommand extends MonoRepoCommand {
 void generateTravisConfig(
   RootConfig configs, {
   bool prettyAnsi = true,
-  bool useGet = false,
+  bool useGet,
   bool validateOnly = false,
 }) {
   prettyAnsi ??= true;
-  useGet ??= false;
   validateOnly ??= false;
   final travisConfig = GeneratedTravisConfig.generate(
     configs,
@@ -109,11 +113,23 @@ class GeneratedTravisConfig {
   factory GeneratedTravisConfig.generate(
     RootConfig configs, {
     bool prettyAnsi = true,
-    bool useGet = false,
+    bool useGet,
   }) {
     prettyAnsi ??= true;
-    useGet ??= false;
 
+    String pubAction;
+
+    if (useGet == null) {
+      pubAction = configs.monoConfig.pubAction;
+    } else {
+      print(
+        yellow.wrap(
+          'The `--use-get` flag is deprecated. '
+          '$_pubGetFlagDeprecatedMessage',
+        ),
+      );
+      pubAction = useGet ? 'get' : 'upgrade';
+    }
     _logPkgs(configs);
 
     final commandsToKeys = extractCommands(configs);
@@ -123,7 +139,7 @@ class GeneratedTravisConfig {
     final sh = generateTravisSh(
       commandsToKeys,
       prettyAnsi,
-      useGet ? 'get' : 'upgrade',
+      pubAction,
     );
 
     String selfValidateSh;

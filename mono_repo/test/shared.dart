@@ -16,7 +16,7 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 void testGenerateTravisConfig({
   bool validateOnly = false,
-  bool useGet = false,
+  bool useGet,
   Object printMatcher,
 }) {
   printMatcher ??= isEmpty;
