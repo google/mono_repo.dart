@@ -79,7 +79,7 @@ Future<bool> presubmit(RootConfig configs,
   // By default run all tasks.
   final allKnownTasks = configs.fold(
     <String>{},
-    (Set<String> exising, PackageConfig config) => exising
+    (Set<String> existing, PackageConfig config) => existing
       ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name))),
   );
   if (tasks.isEmpty) tasks = allKnownTasks;
