@@ -1,4 +1,4 @@
-## 2.5.0-dev
+## 2.5.0
 
 * Provide a better error when parsing a poorly formatted Yaml file.
 * `mono_repo.yaml`:
