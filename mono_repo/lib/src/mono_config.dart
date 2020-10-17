@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import 'yaml.dart';
@@ -15,25 +16,40 @@ const _monoConfigFileName = 'mono_repo.yaml';
 const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 
 const _allowedMonoConfigKeys = {
+  'pub_action',
   'merge_stages',
   'self_validate',
   'travis',
 };
 
+const _defaultPubAction = 'upgrade';
+
+const _allowedPubActions = {
+  'get',
+  _defaultPubAction,
+};
+
 class MonoConfig {
+  final String pubAction;
   final bool selfValidate;
   final Map<String, dynamic> travis;
   final Map<String, ConditionalStage> conditionalStages;
   final Set<String> mergeStages;
 
-  MonoConfig._(
-    this.travis,
-    this.conditionalStages,
-    this.mergeStages,
-    this.selfValidate,
-  );
+  MonoConfig._({
+    @required this.pubAction,
+    @required this.travis,
+    @required this.conditionalStages,
+    @required this.mergeStages,
+    @required this.selfValidate,
+  });
 
-  factory MonoConfig(Map travis, Set<String> mergeStages, bool selfValidate) {
+  factory MonoConfig({
+    @required Map travis,
+    @required Set<String> mergeStages,
+    @required bool selfValidate,
+    @required String pubAction,
+  }) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
     if (overlappingKeys.isNotEmpty) {
@@ -86,10 +102,11 @@ class MonoConfig {
     travis.remove('stages');
 
     return MonoConfig._(
-      travis.map((k, v) => MapEntry(k as String, v)),
-      conditionalStages,
-      mergeStages,
-      selfValidate,
+      travis: travis.map((k, v) => MapEntry(k as String, v)),
+      conditionalStages: conditionalStages,
+      mergeStages: mergeStages,
+      selfValidate: selfValidate,
+      pubAction: pubAction,
     );
   }
 
@@ -128,6 +145,17 @@ class MonoConfig {
       );
     }
 
+    final pubAction = json['pub_action'] ?? _defaultPubAction;
+    if (pubAction is! String || !_allowedPubActions.contains(pubAction)) {
+      final allowed = _allowedPubActions.map((e) => '`$e`').join(', ');
+      throw CheckedFromJsonException(
+        json,
+        'pub_action',
+        'MonoConfig',
+        'Value must be one of: $allowed.',
+      );
+    }
+
     final mergeStages = json['merge_stages'] ?? [];
 
     if (mergeStages is List) {
@@ -141,9 +169,10 @@ class MonoConfig {
       }
 
       return MonoConfig(
-        travis as Map,
-        Set.from(mergeStages),
-        selfValidate as bool,
+        travis: travis as Map,
+        mergeStages: Set.from(mergeStages),
+        selfValidate: selfValidate as bool,
+        pubAction: pubAction as String,
       );
     } else {
       throw CheckedFromJsonException(
@@ -160,7 +189,12 @@ class MonoConfig {
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return MonoConfig({}, <String>{}, false);
+      return MonoConfig(
+        travis: {},
+        mergeStages: <String>{},
+        selfValidate: false,
+        pubAction: _defaultPubAction,
+      );
     }
 
     return createWithCheck(() => MonoConfig.fromJson(yaml));

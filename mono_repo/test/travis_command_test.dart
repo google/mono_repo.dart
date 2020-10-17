@@ -264,6 +264,8 @@ name: pkg_name
     testGenerateTravisConfig(
       useGet: true,
       printMatcher: stringContainsInOrder([
+        'The `--use-get` flag is deprecated. Use `pub_action: get` value in '
+            '`mono_repo.yaml` instead.',
         'package:sub_pkg',
         'Make sure to mark `tool/travis.sh` as executable.'
       ]),
@@ -891,7 +893,7 @@ jobs:
       expect(
         testGenerateTravisConfig,
         throwsAParsedYamlException(r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `merge_stages`, `self_validate`, `travis` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `self_validate`, `travis` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
@@ -1229,6 +1231,85 @@ stages:
           );
         });
       }
+    });
+
+    group('pub_action', () {
+      test('value must be a String', () async {
+        final monoConfigContent = toYaml({'pub_action': 42});
+        await populateConfig(monoConfigContent);
+
+        expect(
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(r'''
+line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
+  ╷
+1 │ pub_action: 42
+  │             ^^
+  ╵'''),
+        );
+      });
+
+      test('value must be in allowed list', () async {
+        final monoConfigContent = toYaml({'pub_action': 'bob'});
+        await populateConfig(monoConfigContent);
+
+        expect(
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(r'''
+line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
+  ╷
+1 │ pub_action: bob
+  │             ^^^
+  ╵'''),
+        );
+      });
+
+      test('upgrade', () async {
+        final monoConfigContent = toYaml({'pub_action': 'upgrade'});
+
+        await populateConfig(monoConfigContent);
+
+        testGenerateTravisConfig(
+          printMatcher: stringContainsInOrder(
+            [
+              'package:sub_pkg',
+              'Make sure to mark `tool/travis.sh` as executable.',
+              '  chmod +x tool/travis.sh',
+            ],
+          ),
+        );
+
+        await d.file(travisFileName, travisYamlOutput).validate();
+        await d.file(travisShPath, travisShellOutput).validate();
+      });
+
+      test('get', () async {
+        final monoConfigContent = toYaml({'pub_action': 'get'});
+
+        await populateConfig(monoConfigContent);
+
+        testGenerateTravisConfig(
+          printMatcher: stringContainsInOrder(
+            [
+              'package:sub_pkg',
+              'Make sure to mark `tool/travis.sh` as executable.',
+              '  chmod +x tool/travis.sh',
+            ],
+          ),
+        );
+
+        await d.file(travisFileName, travisYamlOutput).validate();
+        await d.file(travisShPath, contains(r'''
+  pub get --no-precompile || PUB_EXIT_CODE=$?
+
+  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
+    EXIT_CODE=1
+    echo -e '\033[31mpub get failed\033[0m'
+    popd
+    continue
+  fi
+''')).validate();
+      });
     });
 
     group('self_validate', () {
