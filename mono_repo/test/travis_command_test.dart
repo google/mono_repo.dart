@@ -27,8 +27,7 @@ void main() {
       testGenerateTravisConfig,
       throwsUserExceptionWith(
         'No packages found.',
-        'Each target package directory must contain a '
-            '`mono_pkg.yaml` file.',
+        'Each target package directory must contain a `mono_pkg.yaml` file.',
       ),
     );
   });
