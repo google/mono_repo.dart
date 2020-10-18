@@ -15,9 +15,6 @@ import 'travis/travis_self_validate.dart';
 import 'travis/travis_shell.dart';
 import 'travis/travis_yaml.dart';
 
-const _pubGetFlagDeprecatedMessage =
-    'Use `pub_action: get` value in `mono_repo.yaml` instead.';
-
 class TravisCommand extends MonoRepoCommand {
   @override
   String get name => 'travis';
@@ -35,11 +32,6 @@ class TravisCommand extends MonoRepoCommand {
             'If the generated `$travisShPath` file should include ANSI escapes '
             'to improve output readability.',
       )
-      ..addFlag('use-get',
-          negatable: false,
-          help: 'DEPRECATED! $_pubGetFlagDeprecatedMessage\n'
-              'If the generated `$travisShPath` file should use `pub get` for '
-              'dependencies instead of `pub upgrade`.')
       ..addFlag('validate',
           negatable: false,
           help: 'Validates that the existing travis config is up to date with '
@@ -50,9 +42,6 @@ class TravisCommand extends MonoRepoCommand {
   void run() => generateTravisConfig(
         rootConfig(),
         prettyAnsi: argResults['pretty-ansi'] as bool,
-        useGet: argResults.wasParsed('use-get')
-            ? argResults['use-get'] as bool
-            : null,
         validateOnly: argResults['validate'] as bool,
       );
 }
@@ -60,7 +49,6 @@ class TravisCommand extends MonoRepoCommand {
 void generateTravisConfig(
   RootConfig configs, {
   bool prettyAnsi = true,
-  bool useGet,
   bool validateOnly = false,
 }) {
   prettyAnsi ??= true;
@@ -68,7 +56,6 @@ void generateTravisConfig(
   final travisConfig = GeneratedTravisConfig.generate(
     configs,
     prettyAnsi: prettyAnsi,
-    useGet: useGet,
   );
   if (validateOnly) {
     _validateFile(
@@ -113,23 +100,9 @@ class GeneratedTravisConfig {
   factory GeneratedTravisConfig.generate(
     RootConfig configs, {
     bool prettyAnsi = true,
-    bool useGet,
   }) {
     prettyAnsi ??= true;
 
-    String pubAction;
-
-    if (useGet == null) {
-      pubAction = configs.monoConfig.pubAction;
-    } else {
-      print(
-        yellow.wrap(
-          'The `--use-get` flag is deprecated. '
-          '$_pubGetFlagDeprecatedMessage',
-        ),
-      );
-      pubAction = useGet ? 'get' : 'upgrade';
-    }
     _logPkgs(configs);
 
     final commandsToKeys = extractCommands(configs);
@@ -139,7 +112,7 @@ class GeneratedTravisConfig {
     final sh = generateTravisSh(
       commandsToKeys,
       prettyAnsi,
-      pubAction,
+      configs.monoConfig.pubAction,
     );
 
     String selfValidateSh;
