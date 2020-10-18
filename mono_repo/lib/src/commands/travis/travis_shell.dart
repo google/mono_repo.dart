@@ -45,7 +45,7 @@ fi
 EXIT_CODE=0
 
 for PKG in \${PKGS}; do
-  echo -e "\\033[1mPKG: \${PKG}\\033[22m"
+  ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}')}
   pushd "\${PKG}" || exit \$?
 
   PUB_EXIT_CODE=0
@@ -60,7 +60,7 @@ for PKG in \${PKGS}; do
 
   for TASK in "\$@"; do
     echo
-    echo -e "\\033[1mPKG: \${PKG}; TASK: \${TASK}\\033[22m"
+    ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}; TASK: ${TASK}')}
 ${_shellCase('TASK', _calculateTaskEntries(commandsToKeys, prettyAnsi))}
   done
 
