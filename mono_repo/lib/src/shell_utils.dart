@@ -13,5 +13,19 @@ String safeEcho(bool prettyAnsi, AnsiCode code, String value) {
   return "echo -e '${wrapAnsi(prettyAnsi, code, value)}'";
 }
 
+/// Returns [value] wrapped in an echo statement and double-quotes.
+///
+/// If [prettyAnsi] is `true`, also format [value] with [code].
+String echoWithEvaluation(bool prettyAnsi, AnsiCode code, String value) {
+  if (value.contains('"')) {
+    throw ArgumentError.value(
+      value,
+      'value',
+      'Cannot contain single double quote.',
+    );
+  }
+  return 'echo -e "${wrapAnsi(prettyAnsi, code, value)}"';
+}
+
 String wrapAnsi(bool doWrap, AnsiCode code, String value) =>
     doWrap ? code.wrap(value, forScript: true) : value;
