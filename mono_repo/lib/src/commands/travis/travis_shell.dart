@@ -9,18 +9,9 @@ import 'shared.dart';
 
 final windowsBoilerplate = '''
 # Support built in commands on windows out of the box.
-${_dartCommandContent('pub')}
-${_dartCommandContent('dartfmt')}
-${_dartCommandContent('dartanalyzer')}''';
-
-String _dartCommandContent(String commandName) => '''
-function $commandName {
-  if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-    command $commandName.bat "\$@"
-  else
-    command $commandName "\$@"
-  fi
-}''';
+${dartCommandContent('pub')}
+${dartCommandContent('dartfmt')}
+${dartCommandContent('dartanalyzer')}''';
 
 String generateTravisSh(
   Map<String, String> commandsToKeys,
