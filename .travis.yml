@@ -1,4 +1,4 @@
-# Created with package:mono_repo v2.6.0-dev
+# Created with package:mono_repo v3.0.0-dev
 language: dart
 
 jobs:

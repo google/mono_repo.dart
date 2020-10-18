@@ -1,10 +1,12 @@
-## 2.6.0-dev
+## 3.0.0-dev
 
 * `mono_repo.yaml`:
   * **NEW!** Added support for `pub_action` value.
     Can be one of `get` or `upgrade` (default) to change the package request
     behavior in each action.
-* **DEPRECATED** `--use-get` command-line flag. Use `pub_action` instead.
+* `travis` command:
+  * **BREAKING** Removed `--use-get` command-line flag. Use `pub_action`
+  setting in `mono_repo.yaml` instead.
 
 ## 2.5.0
 

@@ -16,7 +16,6 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 
 void testGenerateTravisConfig({
   bool validateOnly = false,
-  bool useGet,
   Object printMatcher,
 }) {
   printMatcher ??= isEmpty;
@@ -31,7 +30,6 @@ void testGenerateTravisConfig({
         false,
         () => generateTravisConfig(
           RootConfig(rootDirectory: d.sandbox),
-          useGet: useGet,
           validateOnly: validateOnly,
         ),
       ),
