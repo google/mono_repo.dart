@@ -7,6 +7,7 @@
 * `travis` command:
   * **BREAKING** Removed `--use-get` command-line flag. Use `pub_action`
   setting in `mono_repo.yaml` instead.
+  * Improved the output of the generated `tool/travis.sh` script.
 
 ## 2.5.0
 
