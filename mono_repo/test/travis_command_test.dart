@@ -5,8 +5,6 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
-import 'package:mono_repo/src/commands/travis/travis_shell.dart'
-    show windowsBoilerplate;
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -340,45 +338,7 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d
-        .file(
-            travisShPath,
-            '''
-#!/bin/bash
-
-$windowsBoilerplate
-
-'''
-            r'''
-if [[ -z ${PKGS} ]]; then
-  echo -e '\033[31mPKGS environment variable must be set!\033[0m'
-  exit 1
-fi
-
-if [[ "$#" == "0" ]]; then
-  echo -e '\033[31mAt least one task argument must be provided!\033[0m'
-  exit 1
-fi
-
-EXIT_CODE=0
-
-for PKG in ${PKGS}; do
-  echo -e "\033[1mPKG: ${PKG}\033[22m"
-  pushd "${PKG}" || exit $?
-
-  PUB_EXIT_CODE=0
-  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
-
-  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    echo -e '\033[31mpub upgrade failed\033[0m'
-    popd
-    continue
-  fi
-
-  for TASK in "$@"; do
-    echo
-    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
+    await d.file(travisShPath, contains(r'''
     case ${TASK} in
     dartfmt)
       echo 'dartfmt -n --set-exit-if-changed .'
@@ -389,14 +349,7 @@ for PKG in ${PKGS}; do
       EXIT_CODE=1
       ;;
     esac
-  done
-
-  popd
-done
-
-exit ${EXIT_CODE}
-''')
-        .validate();
+''')).validate();
   });
 
   test('two flavors of dartfmt with different arguments', () async {
@@ -487,45 +440,7 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d
-        .file(
-            travisShPath,
-            '''
-#!/bin/bash
-
-$windowsBoilerplate
-
-'''
-            r'''
-if [[ -z ${PKGS} ]]; then
-  echo -e '\033[31mPKGS environment variable must be set!\033[0m'
-  exit 1
-fi
-
-if [[ "$#" == "0" ]]; then
-  echo -e '\033[31mAt least one task argument must be provided!\033[0m'
-  exit 1
-fi
-
-EXIT_CODE=0
-
-for PKG in ${PKGS}; do
-  echo -e "\033[1mPKG: ${PKG}\033[22m"
-  pushd "${PKG}" || exit $?
-
-  PUB_EXIT_CODE=0
-  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
-
-  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    echo -e '\033[31mpub upgrade failed\033[0m'
-    popd
-    continue
-  fi
-
-  for TASK in "$@"; do
-    echo
-    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
+    await d.file(travisShPath, contains(r'''
     case ${TASK} in
     dartfmt_0)
       echo 'dartfmt -n --set-exit-if-changed .'
@@ -540,14 +455,7 @@ for PKG in ${PKGS}; do
       EXIT_CODE=1
       ;;
     esac
-  done
-
-  popd
-done
-
-exit ${EXIT_CODE}
-''')
-        .validate();
+''')).validate();
   });
 
   test('missing `dart` key', () async {
@@ -580,17 +488,27 @@ os:
 - unneeded
 
 stages:
-- analyzer_and_format:
-  - group:
-    - dartfmt
-    - dartanalyzer: --fatal-warnings --fatal-infos .
-    dart: [dev]
-    os: [windows]
-  - group:
-    - dartfmt
-    - dartanalyzer: --fatal-warnings .
-    dart: [2.1.1]
-    os: [osx]
+  - analyze:
+    - group:
+        - dartanalyzer
+        - dartfmt
+      dart:
+        - dev
+      os:
+        - osx
+    - dartanalyzer:
+      dart:
+        - 1.23.0
+      os:
+        - windows
+  - unit_test:
+    - description: "chrome tests"
+      test: --platform chrome
+      dart: dev
+      os: macos
+    - test: --preset travis
+      dart: stable
+      os: linux
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
@@ -601,6 +519,7 @@ name: pkg_a
       printMatcher: stringContainsInOrder([
         'package:pkg_a',
         '`dart` values (unneeded) are not used and can be removed.',
+        '`os` values (unneeded) are not used and can be removed.',
         'Make sure to mark `tool/travis.sh` as executable.'
       ]),
     );
@@ -610,21 +529,34 @@ language: dart
 
 jobs:
   include:
-    - stage: analyzer_and_format
-      name: "SDK: dev; PKG: pkg_a; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-warnings --fatal-infos .`]"
-      dart: dev
+    - stage: analyze
+      name: "SDK: 1.23.0; PKG: pkg_a; TASKS: `dartanalyzer .`"
+      dart: "1.23.0"
       os: windows
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt dartanalyzer_0
-    - stage: analyzer_and_format
-      name: "SDK: 2.1.1; PKG: pkg_a; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-warnings .`]"
-      dart: "2.1.1"
+      script: tool/travis.sh dartanalyzer
+    - stage: analyze
+      name: "SDK: dev; PKG: pkg_a; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
+      dart: dev
       os: osx
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt dartanalyzer_1
+      script: tool/travis.sh dartanalyzer dartfmt
+    - stage: unit_test
+      name: "SDK: dev; PKG: pkg_a; TASKS: chrome tests"
+      dart: dev
+      os: macos
+      env: PKGS="pkg_a"
+      script: tool/travis.sh test_0
+    - stage: unit_test
+      name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
+      dart: stable
+      os: linux
+      env: PKGS="pkg_a"
+      script: tool/travis.sh test_1
 
 stages:
-  - analyzer_and_format
+  - analyze
+  - unit_test
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
@@ -635,71 +567,7 @@ cache:
   directories:
     - "$HOME/.pub-cache"
 ''').validate();
-    await d
-        .file(
-            travisShPath,
-            '''
-#!/bin/bash
-
-$windowsBoilerplate
-
-'''
-            r'''
-if [[ -z ${PKGS} ]]; then
-  echo -e '\033[31mPKGS environment variable must be set!\033[0m'
-  exit 1
-fi
-
-if [[ "$#" == "0" ]]; then
-  echo -e '\033[31mAt least one task argument must be provided!\033[0m'
-  exit 1
-fi
-
-EXIT_CODE=0
-
-for PKG in ${PKGS}; do
-  echo -e "\033[1mPKG: ${PKG}\033[22m"
-  pushd "${PKG}" || exit $?
-
-  PUB_EXIT_CODE=0
-  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
-
-  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    echo -e '\033[31mpub upgrade failed\033[0m'
-    popd
-    continue
-  fi
-
-  for TASK in "$@"; do
-    echo
-    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
-    case ${TASK} in
-    dartanalyzer_0)
-      echo 'dartanalyzer --fatal-warnings --fatal-infos .'
-      dartanalyzer --fatal-warnings --fatal-infos . || EXIT_CODE=$?
-      ;;
-    dartanalyzer_1)
-      echo 'dartanalyzer --fatal-warnings .'
-      dartanalyzer --fatal-warnings . || EXIT_CODE=$?
-      ;;
-    dartfmt)
-      echo 'dartfmt -n --set-exit-if-changed .'
-      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
-      ;;
-    *)
-      echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-      EXIT_CODE=1
-      ;;
-    esac
-  done
-
-  popd
-done
-
-exit ${EXIT_CODE}
-''')
-        .validate();
+    await d.file(travisShPath, travisShellOutput).validate();
   });
 
   test(

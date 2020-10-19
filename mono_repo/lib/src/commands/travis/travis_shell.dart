@@ -37,7 +37,7 @@ EXIT_CODE=0
 
 for PKG in \${PKGS}; do
   ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}')}
-  pushd "\${PKG}" || exit \$?
+  pushd "\${PKG}" > /dev/null || exit \$?
 
   PUB_EXIT_CODE=0
   pub $pubDependencyCommand --no-precompile || PUB_EXIT_CODE=\$?
@@ -55,7 +55,8 @@ for PKG in \${PKGS}; do
 ${_shellCase('TASK', _calculateTaskEntries(commandsToKeys, prettyAnsi))}
   done
 
-  popd
+  popd > /dev/null
+  echo
 done
 
 exit \${EXIT_CODE}
