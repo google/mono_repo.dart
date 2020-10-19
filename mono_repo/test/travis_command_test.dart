@@ -1219,7 +1219,7 @@ EXIT_CODE=0
 
 for PKG in ${PKGS}; do
   echo -e "PKG: ${PKG}"
-  pushd "${PKG}" || exit $?
+  pushd "${PKG}" > /dev/null || exit $?
 
   PUB_EXIT_CODE=0
   pub upgrade --no-precompile || PUB_EXIT_CODE=$?
@@ -1227,7 +1227,8 @@ for PKG in ${PKGS}; do
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     echo -e 'pub upgrade failed'
-    popd
+    popd > /dev/null
+    echo
     continue
   fi
 
@@ -1258,7 +1259,8 @@ for PKG in ${PKGS}; do
     esac
   done
 
-  popd
+  popd > /dev/null
+  echo
 done
 
 exit ${EXIT_CODE}
