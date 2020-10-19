@@ -106,8 +106,6 @@ $windowsBoilerplate
 
 '''
     r'''
-echo
-
 if [[ -z ${PKGS} ]]; then
   echo -e '\033[31mPKGS environment variable must be set!\033[0m'
   exit 1
@@ -121,9 +119,8 @@ fi
 EXIT_CODE=0
 
 for PKG in ${PKGS}; do
-  echo
   echo -e "\033[1mPKG: ${PKG}\033[22m"
-  pushd "${PKG}" >> /dev/null || exit $?
+  pushd "${PKG}" > /dev/null || exit $?
 
   PUB_EXIT_CODE=0
   pub upgrade --no-precompile || PUB_EXIT_CODE=$?
@@ -131,7 +128,8 @@ for PKG in ${PKGS}; do
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     echo -e '\033[31mpub upgrade failed\033[0m'
-    popd
+    popd > /dev/null
+    echo
     continue
   fi
 
@@ -159,6 +157,7 @@ for PKG in ${PKGS}; do
   done
 
   popd > /dev/null
+  echo
 done
 
 exit ${EXIT_CODE}

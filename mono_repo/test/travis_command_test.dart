@@ -1147,7 +1147,8 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     echo -e '\033[31mpub get failed\033[0m'
-    popd
+    popd > /dev/null
+    echo
     continue
   fi
 ''')).validate();
