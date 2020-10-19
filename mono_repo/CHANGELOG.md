@@ -4,9 +4,14 @@
   * **NEW!** Added support for `pub_action` value.
     Can be one of `get` or `upgrade` (default) to change the package request
     behavior in each action.
+  * **NEW!** Added support for `pretty_ansi` value.
+    The default is `true`. Set to `false` to have the generated shell script
+    skip any ANSI formatting.
 * `travis` command:
   * **BREAKING** Removed `--use-get` command-line flag. Use `pub_action`
-  setting in `mono_repo.yaml` instead.
+    setting in `mono_repo.yaml` instead.
+  * **BREAKING** Removed `--pretty-ansi` command-line flag. Use `pretty_ansi`
+    setting in `mono_repo.yaml` instead.
   * Improved the output of the generated `tool/travis.sh` script.
 
 ## 2.5.0

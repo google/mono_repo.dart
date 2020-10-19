@@ -23,39 +23,26 @@ class TravisCommand extends MonoRepoCommand {
   String get description => 'Configure Travis-CI for child packages.';
 
   TravisCommand() : super() {
-    argParser
-      ..addFlag(
-        'pretty-ansi',
-        abbr: 'p',
-        defaultsTo: true,
-        help:
-            'If the generated `$travisShPath` file should include ANSI escapes '
-            'to improve output readability.',
-      )
-      ..addFlag('validate',
-          negatable: false,
-          help: 'Validates that the existing travis config is up to date with '
-              'the current configuration. Does not write any files.');
+    argParser.addFlag('validate',
+        negatable: false,
+        help: 'Validates that the existing travis config is up to date with '
+            'the current configuration. Does not write any files.');
   }
 
   @override
   void run() => generateTravisConfig(
         rootConfig(),
-        prettyAnsi: argResults['pretty-ansi'] as bool,
         validateOnly: argResults['validate'] as bool,
       );
 }
 
 void generateTravisConfig(
   RootConfig rootConfig, {
-  bool prettyAnsi = true,
   bool validateOnly = false,
 }) {
-  prettyAnsi ??= true;
   validateOnly ??= false;
   final travisConfig = GeneratedTravisConfig.generate(
     rootConfig,
-    prettyAnsi: prettyAnsi,
   );
   if (validateOnly) {
     _validateFile(
@@ -101,11 +88,7 @@ class GeneratedTravisConfig {
 
   GeneratedTravisConfig._(this.travisYml, this.travisSh, this.selfValidateSh);
 
-  factory GeneratedTravisConfig.generate(
-    RootConfig rootConfig, {
-    bool prettyAnsi = true,
-  }) {
-    prettyAnsi ??= true;
+  factory GeneratedTravisConfig.generate(RootConfig rootConfig) {
     _logPkgs(rootConfig);
 
     final commandsToKeys = extractCommands(rootConfig);
@@ -114,7 +97,7 @@ class GeneratedTravisConfig {
 
     final sh = generateTravisSh(
       commandsToKeys,
-      prettyAnsi,
+      rootConfig.monoConfig.prettyAnsi,
       rootConfig.monoConfig.pubAction,
     );
 

@@ -18,6 +18,7 @@ const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 const _allowedMonoConfigKeys = {
   'pub_action',
   'merge_stages',
+  'pretty_ansi',
   'self_validate',
   'travis',
 };
@@ -32,6 +33,7 @@ const _allowedPubActions = {
 class MonoConfig {
   final String pubAction;
   final bool selfValidate;
+  final bool prettyAnsi;
   final Map<String, dynamic> travis;
   final Map<String, ConditionalStage> conditionalStages;
   final Set<String> mergeStages;
@@ -42,12 +44,14 @@ class MonoConfig {
     @required this.conditionalStages,
     @required this.mergeStages,
     @required this.selfValidate,
+    @required this.prettyAnsi,
   });
 
   factory MonoConfig({
     @required Map travis,
     @required Set<String> mergeStages,
     @required bool selfValidate,
+    @required bool prettyAnsi,
     @required String pubAction,
   }) {
     final overlappingKeys =
@@ -106,6 +110,7 @@ class MonoConfig {
       conditionalStages: conditionalStages,
       mergeStages: mergeStages,
       selfValidate: selfValidate,
+      prettyAnsi: prettyAnsi,
       pubAction: pubAction,
     );
   }
@@ -145,6 +150,16 @@ class MonoConfig {
       );
     }
 
+    final prettyAnsi = json['pretty_ansi'] ?? true;
+    if (prettyAnsi is! bool) {
+      throw CheckedFromJsonException(
+        json,
+        'pretty_ansi',
+        'MonoConfig',
+        'Value must be `true` or `false`.',
+      );
+    }
+
     final pubAction = json['pub_action'] ?? _defaultPubAction;
     if (pubAction is! String || !_allowedPubActions.contains(pubAction)) {
       final allowed = _allowedPubActions.map((e) => '`$e`').join(', ');
@@ -173,6 +188,7 @@ class MonoConfig {
         mergeStages: Set.from(mergeStages),
         selfValidate: selfValidate as bool,
         pubAction: pubAction as String,
+        prettyAnsi: prettyAnsi as bool,
       );
     } else {
       throw CheckedFromJsonException(
@@ -194,6 +210,7 @@ class MonoConfig {
         mergeStages: <String>{},
         selfValidate: false,
         pubAction: _defaultPubAction,
+        prettyAnsi: true,
       );
     }
 
