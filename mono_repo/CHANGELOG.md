@@ -12,7 +12,7 @@
     setting in `mono_repo.yaml` instead.
   * **BREAKING** Removed `--pretty-ansi` command-line flag. Use `pretty_ansi`
     setting in `mono_repo.yaml` instead.
-  * Improved the output of the generated `tool/travis.sh` script.
+  * Improved the format and output of the generated `tool/travis.sh` script.
 
 ## 2.5.0
 
