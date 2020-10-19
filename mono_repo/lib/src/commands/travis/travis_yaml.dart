@@ -12,12 +12,12 @@ import '../../yaml.dart';
 import 'shared.dart';
 
 String generateTravisYml(
-  RootConfig configs,
+  RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
-  final orderedStages = _calculateOrderedStages(configs);
+  final orderedStages = _calculateOrderedStages(rootConfig);
 
-  for (var config in configs) {
+  for (var config in rootConfig) {
     final sdkConstraint = config.pubspec.environment['sdk'];
 
     if (sdkConstraint == null) {
@@ -44,15 +44,15 @@ String generateTravisYml(
     }
   }
 
-  final jobs = configs.expand((config) => config.jobs);
+  final jobs = rootConfig.expand((config) => config.jobs);
 
   var customTravis = '';
-  if (configs.monoConfig.travis.isNotEmpty) {
+  if (rootConfig.monoConfig.travis.isNotEmpty) {
     customTravis = '\n# Custom configuration\n'
-        '${toYaml(configs.monoConfig.travis)}\n';
+        '${toYaml(rootConfig.monoConfig.travis)}\n';
   }
 
-  final branchConfig = configs.monoConfig.travis.containsKey('branches')
+  final branchConfig = rootConfig.monoConfig.travis.containsKey('branches')
       ? ''
       : '''
 \n# Only building master means that we don't run two builds for each pull request.
@@ -72,8 +72,8 @@ ${toYaml({
       });
 
   final jobList = [
-    ..._listJobs(jobs, commandsToKeys, configs.monoConfig.mergeStages),
-    if (configs.monoConfig.selfValidate) _selfValidateTaskConfig,
+    ..._listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+    if (rootConfig.monoConfig.selfValidate) _selfValidateTaskConfig,
   ]..sort((a, b) {
       var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
 
@@ -102,7 +102,7 @@ ${toYaml({
 ${toYaml({'stages': orderedStages})}
 $branchConfig
 ${toYaml({
-    'cache': {'directories': _cacheDirs(configs)}
+    'cache': {'directories': _cacheDirs(rootConfig)}
   })}
 ''';
 }

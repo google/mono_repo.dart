@@ -47,26 +47,30 @@ class TravisCommand extends MonoRepoCommand {
 }
 
 void generateTravisConfig(
-  RootConfig configs, {
+  RootConfig rootConfig, {
   bool prettyAnsi = true,
   bool validateOnly = false,
 }) {
   prettyAnsi ??= true;
   validateOnly ??= false;
   final travisConfig = GeneratedTravisConfig.generate(
-    configs,
+    rootConfig,
     prettyAnsi: prettyAnsi,
   );
   if (validateOnly) {
     _validateFile(
-      configs.rootDirectory,
+      rootConfig.rootDirectory,
       travisConfig.travisYml,
       travisFileName,
     );
-    _validateFile(configs.rootDirectory, travisConfig.travisSh, travisShPath);
-    if (configs.monoConfig.selfValidate) {
+    _validateFile(
+      rootConfig.rootDirectory,
+      travisConfig.travisSh,
+      travisShPath,
+    );
+    if (rootConfig.monoConfig.selfValidate) {
       _validateFile(
-        configs.rootDirectory,
+        rootConfig.rootDirectory,
         travisConfig.selfValidateSh,
         travisSelfValidateScriptPath,
       );
@@ -74,11 +78,11 @@ void generateTravisConfig(
       // TODO: print a warning if it exists? Fail? Hrm...
     }
   } else {
-    _writeTravisYml(configs.rootDirectory, travisConfig);
-    _writeScript(configs.rootDirectory, travisShPath, travisConfig.travisSh);
-    if (configs.monoConfig.selfValidate) {
+    _writeTravisYml(rootConfig.rootDirectory, travisConfig);
+    _writeScript(rootConfig.rootDirectory, travisShPath, travisConfig.travisSh);
+    if (rootConfig.monoConfig.selfValidate) {
       _writeScript(
-        configs.rootDirectory,
+        rootConfig.rootDirectory,
         travisSelfValidateScriptPath,
         travisConfig.selfValidateSh,
       );
@@ -98,25 +102,24 @@ class GeneratedTravisConfig {
   GeneratedTravisConfig._(this.travisYml, this.travisSh, this.selfValidateSh);
 
   factory GeneratedTravisConfig.generate(
-    RootConfig configs, {
+    RootConfig rootConfig, {
     bool prettyAnsi = true,
   }) {
     prettyAnsi ??= true;
+    _logPkgs(rootConfig);
 
-    _logPkgs(configs);
+    final commandsToKeys = extractCommands(rootConfig);
 
-    final commandsToKeys = extractCommands(configs);
-
-    final yml = generateTravisYml(configs, commandsToKeys);
+    final yml = generateTravisYml(rootConfig, commandsToKeys);
 
     final sh = generateTravisSh(
       commandsToKeys,
       prettyAnsi,
-      configs.monoConfig.pubAction,
+      rootConfig.monoConfig.pubAction,
     );
 
     String selfValidateSh;
-    if (configs.monoConfig.selfValidate) {
+    if (rootConfig.monoConfig.selfValidate) {
       selfValidateSh = generateSelfValidate();
     }
 

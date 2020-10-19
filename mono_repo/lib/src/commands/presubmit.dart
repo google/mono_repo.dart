@@ -55,10 +55,12 @@ final _currentSdk =
         ? 'dev'
         : 'stable';
 
-Future<bool> presubmit(RootConfig configs,
-    {Iterable<String> packages,
-    Iterable<String> tasks,
-    String sdkToRun}) async {
+Future<bool> presubmit(
+  RootConfig rootConfig, {
+  Iterable<String> packages,
+  Iterable<String> tasks,
+  String sdkToRun,
+}) async {
   packages ??= <String>[];
   tasks ??= <String>[];
   sdkToRun ??= _currentSdk;
@@ -69,15 +71,15 @@ Future<bool> presubmit(RootConfig configs,
         'No $travisShPath file found, please run the `travis` command first.');
   }
 
-  final commandsToKeys = extractCommands(configs);
+  final commandsToKeys = extractCommands(rootConfig);
   // By default, run on all packages.
   if (packages.isEmpty) {
-    packages = configs.map((pc) => pc.relativePath).toList();
+    packages = rootConfig.map((pc) => pc.relativePath).toList();
   }
   packages = packages.toList()..sort();
 
   // By default run all tasks.
-  final allKnownTasks = configs.fold(
+  final allKnownTasks = rootConfig.fold(
     <String>{},
     (Set<String> existing, PackageConfig config) => existing
       ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name))),
@@ -96,11 +98,11 @@ Future<bool> presubmit(RootConfig configs,
   // Status of the presubmit.
   var passed = true;
   for (var package in packages) {
-    final config =
-        configs.singleWhere((pkg) => pkg.relativePath == package, orElse: () {
+    final config = rootConfig.singleWhere((pkg) => pkg.relativePath == package,
+        orElse: () {
       throw UserException(
           'Unrecognized package `$package`, known packages are:\n'
-          '${configs.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
+          '${rootConfig.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
     });
 
     print(styleBold.wrap(package));
