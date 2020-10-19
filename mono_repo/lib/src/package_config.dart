@@ -41,12 +41,24 @@ class PackageConfig {
   );
 
   factory PackageConfig.parse(
-      String relativePath, Pubspec pubspec, Map monoPkgYaml) {
+    String relativePath,
+    Pubspec pubspec,
+    Map monoPkgYaml,
+  ) {
     if (monoPkgYaml.isEmpty) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
       return PackageConfig(
-          relativePath, pubspec, [], [], [], [], [], false, false);
+        relativePath,
+        pubspec,
+        [],
+        [],
+        [],
+        [],
+        [],
+        false,
+        false,
+      );
     }
     final rawConfig = RawConfig.fromJson(monoPkgYaml);
 
@@ -111,23 +123,26 @@ class PackageConfig {
     }).toList();
 
     return PackageConfig(
-        relativePath,
-        pubspec,
-        rawConfig.oses,
-        rawConfig.sdks,
-        stageNames,
-        jobs,
-        rawConfig.cache?.directories ?? const [],
-        sdkConfigUsed,
-        osConfigUsed);
+      relativePath,
+      pubspec,
+      rawConfig.oses,
+      rawConfig.sdks,
+      stageNames,
+      jobs,
+      rawConfig.cache?.directories ?? const [],
+      sdkConfigUsed,
+      osConfigUsed,
+    );
   }
 
   bool get hasFlutterDependency {
     if (pubspec.environment.containsKey('flutter')) {
       return true;
     }
-    return pubspec.dependencies.values.any((dependency) =>
-        dependency is SdkDependency && dependency.sdk == 'flutter');
+    return pubspec.dependencies.values.any(
+      (dependency) =>
+          dependency is SdkDependency && dependency.sdk == 'flutter',
+    );
   }
 }
 
@@ -158,8 +173,14 @@ class TravisJob {
           ? _taskCommandsTickQuoted.toList().toString()
           : _taskCommandsTickQuoted.first);
 
-  TravisJob(this.os, this.package, this.sdk, this.stageName, this.tasks,
-      {this.description});
+  TravisJob(
+    this.os,
+    this.package,
+    this.sdk,
+    this.stageName,
+    this.tasks, {
+    this.description,
+  });
 
   factory TravisJob.fromJson(Map<String, dynamic> json) =>
       _$TravisJobFromJson(json);
