@@ -735,7 +735,7 @@ jobs:
       expect(
         testGenerateTravisConfig,
         throwsAParsedYamlException(r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `self_validate`, `travis` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `pretty_ansi`, `self_validate`, `travis` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
@@ -1152,6 +1152,117 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
     continue
   fi
 ''')).validate();
+      });
+    });
+
+    group('pretty_ansi', () {
+      test('value must be bool', () async {
+        final monoConfigContent = toYaml({'pretty_ansi': 'not a bool!'});
+        await populateConfig(monoConfigContent);
+
+        expect(
+          testGenerateTravisConfig,
+          throwsAParsedYamlException(r'''
+line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value must be `true` or `false`.
+  ╷
+1 │ pretty_ansi: "not a bool!"
+  │              ^^^^^^^^^^^^^
+  ╵'''),
+        );
+      });
+
+      test('set to false', () async {
+        await populateConfig(toYaml({'pretty_ansi': false}));
+
+        testGenerateTravisConfig(
+          printMatcher: stringContainsInOrder(['package:sub_pkg']),
+        );
+
+        await d.file(travisFileName, travisYamlOutput).validate();
+        await d.file(travisShPath, r'''
+#!/bin/bash
+
+# Support built in commands on windows out of the box.
+function pub {
+  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+    command pub.bat "$@"
+  else
+    command pub "$@"
+  fi
+}
+function dartfmt {
+  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+    command dartfmt.bat "$@"
+  else
+    command dartfmt "$@"
+  fi
+}
+function dartanalyzer {
+  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
+    command dartanalyzer.bat "$@"
+  else
+    command dartanalyzer "$@"
+  fi
+}
+
+if [[ -z ${PKGS} ]]; then
+  echo -e 'PKGS environment variable must be set!'
+  exit 1
+fi
+
+if [[ "$#" == "0" ]]; then
+  echo -e 'At least one task argument must be provided!'
+  exit 1
+fi
+
+EXIT_CODE=0
+
+for PKG in ${PKGS}; do
+  echo -e "PKG: ${PKG}"
+  pushd "${PKG}" || exit $?
+
+  PUB_EXIT_CODE=0
+  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
+
+  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
+    EXIT_CODE=1
+    echo -e 'pub upgrade failed'
+    popd
+    continue
+  fi
+
+  for TASK in "$@"; do
+    echo
+    echo -e "PKG: ${PKG}; TASK: ${TASK}"
+    case ${TASK} in
+    dartanalyzer)
+      echo 'dartanalyzer .'
+      dartanalyzer . || EXIT_CODE=$?
+      ;;
+    dartfmt)
+      echo 'dartfmt -n --set-exit-if-changed .'
+      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+      ;;
+    test_0)
+      echo 'pub run test --platform chrome'
+      pub run test --platform chrome || EXIT_CODE=$?
+      ;;
+    test_1)
+      echo 'pub run test --preset travis'
+      pub run test --preset travis || EXIT_CODE=$?
+      ;;
+    *)
+      echo -e "Not expecting TASK '${TASK}'. Error!"
+      EXIT_CODE=1
+      ;;
+    esac
+  done
+
+  popd
+done
+
+exit ${EXIT_CODE}
+''').validate();
       });
     });
 
