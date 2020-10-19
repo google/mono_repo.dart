@@ -220,7 +220,9 @@ class Task {
 
   final String args;
 
-  Task(this.name, {this.args});
+  final String command;
+
+  Task(this.name, {this.args}) : command = _commandValue(name, args);
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
@@ -316,7 +318,7 @@ class Task {
 
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 
-  String get command {
+  static String _commandValue(String name, String args) {
     switch (name) {
       case 'dartfmt':
         if (args == null || args == 'sdk') {
