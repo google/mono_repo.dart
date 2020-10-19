@@ -37,7 +37,7 @@ EXIT_CODE=0
 
 for PKG in \${PKGS}; do
   ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}')}
-  pushd "\${PKG}" > /dev/null || exit \$?
+  pushd "\${PKG}" >/dev/null || exit \$?
 
   PUB_EXIT_CODE=0
   pub $pubDependencyCommand --no-precompile || PUB_EXIT_CODE=\$?
@@ -45,18 +45,15 @@ for PKG in \${PKGS}; do
   if [[ \${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     ${safeEcho(prettyAnsi, red, "pub $pubDependencyCommand failed")}
-    popd > /dev/null
-    echo
-    continue
+  else
+    for TASK in "\$@"; do
+      echo
+      ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}; TASK: ${TASK}')}
+${_shellCase('TASK', _calculateTaskEntries(commandsToKeys, prettyAnsi))}
+    done
   fi
 
-  for TASK in "\$@"; do
-    echo
-    ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}; TASK: ${TASK}')}
-${_shellCase('TASK', _calculateTaskEntries(commandsToKeys, prettyAnsi))}
-  done
-
-  popd > /dev/null
+  popd >/dev/null || exit \$?
   echo
 done
 
@@ -91,22 +88,27 @@ List<String> _calculateTaskEntries(
 
   if (taskEntries.isEmpty) {
     throw UserException(
-        'No entries created. Check your nested `$monoPkgFileName` files.');
+      'No entries created. Check your nested `$monoPkgFileName` files.',
+    );
   }
 
   taskEntries.sort();
 
-  final echoContent =
-      wrapAnsi(prettyAnsi, red, "Not expecting TASK '\${TASK}'. Error!");
+  final echoContent = wrapAnsi(
+    prettyAnsi,
+    red,
+    "Not expecting TASK '\${TASK}'. Error!",
+  );
   addEntry('*', ['echo -e "$echoContent"', 'EXIT_CODE=1']);
   return taskEntries;
 }
 
 String _shellCase(String scriptVariable, List<String> entries) {
   if (entries.isEmpty) return '';
+
   return LineSplitter.split('''
 case \${$scriptVariable} in
 ${entries.join('\n')}
 esac
-''').map((l) => '    $l').join('\n');
+''').map((l) => '      $l').join('\n');
 }

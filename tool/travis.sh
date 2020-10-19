@@ -2,21 +2,21 @@
 # Created with package:mono_repo v3.0.0-dev
 
 # Support built in commands on windows out of the box.
-function pub {
+function pub() {
   if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command pub.bat "$@"
   else
     command pub "$@"
   fi
 }
-function dartfmt {
+function dartfmt() {
   if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command dartfmt.bat "$@"
   else
     command dartfmt "$@"
   fi
 }
-function dartanalyzer {
+function dartanalyzer() {
   if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command dartanalyzer.bat "$@"
   else
@@ -38,7 +38,7 @@ EXIT_CODE=0
 
 for PKG in ${PKGS}; do
   echo -e "\033[1mPKG: ${PKG}\033[22m"
-  pushd "${PKG}" > /dev/null || exit $?
+  pushd "${PKG}" >/dev/null || exit $?
 
   PUB_EXIT_CODE=0
   pub upgrade --no-precompile || PUB_EXIT_CODE=$?
@@ -46,47 +46,44 @@ for PKG in ${PKGS}; do
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     echo -e '\033[31mpub upgrade failed\033[0m'
-    popd > /dev/null
-    echo
-    continue
+  else
+    for TASK in "$@"; do
+      echo
+      echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
+      case ${TASK} in
+      command_0)
+        echo 'cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate'
+        cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate || EXIT_CODE=$?
+        ;;
+      command_1)
+        echo 'pub run test -P presubmit'
+        pub run test -P presubmit || EXIT_CODE=$?
+        ;;
+      dartanalyzer_0)
+        echo 'dartanalyzer --fatal-infos --fatal-warnings .'
+        dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
+        ;;
+      dartanalyzer_1)
+        echo 'dartanalyzer --fatal-warnings .'
+        dartanalyzer --fatal-warnings . || EXIT_CODE=$?
+        ;;
+      dartfmt)
+        echo 'dartfmt -n --set-exit-if-changed .'
+        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      test)
+        echo 'pub run test'
+        pub run test || EXIT_CODE=$?
+        ;;
+      *)
+        echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
+        EXIT_CODE=1
+        ;;
+      esac
+    done
   fi
 
-  for TASK in "$@"; do
-    echo
-    echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
-    case ${TASK} in
-    command_0)
-      echo 'cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate'
-      cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate || EXIT_CODE=$?
-      ;;
-    command_1)
-      echo 'pub run test -P presubmit'
-      pub run test -P presubmit || EXIT_CODE=$?
-      ;;
-    dartanalyzer_0)
-      echo 'dartanalyzer --fatal-infos --fatal-warnings .'
-      dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
-      ;;
-    dartanalyzer_1)
-      echo 'dartanalyzer --fatal-warnings .'
-      dartanalyzer --fatal-warnings . || EXIT_CODE=$?
-      ;;
-    dartfmt)
-      echo 'dartfmt -n --set-exit-if-changed .'
-      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
-      ;;
-    test)
-      echo 'pub run test'
-      pub run test || EXIT_CODE=$?
-      ;;
-    *)
-      echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-      EXIT_CODE=1
-      ;;
-    esac
-  done
-
-  popd > /dev/null
+  popd >/dev/null || exit $?
   echo
 done
 

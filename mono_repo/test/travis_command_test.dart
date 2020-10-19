@@ -339,16 +339,16 @@ cache:
 ''').validate();
 
     await d.file(travisShPath, contains(r'''
-    case ${TASK} in
-    dartfmt)
-      echo 'dartfmt -n --set-exit-if-changed .'
-      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
-      ;;
-    *)
-      echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-      EXIT_CODE=1
-      ;;
-    esac
+      case ${TASK} in
+      dartfmt)
+        echo 'dartfmt -n --set-exit-if-changed .'
+        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      *)
+        echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
+        EXIT_CODE=1
+        ;;
+      esac
 ''')).validate();
   });
 
@@ -441,20 +441,20 @@ cache:
 ''').validate();
 
     await d.file(travisShPath, contains(r'''
-    case ${TASK} in
-    dartfmt_0)
-      echo 'dartfmt -n --set-exit-if-changed .'
-      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
-      ;;
-    dartfmt_1)
-      echo 'dartfmt --dry-run --fix --set-exit-if-changed .'
-      dartfmt --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
-      ;;
-    *)
-      echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-      EXIT_CODE=1
-      ;;
-    esac
+      case ${TASK} in
+      dartfmt_0)
+        echo 'dartfmt -n --set-exit-if-changed .'
+        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      dartfmt_1)
+        echo 'dartfmt --dry-run --fix --set-exit-if-changed .'
+        dartfmt --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      *)
+        echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
+        EXIT_CODE=1
+        ;;
+      esac
 ''')).validate();
   });
 
@@ -1147,10 +1147,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     echo -e '\033[31mpub get failed\033[0m'
-    popd > /dev/null
-    echo
-    continue
-  fi
+  else
 ''')).validate();
       });
     });
@@ -1183,21 +1180,21 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
 #!/bin/bash
 
 # Support built in commands on windows out of the box.
-function pub {
+function pub() {
   if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command pub.bat "$@"
   else
     command pub "$@"
   fi
 }
-function dartfmt {
+function dartfmt() {
   if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command dartfmt.bat "$@"
   else
     command dartfmt "$@"
   fi
 }
-function dartanalyzer {
+function dartanalyzer() {
   if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command dartanalyzer.bat "$@"
   else
@@ -1219,7 +1216,7 @@ EXIT_CODE=0
 
 for PKG in ${PKGS}; do
   echo -e "PKG: ${PKG}"
-  pushd "${PKG}" > /dev/null || exit $?
+  pushd "${PKG}" >/dev/null || exit $?
 
   PUB_EXIT_CODE=0
   pub upgrade --no-precompile || PUB_EXIT_CODE=$?
@@ -1227,39 +1224,36 @@ for PKG in ${PKGS}; do
   if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
     EXIT_CODE=1
     echo -e 'pub upgrade failed'
-    popd > /dev/null
-    echo
-    continue
+  else
+    for TASK in "$@"; do
+      echo
+      echo -e "PKG: ${PKG}; TASK: ${TASK}"
+      case ${TASK} in
+      dartanalyzer)
+        echo 'dartanalyzer .'
+        dartanalyzer . || EXIT_CODE=$?
+        ;;
+      dartfmt)
+        echo 'dartfmt -n --set-exit-if-changed .'
+        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      test_0)
+        echo 'pub run test --platform chrome'
+        pub run test --platform chrome || EXIT_CODE=$?
+        ;;
+      test_1)
+        echo 'pub run test --preset travis'
+        pub run test --preset travis || EXIT_CODE=$?
+        ;;
+      *)
+        echo -e "Not expecting TASK '${TASK}'. Error!"
+        EXIT_CODE=1
+        ;;
+      esac
+    done
   fi
 
-  for TASK in "$@"; do
-    echo
-    echo -e "PKG: ${PKG}; TASK: ${TASK}"
-    case ${TASK} in
-    dartanalyzer)
-      echo 'dartanalyzer .'
-      dartanalyzer . || EXIT_CODE=$?
-      ;;
-    dartfmt)
-      echo 'dartfmt -n --set-exit-if-changed .'
-      dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
-      ;;
-    test_0)
-      echo 'pub run test --platform chrome'
-      pub run test --platform chrome || EXIT_CODE=$?
-      ;;
-    test_1)
-      echo 'pub run test --preset travis'
-      pub run test --preset travis || EXIT_CODE=$?
-      ;;
-    *)
-      echo -e "Not expecting TASK '${TASK}'. Error!"
-      EXIT_CODE=1
-      ;;
-    esac
-  done
-
-  popd > /dev/null
+  popd >/dev/null || exit $?
   echo
 done
 
