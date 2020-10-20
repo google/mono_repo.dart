@@ -227,7 +227,7 @@ name: pkg_name
     await d.file(travisShPath, travisShellOutput).validate();
   });
 
-  test('complete travis.yml file', () async {
+  test('incompatible SDK constraints', () async {
     await d.dir('sub_pkg', [
       d.file(monoPkgFileName, testConfig2),
       d.file('pubspec.yaml', '''
