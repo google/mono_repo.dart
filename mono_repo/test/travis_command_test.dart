@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
+import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -196,15 +197,15 @@ name: pkg_name
 
     test("doesn't throw if the previous config is up to date", () async {
       testGenerateTravisConfig(
-        printMatcher: stringContainsInOrder([
-          'package:sub_pkg',
-          'Make sure to mark `tool/travis.sh` as executable.'
-        ]),
+        printMatcher: _subPkgStandardOutput,
       );
 
       // Just check that this doesn't throw.
       testGenerateTravisConfig(
-        printMatcher: stringContainsInOrder(['package:sub_pkg']),
+        printMatcher: '''
+package:sub_pkg
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+Wrote `${p.join(d.sandbox, travisShPath)}`.''',
       );
     });
   });
@@ -218,10 +219,7 @@ name: pkg_name
     ]).create();
 
     testGenerateTravisConfig(
-      printMatcher: stringContainsInOrder([
-        'package:sub_pkg',
-        'Make sure to mark `tool/travis.sh` as executable.'
-      ]),
+      printMatcher: _subPkgStandardOutput,
     );
     await d.file(travisFileName, travisYamlOutput).validate();
     await d.file(travisShPath, travisShellOutput).validate();
@@ -238,12 +236,11 @@ environment:
     ]).create();
 
     testGenerateTravisConfig(
-      printMatcher: stringContainsInOrder([
-        'package:sub_pkg',
-        '  There are jobs defined that are not compatible with the package '
-            'SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.',
-        'Make sure to mark `tool/travis.sh` as executable.',
-      ]),
+      printMatcher: '''
+package:sub_pkg
+  There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''',
     );
 
     await d.file(travisFileName, travisYamlOutput).validate();
@@ -291,11 +288,11 @@ name: pkg_b
     ]).create();
 
     testGenerateTravisConfig(
-      printMatcher: stringContainsInOrder([
-        'package:pkg_a',
-        'package:pkg_b',
-        'Make sure to mark `tool/travis.sh` as executable.'
-      ]),
+      printMatcher: '''
+package:pkg_a
+package:pkg_b
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -393,11 +390,11 @@ name: pkg_b
     ]).create();
 
     testGenerateTravisConfig(
-      printMatcher: stringContainsInOrder([
-        'package:pkg_a',
-        'package:pkg_b',
-        'Make sure to mark `tool/travis.sh` as executable.'
-      ]),
+      printMatcher: '''
+package:pkg_a
+package:pkg_b
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -516,12 +513,12 @@ name: pkg_a
     ]).create();
 
     testGenerateTravisConfig(
-      printMatcher: stringContainsInOrder([
-        'package:pkg_a',
-        '`dart` values (unneeded) are not used and can be removed.',
-        '`os` values (unneeded) are not used and can be removed.',
-        'Make sure to mark `tool/travis.sh` as executable.'
-      ]),
+      printMatcher: '''
+package:pkg_a
+  `dart` values (unneeded) are not used and can be removed.
+  `os` values (unneeded) are not used and can be removed.
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -678,11 +675,7 @@ name: pkg_name
       await d.nothing(travisSelfValidateScriptPath).validate();
 
       testGenerateTravisConfig(
-        printMatcher: stringContainsInOrder([
-          'package:sub_pkg',
-          'Make sure to mark `tool/travis.sh` as executable.',
-          '  chmod +x tool/travis.sh'
-        ]),
+        printMatcher: _subPkgStandardOutput,
       );
 
       await d.file(travisFileName, expectedTravisContent).validate();
@@ -893,11 +886,11 @@ name: pkg_name
         ]).create();
 
         testGenerateTravisConfig(
-          printMatcher: stringContainsInOrder([
-            'package:sub_pkg1',
-            'package:sub_pkg2',
-            'Make sure to mark `tool/travis.sh` as executable.'
-          ]),
+          printMatcher: '''
+package:sub_pkg1
+package:sub_pkg2
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -963,10 +956,11 @@ name: pkg_name
         ]).create();
 
         testGenerateTravisConfig(
-          printMatcher: stringContainsInOrder([
-            'package:sub_pkg1',
-            'package:sub_pkg2',
-          ]),
+          printMatcher: '''
+package:sub_pkg1
+package:sub_pkg2
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -1112,13 +1106,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         await populateConfig(monoConfigContent);
 
         testGenerateTravisConfig(
-          printMatcher: stringContainsInOrder(
-            [
-              'package:sub_pkg',
-              'Make sure to mark `tool/travis.sh` as executable.',
-              '  chmod +x tool/travis.sh',
-            ],
-          ),
+          printMatcher: _subPkgStandardOutput,
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
@@ -1131,13 +1119,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         await populateConfig(monoConfigContent);
 
         testGenerateTravisConfig(
-          printMatcher: stringContainsInOrder(
-            [
-              'package:sub_pkg',
-              'Make sure to mark `tool/travis.sh` as executable.',
-              '  chmod +x tool/travis.sh',
-            ],
-          ),
+          printMatcher: _subPkgStandardOutput,
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
@@ -1172,7 +1154,7 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
         await populateConfig(toYaml({'pretty_ansi': false}));
 
         testGenerateTravisConfig(
-          printMatcher: stringContainsInOrder(['package:sub_pkg']),
+          printMatcher: _subPkgStandardOutput,
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
@@ -1284,15 +1266,12 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
         await populateConfig(monoConfigContent);
 
         testGenerateTravisConfig(
-          printMatcher: stringContainsInOrder(
-            [
-              'package:sub_pkg',
-              'Make sure to mark `tool/travis.sh` as executable.',
-              '  chmod +x tool/travis.sh',
-              'Make sure to mark `tool/mono_repo_self_validate.sh` as executable.',
-              '  chmod +x tool/mono_repo_self_validate.sh',
-            ],
-          ),
+          printMatcher: '''
+package:sub_pkg
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage
+${scriptLines(travisSelfValidateScriptPath).join('\n')}
+Wrote `${p.join(d.sandbox, travisSelfValidateScriptPath)}`.''',
         );
 
         await d
@@ -1334,3 +1313,12 @@ cache:
     });
   });
 }
+
+String get _travisShPathMessage => '''
+${scriptLines(travisShPath).join('\n')}
+Wrote `${p.join(d.sandbox, travisShPath)}`.''';
+
+String get _subPkgStandardOutput => '''
+package:sub_pkg
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$_travisShPathMessage''';
