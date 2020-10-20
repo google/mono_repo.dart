@@ -5,6 +5,7 @@
 import 'dart:io';
 
 import 'package:io/ansi.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../package_config.dart';
@@ -141,13 +142,8 @@ void _validateFile(
   }
 }
 
-void _writeScript(String rootDirectory, String scriptPath, String content) {
-  final fullPath = p.join(rootDirectory, scriptPath);
-  final scriptFile = File(fullPath);
-
-  if (!scriptFile.existsSync()) {
-    scriptFile.createSync(recursive: true);
-    for (var line in [
+@visibleForTesting
+List<String> scriptLines(String scriptPath) => [
       'Make sure to mark `$scriptPath` as executable.',
       '  chmod +x $scriptPath',
       if (Platform.isWindows) ...[
@@ -156,7 +152,15 @@ void _writeScript(String rootDirectory, String scriptPath, String content) {
             'change:',
         '  git update-index --add --chmod=+x $scriptPath'
       ],
-    ]) {
+    ];
+
+void _writeScript(String rootDirectory, String scriptPath, String content) {
+  final fullPath = p.join(rootDirectory, scriptPath);
+  final scriptFile = File(fullPath);
+
+  if (!scriptFile.existsSync()) {
+    scriptFile.createSync(recursive: true);
+    for (var line in scriptLines(scriptPath)) {
       print(yellow.wrap(line));
     }
   }
