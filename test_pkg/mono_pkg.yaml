@@ -7,7 +7,6 @@ stages:
   - group:
     - dartfmt
     - dartanalyzer: --fatal-infos --fatal-warnings .
-    dart: [dev]
 - unit_test:
   - test:
     os:

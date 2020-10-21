@@ -1,26 +1,23 @@
 # See https://github.com/google/mono_repo.dart for details
-dart:
-- 2.7.0
-- dev
 
 stages:
 - mono_repo_self_validate:
     # A bit weird, this should really be a global task but we don't have those.
     - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
-      dart: [dev]
+      dart: dev
 - smoke_test:
   - group:
     - dartfmt
     - dartanalyzer: --fatal-infos --fatal-warnings .
-    dart: [dev]
-  - group:
-    - dartanalyzer: --fatal-warnings .
-    dart: [2.7.0]
+    dart: dev
+  - dartanalyzer: --fatal-warnings .
+    dart: 2.7.0
 - unit_test:
   - command: pub run test -P presubmit
     os:
       - linux
       - windows
+    dart: [2.7.0, dev]
 
 cache:
   directories:
