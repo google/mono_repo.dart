@@ -79,12 +79,12 @@ List<String> _calculateTaskEntries(
     }
   }
 
-  commandsToKeys.forEach((command, taskKey) {
-    addEntry(taskKey, [
-      "echo '${wrapAnsi(prettyAnsi, resetAll, command)}'",
-      '$command || EXIT_CODE=\$?',
+  for (var entry in commandsToKeys.entries) {
+    addEntry(entry.value, [
+      "echo '${entry.key}'",
+      '${entry.key} || EXIT_CODE=\$?',
     ]);
-  });
+  }
 
   if (taskEntries.isEmpty) {
     throw UserException(

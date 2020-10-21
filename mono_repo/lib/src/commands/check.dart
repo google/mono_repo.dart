@@ -56,13 +56,13 @@ void _print(String relativePath, PackageReport report) {
   }
   if (report.siblings.isNotEmpty) {
     print('   siblings:');
-    report.siblings.forEach((k, v) {
-      var value = '     $k: $v';
-      if (report.published && v.overrideData != null) {
+    for (var entry in report.siblings.entries) {
+      var value = '     ${entry.key}: ${entry.value}';
+      if (report.published && entry.value.overrideData != null) {
         value = yellow.wrap(value);
       }
       print(value);
-    });
+    }
   }
   print('');
 }
