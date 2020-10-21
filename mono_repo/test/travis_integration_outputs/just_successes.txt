@@ -6,7 +6,11 @@ PKG: pkg_c; TASK: dartanalyzer
 dartanalyzer .
 Analyzing pkg_c...
 No issues found!
+PKG: pkg_c; TASK: dartanalyzer - SUCCEEDED
 
 PKG: pkg_c; TASK: command_0
 echo "testing 1 2 3"
 testing 1 2 3
+PKG: pkg_c; TASK: command_0 - SUCCEEDED
+
+SUCCESS COUNT: 2
