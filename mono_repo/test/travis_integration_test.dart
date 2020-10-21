@@ -1,6 +1,8 @@
-@TestOn('!windows')
+import 'dart:io';
 
+@TestOn('!windows')
 import 'package:mono_repo/src/package_config.dart';
+import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
@@ -43,7 +45,8 @@ dependencies:
       ),
       d.file('pubspec.yaml', '''
 name: pkg_c
-''')
+'''),
+      d.file('some_dart_file.dart', 'void main() => print("hello");'),
     ]).create();
 
     testGenerateTravisConfig(
@@ -54,13 +57,14 @@ name: pkg_c
       ]),
     );
 
-    //print(File(p.join(d.sandbox, travisShPath)).readAsStringSync());
+    //print(File(p.join(d.sandbox, travisFileName)).readAsStringSync());
 
     final proc = await TestProcess.start(
       '/bin/bash',
       [
         'tool/travis.sh',
         'dartanalyzer',
+        'command',
       ],
       environment: {
         'PKGS': 'pkg_a pkg_b pkg_c',
@@ -69,6 +73,10 @@ name: pkg_c
     );
 
     final output = await proc.stdoutStream().join('\n');
+
+    await proc.shouldExit(0);
+    printOnFailure("r'''\n$output'''");
+
     expect(output, r'''
 PKG: pkg_a
 Resolving dependencies...
@@ -77,10 +85,16 @@ No dependencies changed.
 PKG: pkg_a; TASK: dartanalyzer
 dartanalyzer .
 Analyzing pkg_a...
+PKG: pkg_a; TASK: dartanalyzer - FAILED
+
+PKG: pkg_a; TASK: command
+echo "testing 1 2 3"
+testing 1 2 3
+PKG: pkg_a; TASK: command - SUCCEEDED
 
 PKG: pkg_b
 Resolving dependencies...
-pub upgrade failed
+PKG: pkg_b; 'pub upgrade' - FAILED
 
 PKG: pkg_c
 Resolving dependencies...
@@ -89,9 +103,14 @@ No dependencies changed.
 PKG: pkg_c; TASK: dartanalyzer
 dartanalyzer .
 Analyzing pkg_c...
-''');
+No issues found!
+PKG: pkg_c; TASK: dartanalyzer - SUCCEEDED
 
-    await proc.shouldExit(3);
+PKG: pkg_c; TASK: command
+echo "testing 1 2 3"
+testing 1 2 3
+PKG: pkg_c; TASK: command - SUCCEEDED
+''');
   });
 }
 
@@ -100,6 +119,8 @@ dart:
  - stable
 
 stages:
-  - some_things:
-    - dartanalyzer:
+  - dartanalyze:
+    - dartanalyzer
+  - dartfmt:
+    - command: echo "testing 1 2 3"
 ''';

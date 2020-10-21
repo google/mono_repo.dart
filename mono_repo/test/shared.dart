@@ -35,7 +35,9 @@ void testGenerateTravisConfig({
       ),
     );
   } finally {
-    expect(printOutput.join('\n'), printMatcher);
+    addTearDown(() {
+      expect(printOutput.join('\n'), printMatcher);
+    });
   }
 }
 

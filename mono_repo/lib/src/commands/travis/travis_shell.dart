@@ -33,23 +33,35 @@ if [[ "\$#" == "0" ]]; then
   exit 1
 fi
 
-EXIT_CODE=0
+SUCCESS_COUNT=0
+declare -a FAILURES
 
 for PKG in \${PKGS}; do
   ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}')}
   pushd "\${PKG}" >/dev/null || exit \$?
 
-  PUB_EXIT_CODE=0
-  pub $pubDependencyCommand --no-precompile || PUB_EXIT_CODE=\$?
+  EXIT_CODE=0
+  pub $pubDependencyCommand --no-precompile || EXIT_CODE=\$?
 
-  if [[ \${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    ${safeEcho(prettyAnsi, red, "pub $pubDependencyCommand failed")}
+  if [[ \${EXIT_CODE} -ne 0 ]]; then
+    ${echoWithEvaluation(prettyAnsi, red, "PKG: \${PKG}; 'pub $pubDependencyCommand' - FAILED")}
+    FAILURES+=("\${PKG}: pub $pubDependencyCommand")
   else
     for TASK in "\$@"; do
+      EXIT_CODE=0
       echo
       ${echoWithEvaluation(prettyAnsi, styleBold, r'PKG: ${PKG}; TASK: ${TASK}')}
 ${_shellCase('TASK', _calculateTaskEntries(commandsToKeys, prettyAnsi))}
+
+      if [[ \${EXIT_CODE} -ne 0 ]]
+      then
+        ${echoWithEvaluation(prettyAnsi, red, 'PKG: \${PKG}; TASK: \${TASK} - FAILED')}
+        FAILURES+=("\${PKG}: \${TASK}")
+      else
+        ${echoWithEvaluation(prettyAnsi, green, 'PKG: \${PKG}; TASK: \${TASK} - SUCCEEDED')}
+        SUCCESS_COUNT=\$((SUCCESS_COUNT + 1))
+      fi
+
     done
   fi
 
