@@ -240,7 +240,7 @@ environment:
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''',
+$travisShPathMessage''',
     );
 
     await d.file(travisFileName, travisYamlOutput).validate();
@@ -292,7 +292,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''',
+$travisShPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -394,7 +394,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''',
+$travisShPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -518,7 +518,7 @@ package:pkg_a
   `dart` values (unneeded) are not used and can be removed.
   `os` values (unneeded) are not used and can be removed.
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''',
+$travisShPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -890,7 +890,7 @@ name: pkg_name
 package:sub_pkg1
 package:sub_pkg2
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''',
+$travisShPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -960,7 +960,7 @@ name: pkg_name
 package:sub_pkg1
 package:sub_pkg2
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''',
+$travisShPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -1269,7 +1269,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
           printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage
+$travisShPathMessage
 ${scriptLines(travisSelfValidateScriptPath).join('\n')}
 Wrote `${p.join(d.sandbox, travisSelfValidateScriptPath)}`.''',
         );
@@ -1314,11 +1314,7 @@ cache:
   });
 }
 
-String get _travisShPathMessage => '''
-${scriptLines(travisShPath).join('\n')}
-Wrote `${p.join(d.sandbox, travisShPath)}`.''';
-
 String get _subPkgStandardOutput => '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$_travisShPathMessage''';
+$travisShPathMessage''';

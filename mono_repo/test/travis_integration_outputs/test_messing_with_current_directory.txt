@@ -1,0 +1,6 @@
+PKG: pkg_c
+Resolving dependencies...
+No dependencies changed.
+
+PKG: pkg_c; TASK: command_1
+popd >/dev/null

@@ -9,8 +9,10 @@ import 'package:io/ansi.dart';
 import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/commands/travis/shared.dart'
     show skipCreatedWithSentinel;
+import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -35,7 +37,9 @@ void testGenerateTravisConfig({
       ),
     );
   } finally {
-    expect(printOutput.join('\n'), printMatcher);
+    addTearDown(() {
+      expect(printOutput.join('\n'), printMatcher);
+    });
   }
 }
 
@@ -85,3 +89,7 @@ stages:
       test: --platform chrome
     - test: --preset travis
 ''';
+
+String get travisShPathMessage => '''
+${scriptLines(travisShPath).join('\n')}
+Wrote `${p.join(d.sandbox, travisShPath)}`.''';
