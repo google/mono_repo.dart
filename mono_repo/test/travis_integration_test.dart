@@ -1,6 +1,9 @@
 @TestOn('!windows')
+import 'dart:io';
 
+import 'package:meta/meta.dart';
 import 'package:mono_repo/src/package_config.dart';
+import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
@@ -11,7 +14,7 @@ import 'shared.dart';
 void main() {
   glyph.ascii = false;
 
-  test('integration', () async {
+  setUpAll(() async {
     await d.file('mono_repo.yaml', 'pretty_ansi: false').create();
     await d.dir('pkg_a', [
       d.file(
@@ -43,55 +46,135 @@ dependencies:
       ),
       d.file('pubspec.yaml', '''
 name: pkg_c
-''')
+'''),
+      d.file('some_dart_file.dart', 'void main() => print("hello");'),
     ]).create();
 
     testGenerateTravisConfig(
-      printMatcher: stringContainsInOrder([
-        'package:pkg_a',
-        'package:pkg_b',
-        'Make sure to mark `tool/travis.sh` as executable.'
-      ]),
+      printMatcher: '''
+package:pkg_a
+package:pkg_b
+package:pkg_c
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$travisShPathMessage''',
     );
+  });
 
-    //print(File(p.join(d.sandbox, travisShPath)).readAsStringSync());
+  _registerTest(
+    'all packages with task failures',
+    args: [
+      'dartanalyzer',
+      'command_0',
+    ],
+    pkgsEnvironment: 'pkg_a pkg_b pkg_c',
+    expectedExitCode: 1,
+  );
+
+  _registerTest(
+    'just successes',
+    args: [
+      'dartanalyzer',
+      'command_0',
+    ],
+    pkgsEnvironment: 'pkg_c',
+    expectedExitCode: 0,
+  );
+
+  _registerTest(
+    'no tasks provided',
+    args: [],
+    pkgsEnvironment: 'pkg_a pkg_b pkg_c',
+    expectedExitCode: 1,
+  );
+
+  _registerTest(
+    'wrong task provided',
+    args: [
+      'not_a_task',
+    ],
+    pkgsEnvironment: 'pkg_c',
+    expectedExitCode: 1,
+  );
+
+  _registerTest(
+    'bad PKGS provided',
+    args: [
+      'dartanalyzer',
+      'command_0',
+    ],
+    pkgsEnvironment: 'pkg_d',
+    expectedExitCode: 1,
+  );
+
+  _registerTest(
+    'no PKGS set',
+    args: [
+      'dartanalyzer',
+      'command_0',
+    ],
+    pkgsEnvironment: '',
+    expectedExitCode: 1,
+  );
+
+  _registerTest(
+    'test messing with current directory',
+    args: [
+      'command_1',
+    ],
+    pkgsEnvironment: 'pkg_c',
+    expectedExitCode: 1,
+  );
+}
+
+void _registerTest(
+  String name, {
+  @required List<String> args,
+  @required String pkgsEnvironment,
+  @required int expectedExitCode,
+}) {
+  test(name, () async {
+    // Make sure we're executing from the right directory!
+    await d
+        .file('test/travis_integration_test.dart', isNotEmpty)
+        .validate(p.current);
 
     final proc = await TestProcess.start(
       '/bin/bash',
       [
         'tool/travis.sh',
-        'dartanalyzer',
+        ...args,
       ],
       environment: {
-        'PKGS': 'pkg_a pkg_b pkg_c',
+        'PKGS': pkgsEnvironment,
       },
       workingDirectory: d.sandbox,
     );
 
     final output = await proc.stdoutStream().join('\n');
-    expect(output, r'''
-PKG: pkg_a
-Resolving dependencies...
-No dependencies changed.
 
-PKG: pkg_a; TASK: dartanalyzer
-dartanalyzer .
-Analyzing pkg_a...
+    await proc.shouldExit(expectedExitCode);
+    printOnFailure("r'''\n$output''',");
 
-PKG: pkg_b
-Resolving dependencies...
-pub upgrade failed
+    final fileName = [name.toLowerCase().replaceAll(' ', '_'), '.txt'].join();
 
-PKG: pkg_c
-Resolving dependencies...
-No dependencies changed.
+    final outputFile = File(p.join(
+      'test',
+      'travis_integration_outputs',
+      fileName,
+    ));
 
-PKG: pkg_c; TASK: dartanalyzer
-dartanalyzer .
-Analyzing pkg_c...
-''');
-
-    await proc.shouldExit(3);
+    if (outputFile.existsSync()) {
+      expect(output, outputFile.readAsStringSync());
+    } else {
+      outputFile
+        ..createSync(recursive: true)
+        ..writeAsStringSync(
+          output,
+          mode: FileMode.writeOnly,
+          flush: true,
+        );
+      fail('${outputFile.path} does not exist. Writing output.');
+    }
   });
 }
 
@@ -100,6 +183,10 @@ dart:
  - stable
 
 stages:
-  - some_things:
-    - dartanalyzer:
+  - stage1:
+    - dartanalyzer
+  - stage2:
+    - command: echo "testing 1 2 3"
+  - stage3:
+    - command: popd >/dev/null  
 ''';
