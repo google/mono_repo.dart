@@ -342,8 +342,8 @@ cache:
         dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       *)
-        echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-        EXIT_CODE=1
+        echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
+        exit 64
         ;;
       esac
 ''')).validate();
@@ -448,8 +448,8 @@ cache:
         dartfmt --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       *)
-        echo -e "\033[31mNot expecting TASK '${TASK}'. Error!\033[0m"
-        EXIT_CODE=1
+        echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
+        exit 64
         ;;
       esac
 ''')).validate();
@@ -1124,11 +1124,11 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
 
         await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(travisShPath, contains(r'''
-  pub get --no-precompile || PUB_EXIT_CODE=$?
+  pub get --no-precompile || EXIT_CODE=$?
 
-  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    echo -e '\033[31mpub get failed\033[0m'
+  if [[ ${EXIT_CODE} -ne 0 ]]; then
+    echo -e "\033[31mPKG: ${PKG}; 'pub get' - FAILED  (${EXIT_CODE})\033[0m"
+    FAILURES+=("${PKG}; 'pub get'")
   else
 ''')).validate();
       });
@@ -1185,29 +1185,36 @@ function dartanalyzer() {
 }
 
 if [[ -z ${PKGS} ]]; then
-  echo -e 'PKGS environment variable must be set!'
-  exit 1
+  echo -e 'PKGS environment variable must be set! - TERMINATING JOB'
+  exit 64
 fi
 
 if [[ "$#" == "0" ]]; then
-  echo -e 'At least one task argument must be provided!'
-  exit 1
+  echo -e 'At least one task argument must be provided! - TERMINATING JOB'
+  exit 64
 fi
 
-EXIT_CODE=0
+SUCCESS_COUNT=0
+declare -a FAILURES
 
 for PKG in ${PKGS}; do
   echo -e "PKG: ${PKG}"
-  pushd "${PKG}" >/dev/null || exit $?
+  EXIT_CODE=0
+  pushd "${PKG}" >/dev/null || EXIT_CODE=$?
 
-  PUB_EXIT_CODE=0
-  pub upgrade --no-precompile || PUB_EXIT_CODE=$?
+  if [[ ${EXIT_CODE} -ne 0 ]]; then
+    echo -e "PKG: '${PKG}' does not exist - TERMINATING JOB"
+    exit 64
+  fi
 
-  if [[ ${PUB_EXIT_CODE} -ne 0 ]]; then
-    EXIT_CODE=1
-    echo -e 'pub upgrade failed'
+  pub upgrade --no-precompile || EXIT_CODE=$?
+
+  if [[ ${EXIT_CODE} -ne 0 ]]; then
+    echo -e "PKG: ${PKG}; 'pub upgrade' - FAILED  (${EXIT_CODE})"
+    FAILURES+=("${PKG}; 'pub upgrade'")
   else
     for TASK in "$@"; do
+      EXIT_CODE=0
       echo
       echo -e "PKG: ${PKG}; TASK: ${TASK}"
       case ${TASK} in
@@ -1228,18 +1235,39 @@ for PKG in ${PKGS}; do
         pub run test --preset travis || EXIT_CODE=$?
         ;;
       *)
-        echo -e "Not expecting TASK '${TASK}'. Error!"
-        EXIT_CODE=1
+        echo -e "Unknown TASK '${TASK}' - TERMINATING JOB"
+        exit 64
         ;;
       esac
+
+      if [[ ${EXIT_CODE} -ne 0 ]]; then
+        echo -e "PKG: ${PKG}; TASK: ${TASK} - FAILED (${EXIT_CODE})"
+        FAILURES+=("${PKG}; TASK: ${TASK}")
+      else
+        echo -e "PKG: ${PKG}; TASK: ${TASK} - SUCCEEDED"
+        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+      fi
+
     done
   fi
 
-  popd >/dev/null || exit $?
+  echo
+  echo -e "SUCCESS COUNT: ${SUCCESS_COUNT}"
+
+  if [ ${#FAILURES[@]} -ne 0 ]; then
+    echo -e "FAILURES: ${#FAILURES[@]}"
+    for i in "${FAILURES[@]}"; do
+      echo -e "  $i"
+    done
+  fi
+
+  popd >/dev/null || exit 70
   echo
 done
 
-exit ${EXIT_CODE}
+if [ ${#FAILURES[@]} -ne 0 ]; then
+  exit 1
+fi
 ''').validate();
       });
     });

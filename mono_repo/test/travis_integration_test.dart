@@ -84,7 +84,7 @@ $travisShPathMessage''',
     'no tasks provided',
     args: [],
     pkgsEnvironment: 'pkg_a pkg_b pkg_c',
-    expectedExitCode: 1,
+    expectedExitCode: 64,
   );
 
   _registerTest(
@@ -93,7 +93,7 @@ $travisShPathMessage''',
       'not_a_task',
     ],
     pkgsEnvironment: 'pkg_c',
-    expectedExitCode: 1,
+    expectedExitCode: 64,
   );
 
   _registerTest(
@@ -103,7 +103,7 @@ $travisShPathMessage''',
       'command_0',
     ],
     pkgsEnvironment: 'pkg_d',
-    expectedExitCode: 1,
+    expectedExitCode: 64,
   );
 
   _registerTest(
@@ -113,7 +113,7 @@ $travisShPathMessage''',
       'command_0',
     ],
     pkgsEnvironment: '',
-    expectedExitCode: 1,
+    expectedExitCode: 64,
   );
 
   _registerTest(
@@ -122,7 +122,7 @@ $travisShPathMessage''',
       'command_1',
     ],
     pkgsEnvironment: 'pkg_c',
-    expectedExitCode: 1,
+    expectedExitCode: 70,
   );
 }
 

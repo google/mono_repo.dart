@@ -3,4 +3,4 @@ Resolving dependencies...
 No dependencies changed.
 
 PKG: pkg_c; TASK: not_a_task
-Not expecting TASK 'not_a_task'. Error!
+Unknown TASK 'not_a_task' - TERMINATING JOB

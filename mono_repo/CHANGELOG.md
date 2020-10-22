@@ -8,6 +8,12 @@
     The default is `true`. Set to `false` to have the generated shell script
     skip any ANSI formatting.
 * `travis` command:
+  * Many improvements to the generated `tool/travis.sh` file
+    * Clearly denote when terminating a job due to incorrect usage or 
+      configuration.
+    * Clearly mark the end of each task and if it succeeded or failed.
+    * Print a summary at the end of the tasks for each package to make it easier
+      to find and fix failures.
   * **BREAKING** Removed `--use-get` command-line flag. Use `pub_action`
     setting in `mono_repo.yaml` instead.
   * **BREAKING** Removed `--pretty-ansi` command-line flag. Use `pretty_ansi`
