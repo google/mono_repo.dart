@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
+import '../../version.dart';
 import '../../yaml.dart';
 import 'shared.dart';
 
@@ -271,7 +272,7 @@ const _selfValidateTaskConfig = {
   'stage': _selfValidateStageName,
   'name': 'mono_repo self validate',
   'os': 'linux',
-  'script': 'pub global activate mono_repo 2.5.0 && '
+  'script': 'pub global activate mono_repo $packageVersion && '
       'pub global run mono_repo travis --validate'
 };
 const _equality = DeepCollectionEquality();

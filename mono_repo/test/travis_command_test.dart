@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/package_config.dart';
+import 'package:mono_repo/src/version.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -1302,7 +1303,7 @@ $travisShPathMessage''',
             .file(
                 travisFileName,
                 stringContainsInOrder([
-                  r'''
+                  '''
 language: dart
 
 jobs:
@@ -1310,7 +1311,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 2.5.0 && pub global run mono_repo travis --validate"
+      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo travis --validate"
 ''',
                   r'''
 stages:
