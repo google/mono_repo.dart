@@ -221,18 +221,9 @@ class MonoConfig {
 const _selfValidateStageName = 'mono_repo_self_validate';
 
 String _selfValidateFromValue(Object value) {
-  if (value == null) {
-    return null;
-  }
-
-  if (value is bool) {
-    return value ? _selfValidateStageName : null;
-  }
-
-  if (value is String) {
-    return value;
-  }
-
+  if (value == null) return null;
+  if (value is bool) return value ? _selfValidateStageName : null;
+  if (value is String) return value;
   throw ArgumentError.value(value, 'value', 'Must be a `String` or `bool`.');
 }
 
