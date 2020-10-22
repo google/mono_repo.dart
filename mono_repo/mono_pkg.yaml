@@ -5,6 +5,7 @@ stages:
   - group:
     # https://github.com/google/mono_repo.dart/issues/199
     - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
+    name: mono_repo self validate
     dart: dev
   - group:
     - dartfmt
