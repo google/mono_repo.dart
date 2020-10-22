@@ -12,7 +12,6 @@ import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
-import 'travis/travis_self_validate.dart';
 import 'travis/travis_shell.dart';
 import 'travis/travis_yaml.dart';
 
@@ -66,9 +65,8 @@ void generateTravisConfig(
 class GeneratedTravisConfig {
   final String travisYml;
   final String travisSh;
-  final String selfValidateSh;
 
-  GeneratedTravisConfig._(this.travisYml, this.travisSh, this.selfValidateSh);
+  GeneratedTravisConfig._(this.travisYml, this.travisSh);
 
   factory GeneratedTravisConfig.generate(RootConfig rootConfig) {
     _logPkgs(rootConfig);
@@ -83,12 +81,7 @@ class GeneratedTravisConfig {
       rootConfig.monoConfig.pubAction,
     );
 
-    String selfValidateSh;
-    if (rootConfig.monoConfig.selfValidate) {
-      selfValidateSh = generateSelfValidate();
-    }
-
-    return GeneratedTravisConfig._(yml, sh, selfValidateSh);
+    return GeneratedTravisConfig._(yml, sh);
   }
 }
 
