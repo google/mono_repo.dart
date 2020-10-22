@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
-import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -672,7 +671,6 @@ name: pkg_name
 
       await d.nothing(travisFileName).validate();
       await d.nothing(travisShPath).validate();
-      await d.nothing(travisSelfValidateScriptPath).validate();
 
       testGenerateTravisConfig(
         printMatcher: _subPkgStandardOutput,
@@ -1297,9 +1295,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
           printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage
-${scriptLines(travisSelfValidateScriptPath).join('\n')}
-Wrote `${p.join(d.sandbox, travisSelfValidateScriptPath)}`.''',
+$travisShPathMessage''',
         );
 
         await d
@@ -1314,7 +1310,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: tool/mono_repo_self_validate.sh
+      script: "pub global activate mono_repo 2.5.0 && pub global run mono_repo travis --validate"
 ''',
                   r'''
 stages:
@@ -1334,9 +1330,6 @@ cache:
                 ]))
             .validate();
         await d.file(travisShPath, travisShellOutput).validate();
-        await d
-            .file(travisSelfValidateScriptPath, contains('travis --validate'))
-            .validate();
       });
     });
   });

@@ -14,7 +14,6 @@ part 'package_config.g.dart';
 const monoPkgFileName = 'mono_pkg.yaml';
 const travisFileName = '.travis.yml';
 const travisShPath = 'tool/travis.sh';
-const travisSelfValidateScriptPath = 'tool/mono_repo_self_validate.sh';
 
 class PackageConfig {
   final String relativePath;

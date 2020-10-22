@@ -18,7 +18,9 @@
     setting in `mono_repo.yaml` instead.
   * **BREAKING** Removed `--pretty-ansi` command-line flag. Use `pretty_ansi`
     setting in `mono_repo.yaml` instead.
-  * Improved the format and output of the generated `tool/travis.sh` script.
+  * Simplified generated configuration for `self_validate`.
+    'tool/mono_repo_self_validate.sh' is no longer created or used.
+    When upgrading from `v2.5.0`, you can delete this file.
 
 ## 2.5.0
 
