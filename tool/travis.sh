@@ -58,13 +58,9 @@ for PKG in ${PKGS}; do
       echo
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
-      command_0)
+      command)
         echo 'cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate'
         cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate || EXIT_CODE=$?
-        ;;
-      command_1)
-        echo 'pub run test -P presubmit'
-        pub run test -P presubmit || EXIT_CODE=$?
         ;;
       dartanalyzer_0)
         echo 'dartanalyzer --fatal-infos --fatal-warnings .'
@@ -78,9 +74,13 @@ for PKG in ${PKGS}; do
         echo 'dartfmt -n --set-exit-if-changed .'
         dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
         ;;
-      test)
-        echo 'pub run test'
-        pub run test || EXIT_CODE=$?
+      test_0)
+        echo 'pub run test -P presubmit --test-randomize-ordering-seed=random'
+        pub run test -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        ;;
+      test_1)
+        echo 'pub run test --test-randomize-ordering-seed=random'
+        pub run test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
