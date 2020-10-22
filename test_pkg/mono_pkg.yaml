@@ -8,6 +8,6 @@ stages:
     - dartfmt
     - dartanalyzer: --fatal-infos --fatal-warnings .
 - unit_test:
-  - test:
+  - test: --test-randomize-ordering-seed=random
     os:
       - linux

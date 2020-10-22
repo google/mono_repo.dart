@@ -12,7 +12,7 @@ stages:
   - dartanalyzer: --fatal-warnings .
     dart: 2.7.0
 - unit_test:
-  - command: pub run test -P presubmit
+  - test: -P presubmit --test-randomize-ordering-seed=random
     os:
       - linux
       - windows
