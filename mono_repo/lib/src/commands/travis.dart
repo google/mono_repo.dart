@@ -56,28 +56,9 @@ void generateTravisConfig(
       travisConfig.travisSh,
       travisShPath,
     );
-    if (rootConfig.monoConfig.selfValidate) {
-      _validateFile(
-        rootConfig.rootDirectory,
-        travisConfig.selfValidateSh,
-        travisSelfValidateScriptPath,
-      );
-    } else {
-      // TODO: print a warning if it exists? Fail? Hrm...
-    }
   } else {
     _writeTravisYml(rootConfig.rootDirectory, travisConfig);
     _writeScript(rootConfig.rootDirectory, travisShPath, travisConfig.travisSh);
-    if (rootConfig.monoConfig.selfValidate) {
-      _writeScript(
-        rootConfig.rootDirectory,
-        travisSelfValidateScriptPath,
-        travisConfig.selfValidateSh,
-      );
-    } else {
-      // TODO: check if self-validate script exists – and tell user they
-      // can/should deleted it
-    }
   }
 }
 

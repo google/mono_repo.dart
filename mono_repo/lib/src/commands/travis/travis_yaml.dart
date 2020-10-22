@@ -271,6 +271,7 @@ const _selfValidateTaskConfig = {
   'stage': _selfValidateStageName,
   'name': 'mono_repo self validate',
   'os': 'linux',
-  'script': travisSelfValidateScriptPath,
+  'script': 'pub global activate mono_repo 2.5.0 && '
+      'pub global run mono_repo travis --validate'
 };
 const _equality = DeepCollectionEquality();
