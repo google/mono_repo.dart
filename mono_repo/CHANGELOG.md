@@ -1,4 +1,4 @@
-## 3.0.0-dev
+## 3.0.0
 
 * `mono_repo.yaml`:
   * **NEW!** Added support for `pub_action` value.
