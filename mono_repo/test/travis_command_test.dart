@@ -1355,7 +1355,7 @@ jobs:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 3.0.0-dev && pub global run mono_repo travis --validate"
+      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo travis --validate"
     - stage: analyze
 ''',
                   r'''
