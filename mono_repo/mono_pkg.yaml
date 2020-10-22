@@ -3,10 +3,12 @@
 stages:
 - smoke_test:
   - group:
-    - dartfmt
-    - dartanalyzer: --fatal-infos --fatal-warnings .
     # https://github.com/google/mono_repo.dart/issues/199
     - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
+    dart: dev
+  - group:
+    - dartfmt
+    - dartanalyzer: --fatal-infos --fatal-warnings .
     dart: dev
   - dartanalyzer: --fatal-warnings .
     dart: 2.7.0
