@@ -3,18 +3,18 @@ language: dart
 
 jobs:
   include:
-    - stage: mono_repo_self_validate
-      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`"
-      dart: dev
-      os: linux
-      env: PKGS="mono_repo"
-      script: tool/travis.sh command
     - stage: smoke_test
       name: "SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
       dart: dev
       os: linux
       env: PKGS="mono_repo test_pkg"
       script: tool/travis.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
+      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`"
+      dart: dev
+      os: linux
+      env: PKGS="mono_repo"
+      script: tool/travis.sh command
     - stage: smoke_test
       name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer --fatal-warnings .`"
       dart: "2.7.0"
@@ -53,7 +53,6 @@ jobs:
       script: tool/travis.sh test_1
 
 stages:
-  - mono_repo_self_validate
   - smoke_test
   - unit_test
 

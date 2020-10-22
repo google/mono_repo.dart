@@ -1272,22 +1272,22 @@ fi
     });
 
     group('self_validate', () {
-      test('value must be bool', () async {
-        final monoConfigContent = toYaml({'self_validate': 'not a bool!'});
+      test('value must be bool or string', () async {
+        final monoConfigContent = toYaml({'self_validate': 42});
         await populateConfig(monoConfigContent);
 
         expect(
           testGenerateTravisConfig,
           throwsAParsedYamlException(r'''
-line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Value must be `true` or `false`.
+line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Value must be `true`, `false`, or a stage name.
   ╷
-1 │ self_validate: "not a bool!"
-  │                ^^^^^^^^^^^^^
+1 │ self_validate: 42
+  │                ^^
   ╵'''),
         );
       });
 
-      test('used with a valid configuration', () async {
+      test('set to `true`', () async {
         final monoConfigContent = toYaml({'self_validate': true});
 
         await populateConfig(monoConfigContent);
@@ -1316,6 +1316,50 @@ jobs:
                   r'''
 stages:
   - mono_repo_self_validate
+  - analyze
+  - unit_test
+
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - "$HOME/.pub-cache"
+'''
+                ]))
+            .validate();
+        await d.file(travisShPath, travisShellOutput).validate();
+      });
+
+      test('set to a stage name', () async {
+        final monoConfigContent = toYaml({'self_validate': 'analyze'});
+
+        await populateConfig(monoConfigContent);
+
+        testGenerateTravisConfig(
+          printMatcher: '''
+package:sub_pkg
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$travisShPathMessage''',
+        );
+
+        await d
+            .file(
+                travisFileName,
+                stringContainsInOrder([
+                  '''
+jobs:
+  include:
+    - stage: analyze
+      name: mono_repo self validate
+      os: linux
+      script: "pub global activate mono_repo 3.0.0-dev && pub global run mono_repo travis --validate"
+    - stage: analyze
+''',
+                  r'''
+stages:
   - analyze
   - unit_test
 

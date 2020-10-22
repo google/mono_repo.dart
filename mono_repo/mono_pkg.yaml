@@ -1,11 +1,10 @@
 # See https://github.com/google/mono_repo.dart for details
 
 stages:
-- mono_repo_self_validate:
-    # A bit weird, this should really be a global task but we don't have those.
-    - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
-      dart: dev
 - smoke_test:
+  # https://github.com/google/mono_repo.dart/issues/199
+  - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
+    dart: dev
   - group:
     - dartfmt
     - dartanalyzer: --fatal-infos --fatal-warnings .
