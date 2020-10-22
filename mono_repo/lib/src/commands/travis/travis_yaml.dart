@@ -74,21 +74,32 @@ ${toYaml({
 
   final jobList = [
     ..._listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
-    if (rootConfig.monoConfig.selfValidate) _selfValidateTaskConfig,
+    if (rootConfig.monoConfig.selfValidateStage != null)
+      _selfValidateTaskConfig(rootConfig.monoConfig.selfValidateStage),
   ]..sort((a, b) {
       var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
 
-      if (value == 0) {
-        value = a['env'].compareTo(b['env']);
-      }
-      if (value == 0) {
-        value = a['script'].compareTo(b['script']);
-      }
-      if (value == 0) {
-        value = a['dart'].compareTo(b['dart']);
-      }
-      if (value == 0) {
-        value = a['os'].compareTo(b['os']);
+      for (var key in const ['env', 'script', 'dart', 'os']) {
+        if (value != 0) {
+          break;
+        }
+        final aVal = a[key];
+        final bVal = b[key];
+        if (aVal == null) {
+          if (bVal == null) {
+            value = 0;
+          } else {
+            // null (a) first
+            value = -1;
+          }
+        } else {
+          if (bVal == null) {
+            // null (b) first
+            value = 1;
+          } else {
+            value = aVal.compareTo(bVal);
+          }
+        }
       }
       return value;
     });
@@ -188,9 +199,9 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
       .reversed
       .toList();
 
-  if (rootConfig.monoConfig.selfValidate &&
-      !orderedStages.contains(_selfValidateStageName)) {
-    orderedStages.insert(0, _selfValidateStageName);
+  if (rootConfig.monoConfig.selfValidateStage != null &&
+      !orderedStages.contains(rootConfig.monoConfig.selfValidateStage)) {
+    orderedStages.insert(0, rootConfig.monoConfig.selfValidateStage);
   }
 
   return orderedStages;
@@ -266,13 +277,11 @@ class _TravisJobEntry {
   List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
-const _selfValidateStageName = 'mono_repo_self_validate';
-
-const _selfValidateTaskConfig = {
-  'stage': _selfValidateStageName,
-  'name': 'mono_repo self validate',
-  'os': 'linux',
-  'script': 'pub global activate mono_repo $packageVersion && '
-      'pub global run mono_repo travis --validate'
-};
+Map<String, String> _selfValidateTaskConfig(String stageName) => {
+      'stage': stageName,
+      'name': 'mono_repo self validate',
+      'os': 'linux',
+      'script': 'pub global activate mono_repo $packageVersion && '
+          'pub global run mono_repo travis --validate'
+    };
 const _equality = DeepCollectionEquality();

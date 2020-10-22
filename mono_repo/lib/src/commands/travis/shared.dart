@@ -16,3 +16,4 @@ function $commandName() {
     command $commandName "\$@"
   fi
 }''';
+

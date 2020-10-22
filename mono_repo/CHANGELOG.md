@@ -7,6 +7,8 @@
   * **NEW!** Added support for `pretty_ansi` value.
     The default is `true`. Set to `false` to have the generated shell script
     skip any ANSI formatting.
+  * **UPDATED** `self_validate` can now be _either_ `true` or a String value
+    that maps to the desired stage where validation should run.
 * `travis` command:
   * Many improvements to the generated `tool/travis.sh` file
     * Clearly denote when terminating a job due to incorrect usage or 

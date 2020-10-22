@@ -3,24 +3,24 @@ language: dart
 
 jobs:
   include:
-    - stage: mono_repo_self_validate
-      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`"
-      dart: dev
-      os: linux
-      env: PKGS="mono_repo"
-      script: tool/travis.sh command_0
-    - stage: smoke_test
-      name: "SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
-      dart: dev
-      os: linux
-      env: PKGS="mono_repo test_pkg"
-      script: tool/travis.sh dartfmt dartanalyzer_0
     - stage: smoke_test
       name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer --fatal-warnings .`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/travis.sh dartanalyzer_1
+    - stage: smoke_test
+      name: "SDK: dev; PKG: mono_repo; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`, `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`]"
+      dart: dev
+      os: linux
+      env: PKGS="mono_repo"
+      script: tool/travis.sh dartfmt dartanalyzer_0 command_0
+    - stage: smoke_test
+      name: "SDK: dev; PKG: test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
+      dart: dev
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/travis.sh dartfmt dartanalyzer_0
     - stage: unit_test
       name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit`"
       dart: "2.7.0"
@@ -53,7 +53,6 @@ jobs:
       script: tool/travis.sh test
 
 stages:
-  - mono_repo_self_validate
   - smoke_test
   - unit_test
 

@@ -32,7 +32,7 @@ const _allowedPubActions = {
 
 class MonoConfig {
   final String pubAction;
-  final bool selfValidate;
+  final String selfValidateStage;
   final bool prettyAnsi;
   final Map<String, dynamic> travis;
   final Map<String, ConditionalStage> conditionalStages;
@@ -43,14 +43,14 @@ class MonoConfig {
     @required this.travis,
     @required this.conditionalStages,
     @required this.mergeStages,
-    @required this.selfValidate,
+    @required this.selfValidateStage,
     @required this.prettyAnsi,
   });
 
   factory MonoConfig({
     @required Map travis,
     @required Set<String> mergeStages,
-    @required bool selfValidate,
+    @required String selfValidateStage,
     @required bool prettyAnsi,
     @required String pubAction,
   }) {
@@ -109,7 +109,7 @@ class MonoConfig {
       travis: travis.map((k, v) => MapEntry(k as String, v)),
       conditionalStages: conditionalStages,
       mergeStages: mergeStages,
-      selfValidate: selfValidate,
+      selfValidateStage: selfValidateStage,
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
     );
@@ -141,12 +141,12 @@ class MonoConfig {
     }
 
     final selfValidate = json['self_validate'] ?? false;
-    if (selfValidate is! bool) {
+    if (selfValidate is! bool && selfValidate is! String) {
       throw CheckedFromJsonException(
         json,
         'self_validate',
         'MonoConfig',
-        'Value must be `true` or `false`.',
+        'Value must be `true`, `false`, or a stage name.',
       );
     }
 
@@ -186,7 +186,7 @@ class MonoConfig {
       return MonoConfig(
         travis: travis as Map,
         mergeStages: Set.from(mergeStages),
-        selfValidate: selfValidate as bool,
+        selfValidateStage: _selfValidateFromValue(selfValidate),
         pubAction: pubAction as String,
         prettyAnsi: prettyAnsi as bool,
       );
@@ -208,7 +208,7 @@ class MonoConfig {
       return MonoConfig(
         travis: {},
         mergeStages: <String>{},
-        selfValidate: false,
+        selfValidateStage: null,
         pubAction: _defaultPubAction,
         prettyAnsi: true,
       );
@@ -216,6 +216,24 @@ class MonoConfig {
 
     return createWithCheck(() => MonoConfig.fromJson(yaml));
   }
+}
+
+const _selfValidateStageName = 'mono_repo_self_validate';
+
+String _selfValidateFromValue(Object value) {
+  if (value == null) {
+    return null;
+  }
+
+  if (value is bool) {
+    return value ? _selfValidateStageName : null;
+  }
+
+  if (value is String) {
+    return value;
+  }
+
+  throw ArgumentError.value(value, 'value', 'Must be a `String` or `bool`.');
 }
 
 @JsonSerializable(disallowUnrecognizedKeys: true)
