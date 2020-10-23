@@ -19,6 +19,10 @@ void main() {
     _testRoundTrip('cool beans', expectedEncoding: 'cool beans');
     _testRoundTrip('cool beans-', expectedEncoding: '"cool beans-"');
     _testRoundTrip('-cool beans', expectedEncoding: '"-cool beans"');
+    _testRoundTrip(
+      'actions/checkout@v2',
+      expectedEncoding: 'actions/checkout@v2',
+    );
   });
 
   group('ascii', () {
@@ -66,6 +70,30 @@ void _asciiTest(List<int> bytes) {
 }
 
 void _testRoundTrip(Object source, {String expectedEncoding}) {
+  _testRoundTripCore(source, expectedEncoding: expectedEncoding);
+
+  final sourceAsString = source.toString();
+
+  if (sourceAsString != source) {
+    // If `source` is not a String, test it as if it were – this ensures we
+    // handle the double `3.14` vs the String `'3.14'`, etc...
+    _testRoundTripCore(sourceAsString);
+  }
+
+  // array item
+  if (source is List && source.isNotEmpty) {
+    // We do not support nested lists – yet!
+  } else {
+    _testRoundTripCore([source]);
+  }
+  _testRoundTripCore([sourceAsString]);
+
+  _testRoundTripCore({'somekey': source});
+  // map key & value
+  _testRoundTripCore({sourceAsString: sourceAsString});
+}
+
+void _testRoundTripCore(Object source, {String expectedEncoding}) {
   String testTitle;
   try {
     testTitle = jsonEncode(source);
@@ -83,12 +111,6 @@ void _testRoundTrip(Object source, {String expectedEncoding}) {
       expect(output, expectedEncoding);
     }
   });
-
-  if (source is! String) {
-    // If `source` is not a String, test it as if it were – this ensures we
-    // handle the double `3.14` vs the String `'3.14'`, etc...
-    _testRoundTrip(source.toString());
-  }
 }
 
 final _testItems = [

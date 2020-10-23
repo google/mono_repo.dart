@@ -106,11 +106,11 @@ Object _wrapLoadYaml(String source, {dynamic sourceUrl}) {
 
 String toYaml(Object source) {
   final buffer = StringBuffer();
-  _writeYaml(buffer, source, 0, false);
+  _writeYaml(buffer, source, 0, false, false);
   return buffer.toString();
 }
 
-final _simpleDashedEntry = RegExp(r'^[a-zA-Z](?:[a-zA-Z\-]?[a-zA-Z])*$');
+final _simpleDashedEntry = RegExp(r'^[a-zA-Z][a-zA-Z0-9\-\@\/]*$');
 
 bool _isSimpleString(String input) =>
     _simpleDashedEntry.hasMatch(input) || _simpleString.hasMatch(input);
@@ -140,6 +140,7 @@ void _writeYaml(
   Object source,
   int indent,
   bool parentIsMap,
+  bool parentIsList,
 ) {
   final spaces = '  ' * indent;
   if (source is String) {
@@ -179,13 +180,16 @@ void _writeYaml(
 
         if (_isSimple(entry.value)) {
           buffer.write(' ');
-          _writeYaml(buffer, entry.value, 0, true);
+          _writeYaml(buffer, entry.value, 0, true, false);
         } else {
-          _writeYaml(buffer, entry.value, indent + 1, true);
+          _writeYaml(buffer, entry.value, indent + 1, true, false);
         }
       }
     }
   } else if (source is Iterable) {
+    if (parentIsList && source.isNotEmpty) {
+      throw UnsupportedError('We cannot encode lists within lists – yet!');
+    }
     if (source.isEmpty) {
       if (parentIsMap) {
         // Need to ensure there is a space after the map `key:`
@@ -205,9 +209,9 @@ void _writeYaml(
         }
         buffer.write('$spaces- ');
         if (_isSimple(item)) {
-          _writeYaml(buffer, item, indent, false);
+          _writeYaml(buffer, item, indent, false, true);
         } else {
-          _writeYaml(buffer, item, indent + 1, false);
+          _writeYaml(buffer, item, indent + 1, false, true);
         }
       }
     }
