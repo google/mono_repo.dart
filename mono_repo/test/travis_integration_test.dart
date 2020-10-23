@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:meta/meta.dart';
+import 'package:mono_repo/src/commands/travis.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;

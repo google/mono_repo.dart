@@ -2,18 +2,27 @@ import 'dart:convert';
 
 import 'package:io/ansi.dart';
 
-import '../../package_config.dart';
-import '../../shell_utils.dart';
-import '../../user_exception.dart';
-import 'shared.dart';
+import 'ci_shared.dart';
+import 'package_config.dart';
+import 'shell_utils.dart';
+import 'user_exception.dart';
+
+String _dartCommandContent(String commandName) => '''
+function $commandName() {
+  if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+    command $commandName.bat "\$@"
+  else
+    command $commandName "\$@"
+  fi
+}''';
 
 final windowsBoilerplate = '''
 # Support built in commands on windows out of the box.
-${dartCommandContent('pub')}
-${dartCommandContent('dartfmt')}
-${dartCommandContent('dartanalyzer')}''';
+${_dartCommandContent('pub')}
+${_dartCommandContent('dartfmt')}
+${_dartCommandContent('dartanalyzer')}''';
 
-String generateTravisSh(
+String generateTestScript(
   Map<String, String> commandsToKeys,
   bool prettyAnsi,
   String pubDependencyCommand,

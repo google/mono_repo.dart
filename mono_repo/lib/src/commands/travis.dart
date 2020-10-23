@@ -5,15 +5,18 @@
 import 'dart:io';
 
 import 'package:io/ansi.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
+import '../ci_shared.dart';
 import '../package_config.dart';
 import '../root_config.dart';
+import '../travis_shell.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
-import 'travis/travis_shell.dart';
 import 'travis/travis_yaml.dart';
+
+const travisFileName = '.travis.yml';
+const travisShPath = 'tool/travis.sh';
 
 class TravisCommand extends MonoRepoCommand {
   @override
@@ -41,7 +44,7 @@ void generateTravisConfig(
   bool validateOnly = false,
 }) {
   validateOnly ??= false;
-  final travisConfig = GeneratedTravisConfig.generate(
+  final travisConfig = _GeneratedTravisConfig.generate(
     rootConfig,
   );
   if (validateOnly) {
@@ -56,32 +59,42 @@ void generateTravisConfig(
       travisShPath,
     );
   } else {
-    _writeTravisYml(rootConfig.rootDirectory, travisConfig);
-    _writeScript(rootConfig.rootDirectory, travisShPath, travisConfig.travisSh);
+    writeFile(
+      rootConfig.rootDirectory,
+      travisFileName,
+      travisConfig.travisYml,
+      isScript: false,
+    );
+    writeFile(
+      rootConfig.rootDirectory,
+      travisShPath,
+      travisConfig.travisSh,
+      isScript: true,
+    );
   }
 }
 
 /// The generated yaml and shell script content for travis.
-class GeneratedTravisConfig {
+class _GeneratedTravisConfig {
   final String travisYml;
   final String travisSh;
 
-  GeneratedTravisConfig._(this.travisYml, this.travisSh);
+  _GeneratedTravisConfig._(this.travisYml, this.travisSh);
 
-  factory GeneratedTravisConfig.generate(RootConfig rootConfig) {
+  factory _GeneratedTravisConfig.generate(RootConfig rootConfig) {
     _logPkgs(rootConfig);
 
     final commandsToKeys = extractCommands(rootConfig);
 
     final yml = generateTravisYml(rootConfig, commandsToKeys);
 
-    final sh = generateTravisSh(
+    final sh = generateTestScript(
       commandsToKeys,
       rootConfig.monoConfig.prettyAnsi,
       rootConfig.monoConfig.pubAction,
     );
 
-    return GeneratedTravisConfig._(yml, sh);
+    return _GeneratedTravisConfig._(yml, sh);
   }
 }
 
@@ -93,13 +106,6 @@ class TravisConfigOutOfDateException extends UserException {
           'Generated travis config is out of date',
           details: 'Rerun `mono_repo travis` to update generated config',
         );
-}
-
-/// Write `.travis.yml`
-void _writeTravisYml(String rootDirectory, GeneratedTravisConfig config) {
-  final travisYamlPath = p.join(rootDirectory, travisFileName);
-  File(travisYamlPath).writeAsStringSync(config.travisYml);
-  print(styleDim.wrap('Wrote `$travisYamlPath`.'));
 }
 
 /// Checks [expectedPath] versus the content in [expectedContent].
@@ -115,69 +121,6 @@ void _validateFile(
     throw TravisConfigOutOfDateException();
   }
 }
-
-@visibleForTesting
-List<String> scriptLines(String scriptPath) => [
-      'Make sure to mark `$scriptPath` as executable.',
-      '  chmod +x $scriptPath',
-      if (Platform.isWindows) ...[
-        'It appears you are using Windows, and may not have access to chmod.',
-        'If you are using git, the following will emulate the Unix permissions '
-            'change:',
-        '  git update-index --add --chmod=+x $scriptPath'
-      ],
-    ];
-
-void _writeScript(String rootDirectory, String scriptPath, String content) {
-  final fullPath = p.join(rootDirectory, scriptPath);
-  final scriptFile = File(fullPath);
-
-  if (!scriptFile.existsSync()) {
-    scriptFile.createSync(recursive: true);
-    for (var line in scriptLines(scriptPath)) {
-      print(yellow.wrap(line));
-    }
-  }
-
-  scriptFile.writeAsStringSync(content);
-  // TODO: be clever w/ `scriptFile.statSync().mode` to see if it's executable
-  print(styleDim.wrap('Wrote `$fullPath`.'));
-}
-
-/// Gives a map of command to unique task key for all [configs].
-Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
-  final commandsToKeys = <String, String>{};
-
-  final tasksToConfigure = _travisTasks(configs);
-  final taskNames = tasksToConfigure.map((task) => task.name).toSet();
-
-  for (var taskName in taskNames) {
-    final commands = tasksToConfigure
-        .where((task) => task.name == taskName)
-        .map((task) => task.command)
-        .toSet();
-
-    if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskName;
-      continue;
-    }
-
-    // TODO: could likely use some clever `log` math here
-    final paddingSize = (commands.length - 1).toString().length;
-
-    var count = 0;
-    for (var command in commands) {
-      commandsToKeys[command] =
-          '${taskName}_${count.toString().padLeft(paddingSize, '0')}';
-      count++;
-    }
-  }
-
-  return commandsToKeys;
-}
-
-List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
-    configs.expand((config) => config.jobs).expand((job) => job.tasks).toList();
 
 void _logPkgs(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {

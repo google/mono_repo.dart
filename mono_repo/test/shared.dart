@@ -6,10 +6,8 @@ import 'dart:async';
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart';
+import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/travis.dart';
-import 'package:mono_repo/src/commands/travis/shared.dart'
-    show skipCreatedWithSentinel;
-import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
 import 'package:path/path.dart' as p;

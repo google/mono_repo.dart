@@ -5,12 +5,13 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
+import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../version.dart';
 import '../../yaml.dart';
-import 'shared.dart';
+import '../travis.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,

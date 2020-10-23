@@ -15,8 +15,6 @@ import 'yaml.dart';
 part 'package_config.g.dart';
 
 const monoPkgFileName = 'mono_pkg.yaml';
-const travisFileName = '.travis.yml';
-const travisShPath = 'tool/travis.sh';
 
 class PackageConfig {
   final String relativePath;
