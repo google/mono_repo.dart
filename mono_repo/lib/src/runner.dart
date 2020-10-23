@@ -8,6 +8,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
 import 'commands/check.dart';
+import 'commands/git_hub_actions.dart';
 import 'commands/mono_repo_command.dart';
 import 'commands/presubmit.dart';
 import 'commands/pub.dart';
@@ -15,7 +16,14 @@ import 'commands/travis.dart';
 import 'version.dart';
 
 final commands = List<Command<void>>.unmodifiable(
-    [CheckCommand(), PresubmitCommand(), PubCommand(), TravisCommand()]);
+  [
+    CheckCommand(),
+    GitHubActionsCommand(),
+    PresubmitCommand(),
+    PubCommand(),
+    TravisCommand(),
+  ],
+);
 
 class MonoRepoRunner extends CommandRunner<void> {
   MonoRepoRunner()

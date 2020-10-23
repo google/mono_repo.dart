@@ -33,6 +33,7 @@ Global options:
 
 Available commands:
   check       Check the state of the repository.
+  github      Configure GitHub Actions for child packages.
   presubmit   Run the travis presubmits locally.
   pub         Run `pub get` or `pub upgrade` against all packages.
   travis      Configure Travis-CI for child packages.
