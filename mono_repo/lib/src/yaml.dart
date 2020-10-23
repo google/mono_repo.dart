@@ -110,8 +110,13 @@ String toYaml(Object source) {
   return buffer.toString();
 }
 
+final _simpleDashedEntry = RegExp(r'^[a-zA-Z](?:[a-zA-Z\-]?[a-zA-Z])*$');
+
+bool _isSimpleString(String input) =>
+    _simpleDashedEntry.hasMatch(input) || _simpleString.hasMatch(input);
+
 String _escapeString(String source) {
-  if (_simpleString.hasMatch(source) &&
+  if (_isSimpleString(source) &&
       !source.startsWith(_maybeNumber) &&
       !_escapeRegExp.hasMatch(source) &&
       source.trim() == source && // no leading or trailing whitespace

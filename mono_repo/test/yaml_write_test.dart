@@ -11,16 +11,16 @@ import 'package:test/test.dart';
 
 import 'shared.dart';
 
-void _asciiTest(List<int> bytes) {
-  test(bytes.toString(), () {
-    final source = ascii.decode(bytes);
-    final output = toYaml(source);
-    final yaml = loadYamlOrdered(output);
-    expect(yaml, source, reason: bytes.toString());
-  });
-}
-
 void main() {
+  group('special cases', () {
+    _testRoundTrip('cool_beans', expectedEncoding: 'cool_beans');
+    _testRoundTrip('cool-beans', expectedEncoding: 'cool-beans');
+    _testRoundTrip('Cool-Beans', expectedEncoding: 'Cool-Beans');
+    _testRoundTrip('cool beans', expectedEncoding: 'cool beans');
+    _testRoundTrip('cool beans-', expectedEncoding: '"cool beans-"');
+    _testRoundTrip('-cool beans', expectedEncoding: '"-cool beans"');
+  });
+
   group('ascii', () {
     for (var i = 0; i < 128; i++) {
       _asciiTest([i]);
@@ -56,7 +56,16 @@ void main() {
   });
 }
 
-void _testRoundTrip(Object source) {
+void _asciiTest(List<int> bytes) {
+  test(bytes.toString(), () {
+    final source = ascii.decode(bytes);
+    final output = toYaml(source);
+    final yaml = loadYamlOrdered(output);
+    expect(yaml, source, reason: bytes.toString());
+  });
+}
+
+void _testRoundTrip(Object source, {String expectedEncoding}) {
   String testTitle;
   try {
     testTitle = jsonEncode(source);
@@ -70,6 +79,9 @@ void _testRoundTrip(Object source) {
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
     final yaml = loadYamlOrdered(output);
     expect(yaml, source);
+    if (expectedEncoding != null) {
+      expect(output, expectedEncoding);
+    }
   });
 
   if (source is! String) {
@@ -89,6 +101,11 @@ final _testItems = [
   '\t\v\r',
   '---', // special marker in Yaml
   '...', // special marker in Yaml
+  'n',
+  '-',
+  'n-',
+  '-n',
+  'n-n',
 
   // booleans
   true,
