@@ -100,13 +100,11 @@ class MonoConfig {
       }
     }
 
-    // Removing this at the last minute so any throw CheckedFromJsonException
-    // will have the right value
-    // ... but the code that writes the values won't write stages separately
-    travis.remove('stages');
-
     return MonoConfig._(
-      travis: travis.map((k, v) => MapEntry(k as String, v)),
+      // Removing 'stages' so any `throw CheckedFromJsonException` will have the
+      // right value, but the code that writes the values won't write stages
+      // separately
+      travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
       conditionalStages: conditionalStages,
       mergeStages: mergeStages,
       selfValidateStage: selfValidateStage,

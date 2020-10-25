@@ -13,6 +13,15 @@ import 'user_exception.dart';
 
 final _yamlMapExpando = Expando<y.YamlMap>('yamlMap');
 
+/// Returns a new [Map] with the contents of [source], storing the original
+/// [source] in an [Expando] allowing it be retrieved later in error handling
+/// code to create more helpful errors.
+Map<String, dynamic> transferYamlMap(y.YamlMap source) {
+  final newMap = Map<String, dynamic>.from(source);
+  _yamlMapExpando[newMap] = source;
+  return newMap;
+}
+
 T createWithCheck<T>(T Function() constructor) {
   try {
     return constructor();
@@ -26,8 +35,11 @@ T createWithCheck<T>(T Function() constructor) {
 }
 
 ParsedYamlException toParsedYamlExceptionOrNull(
-    CheckedFromJsonException exception) {
-  final yamlMap = _yamlMapExpando[exception.map];
+  CheckedFromJsonException exception,
+) {
+  final yamlMap = exception.map is y.YamlMap
+      ? exception.map as y.YamlMap
+      : _yamlMapExpando[exception.map];
   if (yamlMap == null) {
     return null;
   }
@@ -46,7 +58,7 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
   final yamlFile = File(p.join(rootDir, relativeFilePath));
 
   if (yamlFile.existsSync()) {
-    final pkgConfigYaml = loadYamlOrdered(
+    final pkgConfigYaml = loadYamlChecked(
       yamlFile.readAsStringSync(),
       sourceUrl: relativeFilePath,
     );
@@ -62,41 +74,9 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
   return null;
 }
 
-/// Returns [source] parsed as Yaml, but with [Map] instances having keys
-/// ordered by their location in the input.
-///
-/// `package:yaml` follows Yaml 1.2 spec strictly and does not honor the input
-/// ordering for [Map] keys, hence this work-around.
-Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
-  Object convertOrdered(Object yaml) {
-    if (yaml == null || yaml is String || yaml is num || yaml is bool) {
-      return yaml;
-    }
-    if (yaml is y.YamlList) {
-      return yaml.map(convertOrdered).toList();
-    }
-    if (yaml is y.YamlMap) {
-      final keys = yaml.keys.toList()
-        ..sort((a, b) {
-          final aNode = yaml.nodes[a];
-          final bNode = yaml.nodes[b];
-
-          return aNode.span.compareTo(bNode.span);
-        });
-      final map = Map.fromIterable(keys, value: (k) => convertOrdered(yaml[k]));
-      _yamlMapExpando[map] = yaml;
-      return map;
-    }
-
-    throw UnsupportedError(
-        'Cannot convert output of type ${yaml.runtimeType}.');
-  }
-
-  final yaml = _wrapLoadYaml(source, sourceUrl: sourceUrl);
-  return convertOrdered(yaml);
-}
-
-Object _wrapLoadYaml(String source, {dynamic sourceUrl}) {
+/// Returns [source] parsed as Yaml, but tries to convert thrown
+/// [y.YamlException] instances to [ParsedYamlException] instances.
+Object loadYamlChecked(String source, {dynamic sourceUrl}) {
   try {
     return y.loadYaml(source, sourceUrl: sourceUrl);
   } on y.YamlException catch (e) {

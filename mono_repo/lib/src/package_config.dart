@@ -2,12 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:checked_yaml/checked_yaml.dart';
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
+import 'package:yaml/yaml.dart';
 
 import 'raw_config.dart';
+import 'yaml.dart';
 
 part 'package_config.g.dart';
 
@@ -43,6 +46,15 @@ class PackageConfig {
     String relativePath,
     Pubspec pubspec,
     Map monoPkgYaml,
+  ) =>
+      createWithCheck(
+        () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
+      );
+
+  factory PackageConfig._parse(
+    String relativePath,
+    Pubspec pubspec,
+    Map monoPkgYaml,
   ) {
     if (monoPkgYaml.isEmpty) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
@@ -72,8 +84,7 @@ class PackageConfig {
       for (var job in stageYaml) {
         var jobSdks = rawConfig.sdks;
         if (job is Map && job.containsKey('dart')) {
-          job = Map<String, dynamic>.from(job as Map);
-          final jobValue = job.remove('dart');
+          final jobValue = job['dart'];
           if (jobValue is List) {
             jobSdks = jobValue.cast<String>();
           } else {
@@ -89,6 +100,13 @@ class PackageConfig {
             );
           }
 
+          if (job is! Map) {
+            throw ParsedYamlException(
+              'Each item within a stage must be a map.',
+              job is YamlNode ? job : stageYaml as YamlNode,
+            );
+          }
+
           throw CheckedFromJsonException(
             monoPkgYaml,
             'dart',
@@ -101,8 +119,7 @@ class PackageConfig {
 
         var jobOses = rawConfig.oses;
         if (job is Map && job.containsKey('os')) {
-          job = Map<String, dynamic>.from(job as Map);
-          final jobValue = job.remove('os');
+          final jobValue = job['os'];
           if (jobValue is List) {
             jobOses = jobValue.cast<String>();
           } else {
@@ -194,7 +211,7 @@ class TravisJob {
     String description;
     dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
-      withoutDescription = Map.of(yaml);
+      withoutDescription = transferYamlMap(yaml as YamlMap);
       description = withoutDescription.remove('description') as String;
     } else {
       withoutDescription = yaml;
@@ -253,7 +270,12 @@ class Task {
         if (group is List) {
           return group.map((taskYaml) => Task.parse(taskYaml)).toList();
         } else {
-          throw ArgumentError.value(group, 'group', 'expected a list of tasks');
+          throw CheckedFromJsonException(
+            yamlValue,
+            'group',
+            'group',
+            'expected a list of tasks',
+          );
         }
       }
     }
@@ -316,19 +338,24 @@ class Task {
           args = yamlValue[taskName] as String;
       }
 
-      final config = Map<String, dynamic>.from(yamlValue)..remove(taskName);
+      final extraConfig = Set<String>.from(yamlValue.keys)
+        ..removeAll([taskName, 'dart', 'os']);
 
       // TODO(kevmoo): at some point, support custom configuration here
-      if (config.isNotEmpty) {
+      if (extraConfig.isNotEmpty) {
         throw CheckedFromJsonException(
           yamlValue,
-          config.keys.first,
+          extraConfig.first,
           'Task',
           'Extra config options are not currently supported.',
           badKey: true,
         );
       }
       return Task(taskName, args: args);
+    }
+
+    if (yamlValue is YamlNode) {
+      throw ParsedYamlException('Must be a map or a string.', yamlValue);
     }
 
     throw ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
