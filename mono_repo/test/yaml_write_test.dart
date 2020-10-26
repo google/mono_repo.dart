@@ -11,16 +11,20 @@ import 'package:test/test.dart';
 
 import 'shared.dart';
 
-void _asciiTest(List<int> bytes) {
-  test(bytes.toString(), () {
-    final source = ascii.decode(bytes);
-    final output = toYaml(source);
-    final yaml = loadYamlOrdered(output);
-    expect(yaml, source, reason: bytes.toString());
-  });
-}
-
 void main() {
+  group('special cases', () {
+    _testRoundTrip('cool_beans', expectedEncoding: 'cool_beans');
+    _testRoundTrip('cool-beans', expectedEncoding: 'cool-beans');
+    _testRoundTrip('Cool-Beans', expectedEncoding: 'Cool-Beans');
+    _testRoundTrip('cool beans', expectedEncoding: 'cool beans');
+    _testRoundTrip('cool beans-', expectedEncoding: '"cool beans-"');
+    _testRoundTrip('-cool beans', expectedEncoding: '"-cool beans"');
+    _testRoundTrip(
+      'actions/checkout@v2',
+      expectedEncoding: 'actions/checkout@v2',
+    );
+  });
+
   group('ascii', () {
     for (var i = 0; i < 128; i++) {
       _asciiTest([i]);
@@ -56,7 +60,40 @@ void main() {
   });
 }
 
-void _testRoundTrip(Object source) {
+void _asciiTest(List<int> bytes) {
+  test(bytes.toString(), () {
+    final source = ascii.decode(bytes);
+    final output = toYaml(source);
+    final yaml = loadYamlOrdered(output);
+    expect(yaml, source, reason: bytes.toString());
+  });
+}
+
+void _testRoundTrip(Object source, {String expectedEncoding}) {
+  _testRoundTripCore(source, expectedEncoding: expectedEncoding);
+
+  final sourceAsString = source.toString();
+
+  if (sourceAsString != source) {
+    // If `source` is not a String, test it as if it were – this ensures we
+    // handle the double `3.14` vs the String `'3.14'`, etc...
+    _testRoundTripCore(sourceAsString);
+  }
+
+  // array item
+  if (source is List && source.isNotEmpty) {
+    // We do not support nested lists – yet!
+  } else {
+    _testRoundTripCore([source]);
+  }
+  _testRoundTripCore([sourceAsString]);
+
+  _testRoundTripCore({'somekey': source});
+  // map key & value
+  _testRoundTripCore({sourceAsString: sourceAsString});
+}
+
+void _testRoundTripCore(Object source, {String expectedEncoding}) {
   String testTitle;
   try {
     testTitle = jsonEncode(source);
@@ -70,13 +107,10 @@ void _testRoundTrip(Object source) {
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
     final yaml = loadYamlOrdered(output);
     expect(yaml, source);
+    if (expectedEncoding != null) {
+      expect(output, expectedEncoding);
+    }
   });
-
-  if (source is! String) {
-    // If `source` is not a String, test it as if it were – this ensures we
-    // handle the double `3.14` vs the String `'3.14'`, etc...
-    _testRoundTrip(source.toString());
-  }
 }
 
 final _testItems = [
@@ -89,6 +123,11 @@ final _testItems = [
   '\t\v\r',
   '---', // special marker in Yaml
   '...', // special marker in Yaml
+  'n',
+  '-',
+  'n-',
+  '-n',
+  'n-n',
 
   // booleans
   true,

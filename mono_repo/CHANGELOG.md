@@ -1,3 +1,7 @@
+## 3.0.1-dev
+
+* Small improvement to how some strings are emitted in Yaml.
+
 ## 3.0.0
 
 * `mono_repo.yaml`:

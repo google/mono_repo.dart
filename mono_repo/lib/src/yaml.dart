@@ -106,12 +106,17 @@ Object _wrapLoadYaml(String source, {dynamic sourceUrl}) {
 
 String toYaml(Object source) {
   final buffer = StringBuffer();
-  _writeYaml(buffer, source, 0, false);
+  _writeYaml(buffer, source, 0, null);
   return buffer.toString();
 }
 
+final _simpleDashedEntry = RegExp(r'^[a-zA-Z][a-zA-Z0-9\-\@\/]*$');
+
+bool _isSimpleString(String input) =>
+    _simpleDashedEntry.hasMatch(input) || _simpleString.hasMatch(input);
+
 String _escapeString(String source) {
-  if (_simpleString.hasMatch(source) &&
+  if (_isSimpleString(source) &&
       !source.startsWith(_maybeNumber) &&
       !_escapeRegExp.hasMatch(source) &&
       source.trim() == source && // no leading or trailing whitespace
@@ -130,11 +135,13 @@ String _escapeString(String source) {
 bool _isSimple(Object source) =>
     source == null || source is bool || source is num || source is String;
 
+enum _ParentType { list, map }
+
 void _writeYaml(
   StringBuffer buffer,
   Object source,
   int indent,
-  bool parentIsMap,
+  _ParentType parentType,
 ) {
   final spaces = '  ' * indent;
   if (source is String) {
@@ -143,7 +150,7 @@ void _writeYaml(
     buffer.write(source);
   } else if (source is Map) {
     if (source.isEmpty) {
-      if (parentIsMap) {
+      if (parentType == _ParentType.map) {
         // Need to ensure there is a space after the map `key:`
         buffer.write(' ');
       }
@@ -160,7 +167,7 @@ void _writeYaml(
           throw ArgumentError('Map keys must be simple literals.');
         }
 
-        if (first && !parentIsMap) {
+        if (first && parentType != _ParentType.map) {
           buffer.write('$keyLiteral:');
         } else {
           buffer
@@ -174,15 +181,18 @@ void _writeYaml(
 
         if (_isSimple(entry.value)) {
           buffer.write(' ');
-          _writeYaml(buffer, entry.value, 0, true);
+          _writeYaml(buffer, entry.value, 0, _ParentType.map);
         } else {
-          _writeYaml(buffer, entry.value, indent + 1, true);
+          _writeYaml(buffer, entry.value, indent + 1, _ParentType.map);
         }
       }
     }
   } else if (source is Iterable) {
+    if (parentType == _ParentType.list && source.isNotEmpty) {
+      throw UnsupportedError('We cannot encode lists within lists – yet!');
+    }
     if (source.isEmpty) {
-      if (parentIsMap) {
+      if (parentType == _ParentType.map) {
         // Need to ensure there is a space after the map `key:`
         buffer.write(' ');
       }
@@ -191,7 +201,7 @@ void _writeYaml(
       var first = true;
       for (var item in source) {
         if (first) {
-          if (parentIsMap) {
+          if (parentType == _ParentType.map) {
             buffer.writeln();
           }
           first = false;
@@ -200,9 +210,9 @@ void _writeYaml(
         }
         buffer.write('$spaces- ');
         if (_isSimple(item)) {
-          _writeYaml(buffer, item, indent, false);
+          _writeYaml(buffer, item, indent, _ParentType.list);
         } else {
-          _writeYaml(buffer, item, indent + 1, false);
+          _writeYaml(buffer, item, indent + 1, _ParentType.list);
         }
       }
     }
