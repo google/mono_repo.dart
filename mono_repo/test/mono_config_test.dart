@@ -7,31 +7,31 @@
 
 import 'dart:convert';
 
-import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
+import 'package:yaml/yaml.dart';
+
+import 'shared.dart';
 
 final _dummyPubspec = Pubspec('_example');
 
 String _encodeJson(Object input) =>
     const JsonEncoder.withIndent(' ').convert(input);
 
-Matcher throwsCheckedFromJsonException(String prettyValue) => throwsA(
-      const TypeMatcher<CheckedFromJsonException>().having((e) {
-        final prettyValue = toParsedYamlExceptionOrNull(e).formattedMessage;
-        printOnFailure("r'''\n$prettyValue'''");
-        return prettyValue;
-      }, 'prettyPrint', prettyValue),
-    );
-
 PackageConfig _parse(map) => PackageConfig.parse(
-    'a', _dummyPubspec, loadYamlOrdered(_encodeJson(map)) as Map);
+    'a',
+    _dummyPubspec,
+    map is YamlMap
+        ? map
+        : loadYamlOrdered(
+            _encodeJson(map),
+          ) as Map);
 
-void _expectParseThrows(Object content, String expectedError) => expect(
-    () => _parse(content), throwsCheckedFromJsonException(expectedError));
+void _expectParseThrows(Object content, String expectedError) =>
+    expect(() => _parse(content), throwsAParsedYamlException(expectedError));
 
 void main() {
   glyph.ascii = false;
@@ -52,7 +52,7 @@ void main() {
   test('valid example', () {
     final monoYaml = loadYamlOrdered(_testConfig1) as Map;
 
-    final config = PackageConfig.parse('a', _dummyPubspec, monoYaml);
+    final config = _parse(monoYaml);
 
     expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
 
@@ -70,7 +70,7 @@ void main() {
       expect(config.sdks, isEmpty);
     });
 
-    test('fun', () {
+    test('stage items must be a map', () {
       _expectParseThrows(
         {
           'stages': [
@@ -80,17 +80,31 @@ void main() {
           ]
         },
         r'''
-line 1, column 1: "dart" is missing.
+line 4, column 14: Each item within a stage must be a map.
   ╷
-1 │ ┌ {
-2 │ │  "stages": [
-3 │ │   {
-4 │ │    "format": [
+4 │      "format": [
+  │ ┌──────────────^
 5 │ │     "dartfmt"
-6 │ │    ]
-7 │ │   }
-8 │ │  ]
-9 │ └ }
+6 │ └    ]
+  ╵''',
+      );
+    });
+
+    test('group items must be instances of map or string', () {
+      _expectParseThrows(
+        loadYaml(r'''
+stages:
+- smoke_test:
+  - group:
+    - [dartfmt]
+    - dartanalyzer: --fatal-infos --fatal-warnings .
+    dart: dev
+'''),
+        r'''
+line 4, column 7: Must be a map or a string.
+  ╷
+4 │     - [dartfmt]
+  │       ^^^^^^^^^
   ╵''',
       );
     });
@@ -99,7 +113,7 @@ line 1, column 1: "dart" is missing.
       _expectParseThrows(
         {'dart': null},
         r'''
-line 2, column 10: Unsupported value for "dart". "dart" must be an array with at least one value.
+line 2, column 10: Unsupported value for "dart". The value for "dart" must be an array with at least one value.
   ╷
 2 │  "dart": null
   │          ^^^^
@@ -111,7 +125,7 @@ line 2, column 10: Unsupported value for "dart". "dart" must be an array with at
       _expectParseThrows(
         {'dart': []},
         r'''
-line 2, column 10: Unsupported value for "dart". "dart" must be an array with at least one value.
+line 2, column 10: Unsupported value for "dart". The value for "dart" must be an array with at least one value.
   ╷
 2 │  "dart": []
   │          ^^
@@ -179,6 +193,26 @@ line 7, column 9: Unsupported value for "a". Stages must be a list of maps with 
   │ ┌─────────^
 8 │ │   }
   │ └──^
+  ╵''',
+      );
+    });
+
+    test('Stages tasks must be a list', () {
+      final monoYaml = loadYaml('''
+stages:
+- smoke_test:
+  - description: 'bob'
+    group: funky
+    dart: dev
+''');
+
+      _expectParseThrows(
+        monoYaml,
+        r'''
+line 4, column 12: Unsupported value for "group". expected a list of tasks
+  ╷
+4 │     group: funky
+  │            ^^^^^
   ╵''',
       );
     });

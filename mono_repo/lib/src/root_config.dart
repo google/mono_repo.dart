@@ -53,9 +53,7 @@ PackageConfig _packageConfigFromDir(
     sourceUrl: pubspecFile.path,
   );
 
-  return createWithCheck(
-    () => PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml),
-  );
+  return PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
 }
 
 class RootConfig extends ListBase<PackageConfig> {

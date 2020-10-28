@@ -181,7 +181,7 @@ name: pkg_name
       );
     });
 
-    test('throws if the previous config doesn\'t match', () async {
+    test("throws if the previous config doesn't match", () async {
       await d.file(travisFileName, '').create();
       await d.dir('tool', [
         d.file('travis.sh', ''),
@@ -460,7 +460,7 @@ cache:
       d.file(monoPkgFileName, r'''
 stages:
   - format:
-    - dartfmt
+    - dartfmt:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
@@ -469,9 +469,12 @@ name: pkg_a
 
     expect(
       testGenerateTravisConfig,
-      throwsAParsedYamlException(
-        contains('"dart" is missing.'),
-      ),
+      throwsAParsedYamlException('''
+line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: A "dart" key is required.
+  ╷
+3 │     - dartfmt:
+  │       ^^^^^^^^
+  ╵'''),
     );
   });
 
@@ -1021,26 +1024,19 @@ stages:
       });
     });
 
-    group('invalid travis value type', () {
-      for (var invalidContent in [
-        true,
-        5,
-        'string',
-        ['array']
-      ]) {
-        test(invalidContent.runtimeType.toString(), () async {
-          final monoConfigContent = toYaml({'travis': invalidContent});
-          await populateConfig(monoConfigContent);
+    test('travis value must be a Map', () async {
+      final monoConfigContent = toYaml({'travis': 5});
+      await populateConfig(monoConfigContent);
 
-          expect(
-            testGenerateTravisConfig,
-            throwsAParsedYamlException(
-              contains(
-                  'Unsupported value for "travis". `travis` must be a Map.'),
-            ),
-          );
-        });
-      }
+      expect(
+        testGenerateTravisConfig,
+        throwsAParsedYamlException(r'''
+line 1, column 9 of mono_repo.yaml: Unsupported value for "travis". `travis` must be a Map.
+  ╷
+1 │ travis: 5
+  │         ^
+  ╵'''),
+      );
     });
 
     group('invalid travis keys', () {
