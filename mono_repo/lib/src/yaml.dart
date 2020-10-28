@@ -58,7 +58,7 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
   final yamlFile = File(p.join(rootDir, relativeFilePath));
 
   if (yamlFile.existsSync()) {
-    final pkgConfigYaml = loadYamlChecked(
+    final pkgConfigYaml = loadYamlOrdered(
       yamlFile.readAsStringSync(),
       sourceUrl: relativeFilePath,
     );
@@ -76,7 +76,8 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
 
 /// Returns [source] parsed as Yaml, but tries to convert thrown
 /// [y.YamlException] instances to [ParsedYamlException] instances.
-Object loadYamlChecked(String source, {dynamic sourceUrl}) {
+// TODO: rename this to `loadYamlChecked` – more accurate
+Object loadYamlOrdered(String source, {dynamic sourceUrl}) {
   try {
     return y.loadYaml(source, sourceUrl: sourceUrl);
   } on y.YamlException catch (e) {

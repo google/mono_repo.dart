@@ -52,10 +52,10 @@ void main() {
   });
 
   test('config file', () {
-    final decoded = loadYamlChecked(testConfig2);
+    final decoded = loadYamlOrdered(testConfig2);
     final output = toYaml(decoded);
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-    final roundTrip = loadYamlChecked(output);
+    final roundTrip = loadYamlOrdered(output);
     expect(roundTrip, decoded);
   });
 }
@@ -64,7 +64,7 @@ void _asciiTest(List<int> bytes) {
   test(bytes.toString(), () {
     final source = ascii.decode(bytes);
     final output = toYaml(source);
-    final yaml = loadYamlChecked(output);
+    final yaml = loadYamlOrdered(output);
     expect(yaml, source, reason: bytes.toString());
   });
 }
@@ -105,7 +105,7 @@ void _testRoundTripCore(Object source, {String expectedEncoding}) {
   test(testTitle, () {
     final output = toYaml(source);
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
-    final yaml = loadYamlChecked(output);
+    final yaml = loadYamlOrdered(output);
     expect(yaml, source);
     if (expectedEncoding != null) {
       expect(output, expectedEncoding);
