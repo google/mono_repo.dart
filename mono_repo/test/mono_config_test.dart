@@ -113,7 +113,7 @@ line 4, column 7: Must be a map or a string.
       _expectParseThrows(
         {'dart': null},
         r'''
-line 2, column 10: Unsupported value for "dart". "dart" must be an array with at least one value.
+line 2, column 10: Unsupported value for "dart". The value for "dart" must be an array with at least one value.
   ╷
 2 │  "dart": null
   │          ^^^^
@@ -125,7 +125,7 @@ line 2, column 10: Unsupported value for "dart". "dart" must be an array with at
       _expectParseThrows(
         {'dart': []},
         r'''
-line 2, column 10: Unsupported value for "dart". "dart" must be an array with at least one value.
+line 2, column 10: Unsupported value for "dart". The value for "dart" must be an array with at least one value.
   ╷
 2 │  "dart": []
   │          ^^

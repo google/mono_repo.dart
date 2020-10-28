@@ -460,7 +460,7 @@ cache:
       d.file(monoPkgFileName, r'''
 stages:
   - format:
-    - dartfmt
+    - dartfmt:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
@@ -469,11 +469,11 @@ name: pkg_a
 
     expect(
       testGenerateTravisConfig,
-      throwsAParsedYamlException(r'''
-line 3, column 5 of pkg_a/mono_pkg.yaml: Each item within a stage must be a map.
+      throwsAParsedYamlException('''
+line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: A "dart" key is required.
   ╷
-3 │     - dartfmt
-  │     ^^^^^^^^^
+3 │     - dartfmt:
+  │       ^^^^^^^^
   ╵'''),
     );
   });

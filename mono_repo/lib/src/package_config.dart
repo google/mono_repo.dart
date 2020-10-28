@@ -96,7 +96,7 @@ class PackageConfig {
               monoPkgYaml,
               'dart',
               'RawConfig',
-              '"dart" must be an array with at least one value.',
+              'The value for "dart" must be an array with at least one value.',
             );
           }
 
@@ -107,11 +107,9 @@ class PackageConfig {
             );
           }
 
-          throw CheckedFromJsonException(
-            monoPkgYaml,
-            'dart',
-            'RawConfig',
-            '"dart" is missing.',
+          throw ParsedYamlException(
+            'A "dart" key is required.',
+            job as YamlMap,
           );
         } else {
           sdkConfigUsed = true;
