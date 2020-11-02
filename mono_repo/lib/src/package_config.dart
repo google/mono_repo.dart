@@ -194,8 +194,7 @@ class CIJob {
     this.description,
   });
 
-  factory CIJob.fromJson(Map<String, dynamic> json) =>
-      _$CIJobFromJson(json);
+  factory CIJob.fromJson(Map<String, dynamic> json) => _$CIJobFromJson(json);
 
   factory CIJob.parse(
     String os,
