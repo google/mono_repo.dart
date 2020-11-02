@@ -210,7 +210,7 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
 
 /// Lists all the jobs, setting their stage, environment, and script.
 Iterable<Map<String, String>> _listJobs(
-  Iterable<TravisJob> jobs,
+  Iterable<CIJob> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
 ) sync* {
@@ -240,7 +240,7 @@ Iterable<Map<String, String>> _listJobs(
 }
 
 class _TravisJobEntry {
-  final TravisJob job;
+  final CIJob job;
   final List<String> commands;
   final bool merge;
 
