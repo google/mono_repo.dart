@@ -8,8 +8,8 @@ part of 'package_config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CIJob _$TravisJobFromJson(Map json) {
-  return $checkedNew('TravisJob', json, () {
+CIJob _$CIJobFromJson(Map json) {
+  return $checkedNew('CIJob', json, () {
     final val = CIJob(
       $checkedConvert(json, 'os', (v) => v as String),
       $checkedConvert(json, 'package', (v) => v as String),
@@ -31,7 +31,7 @@ CIJob _$TravisJobFromJson(Map json) {
   });
 }
 
-Map<String, dynamic> _$TravisJobToJson(CIJob instance) {
+Map<String, dynamic> _$CIJobToJson(CIJob instance) {
   final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {

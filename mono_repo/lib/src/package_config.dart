@@ -195,7 +195,7 @@ class CIJob {
   });
 
   factory CIJob.fromJson(Map<String, dynamic> json) =>
-      _$TravisJobFromJson(json);
+      _$CIJobFromJson(json);
 
   factory CIJob.parse(
     String os,
@@ -232,7 +232,7 @@ class CIJob {
     }
   }
 
-  Map<String, dynamic> toJson() => _$TravisJobToJson(this);
+  Map<String, dynamic> toJson() => _$CIJobToJson(this);
 
   @override
   bool operator ==(Object other) =>
