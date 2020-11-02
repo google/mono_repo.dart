@@ -8,9 +8,9 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../ci_shared.dart';
+import '../ci_test_script.dart';
 import '../package_config.dart';
 import '../root_config.dart';
-import '../travis_shell.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
 import 'travis/travis_yaml.dart';
