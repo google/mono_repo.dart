@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import 'package_config.dart';
+import 'root_config.dart';
 import 'version.dart';
 
 final skipCreatedWithSentinel = Object();
@@ -13,6 +15,60 @@ final skipCreatedWithSentinel = Object();
 String createdWith() => Zone.current[skipCreatedWithSentinel] == true
     ? ''
     : '# Created with package:mono_repo v$packageVersion\n';
+
+class CIJobEntry {
+  final CIJob job;
+  final List<String> commands;
+  final bool merge;
+
+  CIJobEntry(this.job, this.commands, this.merge);
+
+  String jobName(List<String> packages) {
+    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
+
+    return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
+        'TASKS: ${job.name}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is CIJobEntry &&
+      _equality.equals(_identityItems, other._identityItems);
+
+  @override
+  int get hashCode => _equality.hash(_identityItems);
+
+  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
+}
+
+void validateRootConfig(RootConfig rootConfig) {
+  for (var config in rootConfig) {
+    final sdkConstraint = config.pubspec.environment['sdk'];
+
+    if (sdkConstraint == null) {
+      continue;
+    }
+
+    final disallowedExplicitVersions = config.jobs
+        .map((tj) => tj.explicitSdkVersion)
+        .where((v) => v != null)
+        .toSet()
+        .where((v) => !sdkConstraint.allows(v))
+        .toList()
+          ..sort();
+
+    if (disallowedExplicitVersions.isNotEmpty) {
+      final disallowedString =
+          disallowedExplicitVersions.map((v) => '`$v`').join(', ');
+      print(
+        yellow.wrap(
+          '  There are jobs defined that are not compatible with '
+          'the package SDK constraint ($sdkConstraint): $disallowedString.',
+        ),
+      );
+    }
+  }
+}
 
 void writeFile(
   String rootDirectory,
@@ -83,3 +139,5 @@ Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
 
 List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
     configs.expand((config) => config.jobs).expand((job) => job.tasks).toList();
+
+const _equality = DeepCollectionEquality();

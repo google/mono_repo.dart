@@ -214,18 +214,17 @@ Iterable<Map<String, String>> _listJobs(
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
 ) sync* {
-  final jobEntries = <_TravisJobEntry>[];
+  final jobEntries = <CIJobEntry>[];
 
   for (var job in jobs) {
     final commands =
         job.tasks.map((task) => commandsToKeys[task.command]).toList();
 
-    jobEntries.add(
-        _TravisJobEntry(job, commands, mergeStages.contains(job.stageName)));
+    jobEntries
+        .add(CIJobEntry(job, commands, mergeStages.contains(job.stageName)));
   }
 
-  final groupedItems =
-      groupBy<_TravisJobEntry, _TravisJobEntry>(jobEntries, (e) => e);
+  final groupedItems = groupBy<CIJobEntry, CIJobEntry>(jobEntries, (e) => e);
 
   for (var entry in groupedItems.entries) {
     if (entry.key.merge) {
@@ -239,43 +238,20 @@ Iterable<Map<String, String>> _listJobs(
   }
 }
 
-class _TravisJobEntry {
-  final CIJob job;
-  final List<String> commands;
-  final bool merge;
-
-  _TravisJobEntry(this.job, this.commands, this.merge);
-
-  String _jobName(List<String> packages) {
-    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
-
-    return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
-        'TASKS: ${job.name}';
-  }
-
+extension on CIJobEntry {
   Map<String, String> jobYaml(List<String> packages) {
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 
     return {
       'stage': job.stageName,
-      'name': _jobName(packages),
+      'name': jobName(packages),
       'dart': job.sdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
       'script': '$travisShPath ${commands.join(' ')}',
     };
   }
-
-  @override
-  bool operator ==(Object other) =>
-      other is _TravisJobEntry &&
-      _equality.equals(_identityItems, other._identityItems);
-
-  @override
-  int get hashCode => _equality.hash(_identityItems);
-
-  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
 Map<String, String> _selfValidateTaskConfig(String stageName) => {
@@ -285,4 +261,3 @@ Map<String, String> _selfValidateTaskConfig(String stageName) => {
       'script': 'pub global activate mono_repo $packageVersion && '
           'pub global run mono_repo travis --validate'
     };
-const _equality = DeepCollectionEquality();
