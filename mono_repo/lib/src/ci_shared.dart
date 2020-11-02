@@ -107,6 +107,7 @@ List<String> scriptLines(String scriptPath) => [
 
 /// Gives a map of command to unique task key for all [configs].
 Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
+  _logPackages(configs);
   final commandsToKeys = <String, String>{};
 
   final tasksToConfigure = _travisTasks(configs);
@@ -135,6 +136,28 @@ Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
   }
 
   return commandsToKeys;
+}
+
+void _logPackages(Iterable<PackageConfig> configs) {
+  for (var pkg in configs) {
+    print(styleBold.wrap('package:${pkg.relativePath}'));
+    if (pkg.sdks != null && !pkg.dartSdkConfigUsed) {
+      print(
+        yellow.wrap(
+          '  `dart` values (${pkg.sdks.join(', ')}) are not used '
+          'and can be removed.',
+        ),
+      );
+    }
+    if (pkg.oses != null && !pkg.osConfigUsed) {
+      print(
+        yellow.wrap(
+          '  `os` values (${pkg.oses.join(', ')}) are not used '
+          'and can be removed.',
+        ),
+      );
+    }
+  }
 }
 
 List<Task> _travisTasks(Iterable<PackageConfig> configs) =>

@@ -4,12 +4,10 @@
 
 import 'dart:io';
 
-import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../ci_shared.dart';
 import '../ci_test_script.dart';
-import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
@@ -82,8 +80,6 @@ class _GeneratedTravisConfig {
   _GeneratedTravisConfig._(this.travisYml, this.travisSh);
 
   factory _GeneratedTravisConfig.generate(RootConfig rootConfig) {
-    _logPkgs(rootConfig);
-
     final commandsToKeys = extractCommands(rootConfig);
 
     final yml = generateTravisYml(rootConfig, commandsToKeys);
@@ -119,27 +115,5 @@ void _validateFile(
   final shFile = File(p.join(rootDirectory, expectedPath));
   if (!shFile.existsSync() || shFile.readAsStringSync() != expectedContent) {
     throw TravisConfigOutOfDateException();
-  }
-}
-
-void _logPkgs(Iterable<PackageConfig> configs) {
-  for (var pkg in configs) {
-    print(styleBold.wrap('package:${pkg.relativePath}'));
-    if (pkg.sdks != null && !pkg.dartSdkConfigUsed) {
-      print(
-        yellow.wrap(
-          '  `dart` values (${pkg.sdks.join(', ')}) are not used '
-          'and can be removed.',
-        ),
-      );
-    }
-    if (pkg.oses != null && !pkg.osConfigUsed) {
-      print(
-        yellow.wrap(
-          '  `os` values (${pkg.oses.join(', ')}) are not used '
-          'and can be removed.',
-        ),
-      );
-    }
   }
 }
