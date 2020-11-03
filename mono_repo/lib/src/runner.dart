@@ -20,11 +20,16 @@ final commands = List<Command<void>>.unmodifiable(
 class MonoRepoRunner extends CommandRunner<void> {
   MonoRepoRunner()
       : super(
-            'mono_repo', 'Manage multiple packages in one source repository.') {
+          'mono_repo',
+          'Manage multiple packages in one source repository.',
+        ) {
     commands.forEach(addCommand);
     argParser
-      ..addFlag('version',
-          negatable: false, help: 'Prints the version of mono_repo.')
+      ..addFlag(
+        'version',
+        negatable: false,
+        help: 'Prints the version of mono_repo.',
+      )
       ..addFlag(
         recursiveFlag,
         help:

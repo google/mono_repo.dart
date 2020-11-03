@@ -1,4 +1,4 @@
-import 'package:mono_repo/src/commands/travis/travis_shell.dart';
+import 'package:mono_repo/src/ci_test_script.dart';
 
 final travisShellOutput = '''
 #!/bin/bash

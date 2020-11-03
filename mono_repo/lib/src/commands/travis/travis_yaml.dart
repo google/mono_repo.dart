@@ -5,12 +5,13 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
+import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../version.dart';
 import '../../yaml.dart';
-import 'shared.dart';
+import '../travis.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,
@@ -209,72 +210,56 @@ List<Object> _calculateOrderedStages(RootConfig rootConfig) {
 
 /// Lists all the jobs, setting their stage, environment, and script.
 Iterable<Map<String, String>> _listJobs(
-  Iterable<TravisJob> jobs,
+  Iterable<CIJob> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
 ) sync* {
-  final jobEntries = <_TravisJobEntry>[];
+  final jobEntries = <CIJobEntry>[];
 
   for (var job in jobs) {
     final commands =
         job.tasks.map((task) => commandsToKeys[task.command]).toList();
 
-    jobEntries.add(
-        _TravisJobEntry(job, commands, mergeStages.contains(job.stageName)));
+    jobEntries.add(CIJobEntry(job, commands));
   }
 
-  final groupedItems =
-      groupBy<_TravisJobEntry, _TravisJobEntry>(jobEntries, (e) => e);
+  // Group jobs by all of the values that would allow them to merge
+  final groupedItems = groupBy<CIJobEntry, String>(
+      jobEntries,
+      (e) => [
+            e.job.os,
+            e.job.stageName,
+            e.job.sdk,
+            // TODO: sort these? Would merge jobs with different orders
+            e.commands,
+          ].join(':::'));
 
   for (var entry in groupedItems.entries) {
-    if (entry.key.merge) {
+    final first = entry.value.first;
+    if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield entry.key.jobYaml(packages);
+      yield first.jobYaml(packages);
     } else {
-      yield* entry.value.map(
-        (jobEntry) => jobEntry.jobYaml([jobEntry.job.package]),
-      );
+      yield* entry.value.map((jobEntry) => jobEntry.jobYaml());
     }
   }
 }
 
-class _TravisJobEntry {
-  final TravisJob job;
-  final List<String> commands;
-  final bool merge;
-
-  _TravisJobEntry(this.job, this.commands, this.merge);
-
-  String _jobName(List<String> packages) {
-    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
-
-    return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
-        'TASKS: ${job.name}';
-  }
-
-  Map<String, String> jobYaml(List<String> packages) {
+extension on CIJobEntry {
+  Map<String, String> jobYaml([List<String> packages]) {
+    packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 
     return {
       'stage': job.stageName,
-      'name': _jobName(packages),
+      'name': jobName(packages),
       'dart': job.sdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
       'script': '$travisShPath ${commands.join(' ')}',
     };
   }
-
-  @override
-  bool operator ==(Object other) =>
-      other is _TravisJobEntry &&
-      _equality.equals(_identityItems, other._identityItems);
-
-  @override
-  int get hashCode => _equality.hash(_identityItems);
-
-  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
 Map<String, String> _selfValidateTaskConfig(String stageName) => {
@@ -284,4 +269,3 @@ Map<String, String> _selfValidateTaskConfig(String stageName) => {
       'script': 'pub global activate mono_repo $packageVersion && '
           'pub global run mono_repo travis --validate'
     };
-const _equality = DeepCollectionEquality();

@@ -15,8 +15,6 @@ import 'yaml.dart';
 part 'package_config.g.dart';
 
 const monoPkgFileName = 'mono_pkg.yaml';
-const travisFileName = '.travis.yml';
-const travisShPath = 'tool/travis.sh';
 
 class PackageConfig {
   final String relativePath;
@@ -25,7 +23,7 @@ class PackageConfig {
   final List<String> oses;
   final List<String> sdks;
   final List<String> stageNames;
-  final List<TravisJob> jobs;
+  final List<CIJob> jobs;
   final List<String> cacheDirectories;
   final bool dartSdkConfigUsed;
   final bool osConfigUsed;
@@ -74,7 +72,7 @@ class PackageConfig {
     final rawConfig = RawConfig.fromJson(monoPkgYaml);
 
     // FYI: 'test' is default if there are no tasks defined
-    final jobs = <TravisJob>[];
+    final jobs = <CIJob>[];
 
     var sdkConfigUsed = false;
     var osConfigUsed = false;
@@ -129,7 +127,7 @@ class PackageConfig {
 
         for (var sdk in jobSdks) {
           for (var os in jobOses) {
-            jobs.add(TravisJob.parse(os, relativePath, sdk, stage.name, job));
+            jobs.add(CIJob.parse(os, relativePath, sdk, stage.name, job));
           }
         }
       }
@@ -161,7 +159,7 @@ class PackageConfig {
 }
 
 @JsonSerializable(explicitToJson: true)
-class TravisJob {
+class CIJob {
   @JsonKey(includeIfNull: false)
   final String description;
 
@@ -187,7 +185,7 @@ class TravisJob {
           ? _taskCommandsTickQuoted.toList().toString()
           : _taskCommandsTickQuoted.first);
 
-  TravisJob(
+  CIJob(
     this.os,
     this.package,
     this.sdk,
@@ -196,10 +194,9 @@ class TravisJob {
     this.description,
   });
 
-  factory TravisJob.fromJson(Map<String, dynamic> json) =>
-      _$TravisJobFromJson(json);
+  factory CIJob.fromJson(Map<String, dynamic> json) => _$CIJobFromJson(json);
 
-  factory TravisJob.parse(
+  factory CIJob.parse(
     String os,
     String package,
     String sdk,
@@ -215,7 +212,7 @@ class TravisJob {
       withoutDescription = yaml;
     }
     final tasks = Task.parseTaskOrGroup(withoutDescription);
-    return TravisJob(
+    return CIJob(
       os,
       package,
       sdk,
@@ -234,11 +231,11 @@ class TravisJob {
     }
   }
 
-  Map<String, dynamic> toJson() => _$TravisJobToJson(this);
+  Map<String, dynamic> toJson() => _$CIJobToJson(this);
 
   @override
   bool operator ==(Object other) =>
-      other is TravisJob && _equality.equals(_items, other._items);
+      other is CIJob && _equality.equals(_items, other._items);
 
   @override
   int get hashCode => _equality.hash(_items);
