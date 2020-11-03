@@ -220,26 +220,34 @@ Iterable<Map<String, String>> _listJobs(
     final commands =
         job.tasks.map((task) => commandsToKeys[task.command]).toList();
 
-    jobEntries
-        .add(CIJobEntry(job, commands, mergeStages.contains(job.stageName)));
+    jobEntries.add(CIJobEntry(job, commands));
   }
 
-  final groupedItems = groupBy<CIJobEntry, CIJobEntry>(jobEntries, (e) => e);
+  // Group jobs by all of the values that would allow them to merge
+  final groupedItems = groupBy<CIJobEntry, String>(
+      jobEntries,
+      (e) => [
+            e.job.os,
+            e.job.stageName,
+            e.job.sdk,
+            // TODO: sort these? Would merge jobs with different orders
+            e.commands,
+          ].join(':::'));
 
   for (var entry in groupedItems.entries) {
-    if (entry.key.merge) {
+    final first = entry.value.first;
+    if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield entry.key.jobYaml(packages);
+      yield first.jobYaml(packages);
     } else {
-      yield* entry.value.map(
-        (jobEntry) => jobEntry.jobYaml([jobEntry.job.package]),
-      );
+      yield* entry.value.map((jobEntry) => jobEntry.jobYaml());
     }
   }
 }
 
 extension on CIJobEntry {
-  Map<String, String> jobYaml(List<String> packages) {
+  Map<String, String> jobYaml([List<String> packages]) {
+    packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 

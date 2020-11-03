@@ -1023,6 +1023,110 @@ stages:
           ),
         );
       });
+
+      test('should merge correctly', () async {
+        await d.file('mono_repo.yaml', '''
+merge_stages: [analyze]
+''').create();
+
+        await d.dir('pkg_a', [
+          d.file(monoPkgFileName, r'''
+dart:
+ - stable
+
+stages:
+  - analyze:
+    - group:
+        - dartanalyzer
+        - dartfmt
+  - unit_test:
+    - description: "chrome tests"
+      test: --platform chrome
+    - test: --preset travis
+'''),
+          d.file('pubspec.yaml', r'''
+name: pkg_a
+''')
+        ]).create();
+        await d.dir('pkg_b', [
+          d.file(monoPkgFileName, r'''
+dart:
+ - stable
+
+stages:
+  - analyze:
+    - group:
+        - dartanalyzer
+        - dartfmt
+  - unit_test:
+    - description: "chrome tests"
+      test: --platform chrome
+    - test: --preset travis
+'''),
+          d.file('pubspec.yaml', '''
+name: pkg_b
+      ''')
+        ]).create();
+
+        testGenerateTravisConfig(
+          printMatcher: '''
+package:pkg_a
+package:pkg_b
+Wrote `${p.join(d.sandbox, travisFileName)}`.
+$travisShPathMessage''',
+        );
+
+        await d.file(travisFileName, r'''
+language: dart
+
+jobs:
+  include:
+    - stage: analyze
+      name: "SDK: stable; PKGS: pkg_a, pkg_b; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
+      dart: stable
+      os: linux
+      env: PKGS="pkg_a pkg_b"
+      script: tool/travis.sh dartanalyzer dartfmt
+    - stage: unit_test
+      name: "SDK: stable; PKG: pkg_a; TASKS: chrome tests"
+      dart: stable
+      os: linux
+      env: PKGS="pkg_a"
+      script: tool/travis.sh test_0
+    - stage: unit_test
+      name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
+      dart: stable
+      os: linux
+      env: PKGS="pkg_a"
+      script: tool/travis.sh test_1
+    - stage: unit_test
+      name: "SDK: stable; PKG: pkg_b; TASKS: chrome tests"
+      dart: stable
+      os: linux
+      env: PKGS="pkg_b"
+      script: tool/travis.sh test_0
+    - stage: unit_test
+      name: "SDK: stable; PKG: pkg_b; TASKS: `pub run test --preset travis`"
+      dart: stable
+      os: linux
+      env: PKGS="pkg_b"
+      script: tool/travis.sh test_1
+
+stages:
+  - analyze
+  - unit_test
+
+# Only building master means that we don't run two builds for each pull request.
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - "$HOME/.pub-cache"
+''').validate();
+        await d.file(travisShPath, travisShellOutput).validate();
+      });
     });
 
     test('travis value must be a Map', () async {

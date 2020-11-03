@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
@@ -19,9 +18,8 @@ String createdWith() => Zone.current[skipCreatedWithSentinel] == true
 class CIJobEntry {
   final CIJob job;
   final List<String> commands;
-  final bool merge;
 
-  CIJobEntry(this.job, this.commands, this.merge);
+  CIJobEntry(this.job, this.commands);
 
   String jobName(List<String> packages) {
     final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
@@ -29,16 +27,6 @@ class CIJobEntry {
     return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
         'TASKS: ${job.name}';
   }
-
-  @override
-  bool operator ==(Object other) =>
-      other is CIJobEntry &&
-      _equality.equals(_identityItems, other._identityItems);
-
-  @override
-  int get hashCode => _equality.hash(_identityItems);
-
-  List get _identityItems => [job.os, job.stageName, job.sdk, commands, merge];
 }
 
 void validateRootConfig(RootConfig rootConfig) {
@@ -161,5 +149,3 @@ void logPackages(Iterable<PackageConfig> configs) {
 
 List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
     configs.expand((config) => config.jobs).expand((job) => job.tasks).toList();
-
-const _equality = DeepCollectionEquality();
