@@ -1,4 +1,4 @@
-## 3.1.0
+## 3.1.0-beta
 
 * Adds support for Github Actions configuration.
   * There is a new `ci` key in the `mono_repo.yaml` file which accepts a list
