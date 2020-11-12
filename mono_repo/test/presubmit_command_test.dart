@@ -26,7 +26,8 @@ void main() {
     test('no $ciScriptPath', () async {
       await d.dir('pkg_a', [
         d.file('mono_pkg.yaml', ''),
-        d.file('pubspec.yaml', '{"name":"_test"}')
+        d.file('pubspec.yaml',
+            '{"name":"_test", "environment": {"sdk": ">=2.9.0 <3.0.0"}}'),
       ]).create();
 
       expect(
@@ -67,7 +68,10 @@ void main() {
         ..writeAsStringSync(pkgBConfig);
       File(p.join(pkgBPath, 'pubspec.yaml'))
         ..createSync(recursive: true)
-        ..writeAsStringSync('name: pkg_b');
+        ..writeAsStringSync('''
+name: pkg_b
+environment:
+  sdk: ">=2.9.0 <3.0.0"''');
 
       await overrideAnsiOutput(false, () async {
         await expectLater(
@@ -271,6 +275,8 @@ stages:
 
 const pkgAPubspec = '''
 name: pkg_name
+environment:
+  sdk: ">=2.9.0 <3.0.0"
 dev_dependencies:
   test: any
 ''';
