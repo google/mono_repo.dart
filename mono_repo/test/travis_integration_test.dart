@@ -24,6 +24,8 @@ void main() {
       ),
       d.file('pubspec.yaml', '''
 name: pkg_a
+environment:
+  sdk: ">=2.9.0 <3.0.0"
       ''')
     ]).create();
 
@@ -34,6 +36,8 @@ name: pkg_a
       ),
       d.file('pubspec.yaml', '''
 name: pkg_b
+environment:
+  sdk: ">=2.9.0 <3.0.0"
 
 dependencies:
   not_a_package_at_all: any
@@ -47,6 +51,8 @@ dependencies:
       ),
       d.file('pubspec.yaml', '''
 name: pkg_c
+environment:
+  sdk: ">=2.9.0 <3.0.0"
 '''),
       d.file('some_dart_file.dart', 'void main() => print("hello");'),
     ]).create();
