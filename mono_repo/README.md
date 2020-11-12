@@ -33,10 +33,10 @@ Global options:
 
 Available commands:
   check       Check the state of the repository.
-  github      Configure GitHub Actions for child packages.
+  generate    CI config for child packages and configured CI providers.
   presubmit   Run the ci presubmits locally.
   pub         Run `pub get` or `pub upgrade` against all packages.
-  generate    CI config for child packages and configured CI providers.
+  travis      (Deprecated, use `generate`) Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.
 ```
