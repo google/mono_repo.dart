@@ -1,3 +1,7 @@
 # See with https://github.com/google/mono_repo.dart for details on this file
 merge_stages:
 - smoke_test
+
+ci:
+  - travis
+  - github

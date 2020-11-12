@@ -8,49 +8,49 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="mono_repo test_pkg"
-      script: tool/travis.sh dartfmt dartanalyzer_0
+      script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`"
+      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
-      script: tool/travis.sh command
+      script: tool/ci.sh command
     - stage: smoke_test
       name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer --fatal-warnings .`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
-      script: tool/travis.sh dartanalyzer_1
+      script: tool/ci.sh dartanalyzer_1
     - stage: unit_test
       name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: windows
       env: PKGS="mono_repo"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: windows
       env: PKGS="mono_repo"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="test_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
 
 stages:
   - smoke_test

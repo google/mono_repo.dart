@@ -5,7 +5,7 @@ import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../yaml.dart';
-import '../travis.dart';
+import '../ci_script/generate.dart';
 
 String generateGitHubYml(
   RootConfig rootConfig,
@@ -149,7 +149,7 @@ extension on CIJobEntry {
               'PKGS': packages.join(' '),
               'TRAVIS_OS_NAME': job.os,
             },
-            'run': '$travisShPath ${commands.join(' ')}',
+            'run': '$ciScriptPath ${commands.join(' ')}',
           },
         ],
       }

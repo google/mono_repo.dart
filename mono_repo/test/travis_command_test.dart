@@ -5,7 +5,8 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
-import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/version.dart';
 import 'package:mono_repo/src/yaml.dart';
@@ -60,7 +61,8 @@ name: pkg_name
         printMatcher: '''
 package:sub_pkg
   `dart` values () are not used and can be removed.
-  `os` values () are not used and can be removed.''',
+  `os` values () are not used and can be removed.
+Wrote `${p.join(d.sandbox, travisFileName)}`.''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
@@ -206,7 +208,7 @@ name: pkg_name
         printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, travisShPath)}`.''',
+Wrote `${p.join(d.sandbox, ciScriptPath)}`.''',
       );
     });
   });
@@ -223,7 +225,7 @@ name: pkg_name
       printMatcher: _subPkgStandardOutput,
     );
     await d.file(travisFileName, travisYamlOutput).validate();
-    await d.file(travisShPath, travisShellOutput).validate();
+    await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
   test('incompatible SDK constraints', () async {
@@ -241,11 +243,11 @@ environment:
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, travisYamlOutput).validate();
-    await d.file(travisShPath, travisShellOutput).validate();
+    await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
   test('two flavors of dartfmt', () async {
@@ -293,7 +295,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -306,19 +308,19 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
     - stage: format
       name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
     - stage: format
       name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
 
 stages:
   - format
@@ -336,7 +338,7 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d.file(travisShPath, contains(r'''
+    await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
       dartfmt)
         echo 'dartfmt -n --set-exit-if-changed .'
@@ -395,7 +397,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -408,19 +410,19 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt_0
+      script: tool/ci.sh dartfmt_0
     - stage: format
       name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt_0
+      script: tool/ci.sh dartfmt_0
     - stage: format
       name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt --dry-run --fix --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh dartfmt_1
+      script: tool/ci.sh dartfmt_1
 
 stages:
   - format
@@ -438,7 +440,7 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d.file(travisShPath, contains(r'''
+    await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
       dartfmt_0)
         echo 'dartfmt -n --set-exit-if-changed .'
@@ -522,7 +524,7 @@ package:pkg_a
   `dart` values (unneeded) are not used and can be removed.
   `os` values (unneeded) are not used and can be removed.
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -535,25 +537,25 @@ jobs:
       dart: "1.23.0"
       os: windows
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartanalyzer
+      script: tool/ci.sh dartanalyzer
     - stage: analyze
       name: "SDK: dev; PKG: pkg_a; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
       dart: dev
       os: osx
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartanalyzer dartfmt
+      script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
       name: "SDK: dev; PKG: pkg_a; TASKS: chrome tests"
       dart: dev
       os: macos
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
 
 stages:
   - analyze
@@ -568,7 +570,7 @@ cache:
   directories:
     - "$HOME/.pub-cache"
 ''').validate();
-    await d.file(travisShPath, travisShellOutput).validate();
+    await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
   test(
@@ -648,7 +650,7 @@ $lines
 
     await d
         .file(
-          travisShPath,
+          ciScriptPath,
           stringContainsInOrder([
             'test_00)',
             'test_10)',
@@ -675,14 +677,14 @@ name: pkg_name
       await populateConfig(monoRepoContent);
 
       await d.nothing(travisFileName).validate();
-      await d.nothing(travisShPath).validate();
+      await d.nothing(ciScriptPath).validate();
 
       testGenerateTravisConfig(
         printMatcher: _subPkgStandardOutput,
       );
 
       await d.file(travisFileName, expectedTravisContent).validate();
-      await d.file(travisShPath, travisShellOutput).validate();
+      await d.file(ciScriptPath, ciShellOutput).validate();
     }
 
     test('empty travis.yml file', () async {
@@ -731,7 +733,7 @@ jobs:
       expect(
         testGenerateTravisConfig,
         throwsAParsedYamlException(r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `pretty_ansi`, `self_validate`, `travis` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `pretty_ansi`, `self_validate`, `travis`, `ci` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
@@ -893,7 +895,7 @@ name: pkg_name
 package:sub_pkg1
 package:sub_pkg2
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -963,7 +965,7 @@ name: pkg_name
 package:sub_pkg1
 package:sub_pkg2
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -1073,7 +1075,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
 
         await d.file(travisFileName, r'''
@@ -1086,31 +1088,31 @@ jobs:
       dart: stable
       os: linux
       env: PKGS="pkg_a pkg_b"
-      script: tool/travis.sh dartanalyzer dartfmt
+      script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_a; TASKS: chrome tests"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_b; TASKS: chrome tests"
       dart: stable
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_b; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
 
 stages:
   - analyze
@@ -1125,7 +1127,7 @@ cache:
   directories:
     - "$HOME/.pub-cache"
 ''').validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
 
@@ -1210,7 +1212,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
 
       test('get', () async {
@@ -1223,7 +1225,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(travisShPath, contains(r'''
+        await d.file(ciScriptPath, contains(r'''
   pub get --no-precompile || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
@@ -1258,7 +1260,7 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(travisShPath, r'''
+        await d.file(ciScriptPath, r'''
 #!/bin/bash
 
 # Support built in commands on windows out of the box.
@@ -1397,7 +1399,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
           printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
 
         await d
@@ -1431,7 +1433,7 @@ cache:
 '''
                 ]))
             .validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
 
       test('set to a stage name', () async {
@@ -1443,7 +1445,7 @@ cache:
           printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
 
         await d
@@ -1475,7 +1477,7 @@ cache:
 '''
                 ]))
             .validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
   });
@@ -1484,4 +1486,4 @@ cache:
 String get _subPkgStandardOutput => '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''';
+$ciScriptPathMessage''';

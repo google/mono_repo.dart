@@ -13,15 +13,15 @@ import '../ci_shared.dart';
 import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
+import 'ci_script/generate.dart';
 import 'mono_repo_command.dart';
-import 'travis.dart';
 
 class PresubmitCommand extends MonoRepoCommand {
   @override
   String get name => 'presubmit';
 
   @override
-  String get description => 'Run the travis presubmits locally.';
+  String get description => 'Run the ci presubmits locally.';
 
   PresubmitCommand() {
     argParser
@@ -67,9 +67,10 @@ Future<bool> presubmit(
   sdkToRun ??= _currentSdk;
   Directory tmpDir;
 
-  if (!File(travisShPath).existsSync()) {
+  if (!File(ciScriptPath).existsSync()) {
     throw UserException(
-        'No $travisShPath file found, please run the `travis` command first.');
+        'No $ciScriptPath file found, please run the `generate` command '
+        'first.');
   }
 
   final commandsToKeys = extractCommands(rootConfig);
@@ -121,7 +122,7 @@ Future<bool> presubmit(
           continue;
         }
 
-        final result = await Process.run(travisShPath, [taskKey],
+        final result = await Process.run(ciScriptPath, [taskKey],
             environment: {'PKGS': package});
         if (result.exitCode == 0) {
           print(green.wrap('    success'));

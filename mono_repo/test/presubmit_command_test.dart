@@ -7,8 +7,10 @@
 import 'dart:io';
 
 import 'package:io/ansi.dart';
+import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
-import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
@@ -21,16 +23,17 @@ final pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
 
 void main() {
   group('error reporting', () {
-    test('no $travisShPath', () async {
+    test('no $ciScriptPath', () async {
       await d.dir('pkg_a', [
         d.file('mono_pkg.yaml', ''),
-        d.file('pubspec.yaml', '{"name":"_test"}')
+        d.file('pubspec.yaml',
+            '{"name":"_test", "environment": {"sdk": ">=2.7.0 <3.0.0"}}'),
       ]).create();
 
       expect(
         () => presubmit(RootConfig(rootDirectory: d.sandbox)),
         throwsUserExceptionWith(
-          'No $travisShPath file found, please run the `travis` '
+          'No $ciScriptPath file found, please run the `generate` '
           'command first.',
           isNull,
         ),
@@ -65,17 +68,25 @@ void main() {
         ..writeAsStringSync(pkgBConfig);
       File(p.join(pkgBPath, 'pubspec.yaml'))
         ..createSync(recursive: true)
-        ..writeAsStringSync('name: pkg_b');
+        ..writeAsStringSync('''
+name: pkg_b
+environment:
+  sdk: ">=2.7.0 <3.0.0"''');
 
       await overrideAnsiOutput(false, () async {
         await expectLater(
-          () => generateTravisConfig(RootConfig(rootDirectory: repoPath)),
+          () {
+            final config = RootConfig(rootDirectory: repoPath);
+            logPackages(config);
+            generateTravisConfig(config);
+            generateCIScript(config);
+          },
           prints(
             stringContainsInOrder(
               [
                 'package:pkg_a',
                 'package:pkg_b',
-                'Make sure to mark `tool/travis.sh` as executable.',
+                'Make sure to mark `tool/ci.sh` as executable.',
               ],
             ),
           ),
@@ -84,7 +95,7 @@ void main() {
 
       await Process.run(
         'chmod',
-        ['+x', p.join('tool', 'travis.sh')],
+        ['+x', p.join('tool', 'ci.sh')],
         workingDirectory: repoPath,
       );
       await Process.run(pubBinary, ['get'], workingDirectory: pkgAPath);
@@ -264,6 +275,8 @@ stages:
 
 const pkgAPubspec = '''
 name: pkg_name
+environment:
+  sdk: ">=2.7.0 <3.0.0"
 dev_dependencies:
   test: any
 ''';
