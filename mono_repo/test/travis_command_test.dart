@@ -61,7 +61,8 @@ name: pkg_name
         printMatcher: '''
 package:sub_pkg
   `dart` values () are not used and can be removed.
-  `os` values () are not used and can be removed.''',
+  `os` values () are not used and can be removed.
+Wrote `${p.join(d.sandbox, travisFileName)}`.''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
@@ -732,7 +733,7 @@ jobs:
       expect(
         testGenerateTravisConfig,
         throwsAParsedYamlException(r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `pretty_ansi`, `self_validate`, `travis` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `pretty_ansi`, `self_validate`, `travis`, `ci` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^

@@ -32,7 +32,6 @@ class GenerateCommand extends MonoRepoCommand {
     final config = rootConfig();
     logPackages(config);
     final validateOnly = argResults['validate'] as bool;
-    generateCIScript(config, validateOnly: validateOnly);
     for (var ci in config.monoConfig.ci) {
       switch (ci) {
         case CI.github:
@@ -43,5 +42,6 @@ class GenerateCommand extends MonoRepoCommand {
           break;
       }
     }
+    generateCIScript(config, validateOnly: validateOnly);
   }
 }

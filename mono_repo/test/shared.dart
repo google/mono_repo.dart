@@ -29,10 +29,15 @@ void testGenerateTravisConfig({
         })).run(
       () => overrideAnsiOutput(
         false,
-        () => generateTravisConfig(
-          RootConfig(rootDirectory: d.sandbox),
-          validateOnly: validateOnly,
-        ),
+        () {
+          final config = RootConfig(rootDirectory: d.sandbox);
+          logPackages(config);
+          generateTravisConfig(
+            config,
+            validateOnly: validateOnly,
+          );
+          generateCIScript(config, validateOnly: validateOnly);
+        },
       ),
     );
   } finally {

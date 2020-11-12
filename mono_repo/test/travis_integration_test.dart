@@ -142,7 +142,7 @@ void _registerTest(
     final proc = await TestProcess.start(
       '/bin/bash',
       [
-        'tool/travis.sh',
+        'tool/ci.sh',
         ...args,
       ],
       environment: {

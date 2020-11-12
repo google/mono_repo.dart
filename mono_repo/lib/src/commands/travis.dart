@@ -35,11 +35,11 @@ class TravisCommand extends MonoRepoCommand {
     _checkCIConfig(config);
     logPackages(config);
     final validateOnly = argResults['validate'] as bool;
-    generateCIScript(config, validateOnly: validateOnly);
-    return generateTravisConfig(
+    generateTravisConfig(
       config,
       validateOnly: validateOnly,
     );
+    generateCIScript(config, validateOnly: validateOnly);
   }
 }
 
