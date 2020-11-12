@@ -41,14 +41,14 @@ class MonoConfig {
   final Map<String, dynamic> travis;
 
   MonoConfig._({
-    @required this.ci,
+    @required List<CI> ci,
     @required this.conditionalStages,
     @required this.mergeStages,
     @required this.prettyAnsi,
     @required this.pubAction,
     @required this.selfValidateStage,
     @required this.travis,
-  });
+  }) : ci = ci ?? const [CI.travis];
 
   factory MonoConfig({
     @required List<CI> ci,
@@ -177,7 +177,7 @@ class MonoConfig {
     final mergeStages = json['merge_stages'] ?? [];
 
     final ci = (Object ci) {
-      ci ??= ['travis'];
+      if (ci == null) return null;
       if (ci is! List) {
         throw CheckedFromJsonException(
           json,

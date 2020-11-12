@@ -4,10 +4,12 @@
 
 import 'dart:io';
 
+import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../ci_shared.dart';
 import '../ci_test_script.dart';
+import '../mono_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
@@ -21,7 +23,8 @@ class TravisCommand extends MonoRepoCommand {
   String get name => 'travis';
 
   @override
-  String get description => 'Configure Travis-CI for child packages.';
+  String get description =>
+      '(Deprecated, use `generate`) Configure Travis-CI for child packages.';
 
   TravisCommand() : super() {
     argParser.addFlag('validate',
@@ -31,16 +34,21 @@ class TravisCommand extends MonoRepoCommand {
   }
 
   @override
-  void run() => generateTravisConfig(
-        rootConfig(),
-        validateOnly: argResults['validate'] as bool,
-      );
+  void run() {
+    print(yellow.wrap(
+        'This command is deprecated, use the `generate` command instead.'));
+    return generateTravisConfig(
+      rootConfig(),
+      validateOnly: argResults['validate'] as bool,
+    );
+  }
 }
 
 void generateTravisConfig(
   RootConfig rootConfig, {
   bool validateOnly = false,
 }) {
+  _checkCIConfig(rootConfig);
   validateOnly ??= false;
   final travisConfig = _GeneratedTravisConfig.generate(
     rootConfig,
@@ -116,5 +124,24 @@ void _validateFile(
   final shFile = File(p.join(rootDirectory, expectedPath));
   if (!shFile.existsSync() || shFile.readAsStringSync() != expectedContent) {
     throw TravisConfigOutOfDateException();
+  }
+}
+
+/// Thrown if generated config does not match existing config when running with
+/// the `--validate` option.
+class CIConfigMismatchException extends UserException {
+  CIConfigMismatchException(List<CI> rootCIConfig)
+      : super(
+          'This command can only be used if your mono_repo.yml config '
+          'does not configure other CI providers. Use the `generate` command '
+          'instead.',
+          details: 'Existing CI config was $rootCIConfig',
+        );
+}
+
+/// Checks that the root CI config includes exactly one provider, travis.
+void _checkCIConfig(RootConfig rootConfig) {
+  if (rootConfig.monoConfig.ci != [CI.travis]) {
+    throw CIConfigMismatchException(rootConfig.monoConfig.ci);
   }
 }
