@@ -22,7 +22,7 @@ jobs:
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
-        run: tool/travis.sh command
+        run: tool/ci.sh command
   job_002:
     name: "OS: linux; SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
       - env:
           PKGS: mono_repo test_pkg
           TRAVIS_OS_NAME: linux
-        run: tool/travis.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt dartanalyzer_0
   job_003:
     name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer --fatal-warnings .`"
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
-        run: tool/travis.sh dartanalyzer_1
+        run: tool/ci.sh dartanalyzer_1
   job_004:
     name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
-        run: tool/travis.sh test_0
+        run: tool/ci.sh test_0
   job_005:
     name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
@@ -73,7 +73,7 @@ jobs:
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: windows
-        run: tool/travis.sh test_0
+        run: tool/ci.sh test_0
   job_006:
     name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -85,7 +85,7 @@ jobs:
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
-        run: tool/travis.sh test_0
+        run: tool/ci.sh test_0
   job_007:
     name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
@@ -97,7 +97,7 @@ jobs:
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: windows
-        run: tool/travis.sh test_0
+        run: tool/ci.sh test_0
   job_008:
     name: "OS: linux; SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -109,4 +109,4 @@ jobs:
       - env:
           PKGS: test_pkg
           TRAVIS_OS_NAME: linux
-        run: tool/travis.sh test_1
+        run: tool/ci.sh test_1

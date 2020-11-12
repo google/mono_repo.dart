@@ -4,6 +4,7 @@
 
 import '../mono_config.dart';
 
+import '../ci_shared.dart';
 import 'ci_script/generate.dart';
 import 'github/generate.dart';
 import 'mono_repo_command.dart';
@@ -29,10 +30,9 @@ class GenerateCommand extends MonoRepoCommand {
   @override
   void run() {
     final config = rootConfig();
+    logPackages(config);
     final validateOnly = argResults['validate'] as bool;
-
     generateCIScript(config, validateOnly: validateOnly);
-
     for (var ci in config.monoConfig.ci) {
       switch (ci) {
         case CI.github:

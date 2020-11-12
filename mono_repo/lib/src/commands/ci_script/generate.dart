@@ -11,7 +11,7 @@ import '../../ci_test_script.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 
-const ciScriptPath = '.dart_tool/mono_repo/ci.sh';
+const ciScriptPath = 'tool/ci.sh';
 
 void generateCIScript(
   RootConfig rootConfig, {
@@ -42,7 +42,6 @@ class _GeneratedCIScript {
   _GeneratedCIScript._(this.ciScript);
 
   factory _GeneratedCIScript.generate(RootConfig rootConfig) {
-    logPackages(rootConfig);
     final commandsToKeys = extractCommands(rootConfig);
 
     final script = generateTestScript(

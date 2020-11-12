@@ -44,7 +44,6 @@ class _GeneratedGitHubConfig {
   _GeneratedGitHubConfig._(this.workflowYaml);
 
   factory _GeneratedGitHubConfig.generate(RootConfig rootConfig) {
-    logPackages(rootConfig);
     final commandsToKeys = extractCommands(rootConfig);
 
     final yml = generateGitHubYml(rootConfig, commandsToKeys);

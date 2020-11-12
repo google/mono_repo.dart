@@ -44,7 +44,6 @@ class _GeneratedTravisConfig {
   _GeneratedTravisConfig._(this.travisYml);
 
   factory _GeneratedTravisConfig.generate(RootConfig rootConfig) {
-    logPackages(rootConfig);
     final commandsToKeys = extractCommands(rootConfig);
 
     final yml = generateTravisYml(rootConfig, commandsToKeys);
