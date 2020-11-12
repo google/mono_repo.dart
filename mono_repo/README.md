@@ -34,14 +34,41 @@ Global options:
 Available commands:
   check       Check the state of the repository.
   github      Configure GitHub Actions for child packages.
-  presubmit   Run the travis presubmits locally.
+  presubmit   Run the ci presubmits locally.
   pub         Run `pub get` or `pub upgrade` against all packages.
-  travis      Configure Travis-CI for child packages.
+  generate    CI config for child packages and configured CI providers.
 
 Run "mono_repo help <command>" for more information about a command.
 ```
 
 ## Configuration
+
+### Repo level configuration
+
+To start, you should create a `mono_repo.yaml` file at the root of your repo.
+
+This controls repo wide configuration.
+
+One option  you likely want to configure is which CI providers  you want to
+generate config for. Today both `travis` and `github` are supported, and
+can be configured under the `ci` key.
+
+You probably also want to enable the `self_validate` option, which will add a
+job to ensure that your configuration is up to date.
+
+So, an example config might look like this:
+
+```yaml
+# Adds a job that runs `mono_repo generate --validate` to check that everything
+# is up to date.
+self_validate: true
+# This would enable both CI configurations, you probably only want one though.
+ci:
+  - travis
+  - github
+```
+
+### Adding a package config
 
 To configure a package directory to be included it must contain a
 `mono_pkg.yaml` file (along with the normal `pubspec.yaml` file).
@@ -49,10 +76,10 @@ To configure a package directory to be included it must contain a
 You can use an empty `mono_pkg.yaml` file to enable the `check` and `pub`
 commands. 
 
-To enable `travis` and `presubmit`, you must populate `mono_pkg.yaml` with
+To enable `generate` and `presubmit`, you must populate `mono_pkg.yaml` with
 details on how you'd like tests to be run.
 
-### `mono_pkg.yaml` example
+#### `mono_pkg.yaml` example
 
 ```yaml
 # This key is required. It specifies the Dart SDKs your tests will run under
@@ -71,8 +98,8 @@ stages:
     - test
 ```
 
-Running `mono_repo travis` in the root directory generates two files:
-`.travis.yml` and `tool/travis.sh`.
+Running `mono_repo generate` in the root directory generates two or more files:
+`tool/ci.sh` and a configuration file for each configured ci provider.
 
 Look at these repositories for examples of `mono_repo` usage:
 
