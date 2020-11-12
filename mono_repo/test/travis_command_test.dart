@@ -307,19 +307,19 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
     - stage: format
       name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
     - stage: format
       name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
 
 stages:
   - format
@@ -409,19 +409,19 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt_0
+      script: tool/ci.sh dartfmt_0
     - stage: format
       name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartfmt_0
+      script: tool/ci.sh dartfmt_0
     - stage: format
       name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt --dry-run --fix --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh dartfmt_1
+      script: tool/ci.sh dartfmt_1
 
 stages:
   - format
@@ -536,25 +536,25 @@ jobs:
       dart: "1.23.0"
       os: windows
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartanalyzer
+      script: tool/ci.sh dartanalyzer
     - stage: analyze
       name: "SDK: dev; PKG: pkg_a; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
       dart: dev
       os: osx
       env: PKGS="pkg_a"
-      script: tool/travis.sh dartanalyzer dartfmt
+      script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
       name: "SDK: dev; PKG: pkg_a; TASKS: chrome tests"
       dart: dev
       os: macos
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
 
 stages:
   - analyze
@@ -1087,31 +1087,31 @@ jobs:
       dart: stable
       os: linux
       env: PKGS="pkg_a pkg_b"
-      script: tool/travis.sh dartanalyzer dartfmt
+      script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_a; TASKS: chrome tests"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_b; TASKS: chrome tests"
       dart: stable
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: pkg_b; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_b"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
 
 stages:
   - analyze

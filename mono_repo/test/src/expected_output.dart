@@ -103,85 +103,85 @@ jobs:
       dart: "1.23.0"
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh dartanalyzer
+      script: tool/ci.sh dartanalyzer
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
       dart: dev
       os: osx
       env: PKGS="sub_pkg"
-      script: tool/travis.sh dartanalyzer dartfmt
+      script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
       name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: chrome tests"
       dart: "1.23.0"
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: chrome tests"
       dart: "1.23.0"
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: chrome tests"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: chrome tests"
       dart: dev
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: sub_pkg; TASKS: chrome tests"
       dart: stable
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: stable; PKG: sub_pkg; TASKS: chrome tests"
       dart: stable
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_0
+      script: tool/ci.sh test_0
     - stage: unit_test
       name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis`"
       dart: "1.23.0"
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: 1.23.0; PKG: sub_pkg; TASKS: `pub run test --preset travis`"
       dart: "1.23.0"
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test --preset travis`"
       dart: dev
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: stable; PKG: sub_pkg; TASKS: `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: stable; PKG: sub_pkg; TASKS: `pub run test --preset travis`"
       dart: stable
       os: windows
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test_1
+      script: tool/ci.sh test_1
 
 stages:
   - analyze
