@@ -7,6 +7,7 @@
 import 'dart:io';
 
 import 'package:io/ansi.dart';
+import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart';
@@ -31,7 +32,7 @@ void main() {
       expect(
         () => presubmit(RootConfig(rootDirectory: d.sandbox)),
         throwsUserExceptionWith(
-          'No $ciScriptPath file found, please run the `travis` '
+          'No $ciScriptPath file found, please run the `generate` '
           'command first.',
           isNull,
         ),
@@ -70,7 +71,12 @@ void main() {
 
       await overrideAnsiOutput(false, () async {
         await expectLater(
-          () => generateTravisConfig(RootConfig(rootDirectory: repoPath)),
+          () {
+            final config = RootConfig(rootDirectory: repoPath);
+            logPackages(config);
+            generateTravisConfig(config);
+            generateCIScript(config);
+          },
           prints(
             stringContainsInOrder(
               [
@@ -85,7 +91,7 @@ void main() {
 
       await Process.run(
         'chmod',
-        ['+x', p.join('tool', 'travis.sh')],
+        ['+x', p.join('tool', 'ci.sh')],
         workingDirectory: repoPath,
       );
       await Process.run(pubBinary, ['get'], workingDirectory: pkgAPath);
