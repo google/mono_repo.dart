@@ -57,7 +57,7 @@ package:pkg_a
 package:pkg_b
 package:pkg_c
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
   });
 

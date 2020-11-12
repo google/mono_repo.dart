@@ -7,10 +7,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
-import '../../ci_test_script.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
-import '../travis/generate.dart' show travisShPath;
 import 'github_yaml.dart';
 
 const githubActionYamlPath = '.github/workflows/dart.yml';
@@ -29,11 +27,6 @@ void generateGitHubActions(
       githubConfig.workflowYaml,
       githubActionYamlPath,
     );
-    _validateFile(
-      rootConfig.rootDirectory,
-      githubConfig.travisSh,
-      travisShPath,
-    );
   } else {
     writeFile(
       rootConfig.rootDirectory,
@@ -41,21 +34,14 @@ void generateGitHubActions(
       githubConfig.workflowYaml,
       isScript: false,
     );
-    writeFile(
-      rootConfig.rootDirectory,
-      travisShPath,
-      githubConfig.travisSh,
-      isScript: true,
-    );
   }
 }
 
 /// The generated yaml and shell script content for github.
 class _GeneratedGitHubConfig {
   final String workflowYaml;
-  final String travisSh;
 
-  _GeneratedGitHubConfig._(this.workflowYaml, this.travisSh);
+  _GeneratedGitHubConfig._(this.workflowYaml);
 
   factory _GeneratedGitHubConfig.generate(RootConfig rootConfig) {
     logPackages(rootConfig);
@@ -63,13 +49,7 @@ class _GeneratedGitHubConfig {
 
     final yml = generateGitHubYml(rootConfig, commandsToKeys);
 
-    final sh = generateTestScript(
-      commandsToKeys,
-      rootConfig.monoConfig.prettyAnsi,
-      rootConfig.monoConfig.pubAction,
-    );
-
-    return _GeneratedGitHubConfig._(yml, sh);
+    return _GeneratedGitHubConfig._(yml);
   }
 }
 

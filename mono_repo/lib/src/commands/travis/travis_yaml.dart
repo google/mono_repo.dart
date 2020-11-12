@@ -10,7 +10,7 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../version.dart';
 import '../../yaml.dart';
-import 'generate.dart';
+import '../ci_script/generate.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,
@@ -231,7 +231,7 @@ extension on CIJobEntry {
       'dart': job.sdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
-      'script': '$travisShPath ${commands.join(' ')}',
+      'script': '$ciScriptPath ${commands.join(' ')}',
     };
   }
 }

@@ -3,6 +3,8 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import '../mono_config.dart';
+
+import 'ci_script/generate.dart';
 import 'github/generate.dart';
 import 'mono_repo_command.dart';
 import 'travis/generate.dart';
@@ -28,6 +30,9 @@ class GenerateCommand extends MonoRepoCommand {
   void run() {
     final config = rootConfig();
     final validateOnly = argResults['validate'] as bool;
+
+    generateCIScript(config, validateOnly: validateOnly);
+
     for (var ci in config.monoConfig.ci) {
       switch (ci) {
         case CI.github:

@@ -7,6 +7,7 @@ import 'package:io/ansi.dart';
 import '../mono_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
+import 'ci_script/generate.dart';
 import 'mono_repo_command.dart';
 import 'travis/generate.dart';
 
@@ -31,9 +32,13 @@ class TravisCommand extends MonoRepoCommand {
         'This command is deprecated, use the `generate` command instead.'));
     final config = rootConfig();
     _checkCIConfig(config);
+    final validateOnly = argResults['validate'] as bool;
+
+    generateCIScript(config, validateOnly: validateOnly);
+
     return generateTravisConfig(
       config,
-      validateOnly: argResults['validate'] as bool,
+      validateOnly: validateOnly,
     );
   }
 }

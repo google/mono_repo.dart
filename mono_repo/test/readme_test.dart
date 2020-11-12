@@ -5,6 +5,7 @@
 import 'dart:io';
 
 import 'package:mono_repo/src/ci_test_script.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:test/test.dart';
@@ -40,7 +41,7 @@ name: sub_pkg
 
     await d.dir('.', [
       d.file(travisFileName, _travisYml),
-      d.file(travisShPath, _travisSh)
+      d.file(ciScriptPath, _travisSh)
     ]).validate();
   });
 }

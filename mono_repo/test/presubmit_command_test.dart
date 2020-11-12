@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
@@ -21,7 +22,7 @@ final pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
 
 void main() {
   group('error reporting', () {
-    test('no $travisShPath', () async {
+    test('no $ciScriptPath', () async {
       await d.dir('pkg_a', [
         d.file('mono_pkg.yaml', ''),
         d.file('pubspec.yaml', '{"name":"_test"}')
@@ -30,7 +31,7 @@ void main() {
       expect(
         () => presubmit(RootConfig(rootDirectory: d.sandbox)),
         throwsUserExceptionWith(
-          'No $travisShPath file found, please run the `travis` '
+          'No $ciScriptPath file found, please run the `travis` '
           'command first.',
           isNull,
         ),

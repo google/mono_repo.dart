@@ -1,6 +1,6 @@
 import 'package:mono_repo/src/ci_test_script.dart';
 
-final travisShellOutput = '''
+final ciShellOutput = '''
 #!/bin/bash
 
 $windowsBoilerplate

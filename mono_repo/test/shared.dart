@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/ci_shared.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
@@ -88,6 +89,6 @@ stages:
     - test: --preset travis
 ''';
 
-String get travisShPathMessage => '''
-${scriptLines(travisShPath).join('\n')}
-Wrote `${p.join(d.sandbox, travisShPath)}`.''';
+String get ciScriptPathMessage => '''
+${scriptLines(ciScriptPath).join('\n')}
+Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';

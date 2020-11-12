@@ -7,65 +7,67 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
+import '../../ci_test_script.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
-import 'travis_yaml.dart';
 
-const travisFileName = '.travis.yml';
+const ciScriptPath = '.dart_tool/mono_repo/ci.sh';
 
-void generateTravisConfig(
+void generateCIScript(
   RootConfig rootConfig, {
   bool validateOnly = false,
 }) {
   validateOnly ??= false;
-  final travisConfig = _GeneratedTravisConfig.generate(
-    rootConfig,
-  );
+  final ciScript = _GeneratedCIScript.generate(rootConfig).ciScript;
   if (validateOnly) {
     _validateFile(
       rootConfig.rootDirectory,
-      travisConfig.travisYml,
-      travisFileName,
+      ciScript,
+      ciScriptPath,
     );
   } else {
     writeFile(
       rootConfig.rootDirectory,
-      travisFileName,
-      travisConfig.travisYml,
-      isScript: false,
+      ciScriptPath,
+      ciScript,
+      isScript: true,
     );
   }
 }
 
-/// The generated yaml and shell script content for travis.
-class _GeneratedTravisConfig {
-  final String travisYml;
+/// The shared generated shell script content for CI.
+class _GeneratedCIScript {
+  final String ciScript;
 
-  _GeneratedTravisConfig._(this.travisYml);
+  _GeneratedCIScript._(this.ciScript);
 
-  factory _GeneratedTravisConfig.generate(RootConfig rootConfig) {
+  factory _GeneratedCIScript.generate(RootConfig rootConfig) {
     logPackages(rootConfig);
     final commandsToKeys = extractCommands(rootConfig);
 
-    final yml = generateTravisYml(rootConfig, commandsToKeys);
+    final script = generateTestScript(
+      commandsToKeys,
+      rootConfig.monoConfig.prettyAnsi,
+      rootConfig.monoConfig.pubAction,
+    );
 
-    return _GeneratedTravisConfig._(yml);
+    return _GeneratedCIScript._(script);
   }
 }
 
 /// Thrown if generated config does not match existing config when running with
 /// the `--validate` option.
-class TravisConfigOutOfDateException extends UserException {
-  TravisConfigOutOfDateException()
+class CIScriptOutOfDateException extends UserException {
+  CIScriptOutOfDateException()
       : super(
-          'Generated travis config is out of date',
-          details: 'Rerun `mono_repo generate` to update generated config',
+          'Generated ci script is out of date',
+          details: 'Rerun `mono_repo generate` to update the generated script',
         );
 }
 
 /// Checks [expectedPath] versus the content in [expectedContent].
 ///
-/// Throws a [TravisConfigOutOfDateException] if they do not match.
+/// Throws a [CIScriptOutOfDateException] if they do not match.
 void _validateFile(
   String rootDirectory,
   String expectedContent,
@@ -73,6 +75,6 @@ void _validateFile(
 ) {
   final shFile = File(p.join(rootDirectory, expectedPath));
   if (!shFile.existsSync() || shFile.readAsStringSync() != expectedContent) {
-    throw TravisConfigOutOfDateException();
+    throw CIScriptOutOfDateException();
   }
 }

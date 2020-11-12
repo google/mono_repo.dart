@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/version.dart';
@@ -206,7 +207,7 @@ name: pkg_name
         printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, travisShPath)}`.''',
+Wrote `${p.join(d.sandbox, ciScriptPath)}`.''',
       );
     });
   });
@@ -223,7 +224,7 @@ name: pkg_name
       printMatcher: _subPkgStandardOutput,
     );
     await d.file(travisFileName, travisYamlOutput).validate();
-    await d.file(travisShPath, travisShellOutput).validate();
+    await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
   test('incompatible SDK constraints', () async {
@@ -241,11 +242,11 @@ environment:
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, travisYamlOutput).validate();
-    await d.file(travisShPath, travisShellOutput).validate();
+    await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
   test('two flavors of dartfmt', () async {
@@ -293,7 +294,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -336,7 +337,7 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d.file(travisShPath, contains(r'''
+    await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
       dartfmt)
         echo 'dartfmt -n --set-exit-if-changed .'
@@ -395,7 +396,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -438,7 +439,7 @@ cache:
     - pkg_b/.dart_tool
 ''').validate();
 
-    await d.file(travisShPath, contains(r'''
+    await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
       dartfmt_0)
         echo 'dartfmt -n --set-exit-if-changed .'
@@ -522,7 +523,7 @@ package:pkg_a
   `dart` values (unneeded) are not used and can be removed.
   `os` values (unneeded) are not used and can be removed.
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
 
     await d.file(travisFileName, r'''
@@ -568,7 +569,7 @@ cache:
   directories:
     - "$HOME/.pub-cache"
 ''').validate();
-    await d.file(travisShPath, travisShellOutput).validate();
+    await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
   test(
@@ -648,7 +649,7 @@ $lines
 
     await d
         .file(
-          travisShPath,
+          ciScriptPath,
           stringContainsInOrder([
             'test_00)',
             'test_10)',
@@ -675,14 +676,14 @@ name: pkg_name
       await populateConfig(monoRepoContent);
 
       await d.nothing(travisFileName).validate();
-      await d.nothing(travisShPath).validate();
+      await d.nothing(ciScriptPath).validate();
 
       testGenerateTravisConfig(
         printMatcher: _subPkgStandardOutput,
       );
 
       await d.file(travisFileName, expectedTravisContent).validate();
-      await d.file(travisShPath, travisShellOutput).validate();
+      await d.file(ciScriptPath, ciShellOutput).validate();
     }
 
     test('empty travis.yml file', () async {
@@ -893,7 +894,7 @@ name: pkg_name
 package:sub_pkg1
 package:sub_pkg2
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -963,7 +964,7 @@ name: pkg_name
 package:sub_pkg1
 package:sub_pkg2
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
         await d.file(travisFileName, contains(r'''
 stages:
@@ -1073,7 +1074,7 @@ name: pkg_b
 package:pkg_a
 package:pkg_b
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
 
         await d.file(travisFileName, r'''
@@ -1125,7 +1126,7 @@ cache:
   directories:
     - "$HOME/.pub-cache"
 ''').validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
 
@@ -1210,7 +1211,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
 
       test('get', () async {
@@ -1223,7 +1224,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(travisShPath, contains(r'''
+        await d.file(ciScriptPath, contains(r'''
   pub get --no-precompile || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
@@ -1258,7 +1259,7 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
         );
 
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(travisShPath, r'''
+        await d.file(ciScriptPath, r'''
 #!/bin/bash
 
 # Support built in commands on windows out of the box.
@@ -1397,7 +1398,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
           printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
 
         await d
@@ -1431,7 +1432,7 @@ cache:
 '''
                 ]))
             .validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
 
       test('set to a stage name', () async {
@@ -1443,7 +1444,7 @@ cache:
           printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
         );
 
         await d
@@ -1475,7 +1476,7 @@ cache:
 '''
                 ]))
             .validate();
-        await d.file(travisShPath, travisShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
   });
@@ -1484,4 +1485,4 @@ cache:
 String get _subPkgStandardOutput => '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''';
+$ciScriptPathMessage''';
