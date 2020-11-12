@@ -5,7 +5,7 @@ import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../yaml.dart';
-import '../travis.dart';
+import '../travis/generate.dart' show travisShPath;
 
 String generateGitHubYml(
   RootConfig rootConfig,

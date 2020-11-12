@@ -14,7 +14,7 @@ import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
 import 'mono_repo_command.dart';
-import 'travis.dart';
+import 'travis/generate.dart';
 
 class PresubmitCommand extends MonoRepoCommand {
   @override

@@ -10,7 +10,7 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../version.dart';
 import '../../yaml.dart';
-import '../travis.dart';
+import 'generate.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,

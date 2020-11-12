@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
-import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/version.dart';
 import 'package:mono_repo/src/yaml.dart';

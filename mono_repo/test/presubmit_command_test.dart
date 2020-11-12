@@ -8,7 +8,7 @@ import 'dart:io';
 
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
-import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
