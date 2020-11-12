@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   job_001:
-    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`"
+    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
     steps:
       - uses: cedx/setup-dart@v2

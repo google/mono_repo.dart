@@ -10,7 +10,7 @@ jobs:
       env: PKGS="mono_repo test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate`"
+      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
