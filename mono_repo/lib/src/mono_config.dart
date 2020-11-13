@@ -176,41 +176,7 @@ class MonoConfig {
 
     final mergeStages = json['merge_stages'] ?? [];
 
-    final ci = (Object ci) {
-      if (ci == null) return null;
-      if (ci is! List) {
-        throw CheckedFromJsonException(
-          json,
-          'ci',
-          'MonoConfig',
-          'Value must be a List of Strings matching either "github" or '
-              '"travis".',
-        );
-      }
-      final parsed = <CI>[];
-      for (var entry in ci as List<Object>) {
-        if (entry is! String) {
-          throw CheckedFromJsonException(
-            json,
-            'ci',
-            'MonoConfig',
-            'Value must be Strings matching either "github" or "travis".',
-          );
-        }
-        switch (entry as String) {
-          case 'travis':
-            parsed.add(CI.travis);
-            break;
-          case 'github':
-            parsed.add(CI.github);
-            break;
-          default:
-            throw ArgumentError.value(
-                entry, 'ci', 'Only "github" and "travis" are allowed');
-        }
-      }
-      return parsed;
-    }(json['ci']);
+    final ci = _parseCI(json);
 
     if (mergeStages is List) {
       if (mergeStages.any((v) => v is! String)) {
@@ -260,6 +226,44 @@ class MonoConfig {
 }
 
 const _selfValidateStageName = 'mono_repo_self_validate';
+
+/// Parses the `ci` config from a mono_repo.yaml yaml object.
+List<CI> _parseCI(Map<dynamic, dynamic> yaml) {
+  final ci = yaml['ci'];
+  if (ci == null) return null;
+  if (ci is! List) {
+    throw CheckedFromJsonException(
+      yaml,
+      'ci',
+      'MonoConfig',
+      'Value must be a List of Strings matching either "github" or '
+          '"travis".',
+    );
+  }
+  final parsed = <CI>[];
+  for (var entry in ci as List<Object>) {
+    if (entry is! String) {
+      throw CheckedFromJsonException(
+        yaml,
+        'ci',
+        'MonoConfig',
+        'Value must be Strings matching either "github" or "travis".',
+      );
+    }
+    switch (entry as String) {
+      case 'travis':
+        parsed.add(CI.travis);
+        break;
+      case 'github':
+        parsed.add(CI.github);
+        break;
+      default:
+        throw ArgumentError.value(
+            entry, 'ci', 'Only "github" and "travis" are allowed');
+    }
+  }
+  return parsed;
+}
 
 String _selfValidateFromValue(Object value) {
   if (value == null) return null;
