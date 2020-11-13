@@ -1,5 +1,10 @@
-## 3.0.1-dev
+## 3.1.0-beta
 
+* Adds support for Github Actions configuration.
+  * There is a new `ci` key in the `mono_repo.yaml` file which accepts a list
+    of providers to generate for, see the README.md for details.
+  * There is also a new command `generate` which replaces the `travis` command.
+* Deprecated the `travis` command.
 * Small improvement to how some strings are emitted in Yaml.
 
 ## 3.0.0

@@ -21,6 +21,7 @@ const _allowedMonoConfigKeys = {
   'pretty_ansi',
   'self_validate',
   'travis',
+  'ci',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -31,28 +32,31 @@ const _allowedPubActions = {
 };
 
 class MonoConfig {
-  final String pubAction;
-  final String selfValidateStage;
-  final bool prettyAnsi;
-  final Map<String, dynamic> travis;
+  final List<CI> ci;
   final Map<String, ConditionalStage> conditionalStages;
   final Set<String> mergeStages;
+  final bool prettyAnsi;
+  final String pubAction;
+  final String selfValidateStage;
+  final Map<String, dynamic> travis;
 
   MonoConfig._({
-    @required this.pubAction,
-    @required this.travis,
+    @required List<CI> ci,
     @required this.conditionalStages,
     @required this.mergeStages,
-    @required this.selfValidateStage,
     @required this.prettyAnsi,
-  });
+    @required this.pubAction,
+    @required this.selfValidateStage,
+    @required this.travis,
+  }) : ci = ci ?? const [CI.travis];
 
   factory MonoConfig({
-    @required Map travis,
+    @required List<CI> ci,
     @required Set<String> mergeStages,
-    @required String selfValidateStage,
     @required bool prettyAnsi,
     @required String pubAction,
+    @required String selfValidateStage,
+    @required Map travis,
   }) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
@@ -101,15 +105,16 @@ class MonoConfig {
     }
 
     return MonoConfig._(
+      ci: ci,
+      conditionalStages: conditionalStages,
+      mergeStages: mergeStages,
+      prettyAnsi: prettyAnsi,
+      pubAction: pubAction,
+      selfValidateStage: selfValidateStage,
       // Removing 'stages' so any `throw CheckedFromJsonException` will have the
       // right value, but the code that writes the values won't write stages
       // separately
       travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
-      conditionalStages: conditionalStages,
-      mergeStages: mergeStages,
-      selfValidateStage: selfValidateStage,
-      prettyAnsi: prettyAnsi,
-      pubAction: pubAction,
     );
   }
 
@@ -171,6 +176,8 @@ class MonoConfig {
 
     final mergeStages = json['merge_stages'] ?? [];
 
+    final ci = _parseCI(json);
+
     if (mergeStages is List) {
       if (mergeStages.any((v) => v is! String)) {
         throw CheckedFromJsonException(
@@ -182,11 +189,12 @@ class MonoConfig {
       }
 
       return MonoConfig(
-        travis: travis as Map,
+        ci: ci,
         mergeStages: Set.from(mergeStages),
-        selfValidateStage: _selfValidateFromValue(selfValidate),
-        pubAction: pubAction as String,
         prettyAnsi: prettyAnsi as bool,
+        pubAction: pubAction as String,
+        selfValidateStage: _selfValidateFromValue(selfValidate),
+        travis: travis as Map,
       );
     } else {
       throw CheckedFromJsonException(
@@ -204,11 +212,12 @@ class MonoConfig {
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
       return MonoConfig(
-        travis: {},
+        ci: null,
         mergeStages: <String>{},
-        selfValidateStage: null,
         pubAction: _defaultPubAction,
         prettyAnsi: true,
+        selfValidateStage: null,
+        travis: {},
       );
     }
 
@@ -217,6 +226,44 @@ class MonoConfig {
 }
 
 const _selfValidateStageName = 'mono_repo_self_validate';
+
+/// Parses the `ci` config from a mono_repo.yaml yaml object.
+List<CI> _parseCI(Map<dynamic, dynamic> yaml) {
+  final ci = yaml['ci'];
+  if (ci == null) return null;
+  if (ci is! List) {
+    throw CheckedFromJsonException(
+      yaml,
+      'ci',
+      'MonoConfig',
+      'Value must be a List of Strings matching either "github" or '
+          '"travis".',
+    );
+  }
+  final parsed = <CI>[];
+  for (var entry in ci as List<Object>) {
+    if (entry is! String) {
+      throw CheckedFromJsonException(
+        yaml,
+        'ci',
+        'MonoConfig',
+        'Value must be Strings matching either "github" or "travis".',
+      );
+    }
+    switch (entry as String) {
+      case 'travis':
+        parsed.add(CI.travis);
+        break;
+      case 'github':
+        parsed.add(CI.github);
+        break;
+      default:
+        throw ArgumentError.value(
+            entry, 'ci', 'Only "github" and "travis" are allowed');
+    }
+  }
+  return parsed;
+}
 
 String _selfValidateFromValue(Object value) {
   if (value == null) return null;
@@ -248,4 +295,10 @@ class ConditionalStage {
     }
     return _$ConditionalStageToJson(this);
   }
+}
+
+// The available CI providers that we generate config for.
+enum CI {
+  github,
+  travis,
 }

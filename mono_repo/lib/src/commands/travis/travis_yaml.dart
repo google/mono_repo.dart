@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:collection/collection.dart' hide stronglyConnectedComponents;
 import 'package:graphs/graphs.dart';
-import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
@@ -11,40 +10,15 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../version.dart';
 import '../../yaml.dart';
-import '../travis.dart';
+import '../ci_script/generate.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
+  validateRootConfig(rootConfig);
+
   final orderedStages = _calculateOrderedStages(rootConfig);
-
-  for (var config in rootConfig) {
-    final sdkConstraint = config.pubspec.environment['sdk'];
-
-    if (sdkConstraint == null) {
-      continue;
-    }
-
-    final disallowedExplicitVersions = config.jobs
-        .map((tj) => tj.explicitSdkVersion)
-        .where((v) => v != null)
-        .toSet()
-        .where((v) => !sdkConstraint.allows(v))
-        .toList()
-          ..sort();
-
-    if (disallowedExplicitVersions.isNotEmpty) {
-      final disallowedString =
-          disallowedExplicitVersions.map((v) => '`$v`').join(', ');
-      print(
-        yellow.wrap(
-          '  There are jobs defined that are not compatible with '
-          'the package SDK constraint ($sdkConstraint): $disallowedString.',
-        ),
-      );
-    }
-  }
 
   final jobs = rootConfig.expand((config) => config.jobs);
 
@@ -257,7 +231,7 @@ extension on CIJobEntry {
       'dart': job.sdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
-      'script': '$travisShPath ${commands.join(' ')}',
+      'script': '$ciScriptPath ${commands.join(' ')}',
     };
   }
 }

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v3.0.1-dev
+# Created with package:mono_repo v3.1.0-beta
 
 # Support built in commands on windows out of the box.
 function pub() {
@@ -59,8 +59,8 @@ for PKG in ${PKGS}; do
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
       command)
-        echo 'cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate'
-        cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate || EXIT_CODE=$?
+        echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
+        cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate || EXIT_CODE=$?
         ;;
       dartanalyzer_0)
         echo 'dartanalyzer --fatal-infos --fatal-warnings .'

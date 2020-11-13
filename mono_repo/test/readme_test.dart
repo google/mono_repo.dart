@@ -5,7 +5,8 @@
 import 'dart:io';
 
 import 'package:mono_repo/src/ci_test_script.dart';
-import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/commands/ci_script/generate.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
@@ -32,15 +33,15 @@ name: sub_pkg
       printMatcher: stringContainsInOrder(
         [
           'package:sub_pkg\n',
-          'Make sure to mark `tool/travis.sh` as executable.\n',
-          '  chmod +x tool/travis.sh\n',
+          'Make sure to mark `tool/ci.sh` as executable.\n',
+          '  chmod +x tool/ci.sh\n',
         ],
       ),
     );
 
     await d.dir('.', [
       d.file(travisFileName, _travisYml),
-      d.file(travisShPath, _travisSh)
+      d.file(ciScriptPath, _travisSh)
     ]).validate();
   });
 }
@@ -72,19 +73,19 @@ jobs:
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh dartanalyzer
+      script: tool/ci.sh dartanalyzer
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh dartfmt
+      script: tool/ci.sh dartfmt
     - stage: unit_test
       name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
-      script: tool/travis.sh test
+      script: tool/ci.sh test
 
 stages:
   - analyze

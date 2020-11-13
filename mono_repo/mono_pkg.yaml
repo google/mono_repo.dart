@@ -3,7 +3,7 @@
 stages:
 - smoke_test:
   # https://github.com/google/mono_repo.dart/issues/199
-  - command: cd ../ && dart mono_repo/bin/mono_repo.dart travis --validate
+  - command: cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate
     dart: dev
   - group:
     - dartfmt

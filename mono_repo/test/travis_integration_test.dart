@@ -2,7 +2,7 @@
 import 'dart:io';
 
 import 'package:meta/meta.dart';
-import 'package:mono_repo/src/commands/travis.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -24,6 +24,8 @@ void main() {
       ),
       d.file('pubspec.yaml', '''
 name: pkg_a
+environment:
+  sdk: ">=2.7.0 <3.0.0"
       ''')
     ]).create();
 
@@ -34,6 +36,8 @@ name: pkg_a
       ),
       d.file('pubspec.yaml', '''
 name: pkg_b
+environment:
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   not_a_package_at_all: any
@@ -47,6 +51,8 @@ dependencies:
       ),
       d.file('pubspec.yaml', '''
 name: pkg_c
+environment:
+  sdk: ">=2.7.0 <3.0.0"
 '''),
       d.file('some_dart_file.dart', 'void main() => print("hello");'),
     ]).create();
@@ -57,7 +63,7 @@ package:pkg_a
 package:pkg_b
 package:pkg_c
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-$travisShPathMessage''',
+$ciScriptPathMessage''',
     );
   });
 
@@ -142,7 +148,7 @@ void _registerTest(
     final proc = await TestProcess.start(
       '/bin/bash',
       [
-        'tool/travis.sh',
+        'tool/ci.sh',
         ...args,
       ],
       environment: {
