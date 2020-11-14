@@ -241,5 +241,5 @@ Map<String, String> _selfValidateTaskConfig(String stageName) => {
       'name': 'mono_repo self validate',
       'os': 'linux',
       'script': 'pub global activate mono_repo $packageVersion && '
-          'pub global run mono_repo travis --validate'
+          'pub global run mono_repo generate --validate'
     };
