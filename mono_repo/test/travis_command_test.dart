@@ -1414,7 +1414,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo travis --validate"
+      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo generate --validate"
 ''',
                   r'''
 stages:
@@ -1458,7 +1458,7 @@ jobs:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo travis --validate"
+      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo generate --validate"
     - stage: analyze
 ''',
                   r'''

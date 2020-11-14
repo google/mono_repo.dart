@@ -1,3 +1,7 @@
+## 3.1.0-beta.1
+
+* Fix self-validate logic.
+
 ## 3.1.0-beta
 
 * Adds support for Github Actions configuration.
