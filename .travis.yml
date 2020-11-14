@@ -4,7 +4,7 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
-      name: "SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
+      name: "SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`]"
       dart: dev
       os: linux
       env: PKGS="mono_repo test_pkg"
@@ -16,7 +16,7 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh command
     - stage: smoke_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer --fatal-warnings .`"
+      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer .`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
