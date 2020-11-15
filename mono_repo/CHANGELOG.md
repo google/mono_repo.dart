@@ -1,6 +1,8 @@
 ## 3.1.0-beta.2-dev
 
-* Support `stable` as a valid Dart SDK label.
+* GitHub actions:
+  * Support `stable` as a valid Dart SDK label.
+  * Use `[$default-branch]` instead of `[master]`.
 
 ## 3.1.0-beta.1
 

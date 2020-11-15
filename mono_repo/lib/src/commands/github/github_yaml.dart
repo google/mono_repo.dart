@@ -24,7 +24,7 @@ ${createdWith()}${toYaml({'name': 'Dart CI'})}
 
 on:
   push:
-    branches: [ master ]
+    branches: [\$default-branch]
   pull_request:
 
 defaults:
