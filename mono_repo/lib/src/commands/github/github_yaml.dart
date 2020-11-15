@@ -112,7 +112,9 @@ extension on CIJobEntry {
 
     if (realVersion != null) {
       if (realVersion.isPreRelease) {
-        throw UnsupportedError('Not sure how to party on `${job.sdk}`.');
+        throw UnsupportedError(
+          'Unsupported Dart SDK configuration: `${job.sdk}`.',
+        );
       }
       withMap = {
         'release-channel': 'stable',
@@ -120,8 +122,12 @@ extension on CIJobEntry {
       };
     } else if (job.sdk == 'dev') {
       withMap = {'release-channel': 'dev'};
+    } else if (job.sdk == 'stable') {
+      withMap = {'release-channel': 'stable', 'version': 'latest'};
     } else {
-      throw UnsupportedError('Not sure how to party on `${job.sdk}`.');
+      throw UnsupportedError(
+        'Unsupported Dart SDK configuration: `${job.sdk}`.',
+      );
     }
 
     final map = {

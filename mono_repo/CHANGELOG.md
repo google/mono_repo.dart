@@ -1,3 +1,7 @@
+## 3.1.0-beta.2-dev
+
+* Support `stable` as a valid Dart SDK label.
+
 ## 3.1.0-beta.1
 
 * Fix self-validate logic.

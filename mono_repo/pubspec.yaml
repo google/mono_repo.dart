@@ -2,7 +2,7 @@ name: mono_repo
 description: >-
   CLI tools to make it easier to manage a single source repository containing
   multiple Dart packages.
-version: 3.1.0-beta.1
+version: 3.1.0-beta.2-dev
 homepage: https://github.com/google/mono_repo.dart
 
 environment:
