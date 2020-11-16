@@ -63,12 +63,12 @@ for PKG in ${PKGS}; do
         cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate || EXIT_CODE=$?
         ;;
       dartanalyzer_0)
-        echo 'dartanalyzer --fatal-infos --fatal-warnings .'
-        dartanalyzer --fatal-infos --fatal-warnings . || EXIT_CODE=$?
+        echo 'dartanalyzer --fatal-infos .'
+        dartanalyzer --fatal-infos . || EXIT_CODE=$?
         ;;
       dartanalyzer_1)
-        echo 'dartanalyzer --fatal-warnings .'
-        dartanalyzer --fatal-warnings . || EXIT_CODE=$?
+        echo 'dartanalyzer .'
+        dartanalyzer . || EXIT_CODE=$?
         ;;
       dartfmt)
         echo 'dartfmt -n --set-exit-if-changed .'

@@ -24,7 +24,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh command
   job_002:
-    name: "OS: linux; SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos --fatal-warnings .`]"
+    name: "OS: linux; SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`]"
     runs-on: ubuntu-latest
     steps:
       - uses: cedx/setup-dart@v2
@@ -36,7 +36,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt dartanalyzer_0
   job_003:
-    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer --fatal-warnings .`"
+    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer .`"
     runs-on: ubuntu-latest
     steps:
       - uses: cedx/setup-dart@v2
