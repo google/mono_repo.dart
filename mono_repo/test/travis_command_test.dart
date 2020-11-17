@@ -322,11 +322,13 @@ jobs:
       env: PKGS="pkg_b"
       script: tool/ci.sh dartfmt
 
-stages: [format]
+stages:
+  - format
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
   directories:
@@ -422,11 +424,13 @@ jobs:
       env: PKGS="pkg_b"
       script: tool/ci.sh dartfmt_1
 
-stages: [format]
+stages:
+  - format
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
   directories:
@@ -559,10 +563,12 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
-  directories: [$HOME/.pub-cache]
+  directories:
+    - $HOME/.pub-cache
 ''').validate();
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
@@ -710,7 +716,8 @@ branches:
   only:
     - master
     - not_master
-after_failure: [tool/report_failure.sh]
+after_failure:
+  - tool/report_failure.sh
 
 jobs:
   include:
@@ -762,7 +769,7 @@ line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_act
           testGenerateTravisConfig,
           throwsAParsedYamlException(
             startsWith(
-              'line 2, column 11 of mono_repo.yaml: Unsupported value for '
+              'line 3, column 5 of mono_repo.yaml: Unsupported value for '
               '"stages". All values must be String or Map instances.',
             ),
           ),
@@ -916,7 +923,8 @@ travis:
       if: type IN (api, cron)
     - d
   branches:
-  only: [master]
+  only:
+    - master
 
 merge_stages:
 - analyze_and_format
@@ -996,7 +1004,7 @@ stages:
           testGenerateTravisConfig,
           throwsAParsedYamlException(
             startsWith(
-              'line 1, column 15 of mono_repo.yaml: Unsupported value for '
+              'line 2, column 3 of mono_repo.yaml: Unsupported value for '
               '"merge_stages". All values must be strings.',
             ),
           ),
@@ -1112,10 +1120,12 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
-  directories: [$HOME/.pub-cache]
+  directories:
+    - $HOME/.pub-cache
 ''').validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
@@ -1414,10 +1424,12 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
-  directories: [$HOME/.pub-cache]
+  directories:
+    - $HOME/.pub-cache
 '''
                 ]))
             .validate();
@@ -1456,10 +1468,12 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only: [master]
+  only:
+    - master
 
 cache:
-  directories: [$HOME/.pub-cache]
+  directories:
+    - $HOME/.pub-cache
 '''
                 ]))
             .validate();

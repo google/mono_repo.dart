@@ -43,7 +43,8 @@ void main() {
       expectedEncoding: r'''
 on:
   push:
-    branches: [$default-branch]
+    branches:
+      - $default-branch
   pull_request:''',
     );
   });

@@ -201,15 +201,6 @@ void _writeYaml(
         buffer.write(' ');
       }
       buffer.write('[]');
-    } else if (source.length == 1 && _isSimple(source.single)) {
-      // Write out 1-element, simple arrays compactly
-      if (parentType == _ParentType.map) {
-        // Need to ensure there is a space after the map `key:`
-        buffer.write(' ');
-      }
-      buffer.write('[');
-      _writeYaml(buffer, source.single, 0, _ParentType.list);
-      buffer.write(']');
     } else {
       var first = true;
       for (var item in source) {
