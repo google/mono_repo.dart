@@ -5,6 +5,7 @@ targets:
     builders:
       json_serializable:
         generate_for:
+          - lib/src/github_config.dart
           - lib/src/mono_config.dart
           - lib/src/package_config.dart
           - lib/src/pubspec.dart

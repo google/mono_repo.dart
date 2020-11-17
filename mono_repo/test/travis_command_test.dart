@@ -733,7 +733,7 @@ jobs:
       expect(
         testGenerateTravisConfig,
         throwsAParsedYamlException(r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `pub_action`, `merge_stages`, `pretty_ansi`, `self_validate`, `travis`, `ci` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `travis` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^

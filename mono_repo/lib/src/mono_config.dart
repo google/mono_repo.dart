@@ -6,6 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
+import 'github_config.dart';
 import 'yaml.dart';
 
 part 'mono_config.g.dart';
@@ -16,12 +17,12 @@ const _monoConfigFileName = 'mono_repo.yaml';
 const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 
 const _allowedMonoConfigKeys = {
-  'pub_action',
+  'github',
   'merge_stages',
   'pretty_ansi',
+  'pub_action',
   'self_validate',
   'travis',
-  'ci',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -32,31 +33,34 @@ const _allowedPubActions = {
 };
 
 class MonoConfig {
-  final List<CI> ci;
+  final Set<CI> ci;
   final Map<String, ConditionalStage> conditionalStages;
   final Set<String> mergeStages;
   final bool prettyAnsi;
   final String pubAction;
   final String selfValidateStage;
   final Map<String, dynamic> travis;
+  final GitHubConfig github;
 
   MonoConfig._({
-    @required List<CI> ci,
+    @required Set<CI> ci,
     @required this.conditionalStages,
     @required this.mergeStages,
     @required this.prettyAnsi,
     @required this.pubAction,
     @required this.selfValidateStage,
     @required this.travis,
-  }) : ci = ci ?? const [CI.travis];
+    @required this.github,
+  }) : ci = ci ?? const {CI.travis};
 
   factory MonoConfig({
-    @required List<CI> ci,
+    @required Set<CI> ci,
     @required Set<String> mergeStages,
     @required bool prettyAnsi,
     @required String pubAction,
     @required String selfValidateStage,
     @required Map travis,
+    @required Map github,
   }) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
@@ -115,6 +119,7 @@ class MonoConfig {
       // right value, but the code that writes the values won't write stages
       // separately
       travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
+      github: GitHubConfig.fromJson(github),
     );
   }
 
@@ -132,14 +137,38 @@ class MonoConfig {
       );
     }
 
+    final ci = {
+      if (json.containsKey('travis')) CI.travis,
+      if (json.containsKey('github')) CI.github,
+    };
+
     final travis = json['travis'] ?? {};
 
-    if (travis is! Map) {
+    if (travis is bool) {
+      if (!travis) {
+        ci.remove(CI.travis);
+      }
+    } else if (travis is! Map) {
       throw CheckedFromJsonException(
         json,
         'travis',
         'MonoConfig',
         '`travis` must be a Map.',
+      );
+    }
+
+    final github = json['github'] ?? {};
+
+    if (github is bool) {
+      if (!github) {
+        ci.remove(CI.github);
+      }
+    } else if (github is! Map) {
+      throw CheckedFromJsonException(
+        json,
+        'github',
+        'MonoConfig',
+        '`github` must be a Map.',
       );
     }
 
@@ -176,8 +205,6 @@ class MonoConfig {
 
     final mergeStages = json['merge_stages'] ?? [];
 
-    final ci = _parseCI(json);
-
     if (mergeStages is List) {
       if (mergeStages.any((v) => v is! String)) {
         throw CheckedFromJsonException(
@@ -195,6 +222,7 @@ class MonoConfig {
         pubAction: pubAction as String,
         selfValidateStage: _selfValidateFromValue(selfValidate),
         travis: travis as Map,
+        github: github as Map,
       );
     } else {
       throw CheckedFromJsonException(
@@ -218,6 +246,7 @@ class MonoConfig {
         prettyAnsi: true,
         selfValidateStage: null,
         travis: {},
+        github: {},
       );
     }
 
@@ -226,44 +255,6 @@ class MonoConfig {
 }
 
 const _selfValidateStageName = 'mono_repo_self_validate';
-
-/// Parses the `ci` config from a mono_repo.yaml yaml object.
-List<CI> _parseCI(Map<dynamic, dynamic> yaml) {
-  final ci = yaml['ci'];
-  if (ci == null) return null;
-  if (ci is! List) {
-    throw CheckedFromJsonException(
-      yaml,
-      'ci',
-      'MonoConfig',
-      'Value must be a List of Strings matching either "github" or '
-          '"travis".',
-    );
-  }
-  final parsed = <CI>[];
-  for (var entry in ci as List<Object>) {
-    if (entry is! String) {
-      throw CheckedFromJsonException(
-        yaml,
-        'ci',
-        'MonoConfig',
-        'Value must be Strings matching either "github" or "travis".',
-      );
-    }
-    switch (entry as String) {
-      case 'travis':
-        parsed.add(CI.travis);
-        break;
-      case 'github':
-        parsed.add(CI.github);
-        break;
-      default:
-        throw ArgumentError.value(
-            entry, 'ci', 'Only "github" and "travis" are allowed');
-    }
-  }
-  return parsed;
-}
 
 String _selfValidateFromValue(Object value) {
   if (value == null) return null;
