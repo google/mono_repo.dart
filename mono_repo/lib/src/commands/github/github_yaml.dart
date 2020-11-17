@@ -1,11 +1,17 @@
+// Copyright (c) 2020, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 import 'package:collection/collection.dart' hide stronglyConnectedComponents;
 import 'package:io/ansi.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
+import '../shared.dart';
 
 String generateGitHubYml(
   RootConfig rootConfig,
@@ -15,9 +21,11 @@ String generateGitHubYml(
 
   final jobs = rootConfig.expand((config) => config.jobs);
 
-  final jobList = Map<String, dynamic>.fromEntries(
-    _listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
-  );
+  final jobList = Map.fromEntries([
+    if (rootConfig.monoConfig.selfValidateStage != null)
+      _selfValidateTaskConfig(),
+    ..._listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+  ]);
 
   return '''
 ${createdWith()}${toYaml({'name': 'Dart CI'})}
@@ -78,14 +86,14 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   }
 }
 
+final _jobNameCache = <String>{};
+
+String _replace(String input) {
+  _jobNameCache.add(input);
+  return 'job_${_jobNameCache.length.toString().padLeft(3, '0')}';
+}
+
 extension on CIJobEntry {
-  static final _jobNameCache = <String>{};
-
-  static String _replace(String input) {
-    _jobNameCache.add(input);
-    return 'job_${_jobNameCache.length.toString().padLeft(3, '0')}';
-  }
-
   String _jobName(List<String> packages) {
     final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
 
@@ -105,59 +113,86 @@ extension on CIJobEntry {
     throw UnsupportedError('Not sure how to map `${job.os}` to GitHub!');
   }
 
-  Map<String, dynamic> get _dartSetup {
-    Map<String, String> withMap;
-
-    final realVersion = job.explicitSdkVersion;
-
-    if (realVersion != null) {
-      if (realVersion.isPreRelease) {
-        throw UnsupportedError(
-          'Unsupported Dart SDK configuration: `${job.sdk}`.',
-        );
-      }
-      withMap = {
-        'release-channel': 'stable',
-        'version': job.sdk,
-      };
-    } else if (job.sdk == 'dev') {
-      withMap = {'release-channel': 'dev'};
-    } else if (job.sdk == 'stable') {
-      withMap = {'release-channel': 'stable', 'version': 'latest'};
-    } else {
-      throw UnsupportedError(
-        'Unsupported Dart SDK configuration: `${job.sdk}`.',
-      );
-    }
-
-    final map = {
-      'uses': 'cedx/setup-dart@v2',
-      'with': withMap,
-    };
-
-    return map;
-  }
-
   MapEntry<String, Map<String, dynamic>> jobYaml([List<String> packages]) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 
-    return MapEntry(_replace(_jobName(packages)), {
-      'name': _jobName(packages),
-      'runs-on': _githubJobOs,
-      'steps': [
-        _dartSetup,
-        {'run': 'dart --version'},
-        {'uses': 'actions/checkout@v2'},
-        {
-          'env': {
-            'PKGS': packages.join(' '),
-            'TRAVIS_OS_NAME': job.os,
-          },
-          'run': '$ciScriptPath ${commands.join(' ')}',
-        },
-      ],
-    });
+    return _githubJobYaml(
+      _jobName(packages),
+      _githubJobOs,
+      job.sdk,
+      {
+        '$ciScriptPath ${commands.join(' ')}': {
+          'PKGS': packages.join(' '),
+          'TRAVIS_OS_NAME': job.os,
+        }
+      },
+    );
   }
 }
+
+Map<String, dynamic> _createDartSetup(String sdk) {
+  Map<String, String> withMap;
+
+  Version realVersion;
+
+  try {
+    realVersion = Version.parse(sdk);
+  } on FormatException {
+    // noop
+  }
+
+  if (realVersion != null) {
+    if (realVersion.isPreRelease) {
+      throw UnsupportedError(
+        'Unsupported Dart SDK configuration: `$sdk`.',
+      );
+    }
+    withMap = {
+      'release-channel': 'stable',
+      'version': sdk,
+    };
+  } else if (sdk == 'dev') {
+    withMap = {'release-channel': 'dev'};
+  } else if (sdk == 'stable') {
+    withMap = {'release-channel': 'stable', 'version': 'latest'};
+  } else {
+    throw UnsupportedError(
+      'Unsupported Dart SDK configuration: `$sdk`.',
+    );
+  }
+
+  final map = {
+    'uses': 'cedx/setup-dart@v2',
+    'with': withMap,
+  };
+
+  return map;
+}
+
+MapEntry<String, Map<String, dynamic>> _githubJobYaml(
+        String jobName,
+        String jobOs,
+        String dartVersion,
+        Map<String, Map<String, dynamic>> runCommands) =>
+    MapEntry(_replace(jobName), {
+      'name': jobName,
+      'runs-on': jobOs,
+      'steps': [
+        _createDartSetup(dartVersion),
+        {'run': 'dart --version'},
+        {'uses': 'actions/checkout@v2'},
+        for (var command in runCommands.entries)
+          {
+            if (command.value != null && command.value.isNotEmpty)
+              'env': command.value,
+            'run': command.key
+          },
+      ],
+    });
+
+MapEntry<String, Map<String, dynamic>> _selfValidateTaskConfig() =>
+    _githubJobYaml(selfValidateJobName, 'ubuntu-latest', 'stable', {
+      for (var command in selfValidateCommands) command: null,
+    });
