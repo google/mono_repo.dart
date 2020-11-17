@@ -13,15 +13,39 @@ import 'shared.dart';
 
 void main() {
   group('special cases', () {
-    _testRoundTrip('cool_beans', expectedEncoding: 'cool_beans');
-    _testRoundTrip('cool-beans', expectedEncoding: 'cool-beans');
-    _testRoundTrip('Cool-Beans', expectedEncoding: 'Cool-Beans');
-    _testRoundTrip('cool beans', expectedEncoding: 'cool beans');
-    _testRoundTrip('cool beans-', expectedEncoding: '"cool beans-"');
-    _testRoundTrip('-cool beans', expectedEncoding: '"-cool beans"');
-    _testRoundTrip(
+    for (var entry in [
+      'cool_beans',
+      'cool-beans',
+      'Cool-Beans',
+      'cool beans',
+      'cool beans-',
+      'dart --version',
+      'one space two  spaces',
       'actions/checkout@v2',
-      expectedEncoding: 'actions/checkout@v2',
+      'pub global activate mono_repo 3.1.0-beta.2-dev',
+      'pub global run mono_repo generate --validate',
+    ]) {
+      _testRoundTrip(entry, expectedEncoding: entry);
+    }
+
+    _testRoundTrip('-cool beans', expectedEncoding: '"-cool beans"');
+    _testRoundTrip('dart --version ', expectedEncoding: '"dart --version "');
+
+    _testRoundTrip(
+      {
+        'on': {
+          'push': {
+            'branches': [r'$default-branch']
+          },
+          'pull_request': null,
+        },
+      },
+      expectedEncoding: r'''
+on:
+  push:
+    branches:
+      - $default-branch
+  pull_request:''',
     );
   });
 

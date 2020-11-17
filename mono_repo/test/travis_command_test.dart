@@ -332,7 +332,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -434,7 +434,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
     - /some_repo_root_dir
     - pkg_a/.dart_tool
     - pkg_b/.dart_tool
@@ -568,7 +568,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
 ''').validate();
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
@@ -1125,7 +1125,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
 ''').validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
@@ -1429,7 +1429,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
 '''
                 ]))
             .validate();
@@ -1473,7 +1473,7 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
 '''
                 ]))
             .validate();

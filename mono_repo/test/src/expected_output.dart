@@ -194,5 +194,5 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
 ''';

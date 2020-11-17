@@ -63,5 +63,5 @@ branches:
 
 cache:
   directories:
-    - "$HOME/.pub-cache"
+    - $HOME/.pub-cache
     - mono_repo/.dart_tool/build
