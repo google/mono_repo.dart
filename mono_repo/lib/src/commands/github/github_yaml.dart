@@ -149,6 +149,7 @@ extension on CIJobEntry {
         'runs-on': _githubJobOs,
         'steps': [
           _dartSetup,
+          {'run': 'dart --version'},
           {'uses': 'actions/checkout@v2'},
           {
             'env': {
