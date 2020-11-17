@@ -923,8 +923,8 @@ travis:
       if: type IN (api, cron)
     - d
   branches:
-  only:
-    - master
+    only:
+      - master
 
 merge_stages:
 - analyze_and_format
