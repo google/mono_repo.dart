@@ -1,3 +1,7 @@
+// Copyright (c) 2020, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 import 'dart:collection';
 
 import 'package:collection/collection.dart' hide stronglyConnectedComponents;
@@ -8,9 +12,9 @@ import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
-import '../../version.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
+import '../shared.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,
@@ -238,8 +242,7 @@ extension on CIJobEntry {
 
 Map<String, String> _selfValidateTaskConfig(String stageName) => {
       'stage': stageName,
-      'name': 'mono_repo self validate',
+      'name': selfValidateJobName,
       'os': 'linux',
-      'script': 'pub global activate mono_repo $packageVersion && '
-          'pub global run mono_repo generate --validate'
+      'script': selfValidateCommands.join(' && ')
     };

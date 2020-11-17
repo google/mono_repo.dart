@@ -4,6 +4,7 @@
   * Support `stable` as a valid Dart SDK label.
   * Use `[$default-branch]` instead of `[master]`.
   * Prints the Dart SDK version after installation.
+  * Now supports `self_validate`.
 
 ## 3.1.0-beta.1
 
