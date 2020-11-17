@@ -93,12 +93,10 @@ stages:
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
-  only:
-    - master
+  only: [master]
 
 cache:
-  directories:
-    - "\$HOME/.pub-cache"
+  directories: [\$HOME/.pub-cache]
 ''';
 
 final _travisSh = '''

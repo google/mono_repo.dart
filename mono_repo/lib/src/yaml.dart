@@ -91,10 +91,31 @@ String toYaml(Object source) {
   return buffer.toString();
 }
 
-final _simpleDashedEntry = RegExp(r'^[a-zA-Z][a-zA-Z0-9\-\@\/]*$');
+final _trivialSymbols = {'-', '@', '_', '/', '.'}.map(RegExp.escape).join();
+
+// Characters that are okay to end a String starting with [a-zA-Z]
+final _trivialSection = 'a-zA-Z\$0-9$_trivialSymbols';
+
+final _trivialString = RegExp(
+  // A String starting with [a-zA-Z]
+  r'^[a-zA-Z$]'
+  // Starting a non-capture group
+  '(?:'
+  // One of...
+  // (a) [_trivialSection or space]+ followed by a _trivialSection
+  '(?:[$_trivialSection ]+[$_trivialSection])'
+  // or
+  '|'
+  // (b) any number of _trivialSection
+  '(?:[$_trivialSection]*)'
+  // End parent capture group
+  ')'
+  // End String
+  r'$',
+);
 
 bool _isSimpleString(String input) =>
-    _simpleDashedEntry.hasMatch(input) || _simpleString.hasMatch(input);
+    _trivialString.hasMatch(input) || _simpleString.hasMatch(input);
 
 String _escapeString(String source) {
   if (_isSimpleString(source) &&
@@ -160,7 +181,9 @@ void _writeYaml(
           first = false;
         }
 
-        if (_isSimple(entry.value)) {
+        if (entry.value == null) {
+          // skip it!
+        } else if (_isSimple(entry.value)) {
           buffer.write(' ');
           _writeYaml(buffer, entry.value, 0, _ParentType.map);
         } else {
@@ -178,6 +201,15 @@ void _writeYaml(
         buffer.write(' ');
       }
       buffer.write('[]');
+    } else if (source.length == 1 && _isSimple(source.single)) {
+      // Write out 1-element, simple arrays compactly
+      if (parentType == _ParentType.map) {
+        // Need to ensure there is a space after the map `key:`
+        buffer.write(' ');
+      }
+      buffer.write('[');
+      _writeYaml(buffer, source.single, 0, _ParentType.list);
+      buffer.write(']');
     } else {
       var first = true;
       for (var item in source) {
@@ -209,10 +241,10 @@ void _writeYaml(
 ///
 /// See http://yaml.org/spec/1.2/spec.html#id2805071
 /// `...` is from http://yaml.org/spec/1.2/spec.html#id2760395
-const _yamlSpecialStrings = ['true', 'false', 'null', '...', 'yes', 'no'];
+const _yamlSpecialStrings = {'true', 'false', 'null', '...', 'yes', 'no'};
 
 /// See http://yaml.org/spec/1.2/spec.html#id2772075
-final _yamlIndicators = [
+final _yamlIndicators = {
   '-',
   '?',
   ':',
@@ -231,7 +263,7 @@ final _yamlIndicators = [
   '%',
   '@',
   '`',
-].map(RegExp.escape).join();
+}.map(RegExp.escape).join();
 
 final _simpleString =
     RegExp('^[^${_yamlIndicators}0-9"~][^$_yamlIndicators]*\$');
