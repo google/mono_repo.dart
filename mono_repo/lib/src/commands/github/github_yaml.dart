@@ -16,8 +16,8 @@ String generateGitHubYml(
   final jobs = rootConfig.expand((config) => config.jobs);
 
   final jobList = Map<String, dynamic>.fromEntries(
-      _listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages)
-          .map((e) => e.entries.single));
+    _listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+  );
 
   return '''
 ${createdWith()}${toYaml({'name': 'Dart CI'})}
@@ -36,7 +36,7 @@ ${toYaml({'jobs': jobList})}
 }
 
 /// Lists all the jobs, setting their stage, environment, and script.
-Iterable<Map<String, dynamic>> _listJobs(
+Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   Iterable<CIJob> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
@@ -138,28 +138,26 @@ extension on CIJobEntry {
     return map;
   }
 
-  Map<String, dynamic> jobYaml([List<String> packages]) {
+  MapEntry<String, Map<String, dynamic>> jobYaml([List<String> packages]) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 
-    return {
-      _replace(_jobName(packages)): {
-        'name': _jobName(packages),
-        'runs-on': _githubJobOs,
-        'steps': [
-          _dartSetup,
-          {'run': 'dart --version'},
-          {'uses': 'actions/checkout@v2'},
-          {
-            'env': {
-              'PKGS': packages.join(' '),
-              'TRAVIS_OS_NAME': job.os,
-            },
-            'run': '$ciScriptPath ${commands.join(' ')}',
+    return MapEntry(_replace(_jobName(packages)), {
+      'name': _jobName(packages),
+      'runs-on': _githubJobOs,
+      'steps': [
+        _dartSetup,
+        {'run': 'dart --version'},
+        {'uses': 'actions/checkout@v2'},
+        {
+          'env': {
+            'PKGS': packages.join(' '),
+            'TRAVIS_OS_NAME': job.os,
           },
-        ],
-      }
-    };
+          'run': '$ciScriptPath ${commands.join(' ')}',
+        },
+      ],
+    });
   }
 }
