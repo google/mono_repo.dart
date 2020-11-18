@@ -19,14 +19,14 @@ import 'shared.dart';
 void main() {
   test('validate readme content', () {
     final readmeContent = File('README.md').readAsStringSync();
-    expect(readmeContent, contains(_yamlWrap(_pkgConfig)));
-    expect(readmeContent, contains(_yamlWrap(_repoConfig)));
+    expect(readmeContent.replaceAll('/r', ''), contains(_yamlWrap(_pkgYaml)));
+    expect(readmeContent.replaceAll('/r', ''), contains(_yamlWrap(_repoYaml)));
   });
 
   test('validate readme example output', () async {
-    await d.file('mono_repo.yaml', _repoConfig).create();
+    await d.file('mono_repo.yaml', _repoYaml).create();
     await d.dir('sub_pkg', [
-      d.file(monoPkgFileName, _pkgConfig),
+      d.file(monoPkgFileName, _pkgYaml),
       d.file('pubspec.yaml', '''
 name: sub_pkg
 ''')
@@ -52,7 +52,7 @@ name: sub_pkg
 
 String _yamlWrap(String content) => '```yaml\n$content```';
 
-const _repoConfig = r'''
+const _repoYaml = r'''
 # Adds a job that runs `mono_repo generate --validate` to check that everything
 # is up to date.
 self_validate: true
@@ -63,7 +63,7 @@ github:
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
 ''';
 
-const _pkgConfig = r'''
+const _pkgYaml = r'''
 # This key is required. It specifies the Dart SDKs your tests will run under
 # You can provide one or more value.
 # See https://docs.travis-ci.com/user/languages/dart#choosing-dart-versions-to-test-against
