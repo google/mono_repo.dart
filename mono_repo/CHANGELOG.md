@@ -1,3 +1,9 @@
+## 3.1.0-beta.3
+
+* GitHub actions:
+  * Change default branches to be `['master', 'main']`.
+    `$default-branch` is for templates.
+
 ## 3.1.0-beta.2
 
 * GitHub actions:

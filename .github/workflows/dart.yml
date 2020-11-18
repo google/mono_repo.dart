@@ -1,9 +1,10 @@
-# Created with package:mono_repo v3.1.0-beta.2
+# Created with package:mono_repo v3.1.0-beta.3
 name: Dart CI
 on:
   push:
     branches:
-      - $default-branch
+      - main
+      - master
   pull_request:
   schedule:
     - cron: "0 0 * * 0"

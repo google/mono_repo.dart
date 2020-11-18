@@ -54,7 +54,10 @@ Map<String, dynamic> _parseOn(Map<String, dynamic> on, String cron) {
 
 const _defaultOn = {
   'push': {
-    'branches': [r'$default-branch']
+    'branches': [
+      'main',
+      'master',
+    ]
   },
   // A `null` value here means all pull requests are processed by this workflow.
   'pull_request': null,
