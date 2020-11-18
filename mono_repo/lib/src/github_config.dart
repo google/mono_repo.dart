@@ -10,7 +10,7 @@ part 'github_config.g.dart';
 class GitHubConfig {
   final Map<String, dynamic> on;
 
-  // This is currently just to make JsonSerializable happy – need to fix!
+  // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
   GitHubConfig(Map<String, dynamic> on, String cron) : on = _parseOn(on, cron);
@@ -55,5 +55,6 @@ const _defaultOn = {
   'push': {
     'branches': [r'$default-branch']
   },
+  // A `null` value here means all pull requests are processed by this workflow.
   'pull_request': null,
 };

@@ -142,35 +142,28 @@ class MonoConfig {
       if (json.containsKey('github')) CI.github,
     };
 
-    final travis = json['travis'] ?? {};
+    Map parseCI(CI targetCI) {
+      final key = targetCI.toString().split('.').last;
+      final value = json[key] ?? {};
 
-    if (travis is bool) {
-      if (!travis) {
-        ci.remove(CI.travis);
+      if (value is bool) {
+        if (!value) {
+          ci.remove(targetCI);
+        }
+      } else if (value is! Map) {
+        throw CheckedFromJsonException(
+          json,
+          key,
+          'MonoConfig',
+          '`$key` must be a Map.',
+        );
       }
-    } else if (travis is! Map) {
-      throw CheckedFromJsonException(
-        json,
-        'travis',
-        'MonoConfig',
-        '`travis` must be a Map.',
-      );
+
+      return value as Map;
     }
 
-    final github = json['github'] ?? {};
-
-    if (github is bool) {
-      if (!github) {
-        ci.remove(CI.github);
-      }
-    } else if (github is! Map) {
-      throw CheckedFromJsonException(
-        json,
-        'github',
-        'MonoConfig',
-        '`github` must be a Map.',
-      );
-    }
+    final travis = parseCI(CI.travis);
+    final github = parseCI(CI.github);
 
     final selfValidate = json['self_validate'] ?? false;
     if (selfValidate is! bool && selfValidate is! String) {
@@ -221,8 +214,8 @@ class MonoConfig {
         prettyAnsi: prettyAnsi as bool,
         pubAction: pubAction as String,
         selfValidateStage: _selfValidateFromValue(selfValidate),
-        travis: travis as Map,
-        github: github as Map,
+        travis: travis,
+        github: github,
       );
     } else {
       throw CheckedFromJsonException(
