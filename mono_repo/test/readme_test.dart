@@ -19,8 +19,8 @@ import 'shared.dart';
 void main() {
   test('validate readme content', () {
     final readmeContent = File('README.md').readAsStringSync();
-    expect(readmeContent, contains(_pkgConfig));
-    expect(readmeContent, contains(_repoConfig));
+    expect(readmeContent, contains(_yamlWrap(_pkgConfig)));
+    expect(readmeContent, contains(_yamlWrap(_repoConfig)));
   });
 
   test('validate readme example output', () async {
@@ -49,6 +49,8 @@ name: sub_pkg
     ]).validate();
   });
 }
+
+String _yamlWrap(String content) => '```yaml\n$content```';
 
 const _repoConfig = r'''
 # Adds a job that runs `mono_repo generate --validate` to check that everything
