@@ -18,9 +18,12 @@ import 'shared.dart';
 
 void main() {
   test('validate readme content', () {
-    final readmeContent = File('README.md').readAsStringSync();
-    expect(readmeContent.replaceAll('/r', ''), contains(_yamlWrap(_pkgYaml)));
-    expect(readmeContent.replaceAll('/r', ''), contains(_yamlWrap(_repoYaml)));
+    final readmeContent = File('README.md')
+        .readAsStringSync()
+        // For Windows tests
+        .replaceAll('\r', '');
+    expect(readmeContent, contains(_yamlWrap(_pkgYaml)));
+    expect(readmeContent, contains(_yamlWrap(_repoYaml)));
   });
 
   test('validate readme example output', () async {
