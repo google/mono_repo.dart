@@ -46,7 +46,7 @@ class TravisCommand extends MonoRepoCommand {
 /// Thrown if generated config does not match existing config when running with
 /// the `--validate` option.
 class CIConfigMismatchException extends UserException {
-  CIConfigMismatchException(List<CI> rootCIConfig)
+  CIConfigMismatchException(Set<CI> rootCIConfig)
       : super(
           'This command can only be used if your mono_repo.yml config '
           'does not configure other CI providers. Use the `generate` command '
@@ -57,7 +57,10 @@ class CIConfigMismatchException extends UserException {
 
 /// Checks that the root CI config includes exactly one provider, travis.
 void _checkCIConfig(RootConfig rootConfig) {
-  if (rootConfig.monoConfig.ci != [CI.travis]) {
-    throw CIConfigMismatchException(rootConfig.monoConfig.ci);
+  final ci = rootConfig.monoConfig.ci;
+
+  if (ci.length == 1 && ci.single == CI.travis) {
+    return;
   }
+  throw CIConfigMismatchException(ci);
 }

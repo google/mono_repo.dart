@@ -28,16 +28,7 @@ String generateGitHubYml(
   ]);
 
   return '''
-${createdWith()}${toYaml({'name': 'Dart CI'})}
-
-on:
-  push:
-    branches: [\$default-branch]
-  pull_request:
-
-defaults:
-  run:
-    shell: bash
+${createdWith()}${toYaml(rootConfig.monoConfig.github.generate())}
 
 ${toYaml({'jobs': jobList})}
 ''';
