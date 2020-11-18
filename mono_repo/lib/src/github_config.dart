@@ -22,7 +22,8 @@ class GitHubConfig {
         if (on != null) 'on': on,
         'defaults': {
           'run': {'shell': 'bash'}
-        }
+        },
+        'env': {'PUB_ENVIRONMENT': 'bot.github'},
       };
 }
 

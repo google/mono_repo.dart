@@ -138,6 +138,8 @@ on:
 defaults:
   run:
     shell: bash
+env:
+  PUB_ENVIRONMENT: bot.github
 
 jobs:
   job_001:
