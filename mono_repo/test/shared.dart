@@ -8,13 +8,14 @@ import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
-import 'package:mono_repo/src/commands/travis/generate.dart';
+import 'package:mono_repo/src/commands/generate.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
+// TODO: rename this to `generateConfig` or similar – it's not just for Travis
 void testGenerateTravisConfig({
   bool validateOnly = false,
   Object printMatcher,
@@ -31,12 +32,7 @@ void testGenerateTravisConfig({
         false,
         () {
           final config = RootConfig(rootDirectory: d.sandbox);
-          logPackages(config);
-          generateTravisConfig(
-            config,
-            validateOnly: validateOnly,
-          );
-          generateCIScript(config, validateOnly: validateOnly);
+          generate(config, validateOnly, forceTravis: true);
         },
       ),
     );

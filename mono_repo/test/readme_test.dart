@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:mono_repo/src/ci_test_script.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
+import 'package:mono_repo/src/commands/github/generate.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:test/test.dart';
@@ -18,10 +19,12 @@ import 'shared.dart';
 void main() {
   test('validate readme content', () {
     final readmeContent = File('README.md').readAsStringSync();
-    expect(readmeContent.replaceAll('\r', ''), contains(_pkgConfig));
+    expect(readmeContent, contains(_pkgConfig));
+    expect(readmeContent, contains(_repoConfig));
   });
 
   test('validate readme example output', () async {
+    await d.file('mono_repo.yaml', _repoConfig).create();
     await d.dir('sub_pkg', [
       d.file(monoPkgFileName, _pkgConfig),
       d.file('pubspec.yaml', '''
@@ -41,10 +44,22 @@ name: sub_pkg
 
     await d.dir('.', [
       d.file(travisFileName, _travisYml),
-      d.file(ciScriptPath, _travisSh)
+      d.file(ciScriptPath, _travisSh),
+      d.file(githubActionYamlPath, _githubYamlContent),
     ]).validate();
   });
 }
+
+const _repoConfig = r'''
+# Adds a job that runs `mono_repo generate --validate` to check that everything
+# is up to date.
+self_validate: true
+# This would enable both CI configurations, you probably only want one though.
+travis:
+github:
+  # Setting just `cron` keeps the defaults for `push` and `pull_request`
+  cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
+''';
 
 const _pkgConfig = r'''
 # This key is required. It specifies the Dart SDKs your tests will run under
@@ -63,11 +78,15 @@ stages:
     - test
 ''';
 
-const _travisYml = '''
+const _travisYml = r'''
 language: dart
 
 jobs:
   include:
+    - stage: mono_repo_self_validate
+      name: mono_repo self validate
+      os: linux
+      script: "pub global activate mono_repo 3.1.0-beta.2 && pub global run mono_repo generate --validate"
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
       dart: dev
@@ -88,6 +107,7 @@ jobs:
       script: tool/ci.sh test
 
 stages:
+  - mono_repo_self_validate
   - analyze
   - unit_test
 
@@ -98,7 +118,74 @@ branches:
 
 cache:
   directories:
-    - \$HOME/.pub-cache
+    - $HOME/.pub-cache
+''';
+
+const _githubYamlContent = r'''
+name: Dart CI
+on:
+  push:
+    branches:
+      - $default-branch
+  pull_request:
+  schedule:
+    - cron: "0 0 * * 0"
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  job_001:
+    name: mono_repo self validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: stable
+          version: latest
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - run: pub global activate mono_repo 3.1.0-beta.2
+      - run: pub global run mono_repo generate --validate
+  job_002:
+    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: sub_pkg
+          TRAVIS_OS_NAME: linux
+        run: tool/ci.sh dartanalyzer
+  job_003:
+    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: sub_pkg
+          TRAVIS_OS_NAME: linux
+        run: tool/ci.sh dartfmt
+  job_004:
+    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: sub_pkg
+          TRAVIS_OS_NAME: linux
+        run: tool/ci.sh test
 ''';
 
 final _travisSh = '''

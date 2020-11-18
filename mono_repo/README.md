@@ -49,9 +49,9 @@ To start, you should create a `mono_repo.yaml` file at the root of your repo.
 
 This controls repo wide configuration.
 
-One option  you likely want to configure is which CI providers  you want to
+One option you likely want to configure is which CI providers you want to
 generate config for. Today both `travis` and `github` are supported, and
-can be configured under the `ci` key.
+can be configured by adding corresponding entries.
 
 You probably also want to enable the `self_validate` option, which will add a
 job to ensure that your configuration is up to date.
@@ -63,9 +63,10 @@ So, an example config might look like this:
 # is up to date.
 self_validate: true
 # This would enable both CI configurations, you probably only want one though.
-ci:
-  - travis
-  - github
+travis:
+github:
+  # Setting just `cron` keeps the defaults for `push` and `pull_request`
+  cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
 ```
 
 ### Adding a package config
