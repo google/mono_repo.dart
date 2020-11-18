@@ -91,7 +91,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 3.1.0-beta.2 && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 3.1.0-beta.3 && pub global run mono_repo generate --validate"
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
       dart: dev
@@ -131,7 +131,8 @@ name: Dart CI
 on:
   push:
     branches:
-      - $default-branch
+      - main
+      - master
   pull_request:
   schedule:
     - cron: "0 0 * * 0"
@@ -152,7 +153,7 @@ jobs:
           version: latest
       - run: dart --version
       - uses: actions/checkout@v2
-      - run: pub global activate mono_repo 3.1.0-beta.2
+      - run: pub global activate mono_repo 3.1.0-beta.3
       - run: pub global run mono_repo generate --validate
   job_002:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"

@@ -1,3 +1,9 @@
+## 3.1.0-beta.3
+
+* GitHub actions:
+  * Changing default branches while tracking down an issue with
+    `$default-branch`.
+
 ## 3.1.0-beta.2
 
 * GitHub actions:
