@@ -57,7 +57,10 @@ class CIConfigMismatchException extends UserException {
 
 /// Checks that the root CI config includes exactly one provider, travis.
 void _checkCIConfig(RootConfig rootConfig) {
-  if (rootConfig.monoConfig.ci != {CI.travis}) {
-    throw CIConfigMismatchException(rootConfig.monoConfig.ci);
+  final ci = rootConfig.monoConfig.ci;
+
+  if (ci.length == 1 && ci.single == CI.travis) {
+    return;
   }
+  throw CIConfigMismatchException(ci);
 }
