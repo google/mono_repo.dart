@@ -665,16 +665,6 @@ $lines
   });
 
   group('mono_repo.yaml', () {
-    Future populateConfig(String monoRepoContent) async {
-      await d.file('mono_repo.yaml', monoRepoContent).create();
-      await d.dir('sub_pkg', [
-        d.file(monoPkgFileName, testConfig2),
-        d.file('pubspec.yaml', '''
-name: pkg_name
-      ''')
-      ]).create();
-    }
-
     Future<void> validConfig(
       String monoRepoContent,
       Object expectedTravisContent,

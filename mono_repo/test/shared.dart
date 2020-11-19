@@ -10,11 +10,22 @@ import 'package:meta/meta.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/generate.dart';
+import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+
+Future<void> populateConfig(String monoRepoContent) async {
+  await d.file('mono_repo.yaml', monoRepoContent).create();
+  await d.dir('sub_pkg', [
+    d.file(monoPkgFileName, testConfig2),
+    d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+  ]).create();
+}
 
 void testGenerateTravisConfig({
   bool validateOnly = false,

@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:async';
-
 import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
@@ -18,16 +16,6 @@ void main() {
   glyph.ascii = false;
 
   group('mono_repo.yaml', () {
-    Future populateConfig(String monoRepoContent) async {
-      await d.file('mono_repo.yaml', monoRepoContent).create();
-      await d.dir('sub_pkg', [
-        d.file(monoPkgFileName, testConfig2),
-        d.file('pubspec.yaml', '''
-name: pkg_name
-      ''')
-      ]).create();
-    }
-
     group('stages', () {
       test('must be a list', () async {
         final monoConfigContent = toYaml({
