@@ -20,8 +20,6 @@ String generateTravisYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
-  validateRootConfig(rootConfig);
-
   final orderedStages = _calculateOrderedStages(rootConfig);
 
   final jobs = rootConfig.expand((config) => config.jobs);

@@ -10,18 +10,40 @@ import 'package:meta/meta.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/generate.dart';
+import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-// TODO: rename this to `generateConfig` or similar – it's not just for Travis
+Future<void> populateConfig(String monoRepoContent) async {
+  await d.file('mono_repo.yaml', monoRepoContent).create();
+  await d.dir('sub_pkg', [
+    d.file(monoPkgFileName, testConfig2),
+    d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+  ]).create();
+}
+
 void testGenerateTravisConfig({
   bool validateOnly = false,
   Object printMatcher,
 }) =>
     testGenerateConfig(
+      forceTravis: true,
+      forceGitHub: false,
+      validateOnly: validateOnly,
+      printMatcher: printMatcher,
+    );
+
+void testGenerateBothConfig({
+  bool validateOnly = false,
+  Object printMatcher,
+}) =>
+    testGenerateConfig(
+      forceGitHub: true,
       forceTravis: true,
       validateOnly: validateOnly,
       printMatcher: printMatcher,
@@ -29,6 +51,7 @@ void testGenerateTravisConfig({
 
 void testGenerateConfig({
   @required bool forceTravis,
+  @required bool forceGitHub,
   bool validateOnly = false,
   Object printMatcher,
 }) {
@@ -44,7 +67,12 @@ void testGenerateConfig({
         false,
         () {
           final config = RootConfig(rootDirectory: d.sandbox);
-          generate(config, validateOnly, forceTravis: forceTravis);
+          generate(
+            config,
+            validateOnly,
+            forceTravis: forceTravis,
+            forceGitHub: forceGitHub,
+          );
         },
       ),
     );

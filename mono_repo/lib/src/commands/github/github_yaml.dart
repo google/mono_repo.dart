@@ -17,8 +17,6 @@ String generateGitHubYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
-  validateRootConfig(rootConfig);
-
   final jobs = rootConfig.expand((config) => config.jobs);
 
   final jobList = Map.fromEntries([
@@ -98,6 +96,7 @@ extension on CIJobEntry {
         return 'ubuntu-latest';
       case 'windows':
         return 'windows-latest';
+      case 'osx':
       case 'macos':
         return 'macos-latest';
     }
