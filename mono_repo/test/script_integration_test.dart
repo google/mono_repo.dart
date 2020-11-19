@@ -2,7 +2,8 @@
 import 'dart:io';
 
 import 'package:meta/meta.dart';
-import 'package:mono_repo/src/commands/travis/generate.dart';
+import 'package:mono_repo/src/commands/travis/generate.dart'
+    show travisFileName;
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -142,7 +143,7 @@ void _registerTest(
   test(name, () async {
     // Make sure we're executing from the right directory!
     await d
-        .file('test/travis_integration_test.dart', isNotEmpty)
+        .file('test/script_integration_test.dart', isNotEmpty)
         .validate(p.current);
 
     final proc = await TestProcess.start(
@@ -166,7 +167,7 @@ void _registerTest(
 
     final outputFile = File(p.join(
       'test',
-      'travis_integration_outputs',
+      'script_integration_outputs',
       fileName,
     ));
 
