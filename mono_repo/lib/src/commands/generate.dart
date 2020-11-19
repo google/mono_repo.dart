@@ -35,8 +35,10 @@ void generate(
   RootConfig config,
   bool validateOnly, {
   bool forceTravis = false,
+  bool forceGitHub = false,
 }) {
   logPackages(config);
+  validateRootConfig(config);
   for (var ci in config.monoConfig.ci) {
     switch (ci) {
       case CI.github:
@@ -49,6 +51,9 @@ void generate(
   }
   if (!config.monoConfig.ci.contains(CI.travis) && forceTravis) {
     generateTravisConfig(config, validateOnly: validateOnly);
+  }
+  if (!config.monoConfig.ci.contains(CI.github) && forceGitHub) {
+    generateGitHubActions(config, validateOnly: validateOnly);
   }
   generateCIScript(config, validateOnly: validateOnly);
 }

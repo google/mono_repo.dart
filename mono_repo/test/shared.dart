@@ -16,12 +16,23 @@ import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
-// TODO: rename this to `generateConfig` or similar – it's not just for Travis
 void testGenerateTravisConfig({
   bool validateOnly = false,
   Object printMatcher,
 }) =>
     testGenerateConfig(
+      forceTravis: true,
+      forceGitHub: false,
+      validateOnly: validateOnly,
+      printMatcher: printMatcher,
+    );
+
+void testGenerateBothConfig({
+  bool validateOnly = false,
+  Object printMatcher,
+}) =>
+    testGenerateConfig(
+      forceGitHub: true,
       forceTravis: true,
       validateOnly: validateOnly,
       printMatcher: printMatcher,
@@ -29,6 +40,7 @@ void testGenerateTravisConfig({
 
 void testGenerateConfig({
   @required bool forceTravis,
+  @required bool forceGitHub,
   bool validateOnly = false,
   Object printMatcher,
 }) {
@@ -44,7 +56,12 @@ void testGenerateConfig({
         false,
         () {
           final config = RootConfig(rootDirectory: d.sandbox);
-          generate(config, validateOnly, forceTravis: forceTravis);
+          generate(
+            config,
+            validateOnly,
+            forceTravis: forceTravis,
+            forceGitHub: forceGitHub,
+          );
         },
       ),
     );
