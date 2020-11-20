@@ -25,7 +25,7 @@ Map<String, String> generateGitHubYml(
     jobs.add(SelfValidateJob(selfValidateStage));
   }
 
-  final allJobStages = jobs.map((e) => e.stageName).toSet();
+  final allJobStages = { for (var job in jobs) job.stageName};
 
   final output = <String, String>{};
 
