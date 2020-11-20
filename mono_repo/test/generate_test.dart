@@ -720,54 +720,44 @@ jobs:
       );
     });
 
-    test('only supports a travis key', () async {
-      final monoConfigContent = toYaml({
+    test(
+      'disallows unsupported keys',
+      () => _testBadConfig({
         'other': {'stages': 5}
-      });
-      await populateConfig(monoConfigContent);
-      expect(
-        testGenerateBothConfig,
-        throwsAParsedYamlException(r'''
+      }, r'''
 line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `travis` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
   ╵'''),
-      );
-    });
+    );
 
     group('merge_stages', () {
-      test('must be a list', () async {
-        final monoConfigContent = toYaml({
-          'merge_stages': {'stages': 5}
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateBothConfig,
-          throwsAParsedYamlException(
-            startsWith(
-              'line 2, column 3 of mono_repo.yaml: Unsupported value for '
-              '"merge_stages". `merge_stages` must be an array.',
-            ),
+      test(
+        'must be a list',
+        () => _testBadConfig(
+          {
+            'merge_stages': {'stages': 5}
+          },
+          startsWith(
+            'line 2, column 3 of mono_repo.yaml: Unsupported value for '
+            '"merge_stages". `merge_stages` must be an array.',
           ),
-        );
-      });
+        ),
+      );
 
-      test('must be String items', () async {
-        final monoConfigContent = toYaml({
-          'merge_stages': [5]
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateBothConfig,
-          throwsAParsedYamlException(
-            startsWith(
-              'line 2, column 3 of mono_repo.yaml: Unsupported value for '
-              '"merge_stages". All values must be strings.',
-            ),
+      test(
+        'must be String items',
+        () => _testBadConfig(
+          {
+            'merge_stages': [5]
+          },
+          startsWith(
+            'line 2, column 3 of mono_repo.yaml: Unsupported value for '
+            '"merge_stages". All values must be strings.',
           ),
-        );
-      });
+        ),
+      );
 
       test('must match a configured stage from pkg_config', () async {
         final monoConfigContent = toYaml({
@@ -890,35 +880,27 @@ cache:
     });
 
     group('pub_action', () {
-      test('value must be a String', () async {
-        final monoConfigContent = toYaml({'pub_action': 42});
-        await populateConfig(monoConfigContent);
-
-        expect(
-          testGenerateBothConfig,
-          throwsAParsedYamlException(r'''
+      test(
+        'value must be a String',
+        () => _testBadConfig({
+          'pub_action': 42,
+        }, r'''
 line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
   ╷
 1 │ pub_action: 42
   │             ^^
   ╵'''),
-        );
-      });
+      );
 
-      test('value must be in allowed list', () async {
-        final monoConfigContent = toYaml({'pub_action': 'bob'});
-        await populateConfig(monoConfigContent);
-
-        expect(
-          testGenerateBothConfig,
-          throwsAParsedYamlException(r'''
+      test(
+        'value must be in allowed list',
+        () => _testBadConfig({'pub_action': 'bob'}, r'''
 line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
   ╷
 1 │ pub_action: bob
   │             ^^^
   ╵'''),
-        );
-      });
+      );
 
       test('upgrade', () async {
         final monoConfigContent = toYaml({'pub_action': 'upgrade'});
@@ -957,20 +939,15 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
     });
 
     group('pretty_ansi', () {
-      test('value must be bool', () async {
-        final monoConfigContent = toYaml({'pretty_ansi': 'not a bool!'});
-        await populateConfig(monoConfigContent);
-
-        expect(
-          testGenerateBothConfig,
-          throwsAParsedYamlException(r'''
+      test(
+        'value must be bool',
+        () => _testBadConfig({'pretty_ansi': 'not a bool!'}, r'''
 line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value must be `true` or `false`.
   ╷
 1 │ pretty_ansi: "not a bool!"
   │              ^^^^^^^^^^^^^
   ╵'''),
-        );
-      });
+      );
 
       test('set to false', () async {
         await populateConfig(toYaml({'pretty_ansi': false}));
@@ -1096,20 +1073,15 @@ fi
     });
 
     group('self_validate', () {
-      test('value must be bool or string', () async {
-        final monoConfigContent = toYaml({'self_validate': 42});
-        await populateConfig(monoConfigContent);
-
-        expect(
-          testGenerateBothConfig,
-          throwsAParsedYamlException(r'''
+      test(
+        'value must be bool or string',
+        () => _testBadConfig({'self_validate': 42}, r'''
 line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Value must be `true`, `false`, or a stage name.
   ╷
 1 │ self_validate: 42
   │                ^^
   ╵'''),
-        );
-      });
+      );
 
       test('set to `true`', () async {
         final monoConfigContent = toYaml({'self_validate': true});
@@ -1208,3 +1180,15 @@ String get _writeScriptOutput => '''
 Wrote `${p.join(d.sandbox, travisFileName)}`.
 Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 $ciScriptPathMessage''';
+
+Future<void> _testBadConfig(
+  Object monoRepoYaml,
+  Object expectedParsedYaml,
+) async {
+  final monoConfigContent = toYaml(monoRepoYaml);
+  await populateConfig(monoConfigContent);
+  expect(
+    testGenerateBothConfig,
+    throwsAParsedYamlException(expectedParsedYaml),
+  );
+}
