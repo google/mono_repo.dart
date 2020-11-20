@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
@@ -51,6 +52,18 @@ class CIJobEntry {
         'TASKS: ${job.name}';
   }
 }
+
+/// Group jobs by all of the values that would allow them to merge
+Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
+    groupBy<CIJobEntry, String>(
+        jobEntries,
+        (e) => [
+              e.job.os,
+              e.job.stageName,
+              e.job.sdk,
+              // TODO: sort these? Would merge jobs with different orders
+              e.commands,
+            ].join(':::'));
 
 void validateRootConfig(RootConfig rootConfig) {
   for (var config in rootConfig) {

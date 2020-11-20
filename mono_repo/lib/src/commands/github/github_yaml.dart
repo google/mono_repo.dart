@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:collection/collection.dart' hide stronglyConnectedComponents;
 import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -117,15 +116,7 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   }
 
   // Group jobs by all of the values that would allow them to merge
-  final groupedItems = groupBy<CIJobEntry, String>(
-      jobEntries,
-      (e) => [
-            e.job.os,
-            e.job.stageName,
-            e.job.sdk,
-            // TODO: sort these? Would merge jobs with different orders
-            e.commands,
-          ].join(':::'));
+  final groupedItems = groupCIJobEntries(jobEntries);
 
   for (var entry in groupedItems.entries) {
     final first = entry.value.first;

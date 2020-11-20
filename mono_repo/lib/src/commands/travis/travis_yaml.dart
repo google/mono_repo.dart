@@ -4,7 +4,6 @@
 
 import 'dart:collection';
 
-import 'package:collection/collection.dart' hide stronglyConnectedComponents;
 import 'package:graphs/graphs.dart';
 import 'package:path/path.dart' as p;
 
@@ -198,16 +197,7 @@ Iterable<Map<String, String>> _listJobs(
     jobEntries.add(CIJobEntry(job, commands));
   }
 
-  // Group jobs by all of the values that would allow them to merge
-  final groupedItems = groupBy<CIJobEntry, String>(
-      jobEntries,
-      (e) => [
-            e.job.os,
-            e.job.stageName,
-            e.job.sdk,
-            // TODO: sort these? Would merge jobs with different orders
-            e.commands,
-          ].join(':::'));
+  final groupedItems = groupCIJobEntries(jobEntries);
 
   for (var entry in groupedItems.entries) {
     final first = entry.value.first;
