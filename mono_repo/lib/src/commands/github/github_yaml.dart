@@ -12,17 +12,18 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
-import 'self_validate_job.dart';
 
 Map<String, String> generateGitHubYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
-  final jobs = rootConfig.expand((config) => config.jobs).toList();
+  final jobs = <HasStageName>[
+    ...rootConfig.expand((config) => config.jobs),
+  ];
 
   final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
   if (selfValidateStage != null) {
-    jobs.add(SelfValidateJob(selfValidateStage));
+    jobs.add(_SelfValidateJob(selfValidateStage));
   }
 
   final allJobStages = {for (var job in jobs) job.stageName};
@@ -32,7 +33,7 @@ Map<String, String> generateGitHubYml(
   void populateJobs(
     String fileName,
     String workflowName,
-    Iterable<CIJob> myJobs,
+    Iterable<HasStageName> myJobs,
     MapEntry<String, Map<String, dynamic>> extraEntry,
   ) {
     if (output.containsKey(fileName)) {
@@ -86,22 +87,24 @@ ${toYaml({'jobs': jobList})}
 
 /// Lists all the jobs, setting their stage, environment, and script.
 Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
-  Iterable<CIJob> jobs,
+  Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
   for (var job in jobs) {
-    if (job is SelfValidateJob) {
+    if (job is _SelfValidateJob) {
       yield MapEntry(selfValidateJobName, _selfValidateTaskConfig());
       continue;
     }
 
-    final commands =
-        job.tasks.map((task) => commandsToKeys[task.command]).toList();
+    final ciJob = job as CIJob;
 
-    jobEntries.add(CIJobEntry(job, commands));
+    final commands =
+        ciJob.tasks.map((task) => commandsToKeys[task.command]).toList();
+
+    jobEntries.add(CIJobEntry(ciJob, commands));
   }
 
   // Group jobs by all of the values that would allow them to merge
@@ -239,3 +242,12 @@ Map<String, dynamic> _selfValidateTaskConfig() =>
     _githubJobYaml(selfValidateJobName, 'ubuntu-latest', 'stable', {
       for (var command in selfValidateCommands) command: null,
     });
+
+/// Used as a place-holder so we can treat all jobs the same in certain
+/// workflows.
+class _SelfValidateJob implements HasStageName {
+  @override
+  final String stageName;
+
+  _SelfValidateJob(this.stageName);
+}
