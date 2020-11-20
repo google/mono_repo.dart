@@ -34,10 +34,10 @@
 value in `mono_repo.yaml`. Instead, the top-level keys `travis` and `github`
 are used. If they exist (even if empty) they enable that CI target.
 * Added `github` top-level key.
-* Configure the `on` value to control what triggers the generated defined
-  workflow.
-* A short-cut value `cron` is also supported – it can be a String that
-  adds a single scheduled job to the default `on` value.
+    * Configure the `on` value to control what triggers the generated defined
+      workflow.
+    * A short-cut value `cron` is also supported – it can be a String that
+      adds a single scheduled job to the default `on` value.
 * Support `stable` as a valid Dart SDK label.
 * Use `[$default-branch]` instead of `[master]`.
 * Prints the Dart SDK version after installation.
