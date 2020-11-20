@@ -51,7 +51,7 @@ name: sub_pkg
       d.file(travisFileName, _travisYml),
       d.file(ciScriptPath, _travisSh),
       d.file(githubWorkflowFilePath('lint'), _githubLintContent),
-      d.file(defaultGithubWorkflowFilePath, _githubYamlContent),
+      d.file(defaultGitHubWorkflowFilePath, _githubYamlContent),
     ]).validate();
   });
 }

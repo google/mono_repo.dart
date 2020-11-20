@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart'
-    show defaultGithubWorkflowFilePath;
+    show defaultGitHubWorkflowFilePath;
 import 'package:mono_repo/src/commands/travis/generate.dart'
     show travisFileName;
 import 'package:mono_repo/src/package_config.dart';
@@ -210,7 +210,7 @@ name: pkg_name
       testGenerateBothConfig(printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, defaultGithubWorkflowFilePath)}`.
+Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''');
     });
   });
@@ -1206,5 +1206,5 @@ $_writeScriptOutput''';
 
 String get _writeScriptOutput => '''
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, defaultGithubWorkflowFilePath)}`.
+Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 $ciScriptPathMessage''';

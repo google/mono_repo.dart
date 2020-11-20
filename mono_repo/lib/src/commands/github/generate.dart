@@ -13,7 +13,8 @@ import 'github_yaml.dart';
 
 const githubWorkflowDirectory = '.github/workflows';
 
-final defaultGithubWorkflowFilePath = githubWorkflowFilePath('dart');
+final defaultGitHubWorkflowFilePath =
+    githubWorkflowFilePath(defaultGitHubWorkflowFileName);
 
 String githubWorkflowFilePath(String filename) =>
     '$githubWorkflowDirectory/$filename.yml';

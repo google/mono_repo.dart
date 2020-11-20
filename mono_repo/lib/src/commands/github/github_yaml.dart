@@ -13,6 +13,8 @@ import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
 
+const defaultGitHubWorkflowFileName = 'dart';
+
 Map<String, String> generateGitHubYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
@@ -75,7 +77,7 @@ ${toYaml({'jobs': jobList})}
 
   if (allJobStages.isNotEmpty) {
     populateJobs(
-      'dart',
+      defaultGitHubWorkflowFileName,
       'Dart CI',
       jobs.where((element) => allJobStages.contains(element.stageName)),
       null,
