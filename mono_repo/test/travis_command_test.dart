@@ -17,97 +17,82 @@ void main() {
 
   group('mono_repo.yaml', () {
     group('stages', () {
-      test('must be a list', () async {
-        final monoConfigContent = toYaml({
-          'travis': {'stages': 5}
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateTravisConfig,
-          throwsAParsedYamlException(
-            startsWith(
-              'line 2, column 11 of mono_repo.yaml: Unsupported value for '
-              '"stages". `stages` must be an array.',
-            ),
+      test(
+        'must be a list',
+        () => _testBadConfig(
+          {
+            'travis': {'stages': 5}
+          },
+          startsWith(
+            'line 2, column 11 of mono_repo.yaml: Unsupported value for '
+            '"stages". `stages` must be an array.',
           ),
-        );
-      });
+        ),
+      );
 
-      test('must be string or map items', () async {
-        final monoConfigContent = toYaml({
-          'travis': {
-            'stages': [5]
-          }
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateTravisConfig,
-          throwsAParsedYamlException(
-            startsWith(
-              'line 3, column 5 of mono_repo.yaml: Unsupported value for '
-              '"stages". All values must be String or Map instances.',
-            ),
+      test(
+        'must be string or map items',
+        () => _testBadConfig(
+          {
+            'travis': {
+              'stages': [5]
+            }
+          },
+          startsWith(
+            'line 3, column 5 of mono_repo.yaml: Unsupported value for '
+            '"stages". All values must be String or Map instances.',
           ),
-        );
-      });
+        ),
+      );
 
-      test('map item must be exactly name + if – no less', () async {
-        final monoConfigContent = toYaml({
-          'travis': {
-            'stages': [
-              {'name': 'bob'}
-            ]
-          }
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateTravisConfig,
-          throwsAParsedYamlException(
-              startsWith('line 3, column 7 of mono_repo.yaml: '
-                  'Required keys are missing: if.')),
-        );
-      });
+      test(
+        'map item must be exactly name + if – no less',
+        () => _testBadConfig(
+            {
+              'travis': {
+                'stages': [
+                  {'name': 'bob'}
+                ]
+              }
+            },
+            startsWith('line 3, column 7 of mono_repo.yaml: '
+                'Required keys are missing: if.')),
+      );
 
-      test('map item must be exactly name + if – no more', () async {
-        final monoConfigContent = toYaml({
-          'travis': {
-            'stages': [
-              {'name': 'bob', 'if': 'thing', 'bob': 'other'}
-            ]
-          }
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateTravisConfig,
-          throwsAParsedYamlException(
-            startsWith(
-              'line 5, column 7 of mono_repo.yaml: Unrecognized keys: [bob]; '
-              'supported keys: [name, if]',
-            ),
+      test(
+        'map item must be exactly name + if – no more',
+        () => _testBadConfig(
+          {
+            'travis': {
+              'stages': [
+                {'name': 'bob', 'if': 'thing', 'bob': 'other'}
+              ]
+            }
+          },
+          startsWith(
+            'line 5, column 7 of mono_repo.yaml: Unrecognized keys: [bob]; '
+            'supported keys: [name, if]',
           ),
-        );
-      });
+        ),
+      );
 
-      test('cannot have duplicate names', () async {
-        final monoConfigContent = toYaml({
-          'travis': {
-            'stages': [
-              {'name': 'bob', 'if': 'if'},
-              {'name': 'bob', 'if': 'if'},
-            ]
-          }
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          testGenerateTravisConfig,
-          throwsAParsedYamlException(
-            startsWith(
-              'line 3, column 5 of mono_repo.yaml: Unsupported value for '
-              '"stages". `bob` appears more than once.',
-            ),
+      test(
+        'cannot have duplicate names',
+        () => _testBadConfig(
+          {
+            'travis': {
+              'stages': [
+                {'name': 'bob', 'if': 'if'},
+                {'name': 'bob', 'if': 'if'},
+              ]
+            }
+          },
+          startsWith(
+            'line 3, column 5 of mono_repo.yaml: Unsupported value for '
+            '"stages". `bob` appears more than once.',
           ),
-        );
-      });
+        ),
+      );
 
       test('must match a configured stage from pkg_config', () async {
         final monoConfigContent = toYaml({
@@ -253,20 +238,15 @@ stages:
       });
     });
 
-    test('travis value must be a Map', () async {
-      final monoConfigContent = toYaml({'travis': 5});
-      await populateConfig(monoConfigContent);
-
-      expect(
-        testGenerateTravisConfig,
-        throwsAParsedYamlException(r'''
+    test(
+      'travis value must be a Map',
+      () => _testBadConfig({'travis': 5}, r'''
 line 1, column 9 of mono_repo.yaml: Unsupported value for "travis". `travis` must be a Map.
   ╷
 1 │ travis: 5
   │         ^
   ╵'''),
-      );
-    });
+    );
 
     group('invalid travis keys', () {
       for (var invalidValues in [
@@ -274,23 +254,30 @@ line 1, column 9 of mono_repo.yaml: Unsupported value for "travis". `travis` mus
         ['jobs'],
         ['language'],
       ]) {
-        test(invalidValues.toString(), () async {
-          final invalidContent = Map.fromIterable(invalidValues);
-          final monoConfigContent = toYaml({'travis': invalidContent});
-          await populateConfig(monoConfigContent);
-
-          expect(
-            testGenerateTravisConfig,
-            throwsAParsedYamlException(
-              contains(
-                ' of mono_repo.yaml: Unsupported value for '
-                '"${invalidValues.single}". Contains illegal keys: '
-                '${invalidValues.join(', ')}',
-              ),
+        test(
+          invalidValues.toString(),
+          () => _testBadConfig(
+            {'travis': Map.fromIterable(invalidValues)},
+            contains(
+              ' of mono_repo.yaml: Unsupported value for '
+              '"${invalidValues.single}". Contains illegal keys: '
+              '${invalidValues.join(', ')}',
             ),
-          );
-        });
+          ),
+        );
       }
     });
   });
+}
+
+Future<void> _testBadConfig(
+  Object monoRepoYaml,
+  Object expectedParsedYaml,
+) async {
+  final monoConfigContent = toYaml(monoRepoYaml);
+  await populateConfig(monoConfigContent);
+  expect(
+    testGenerateTravisConfig,
+    throwsAParsedYamlException(expectedParsedYaml),
+  );
 }
