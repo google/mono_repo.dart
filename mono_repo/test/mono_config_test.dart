@@ -26,7 +26,7 @@ PackageConfig _parse(map) => PackageConfig.parse(
     _dummyPubspec,
     map is YamlMap
         ? map
-        : loadYamlOrdered(
+        : loadYamlChecked(
             _encodeJson(map),
           ) as Map);
 
@@ -50,7 +50,7 @@ void main() {
   });
 
   test('valid example', () {
-    final monoYaml = loadYamlOrdered(_testConfig1) as Map;
+    final monoYaml = loadYamlChecked(_testConfig1) as Map;
 
     final config = _parse(monoYaml);
 
