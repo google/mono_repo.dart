@@ -19,7 +19,6 @@ void main() {
       throwsUserExceptionWith(
         'A `mono_pkg.yaml` file was found, but missing '
         'an expected `pubspec.yaml` in `subdir`.',
-        isNull,
       ),
     );
   });

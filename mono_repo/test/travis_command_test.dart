@@ -107,8 +107,9 @@ void main() {
           () => testGenerateTravisConfig(printMatcher: 'package:sub_pkg'),
           throwsUserExceptionWith(
             'Error parsing mono_repo.yaml',
-            'One or more stage was referenced in `mono_repo.yaml` that do not '
-                'exist in any `mono_pkg.yaml` files: `bob`.',
+            details:
+                'One or more stage was referenced in `mono_repo.yaml` that do '
+                'not exist in any `mono_pkg.yaml` files: `bob`.',
           ),
         );
       });

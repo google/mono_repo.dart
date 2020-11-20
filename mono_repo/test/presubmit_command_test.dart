@@ -35,7 +35,6 @@ void main() {
         throwsUserExceptionWith(
           'No $ciScriptPath file found, please run the `generate` '
           'command first.',
-          isNull,
         ),
       );
     });

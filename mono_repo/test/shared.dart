@@ -78,10 +78,10 @@ void testGenerateConfig({
   }
 }
 
-Matcher throwsUserExceptionWith(Object message, Object details) => throwsA(
+Matcher throwsUserExceptionWith(Object message, {Object details}) => throwsA(
       const TypeMatcher<UserException>()
           .having((e) => e.message, 'message', message)
-          .having((e) => e.details, 'details', details),
+          .having((e) => e.details, 'details', details ?? isNull),
     );
 
 Matcher throwsAParsedYamlException(Object matcher) => throwsA(

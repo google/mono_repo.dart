@@ -30,7 +30,8 @@ void main() {
       testGenerateBothConfig,
       throwsUserExceptionWith(
         'No packages found.',
-        'Each target package directory must contain a `mono_pkg.yaml` file.',
+        details: 'Each target package directory must contain a '
+            '`mono_pkg.yaml` file.',
       ),
     );
   });
@@ -46,7 +47,7 @@ name: pkg_name
     final path = p.join('sub_pkg', 'mono_pkg.yaml');
     expect(
       testGenerateBothConfig,
-      throwsUserExceptionWith('The contents of `$path` must be a Map.', isNull),
+      throwsUserExceptionWith('The contents of `$path` must be a Map.'),
     );
   });
 
@@ -68,7 +69,6 @@ Wrote `${p.join(d.sandbox, travisFileName)}`.''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
-        isNull,
       ),
     );
   });
@@ -113,8 +113,8 @@ name: pkg_name
       testGenerateBothConfig,
       throwsUserExceptionWith(
         'Found legacy package configuration file '
-            '(".mono_repo.yml") in `sub_pkg`.',
-        'Rename to "mono_pkg.yaml".',
+        '(".mono_repo.yml") in `sub_pkg`.',
+        details: 'Rename to "mono_pkg.yaml".',
       ),
     );
   });
@@ -161,7 +161,6 @@ package:pkg_b''',
       throwsUserExceptionWith(
         'Not all packages agree on `stages` ordering, found a cycle '
         'between the following stages: `analyze`, `format`.',
-        isNull,
       ),
     );
   });
@@ -768,8 +767,9 @@ line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`
           () => testGenerateBothConfig(printMatcher: 'package:sub_pkg'),
           throwsUserExceptionWith(
             'Error parsing mono_repo.yaml',
-            'One or more stage was referenced in `mono_repo.yaml` that do not '
-                'exist in any `mono_pkg.yaml` files: `bob`.',
+            details:
+                'One or more stage was referenced in `mono_repo.yaml` that do '
+                'not exist in any `mono_pkg.yaml` files: `bob`.',
           ),
         );
       });
