@@ -150,6 +150,7 @@ class MonoConfig {
         if (!value) {
           ci.remove(targetCI);
         }
+        return {};
       } else if (value is! Map) {
         throw CheckedFromJsonException(
           json,

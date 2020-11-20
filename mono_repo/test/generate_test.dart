@@ -23,6 +23,34 @@ import 'src/expected_output.dart';
 void main() {
   glyph.ascii = false;
 
+  group('simple bits for configurations', () {
+    for (var ci in ['github', 'travis']) {
+      group('ci $ci', () {
+        for (var value in const [true, false, null]) {
+          test('value `$value`', () async {
+            final monoConfigContent = toYaml({ci: value});
+            await populateConfig(monoConfigContent);
+
+            final expected = [
+              'package:sub_pkg',
+              if (ci == 'travis' && value != false)
+                'Wrote `${p.join(d.sandbox, travisFileName)}`.',
+              if (ci == 'github' && value != false)
+                'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
+              ciScriptPathMessage,
+            ].join('\n');
+
+            testGenerateConfig(
+              forceGitHub: false,
+              forceTravis: false,
+              printMatcher: expected,
+            );
+          });
+        }
+      });
+    }
+  });
+
   test('no package', () async {
     await d.dir('sub_pkg').create();
 
