@@ -6,13 +6,12 @@ import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 import '../../ci_shared.dart';
+import '../../github_config.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
-
-const defaultGitHubWorkflowFileName = 'dart';
 
 Map<String, String> generateGitHubYml(
   RootConfig rootConfig,
@@ -35,15 +34,15 @@ Map<String, String> generateGitHubYml(
     String fileName,
     String workflowName,
     Iterable<HasStageName> myJobs,
-    MapEntry<String, Map<String, dynamic>> extraEntry,
   ) {
     if (output.containsKey(fileName)) {
-      throw UnimplementedError('Need a better error here!');
+      throw UnsupportedError(
+        'Should not get here – duplicate workflow "$fileName".',
+      );
     }
-    final jobList = Map.fromEntries([
-      if (extraEntry != null) extraEntry,
-      ..._listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
-    ]);
+    final jobList = Map.fromEntries(
+      _listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+    );
 
     output[fileName] = '''
 ${createdWith()}${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
@@ -56,30 +55,36 @@ ${toYaml({'jobs': jobList})}
 
   if (workflows != null) {
     for (var entry in workflows.entries) {
-      final myJobs = jobs
-          .where((element) => entry.value.stages.contains(element.stageName))
-          .toList();
+      assert(entry.value.stages.isNotEmpty);
+      final myJobs = {
+        for (var entry in entry.value.stages)
+          entry: jobs.where((element) => element.stageName == entry).toList(),
+      };
 
-      if (myJobs.isEmpty) {
-        // TODO: make this better. Refer to the location in source?
-        // Move the check to parse time?
-        throw UserException(
-          'No jobs are defined for the provided stage names.',
-        );
+      for (var jobEntry in myJobs.entries) {
+        if (jobEntry.value.isEmpty) {
+          throw UserException(
+            'No jobs are defined for the stage "${jobEntry.key}" '
+            'defined in GitHub workflow "${entry.key}".',
+          );
+        }
       }
 
-      allJobStages.removeWhere(entry.value.stages.contains);
+      allJobStages.removeAll(entry.value.stages);
 
-      populateJobs(entry.key, entry.value.name, myJobs, null);
+      populateJobs(
+        entry.key,
+        entry.value.name,
+        myJobs.values.expand((element) => element),
+      );
     }
   }
 
   if (allJobStages.isNotEmpty) {
     populateJobs(
       defaultGitHubWorkflowFileName,
-      'Dart CI',
+      defaultGitHubWorkflowName,
       jobs.where((element) => allJobStages.contains(element.stageName)),
-      null,
     );
   }
 

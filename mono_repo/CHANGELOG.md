@@ -1,3 +1,9 @@
+## 3.1.0-beta.5-dev
+
+### GitHub actions
+
+* Improved error messages for invalid configuration.
+
 ## 3.1.0-beta.4
 
 ### GitHub actions

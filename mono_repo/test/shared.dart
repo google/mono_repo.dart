@@ -37,6 +37,17 @@ void testGenerateTravisConfig({
       printMatcher: printMatcher,
     );
 
+void testGenerateGitHubConfig({
+  bool validateOnly = false,
+  Object printMatcher,
+}) =>
+    testGenerateConfig(
+      forceTravis: false,
+      forceGitHub: true,
+      validateOnly: validateOnly,
+      printMatcher: printMatcher,
+    );
+
 void testGenerateBothConfig({
   bool validateOnly = false,
   Object printMatcher,

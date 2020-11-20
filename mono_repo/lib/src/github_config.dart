@@ -6,6 +6,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'github_config.g.dart';
 
+const defaultGitHubWorkflowFileName = 'dart';
+const defaultGitHubWorkflowName = 'Dart CI';
+
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class GitHubConfig {
   final Map<String, dynamic> on;
@@ -19,7 +22,61 @@ class GitHubConfig {
     Map<String, dynamic> on,
     String cron,
     this.workflows,
-  ) : on = _parseOn(on, cron);
+  ) : on = _parseOn(on, cron) {
+    if (workflows == null) {
+      return;
+    }
+    _noDefaultFileName();
+    _noDuplicateWorkflowNames();
+    _noDuplicateStageNames();
+  }
+
+  void _noDuplicateStageNames() {
+    final stageToWorkflow = <String, String>{};
+    for (var entry in workflows.entries) {
+      for (var stage in entry.value.stages) {
+        final existing = stageToWorkflow[stage];
+        if (existing != null) {
+          throw ArgumentError.value(
+            workflows,
+            'workflows',
+            'Stage "$stage" is already defined in workflow "$existing".',
+          );
+        }
+        stageToWorkflow[stage] = entry.key;
+      }
+    }
+  }
+
+  void _noDuplicateWorkflowNames() {
+    final nameCounts = <String, int>{};
+    for (var name in workflows.values.map((e) => e.name)) {
+      nameCounts[name] = (nameCounts[name] ?? 0) + 1;
+    }
+    final moreThanOne = nameCounts.entries
+        .where((element) => element.value > 1)
+        .map((e) => e.key)
+        .toList();
+    if (moreThanOne.isNotEmpty) {
+      throw ArgumentError.value(
+        workflows,
+        'workflows',
+        'Workflows must have different names. '
+            'Duplicate name(s): ${moreThanOne.join(', ')}',
+      );
+    }
+  }
+
+  void _noDefaultFileName() {
+    if (workflows.containsKey(defaultGitHubWorkflowFileName)) {
+      throw ArgumentError.value(
+        workflows,
+        'workflows',
+        'Cannot define a workflow with the default key '
+            '"$defaultGitHubWorkflowFileName".',
+      );
+    }
+  }
 
   factory GitHubConfig.fromJson(Map json) => _$GitHubConfigFromJson(json);
 
@@ -35,19 +92,32 @@ class GitHubConfig {
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class GitHubWorkflow {
-  @JsonKey(nullable: false)
+  @JsonKey(nullable: false, disallowNullValue: true, required: true)
   final String name;
-  @JsonKey(nullable: false)
+  @JsonKey(nullable: false, disallowNullValue: true, required: true)
   final Set<String> stages;
 
   GitHubWorkflow(this.name, this.stages) {
+    if (name == defaultGitHubWorkflowName) {
+      throw ArgumentError.value(
+        name,
+        'name',
+        'Cannot be the default workflow name "$defaultGitHubWorkflowName".',
+      );
+    }
     if (stages.isEmpty) {
-      throw ArgumentError.value(stages, 'stages', 'cannot be empty');
+      throw ArgumentError.value(stages, 'stages', 'Cannot be empty.');
+    }
+    if (stages.any((element) => element == null)) {
+      throw ArgumentError.value(
+        stages,
+        'stages',
+        'Stage values cannot be null.',
+      );
     }
   }
 
-  factory GitHubWorkflow.fromJson(Map<String, dynamic> json) =>
-      _$GitHubWorkflowFromJson(json);
+  factory GitHubWorkflow.fromJson(Map json) => _$GitHubWorkflowFromJson(json);
 }
 
 Map<String, dynamic> _parseOn(Map<String, dynamic> on, String cron) {

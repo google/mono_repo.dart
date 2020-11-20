@@ -23,13 +23,8 @@ GitHubConfig _$GitHubConfigFromJson(Map json) {
           json,
           'workflows',
           (v) => (v as Map)?.map(
-                (k, e) => MapEntry(
-                    k as String,
-                    e == null
-                        ? null
-                        : GitHubWorkflow.fromJson((e as Map)?.map(
-                            (k, e) => MapEntry(k as String, e),
-                          ))),
+                (k, e) => MapEntry(k as String,
+                    e == null ? null : GitHubWorkflow.fromJson(e as Map)),
               )),
     );
     return val;
@@ -38,7 +33,10 @@ GitHubConfig _$GitHubConfigFromJson(Map json) {
 
 GitHubWorkflow _$GitHubWorkflowFromJson(Map json) {
   return $checkedNew('GitHubWorkflow', json, () {
-    $checkKeys(json, allowedKeys: const ['name', 'stages']);
+    $checkKeys(json,
+        allowedKeys: const ['name', 'stages'],
+        requiredKeys: const ['name', 'stages'],
+        disallowNullValues: const ['name', 'stages']);
     final val = GitHubWorkflow(
       $checkedConvert(json, 'name', (v) => v as String),
       $checkedConvert(
