@@ -13,18 +13,39 @@ class GitHubConfig {
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
-  GitHubConfig(Map<String, dynamic> on, String cron) : on = _parseOn(on, cron);
+  final Map<String, GitHubWorkflow> workflows;
+
+  GitHubConfig(
+    Map<String, dynamic> on,
+    String cron,
+    this.workflows,
+  ) : on = _parseOn(on, cron);
 
   factory GitHubConfig.fromJson(Map json) => _$GitHubConfigFromJson(json);
 
-  Map<String, dynamic> generate() => {
-        'name': 'Dart CI',
+  Map<String, dynamic> generate(String workflowName) => {
+        'name': workflowName,
         if (on != null) 'on': on,
         'defaults': {
           'run': {'shell': 'bash'}
         },
         'env': {'PUB_ENVIRONMENT': 'bot.github'},
       };
+}
+
+@JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
+class GitHubWorkflow {
+  @JsonKey(nullable: false)
+  final String name;
+  @JsonKey(nullable: false)
+  final Set<String> stages;
+
+  GitHubWorkflow(this.name, this.stages) {
+    // TODO: stages shouldn't be empty
+  }
+
+  factory GitHubWorkflow.fromJson(Map<String, dynamic> json) =>
+      _$GitHubWorkflowFromJson(json);
 }
 
 Map<String, dynamic> _parseOn(Map<String, dynamic> on, String cron) {

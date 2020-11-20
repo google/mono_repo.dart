@@ -9,27 +9,81 @@ import 'package:pub_semver/pub_semver.dart';
 import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
+import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
 import '../shared.dart';
+import 'self_validate_job.dart';
 
-String generateGitHubYml(
+Map<String, String> generateGitHubYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
-  final jobs = rootConfig.expand((config) => config.jobs);
+  final jobs = rootConfig.expand((config) => config.jobs).toList();
 
-  final jobList = Map.fromEntries([
-    if (rootConfig.monoConfig.selfValidateStage != null)
-      _selfValidateTaskConfig(),
-    ..._listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
-  ]);
+  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
+  if (selfValidateStage != null) {
+    jobs.add(SelfValidateJob(selfValidateStage));
+  }
 
-  return '''
-${createdWith()}${toYaml(rootConfig.monoConfig.github.generate())}
+  final allJobStages = jobs.map((e) => e.stageName).toSet();
+
+  final output = <String, String>{};
+
+  void doTheWork(
+    String fileName,
+    String workflowName,
+    Iterable<CIJob> myJobs,
+    MapEntry<String, Map<String, dynamic>> extraEntry,
+  ) {
+    if (output.containsKey(fileName)) {
+      throw UnimplementedError('Need a better error here!');
+    }
+    _jobNameCache.clear();
+    final jobList = Map.fromEntries([
+      if (extraEntry != null) extraEntry,
+      ..._listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+    ]);
+
+    output[fileName] = '''
+${createdWith()}${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
 
 ${toYaml({'jobs': jobList})}
 ''';
+  }
+
+  final workflows = rootConfig.monoConfig.github.workflows;
+
+  if (workflows != null) {
+    for (var entry in workflows.entries) {
+      final myJobs = jobs
+          .where((element) => entry.value.stages.contains(element.stageName))
+          .toList();
+
+      if (myJobs.isEmpty) {
+        // TODO: make this better. Refer to the location in source?
+        // Move the check to parse time?
+        throw UserException(
+          'No jobs are defined for the provided stage names.',
+        );
+      }
+
+      allJobStages.removeWhere(entry.value.stages.contains);
+
+      doTheWork(entry.key, entry.value.name, myJobs, null);
+    }
+  }
+
+  if (allJobStages.isNotEmpty) {
+    doTheWork(
+      'dart',
+      'Dart CI',
+      jobs.where((element) => allJobStages.contains(element.stageName)),
+      null,
+    );
+  }
+
+  return output;
 }
 
 /// Lists all the jobs, setting their stage, environment, and script.
@@ -41,6 +95,11 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   final jobEntries = <CIJobEntry>[];
 
   for (var job in jobs) {
+    if (job is SelfValidateJob) {
+      yield _selfValidateTaskConfig();
+      continue;
+    }
+
     final commands =
         job.tasks.map((task) => commandsToKeys[task.command]).toList();
 
@@ -75,6 +134,7 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   }
 }
 
+// TODO: refactor to eliminate global state!
 final _jobNameCache = <String>{};
 
 String _replace(String input) {

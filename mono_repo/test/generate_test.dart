@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart'
-    show githubActionYamlPath;
+    show defaultGithubWorkflowFilePath;
 import 'package:mono_repo/src/commands/travis/generate.dart'
     show travisFileName;
 import 'package:mono_repo/src/package_config.dart';
@@ -65,8 +65,7 @@ name: pkg_name
 package:sub_pkg
   `dart` values () are not used and can be removed.
   `os` values () are not used and can be removed.
-Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, githubActionYamlPath)}`.''',
+Wrote `${p.join(d.sandbox, travisFileName)}`.''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
@@ -212,7 +211,7 @@ name: pkg_name
       testGenerateBothConfig(printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, githubActionYamlPath)}`.
+Wrote `${p.join(d.sandbox, defaultGithubWorkflowFilePath)}`.
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''');
     });
   });
@@ -1208,5 +1207,5 @@ $_writeScriptOutput''';
 
 String get _writeScriptOutput => '''
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, githubActionYamlPath)}`.
+Wrote `${p.join(d.sandbox, defaultGithubWorkflowFilePath)}`.
 $ciScriptPathMessage''';

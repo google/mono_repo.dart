@@ -11,7 +11,12 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import 'github_yaml.dart';
 
-const githubActionYamlPath = '.github/workflows/dart.yml';
+const githubWorkflowDirectory = '.github/workflows';
+
+final defaultGithubWorkflowFilePath = githubWorkflowFilePath('dart');
+
+String githubWorkflowFilePath(String filename) =>
+    '$githubWorkflowDirectory/$filename.yml';
 
 void generateGitHubActions(
   RootConfig rootConfig, {
@@ -21,34 +26,36 @@ void generateGitHubActions(
   final githubConfig = _GeneratedGitHubConfig.generate(
     rootConfig,
   );
-  if (validateOnly) {
-    _validateFile(
-      rootConfig.rootDirectory,
-      githubConfig.workflowYaml,
-      githubActionYamlPath,
-    );
-  } else {
-    writeFile(
-      rootConfig.rootDirectory,
-      githubActionYamlPath,
-      githubConfig.workflowYaml,
-      isScript: false,
-    );
+  for (var entry in githubConfig.workflowFiles.entries) {
+    if (validateOnly) {
+      _validateFile(
+        rootConfig.rootDirectory,
+        entry.value,
+        githubWorkflowFilePath(entry.key),
+      );
+    } else {
+      writeFile(
+        rootConfig.rootDirectory,
+        githubWorkflowFilePath(entry.key),
+        entry.value,
+        isScript: false,
+      );
+    }
   }
 }
 
 /// The generated yaml and shell script content for github.
 class _GeneratedGitHubConfig {
-  final String workflowYaml;
+  final Map<String, String> workflowFiles;
 
-  _GeneratedGitHubConfig._(this.workflowYaml);
+  _GeneratedGitHubConfig._(this.workflowFiles);
 
   factory _GeneratedGitHubConfig.generate(RootConfig rootConfig) {
     final commandsToKeys = extractCommands(rootConfig);
 
-    final yml = generateGitHubYml(rootConfig, commandsToKeys);
+    final result = generateGitHubYml(rootConfig, commandsToKeys);
 
-    return _GeneratedGitHubConfig._(yml);
+    return _GeneratedGitHubConfig._(result);
   }
 }
 
