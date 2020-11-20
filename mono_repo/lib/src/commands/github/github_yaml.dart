@@ -93,9 +93,16 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
+  var count = 0;
+
+  MapEntry<String, Map<String, dynamic>> _jobEntry(
+    Map<String, dynamic> content,
+  ) =>
+      MapEntry('job_${(++count).toString().padLeft(3, '0')}', content);
+
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield MapEntry(selfValidateJobName, _selfValidateTaskConfig());
+      yield _jobEntry(_selfValidateTaskConfig());
       continue;
     }
 
@@ -118,8 +125,6 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
             e.commands,
           ].join(':::'));
 
-  var count = 0;
-
   for (var entry in groupedItems.entries) {
     final first = entry.value.first;
 
@@ -130,16 +135,14 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield MapEntry(_jobName(++count), first.jobYaml(packages));
+      yield _jobEntry(first.jobYaml(packages));
     } else {
       yield* entry.value.map(
-        (jobEntry) => MapEntry(_jobName(++count), jobEntry.jobYaml()),
+        (jobEntry) => _jobEntry(jobEntry.jobYaml()),
       );
     }
   }
 }
-
-String _jobName(int count) => 'job_${count.toString().padLeft(3, '0')}';
 
 extension on CIJobEntry {
   String _jobName(List<String> packages) {
