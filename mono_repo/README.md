@@ -61,12 +61,27 @@ So, an example config might look like this:
 ```yaml
 # Adds a job that runs `mono_repo generate --validate` to check that everything
 # is up to date.
-self_validate: true
+# You can specify the value as just `true` or give a `stage` you'd like this
+# job to run in.
+self_validate: analyze
+
 # This would enable both CI configurations, you probably only want one though.
 travis:
 github:
   # Setting just `cron` keeps the defaults for `push` and `pull_request`
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
+
+  # You can group stages into individual workflows  
+  workflows:
+    # The key here is the name of the file - .github/workflows/lint.yml
+    lint:
+      # This populates `name` in the workflow
+      name: Dart Lint CI
+      # These are the stages that are populated in the workflow file
+      stages:
+      - analyze
+  # Any stages that are omitted here are put in a default workflow 
+  # named `dart.yml`.
 ```
 
 ### Adding a package config

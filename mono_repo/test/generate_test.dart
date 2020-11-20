@@ -7,11 +7,10 @@ import 'dart:async';
 import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart'
-    show githubActionYamlPath;
+    show defaultGitHubWorkflowFilePath;
 import 'package:mono_repo/src/commands/travis/generate.dart'
     show travisFileName;
 import 'package:mono_repo/src/package_config.dart';
-import 'package:mono_repo/src/version.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -65,8 +64,7 @@ name: pkg_name
 package:sub_pkg
   `dart` values () are not used and can be removed.
   `os` values () are not used and can be removed.
-Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, githubActionYamlPath)}`.''',
+Wrote `${p.join(d.sandbox, travisFileName)}`.''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
@@ -212,7 +210,7 @@ name: pkg_name
       testGenerateBothConfig(printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, githubActionYamlPath)}`.
+Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''');
     });
   });
@@ -1127,7 +1125,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
             .file(
                 travisFileName,
                 stringContainsInOrder([
-                  '''
+                  r'''
 language: dart
 
 jobs:
@@ -1135,7 +1133,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
 ''',
                   r'''
 stages:
@@ -1171,13 +1169,13 @@ cache:
             .file(
                 travisFileName,
                 stringContainsInOrder([
-                  '''
+                  r'''
 jobs:
   include:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
     - stage: analyze
 ''',
                   r'''
@@ -1208,5 +1206,5 @@ $_writeScriptOutput''';
 
 String get _writeScriptOutput => '''
 Wrote `${p.join(d.sandbox, travisFileName)}`.
-Wrote `${p.join(d.sandbox, githubActionYamlPath)}`.
+Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 $ciScriptPathMessage''';

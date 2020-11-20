@@ -9,11 +9,34 @@ import 'package_config.dart';
 import 'root_config.dart';
 import 'version.dart';
 
-final skipCreatedWithSentinel = Object();
+/// Run [function] (using the optional [zoneSpec] while override the version
+/// to `1.2.3` and forcing off ANSI color output.
+T testGenerate<T>(T Function() function, {ZoneSpecification zoneSpec}) =>
+    Zone.current.fork(
+      zoneValues: {_testingZoneKey: true},
+      specification: zoneSpec,
+    ).run(
+      () => overrideAnsiOutput(false, function),
+    );
 
-String createdWith() => Zone.current[skipCreatedWithSentinel] == true
-    ? ''
-    : '# Created with package:mono_repo v$packageVersion\n';
+/// Object used to flag if code is running in a test.
+final _testingZoneKey = Object();
+
+bool get _isTesting => Zone.current[_testingZoneKey] == true;
+
+// TODO: Eliminate the special logic here. Having a hard-wired version is
+// easier for testing.
+String createdWith() =>
+    _isTesting ? '' : '# Created with package:mono_repo v$packageVersion\n';
+
+String get _pkgVersion => _isTesting ? '1.2.3' : packageVersion;
+
+const selfValidateJobName = 'mono_repo self validate';
+
+final selfValidateCommands = [
+  'pub global activate mono_repo $_pkgVersion',
+  'pub global run mono_repo generate --validate',
+];
 
 class CIJobEntry {
   final CIJob job;

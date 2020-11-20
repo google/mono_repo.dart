@@ -158,8 +158,12 @@ class PackageConfig {
   }
 }
 
+abstract class HasStageName {
+  String get stageName;
+}
+
 @JsonSerializable(explicitToJson: true)
-class CIJob {
+class CIJob implements HasStageName {
   @JsonKey(includeIfNull: false)
   final String description;
 
@@ -171,6 +175,7 @@ class CIJob {
 
   final String sdk;
 
+  @override
   final String stageName;
 
   final List<Task> tasks;

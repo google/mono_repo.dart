@@ -35,7 +35,9 @@ name: sub_pkg
 ''')
     ]).create();
 
-    testGenerateTravisConfig(
+    testGenerateConfig(
+      forceTravis: false,
+      forceGitHub: false,
       printMatcher: stringContainsInOrder(
         [
           'package:sub_pkg\n',
@@ -48,7 +50,8 @@ name: sub_pkg
     await d.dir('.', [
       d.file(travisFileName, _travisYml),
       d.file(ciScriptPath, _travisSh),
-      d.file(githubActionYamlPath, _githubYamlContent),
+      d.file(githubWorkflowFilePath('lint'), _githubLintContent),
+      d.file(defaultGitHubWorkflowFilePath, _githubYamlContent),
     ]).validate();
   });
 }
@@ -58,12 +61,27 @@ String _yamlWrap(String content) => '```yaml\n$content```';
 const _repoYaml = r'''
 # Adds a job that runs `mono_repo generate --validate` to check that everything
 # is up to date.
-self_validate: true
+# You can specify the value as just `true` or give a `stage` you'd like this
+# job to run in.
+self_validate: analyze
+
 # This would enable both CI configurations, you probably only want one though.
 travis:
 github:
   # Setting just `cron` keeps the defaults for `push` and `pull_request`
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
+
+  # You can group stages into individual workflows  
+  workflows:
+    # The key here is the name of the file - .github/workflows/lint.yml
+    lint:
+      # This populates `name` in the workflow
+      name: Dart Lint CI
+      # These are the stages that are populated in the workflow file
+      stages:
+      - analyze
+  # Any stages that are omitted here are put in a default workflow 
+  # named `dart.yml`.
 ''';
 
 const _pkgYaml = r'''
@@ -88,10 +106,10 @@ language: dart
 
 jobs:
   include:
-    - stage: mono_repo_self_validate
+    - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 3.1.0-beta.3 && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
       dart: dev
@@ -112,7 +130,6 @@ jobs:
       script: tool/ci.sh test
 
 stages:
-  - mono_repo_self_validate
   - analyze
   - unit_test
 
@@ -126,8 +143,8 @@ cache:
     - $HOME/.pub-cache
 ''';
 
-const _githubYamlContent = r'''
-name: Dart CI
+const _githubLintContent = r'''
+name: Dart Lint CI
 on:
   push:
     branches:
@@ -153,7 +170,7 @@ jobs:
           version: latest
       - run: dart --version
       - uses: actions/checkout@v2
-      - run: pub global activate mono_repo 3.1.0-beta.3
+      - run: pub global activate mono_repo 1.2.3
       - run: pub global run mono_repo generate --validate
   job_002:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
@@ -181,7 +198,26 @@ jobs:
           PKGS: sub_pkg
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt
-  job_004:
+''';
+
+const _githubYamlContent = r'''
+name: Dart CI
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  schedule:
+    - cron: "0 0 * * 0"
+defaults:
+  run:
+    shell: bash
+env:
+  PUB_ENVIRONMENT: bot.github
+
+jobs:
+  job_001:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
     runs-on: ubuntu-latest
     steps:

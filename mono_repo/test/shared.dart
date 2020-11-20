@@ -5,7 +5,6 @@
 import 'dart:async';
 
 import 'package:checked_yaml/checked_yaml.dart';
-import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
@@ -58,23 +57,19 @@ void testGenerateConfig({
   printMatcher ??= isEmpty;
   final printOutput = <String>[];
   try {
-    Zone.current.fork(
-        zoneValues: {skipCreatedWithSentinel: true},
-        specification: ZoneSpecification(print: (z1, zd, z2, value) {
-          printOutput.add(value);
-        })).run(
-      () => overrideAnsiOutput(
-        false,
-        () {
-          final config = RootConfig(rootDirectory: d.sandbox);
-          generate(
-            config,
-            validateOnly,
-            forceTravis: forceTravis,
-            forceGitHub: forceGitHub,
-          );
-        },
-      ),
+    testGenerate(
+      () {
+        final config = RootConfig(rootDirectory: d.sandbox);
+        generate(
+          config,
+          validateOnly,
+          forceTravis: forceTravis,
+          forceGitHub: forceGitHub,
+        );
+      },
+      zoneSpec: ZoneSpecification(print: (z1, zd, z2, value) {
+        printOutput.add(value);
+      }),
     );
   } finally {
     addTearDown(() {
