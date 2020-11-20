@@ -9,14 +9,17 @@ import 'package_config.dart';
 import 'root_config.dart';
 import 'version.dart';
 
-final skipCreatedWithSentinel = Object();
+/// Object used to flag if code is running in a test.
+final testingZoneKey = Object();
 
-String createdWith() => Zone.current[skipCreatedWithSentinel] == true
-    ? ''
-    : '# Created with package:mono_repo v$packageVersion\n';
+bool get _isTesting => Zone.current[testingZoneKey] == true;
 
-String get _pkgVersion =>
-    Zone.current[skipCreatedWithSentinel] == true ? '1.2.3' : packageVersion;
+// TODO: Eliminate the special logic here. Having a hard-wired version is
+// easier for testing.
+String createdWith() =>
+    _isTesting ? '' : '# Created with package:mono_repo v$packageVersion\n';
+
+String get _pkgVersion => _isTesting ? '1.2.3' : packageVersion;
 
 const selfValidateJobName = 'mono_repo self validate';
 

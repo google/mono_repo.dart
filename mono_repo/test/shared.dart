@@ -59,7 +59,7 @@ void testGenerateConfig({
   final printOutput = <String>[];
   try {
     Zone.current.fork(
-        zoneValues: {skipCreatedWithSentinel: true},
+        zoneValues: {testingZoneKey: true},
         specification: ZoneSpecification(print: (z1, zd, z2, value) {
           printOutput.add(value);
         })).run(
