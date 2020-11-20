@@ -31,8 +31,8 @@
 ### GitHub actions
 
 * **BREAK** from previous betas: `ci` is no longer supported as a top-level
-value in `mono_repo.yaml`. Instead, the top-level keys `travis` and `github`
-are used. If they exist (even if empty) they enable that CI target.
+  value in `mono_repo.yaml`. Instead, the top-level keys `travis` and `github`
+  are used. If they exist (even if empty) they enable that CI target.
 * Added `github` top-level key.
   * Configure the `on` value to control what triggers the generated defined
     workflow.
