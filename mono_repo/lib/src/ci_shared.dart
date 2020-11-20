@@ -15,6 +15,16 @@ String createdWith() => Zone.current[skipCreatedWithSentinel] == true
     ? ''
     : '# Created with package:mono_repo v$packageVersion\n';
 
+String get _pkgVersion =>
+    Zone.current[skipCreatedWithSentinel] == true ? '1.2.3' : packageVersion;
+
+const selfValidateJobName = 'mono_repo self validate';
+
+final selfValidateCommands = [
+  'pub global activate mono_repo $_pkgVersion',
+  'pub global run mono_repo generate --validate',
+];
+
 class CIJobEntry {
   final CIJob job;
   final List<String> commands;

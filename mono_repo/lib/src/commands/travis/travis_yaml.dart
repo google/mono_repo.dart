@@ -14,7 +14,6 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
-import '../shared.dart';
 
 String generateTravisYml(
   RootConfig rootConfig,

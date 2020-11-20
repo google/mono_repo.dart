@@ -11,7 +11,6 @@ import 'package:mono_repo/src/commands/github/generate.dart'
 import 'package:mono_repo/src/commands/travis/generate.dart'
     show travisFileName;
 import 'package:mono_repo/src/package_config.dart';
-import 'package:mono_repo/src/version.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -1126,7 +1125,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
             .file(
                 travisFileName,
                 stringContainsInOrder([
-                  '''
+                  r'''
 language: dart
 
 jobs:
@@ -1134,7 +1133,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
 ''',
                   r'''
 stages:
@@ -1170,13 +1169,13 @@ cache:
             .file(
                 travisFileName,
                 stringContainsInOrder([
-                  '''
+                  r'''
 jobs:
   include:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo $packageVersion && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
     - stage: analyze
 ''',
                   r'''

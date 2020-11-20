@@ -35,7 +35,9 @@ name: sub_pkg
 ''')
     ]).create();
 
-    testGenerateTravisConfig(
+    testGenerateConfig(
+      forceTravis: false,
+      forceGitHub: false,
       printMatcher: stringContainsInOrder(
         [
           'package:sub_pkg\n',
@@ -107,7 +109,7 @@ jobs:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 3.1.0-beta.3 && pub global run mono_repo generate --validate"
+      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
     - stage: analyze
       name: "SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
       dart: dev
@@ -168,7 +170,7 @@ jobs:
           version: latest
       - run: dart --version
       - uses: actions/checkout@v2
-      - run: pub global activate mono_repo 3.1.0-beta.3
+      - run: pub global activate mono_repo 1.2.3
       - run: pub global run mono_repo generate --validate
   job_002:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"

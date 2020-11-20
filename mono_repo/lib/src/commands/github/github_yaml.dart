@@ -12,7 +12,6 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
-import '../shared.dart';
 import 'self_validate_job.dart';
 
 Map<String, String> generateGitHubYml(
