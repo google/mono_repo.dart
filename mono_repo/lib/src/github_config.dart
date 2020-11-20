@@ -41,7 +41,9 @@ class GitHubWorkflow {
   final Set<String> stages;
 
   GitHubWorkflow(this.name, this.stages) {
-    // TODO: stages shouldn't be empty
+    if (stages.isEmpty) {
+      throw ArgumentError.value(stages, 'stages', 'cannot be empty');
+    }
   }
 
   factory GitHubWorkflow.fromJson(Map<String, dynamic> json) =>

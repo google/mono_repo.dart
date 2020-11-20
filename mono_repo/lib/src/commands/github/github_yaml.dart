@@ -29,7 +29,7 @@ Map<String, String> generateGitHubYml(
 
   final output = <String, String>{};
 
-  void doTheWork(
+  void populateJobs(
     String fileName,
     String workflowName,
     Iterable<CIJob> myJobs,
@@ -38,7 +38,6 @@ Map<String, String> generateGitHubYml(
     if (output.containsKey(fileName)) {
       throw UnimplementedError('Need a better error here!');
     }
-    _jobNameCache.clear();
     final jobList = Map.fromEntries([
       if (extraEntry != null) extraEntry,
       ..._listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
@@ -69,12 +68,12 @@ ${toYaml({'jobs': jobList})}
 
       allJobStages.removeWhere(entry.value.stages.contains);
 
-      doTheWork(entry.key, entry.value.name, myJobs, null);
+      populateJobs(entry.key, entry.value.name, myJobs, null);
     }
   }
 
   if (allJobStages.isNotEmpty) {
-    doTheWork(
+    populateJobs(
       'dart',
       'Dart CI',
       jobs.where((element) => allJobStages.contains(element.stageName)),
@@ -95,7 +94,7 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
   for (var job in jobs) {
     if (job is SelfValidateJob) {
-      yield _selfValidateTaskConfig();
+      yield MapEntry(selfValidateJobName, _selfValidateTaskConfig());
       continue;
     }
 
@@ -116,6 +115,8 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
             e.commands,
           ].join(':::'));
 
+  var count = 0;
+
   for (var entry in groupedItems.entries) {
     final first = entry.value.first;
 
@@ -126,20 +127,16 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield first.jobYaml(packages);
+      yield MapEntry(_jobName(++count), first.jobYaml(packages));
     } else {
-      yield* entry.value.map((jobEntry) => jobEntry.jobYaml());
+      yield* entry.value.map(
+        (jobEntry) => MapEntry(_jobName(++count), jobEntry.jobYaml()),
+      );
     }
   }
 }
 
-// TODO: refactor to eliminate global state!
-final _jobNameCache = <String>{};
-
-String _replace(String input) {
-  _jobNameCache.add(input);
-  return 'job_${_jobNameCache.length.toString().padLeft(3, '0')}';
-}
+String _jobName(int count) => 'job_${count.toString().padLeft(3, '0')}';
 
 extension on CIJobEntry {
   String _jobName(List<String> packages) {
@@ -162,7 +159,7 @@ extension on CIJobEntry {
     throw UnsupportedError('Not sure how to map `${job.os}` to GitHub!');
   }
 
-  MapEntry<String, Map<String, dynamic>> jobYaml([List<String> packages]) {
+  Map<String, dynamic> jobYaml([List<String> packages]) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
@@ -220,12 +217,9 @@ Map<String, dynamic> _createDartSetup(String sdk) {
   return map;
 }
 
-MapEntry<String, Map<String, dynamic>> _githubJobYaml(
-        String jobName,
-        String jobOs,
-        String dartVersion,
-        Map<String, Map<String, dynamic>> runCommands) =>
-    MapEntry(_replace(jobName), {
+Map<String, dynamic> _githubJobYaml(String jobName, String jobOs,
+        String dartVersion, Map<String, Map<String, dynamic>> runCommands) =>
+    {
       'name': jobName,
       'runs-on': jobOs,
       'steps': [
@@ -239,9 +233,9 @@ MapEntry<String, Map<String, dynamic>> _githubJobYaml(
             'run': command.key
           },
       ],
-    });
+    };
 
-MapEntry<String, Map<String, dynamic>> _selfValidateTaskConfig() =>
+Map<String, dynamic> _selfValidateTaskConfig() =>
     _githubJobYaml(selfValidateJobName, 'ubuntu-latest', 'stable', {
       for (var command in selfValidateCommands) command: null,
     });

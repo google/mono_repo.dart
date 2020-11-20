@@ -9,10 +9,20 @@ import 'package_config.dart';
 import 'root_config.dart';
 import 'version.dart';
 
-/// Object used to flag if code is running in a test.
-final testingZoneKey = Object();
+/// Run [function] (using the optional [zoneSpec] while override the version
+/// to `1.2.3` and forcing off ANSI color output.
+T testGenerate<T>(T Function() function, {ZoneSpecification zoneSpec}) =>
+    Zone.current.fork(
+      zoneValues: {_testingZoneKey: true},
+      specification: zoneSpec,
+    ).run(
+      () => overrideAnsiOutput(false, function),
+    );
 
-bool get _isTesting => Zone.current[testingZoneKey] == true;
+/// Object used to flag if code is running in a test.
+final _testingZoneKey = Object();
+
+bool get _isTesting => Zone.current[_testingZoneKey] == true;
 
 // TODO: Eliminate the special logic here. Having a hard-wired version is
 // easier for testing.
