@@ -25,7 +25,7 @@ final _testingZoneKey = Object();
 
 bool get _isTesting => Zone.current[_testingZoneKey] == true;
 
-String createdWith() => '# Created with package:mono_repo v$_pkgVersion';
+String get createdWith => '# Created with package:mono_repo v$_pkgVersion';
 
 String get _pkgVersion => _isTesting ? '1.2.3' : packageVersion;
 

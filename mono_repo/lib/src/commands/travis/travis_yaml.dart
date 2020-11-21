@@ -80,7 +80,7 @@ ${toYaml({
     });
 
   return '''
-${createdWith()}
+$createdWith
 ${toYaml({'language': 'dart'})}
 $customTravis
 ${toYaml({

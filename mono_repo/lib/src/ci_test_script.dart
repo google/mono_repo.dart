@@ -29,7 +29,7 @@ String generateTestScript(
 ) =>
     '''
 #!/bin/bash
-${createdWith()}
+$createdWith
 
 $windowsBoilerplate
 
