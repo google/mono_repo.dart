@@ -329,6 +329,7 @@ $_writeScriptOutput''',
 
     // TODO: validate GitHub case
     await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -431,6 +432,7 @@ $_writeScriptOutput''',
 
     // TODO: validate GitHub case
     await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -558,6 +560,7 @@ $_writeScriptOutput''',
 
     // TODO: validate GitHub case
     await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -728,6 +731,7 @@ travis:
   - tool/report_failure.sh
 ''',
         contains('''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 # Custom configuration
@@ -855,6 +859,7 @@ $_writeScriptOutput''',
 
         // TODO: validate GitHub case
         await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -988,6 +993,7 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
         await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(ciScriptPath, r'''
 #!/bin/bash
+# Created with package:mono_repo v1.2.3
 
 # Support built in commands on windows out of the box.
 function pub() {
@@ -1126,6 +1132,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
                 travisFileName,
                 stringContainsInOrder([
                   r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:

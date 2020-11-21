@@ -102,6 +102,7 @@ stages:
 ''';
 
 const _travisYml = r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -144,6 +145,7 @@ cache:
 ''';
 
 const _githubLintContent = r'''
+# Created with package:mono_repo v1.2.3
 name: Dart Lint CI
 on:
   push:
@@ -201,6 +203,7 @@ jobs:
 ''';
 
 const _githubYamlContent = r'''
+# Created with package:mono_repo v1.2.3
 name: Dart CI
 on:
   push:
@@ -234,6 +237,7 @@ jobs:
 
 final _travisSh = '''
 #!/bin/bash
+# Created with package:mono_repo v1.2.3
 
 $windowsBoilerplate
 

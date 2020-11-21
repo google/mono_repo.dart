@@ -30,6 +30,7 @@ String generateTestScript(
     '''
 #!/bin/bash
 ${createdWith()}
+
 $windowsBoilerplate
 
 if [[ -z \${PKGS} ]]; then

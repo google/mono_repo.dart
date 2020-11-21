@@ -2,6 +2,7 @@ import 'package:mono_repo/src/ci_test_script.dart';
 
 final ciShellOutput = '''
 #!/bin/bash
+# Created with package:mono_repo v1.2.3
 
 $windowsBoilerplate
 
@@ -94,6 +95,7 @@ fi
 """;
 
 const travisYamlOutput = r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
