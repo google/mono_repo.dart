@@ -16,7 +16,10 @@ function $commandName() {
   fi
 }''';
 
-final windowsBoilerplate = '''
+final bashScriptHeader = '''
+#!/bin/bash
+$createdWith
+
 # Support built in commands on windows out of the box.
 ${_dartCommandContent('pub')}
 ${_dartCommandContent('dartfmt')}
@@ -28,10 +31,7 @@ String generateTestScript(
   String pubDependencyCommand,
 ) =>
     '''
-#!/bin/bash
-$createdWith
-
-$windowsBoilerplate
+$bashScriptHeader
 
 if [[ -z \${PKGS} ]]; then
   ${safeEcho(prettyAnsi, red, "PKGS environment variable must be set! - TERMINATING JOB")}

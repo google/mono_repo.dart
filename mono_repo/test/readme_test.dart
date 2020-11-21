@@ -236,10 +236,7 @@ jobs:
 ''';
 
 final _travisSh = '''
-#!/bin/bash
-# Created with package:mono_repo v1.2.3
-
-$windowsBoilerplate
+$bashScriptHeader
 
 '''
     r'''
