@@ -123,6 +123,7 @@ Look at these repositories for examples of `mono_repo` usage:
 * https://github.com/dart-lang/build
 * https://github.com/dart-lang/pub-dev
 * https://github.com/dart-lang/source_gen
+* https://github.com/dart-lang/test
 * https://github.com/dart-lang/webdev
 * https://github.com/google/json_serializable.dart
 
