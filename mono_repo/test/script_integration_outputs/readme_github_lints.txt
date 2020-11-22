@@ -19,6 +19,14 @@ jobs:
     name: mono_repo self validate
     runs-on: ubuntu-latest
     steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - uses: cedx/setup-dart@v2
         with:
           release-channel: stable
@@ -31,6 +39,16 @@ jobs:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
     runs-on: ubuntu-latest
     steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:dartanalyzer"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - uses: cedx/setup-dart@v2
         with:
           release-channel: dev
@@ -44,6 +62,16 @@ jobs:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
     runs-on: ubuntu-latest
     steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:dartfmt"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - uses: cedx/setup-dart@v2
         with:
           release-channel: dev
