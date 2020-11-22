@@ -24,6 +24,16 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo;commands:command"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
@@ -37,6 +47,16 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo-test_pkg;commands:dartfmt-dartanalyzer_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo-test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: mono_repo test_pkg
           TRAVIS_OS_NAME: linux
@@ -51,6 +71,16 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo;commands:dartanalyzer_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
@@ -65,6 +95,16 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
@@ -79,6 +119,16 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:windows-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo;commands:test_0"
+          restore-keys: |
+            os:windows-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo
+            os:windows-latest;pub-cache-hosted;dart:2.7.0
+            os:windows-latest;pub-cache-hosted
+            os:windows-latest
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: windows
@@ -92,6 +142,16 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
@@ -105,6 +165,16 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:windows-latest;pub-cache-hosted;dart:dev;packages:mono_repo;commands:test_0"
+          restore-keys: |
+            os:windows-latest;pub-cache-hosted;dart:dev;packages:mono_repo
+            os:windows-latest;pub-cache-hosted;dart:dev
+            os:windows-latest;pub-cache-hosted
+            os:windows-latest
       - env:
           PKGS: mono_repo
           TRAVIS_OS_NAME: windows
@@ -118,6 +188,16 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:test_pkg;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: test_pkg
           TRAVIS_OS_NAME: linux

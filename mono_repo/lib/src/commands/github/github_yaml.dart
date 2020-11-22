@@ -173,12 +173,17 @@ extension on CIJobEntry {
       _jobName(packages),
       _githubJobOs,
       job.sdk,
-      {
-        '$ciScriptPath ${commands.join(' ')}': {
-          'PKGS': packages.join(' '),
-          'TRAVIS_OS_NAME': job.os,
-        }
-      },
+      [
+        _CommandEntry(
+          '$ciScriptPath ${commands.join(' ')}',
+          env: {
+            'PKGS': packages.join(' '),
+            'TRAVIS_OS_NAME': job.os,
+          },
+        )
+      ],
+      packages: packages,
+      commandNames: commands,
     );
   }
 }
@@ -222,8 +227,14 @@ Map<String, dynamic> _createDartSetup(String sdk) {
   return map;
 }
 
-Map<String, dynamic> _githubJobYaml(String jobName, String jobOs,
-        String dartVersion, Map<String, Map<String, dynamic>> runCommands) =>
+Map<String, dynamic> _githubJobYaml(
+  String jobName,
+  String jobOs,
+  String dartVersion,
+  List<_CommandEntry> runCommands, {
+  List<String> packages,
+  List<String> commandNames,
+}) =>
     {
       'name': jobName,
       'runs-on': jobOs,
@@ -231,19 +242,73 @@ Map<String, dynamic> _githubJobYaml(String jobName, String jobOs,
         _createDartSetup(dartVersion),
         {'run': 'dart --version'},
         {'uses': 'actions/checkout@v2'},
-        for (var command in runCommands.entries)
-          {
-            if (command.value != null && command.value.isNotEmpty)
-              'env': command.value,
-            'run': command.key
-          },
+        _cacheEntry(
+          jobOs,
+          dartVersion,
+          packages: packages,
+          commandNames: commandNames,
+        ),
+        for (var command in runCommands) command.runContent,
       ],
     };
 
-Map<String, dynamic> _selfValidateTaskConfig() =>
-    _githubJobYaml(selfValidateJobName, 'ubuntu-latest', 'stable', {
-      for (var command in selfValidateCommands) command: null,
-    });
+class _CommandEntry {
+  final String run;
+  final Map<String, String> env;
+
+  _CommandEntry(
+    this.run, {
+    this.env,
+  });
+
+  Map<String, dynamic> get runContent => {
+        if (env != null && env.isNotEmpty) 'env': env,
+        'run': run,
+      };
+}
+
+const _pubCacheHostedDir = '~/.pub-cache/hosted';
+
+Map<String, dynamic> _cacheEntry(
+  String os,
+  String dartVersion, {
+  List<String> packages,
+  List<String> commandNames,
+}) {
+  final cacheKeyParts = [
+    'os:$os',
+    'pub-cache-hosted',
+    'dart:$dartVersion',
+    if (packages != null && packages.isNotEmpty)
+      'packages:${packages.join('-')}',
+    if (commandNames != null && commandNames.isNotEmpty)
+      'commands:${commandNames.join('-')}'
+  ];
+
+  final restoreKeys = [
+    for (var i = cacheKeyParts.length - 1; i > 0; i--)
+      cacheKeyParts.take(i).join(';')
+  ];
+
+  return {
+    'name': 'Cache $_pubCacheHostedDir',
+    'uses': 'actions/cache@v2',
+    'with': {
+      'path': _pubCacheHostedDir,
+      'key': cacheKeyParts.join(';'),
+      'restore-keys': restoreKeys.join('\n'),
+    }
+  };
+}
+
+Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
+      selfValidateJobName,
+      'ubuntu-latest',
+      'stable',
+      [
+        for (var command in selfValidateCommands) _CommandEntry(command),
+      ],
+    );
 
 /// Used as a place-holder so we can treat all jobs the same in certain
 /// workflows.

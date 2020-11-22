@@ -24,6 +24,16 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
+      - name: "Cache ~/.pub-cache/hosted"
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:test"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
       - env:
           PKGS: sub_pkg
           TRAVIS_OS_NAME: linux
