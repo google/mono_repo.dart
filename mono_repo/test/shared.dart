@@ -142,6 +142,8 @@ ${scriptLines(ciScriptPath).join('\n')}
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
 
 void validateOutput(String fileName, String output) {
+  expect(output, isNotEmpty);
+
   final outputFile = File(p.join(
     'test',
     'script_integration_outputs',

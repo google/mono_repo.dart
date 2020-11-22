@@ -10,6 +10,7 @@ import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+import 'package:path/path.dart' as p;
 
 import 'shared.dart';
 
@@ -46,20 +47,20 @@ name: sub_pkg
       ),
     );
 
-    Future<void> validateFile(
+    void validateFile(
       String fileToVerify,
       String expectedOutputFileName,
-    ) async {
+    ) {
       validateOutput(
         'readme_$expectedOutputFileName.txt',
-        await d.file(fileToVerify).read(),
+        File(p.join(d.sandbox, fileToVerify)).readAsStringSync(),
       );
     }
 
-    await validateFile(travisFileName, 'travis');
-    await validateFile(ciScriptPath, 'ci');
-    await validateFile(githubWorkflowFilePath('lint'), 'github_lints');
-    await validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
+    validateFile(travisFileName, 'travis');
+    validateFile(ciScriptPath, 'ci');
+    validateFile(githubWorkflowFilePath('lint'), 'github_lints');
+    validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
   });
 }
 
