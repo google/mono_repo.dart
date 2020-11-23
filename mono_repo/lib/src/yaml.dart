@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:checked_yaml/checked_yaml.dart';
@@ -146,6 +147,18 @@ void _writeYaml(
 ) {
   final spaces = '  ' * indent;
   if (source is String) {
+    if (parentType == _ParentType.map) {
+      // We know this is the `value` because the key has special handling!
+
+      final lines = LineSplitter.split(source);
+      if (lines.length > 1 &&
+          lines.every((e) => e.trim() == e && e.trim().isNotEmpty)) {
+        buffer
+          ..writeln('|')
+          ..writeAll(lines.map((e) => '$spaces$e'), '\n');
+        return;
+      }
+    }
     buffer.write(_escapeString(source));
   } else if (source == null || source is bool || source is num) {
     buffer.write(source);
@@ -184,7 +197,7 @@ void _writeYaml(
           // skip it!
         } else if (_isSimple(entry.value)) {
           buffer.write(' ');
-          _writeYaml(buffer, entry.value, 0, _ParentType.map);
+          _writeYaml(buffer, entry.value, indent + 1, _ParentType.map);
         } else {
           _writeYaml(buffer, entry.value, indent + 1, _ParentType.map);
         }
