@@ -5,6 +5,8 @@
 * Improved error messages for invalid configuration.
 * Add support for the github `env` key in repo level configuration for setting
   up global environment variables.
+* Support caching pub dependencies between builds – but only on Linux and MacOS
+  for now.
 
 ## 3.1.0-beta.4
 

@@ -173,11 +173,18 @@ extension on CIJobEntry {
       _jobName(packages),
       _githubJobOs,
       job.sdk,
-      {
-        '$ciScriptPath ${commands.join(' ')}': {
-          'PKGS': packages.join(' '),
-          'TRAVIS_OS_NAME': job.os,
-        }
+      [
+        _CommandEntry(
+          '$ciScriptPath ${commands.join(' ')}',
+          env: {
+            'PKGS': packages.join(' '),
+            'TRAVIS_OS_NAME': job.os,
+          },
+        )
+      ],
+      additionalCacheKeys: {
+        'packages': packages.join('-'),
+        'commands': commands.join('-'),
       },
     );
   }
@@ -222,28 +229,114 @@ Map<String, dynamic> _createDartSetup(String sdk) {
   return map;
 }
 
-Map<String, dynamic> _githubJobYaml(String jobName, String jobOs,
-        String dartVersion, Map<String, Map<String, dynamic>> runCommands) =>
+/// Returns the content of a Github Action Job.
+///
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobs
+///
+/// [jobName] is displayed on GitHUb.
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idname
+///
+/// [runsOn] corresponds to the type of machine to run the job on.
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+///
+/// [dartVersion] specifies which version of Dart to install.
+///
+/// [runCommands] specifies the steps to be run.
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
+///
+/// [additionalCacheKeys] is used to create a unique key used to store and
+/// retrieve the cache.
+Map<String, dynamic> _githubJobYaml(
+  String jobName,
+  String runsOn,
+  String dartVersion,
+  List<_CommandEntry> runCommands, {
+  Map<String, String> additionalCacheKeys,
+}) =>
     {
       'name': jobName,
-      'runs-on': jobOs,
+      'runs-on': runsOn,
       'steps': [
+        if (!runsOn.startsWith('windows'))
+          _cacheEntries(
+            runsOn,
+            additionalCacheKeys: {
+              'dart': dartVersion,
+              if (additionalCacheKeys != null) ...additionalCacheKeys,
+            },
+          ),
         _createDartSetup(dartVersion),
         {'run': 'dart --version'},
         {'uses': 'actions/checkout@v2'},
-        for (var command in runCommands.entries)
-          {
-            if (command.value != null && command.value.isNotEmpty)
-              'env': command.value,
-            'run': command.key
-          },
+        for (var command in runCommands) command.runContent,
       ],
     };
 
-Map<String, dynamic> _selfValidateTaskConfig() =>
-    _githubJobYaml(selfValidateJobName, 'ubuntu-latest', 'stable', {
-      for (var command in selfValidateCommands) command: null,
-    });
+class _CommandEntry {
+  final String run;
+  final Map<String, String> env;
+
+  _CommandEntry(
+    this.run, {
+    this.env,
+  });
+
+  /// The entry in the GitHub Action stage representing this object.
+  ///
+  /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
+  Map<String, dynamic> get runContent => {
+        if (env != null && env.isNotEmpty) 'env': env,
+        'run': run,
+      };
+}
+
+/// Creates a "step" for enabling caching for the containing job.
+///
+/// See https://github.com/marketplace/actions/cache
+///
+/// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
+/// store and retrieve the cache.
+Map<String, dynamic> _cacheEntries(
+  String runsOn, {
+  Map<String, String> additionalCacheKeys,
+}) {
+  final cacheKeyParts = [
+    'os:$runsOn',
+    'pub-cache-hosted',
+    if (additionalCacheKeys != null) ...[
+      for (var entry in additionalCacheKeys.entries)
+        '${entry.key}:${entry.value}'
+    ]
+  ];
+
+  final restoreKeys = [
+    for (var i = cacheKeyParts.length - 1; i > 0; i--)
+      cacheKeyParts.take(i).join(';')
+  ];
+
+  // Just caching the `hosted` directory because caching git dependencies or
+  // activated packages can cause problems.
+  const pubCacheHosted = '~/.pub-cache/hosted';
+
+  return {
+    'name': 'Cache Pub hosted dependencies',
+    'uses': 'actions/cache@v2',
+    'with': {
+      'path': pubCacheHosted,
+      'key': cacheKeyParts.join(';'),
+      'restore-keys': restoreKeys.join('\n'),
+    }
+  };
+}
+
+Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
+      selfValidateJobName,
+      'ubuntu-latest',
+      'stable',
+      [
+        for (var command in selfValidateCommands) _CommandEntry(command),
+      ],
+    );
 
 /// Used as a place-holder so we can treat all jobs the same in certain
 /// workflows.
