@@ -3,11 +3,11 @@ name: Dart CI
 on:
   push:
     branches:
-      - main
-      - master
+    - main
+    - master
   pull_request:
   schedule:
-    - cron: "0 0 * * 0"
+  - cron: "0 0 * * 0"
 defaults:
   run:
     shell: bash
@@ -19,4 +19,11 @@ jobs:
     name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
-      - run: "ls %LOCALAPPDATA%\Pub\Cache\hosted"
+    - uses: cedx/setup-dart@v2
+      with:
+        release-channel: stable
+        version: "2.7.0"
+    - run: dart --version
+    - run: cd mono_repo
+    - run: pub get
+    - run: "ls %LOCALAPPDATA%\Pub\Cache\hosted"
