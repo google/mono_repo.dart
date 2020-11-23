@@ -182,8 +182,10 @@ extension on CIJobEntry {
           },
         )
       ],
-      packages: packages,
-      commandNames: commands,
+      additionalCacheKeys: {
+        'packages': packages.join('-'),
+        'commands': commands.join('-'),
+      },
     );
   }
 }
@@ -227,24 +229,42 @@ Map<String, dynamic> _createDartSetup(String sdk) {
   return map;
 }
 
+/// Returns the content of a Github Action Job.
+///
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobs
+///
+/// [jobName] is displayed on GitHUb.
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idname
+///
+/// [runsOn] corresponds to the type of machine to run the job on.
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+///
+/// [dartVersion] specifies which version of Dart to install.
+///
+/// [runCommands] specifies the steps to be run.
+/// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
+///
+/// [additionalCacheKeys] is used to create a unique key used to store and
+/// retrieve the cache.
 Map<String, dynamic> _githubJobYaml(
   String jobName,
-  String jobOs,
+  String runsOn,
   String dartVersion,
   List<_CommandEntry> runCommands, {
-  List<String> packages,
-  List<String> commandNames,
+  Map<String, String> additionalCacheKeys,
 }) =>
     {
       'name': jobName,
-      'runs-on': jobOs,
+      'runs-on': runsOn,
       'steps': [
-        ..._cacheEntries(
-          jobOs,
-          dartVersion,
-          packages: packages,
-          commandNames: commandNames,
-        ),
+        if (!runsOn.startsWith('windows'))
+          _cacheEntries(
+            runsOn,
+            additionalCacheKeys: {
+              'dart': dartVersion,
+              if (additionalCacheKeys != null) ...additionalCacheKeys,
+            },
+          ),
         _createDartSetup(dartVersion),
         {'run': 'dart --version'},
         {'uses': 'actions/checkout@v2'},
@@ -261,26 +281,32 @@ class _CommandEntry {
     this.env,
   });
 
+  /// The entry in the GitHub Action stage representing this object.
+  ///
+  /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
   Map<String, dynamic> get runContent => {
         if (env != null && env.isNotEmpty) 'env': env,
         'run': run,
       };
 }
 
-List<Map<String, dynamic>> _cacheEntries(
-  String jobOs,
-  String dartVersion, {
-  List<String> packages,
-  List<String> commandNames,
+/// Creates a "step" for enabling caching for the containing job.
+///
+/// See https://github.com/marketplace/actions/cache
+///
+/// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
+/// store and retrieve the cache.
+Map<String, dynamic> _cacheEntries(
+  String runsOn, {
+  Map<String, String> additionalCacheKeys,
 }) {
   final cacheKeyParts = [
-    'os:$jobOs',
+    'os:$runsOn',
     'pub-cache-hosted',
-    'dart:$dartVersion',
-    if (packages != null && packages.isNotEmpty)
-      'packages:${packages.join('-')}',
-    if (commandNames != null && commandNames.isNotEmpty)
-      'commands:${commandNames.join('-')}'
+    if (additionalCacheKeys != null) ...[
+      for (var entry in additionalCacheKeys.entries)
+        '${entry.key}:${entry.value}'
+    ]
   ];
 
   final restoreKeys = [
@@ -292,20 +318,15 @@ List<Map<String, dynamic>> _cacheEntries(
   // activated packages can cause problems.
   const pubCacheHosted = '~/.pub-cache/hosted';
 
-  return [
-    // TODO: Support windows caching google/mono_repo.dart#267
-    // Sadly, there seems to be no clean way to support windows - yet
-    if (!jobOs.startsWith('windows'))
-      {
-        'name': 'Cache Pub hosted dependencies',
-        'uses': 'actions/cache@v2',
-        'with': {
-          'path': pubCacheHosted,
-          'key': cacheKeyParts.join(';'),
-          'restore-keys': restoreKeys.join('\n'),
-        }
-      }
-  ];
+  return {
+    'name': 'Cache Pub hosted dependencies',
+    'uses': 'actions/cache@v2',
+    'with': {
+      'path': pubCacheHosted,
+      'key': cacheKeyParts.join(';'),
+      'restore-keys': restoreKeys.join('\n'),
+    }
+  };
 }
 
 Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
