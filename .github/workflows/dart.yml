@@ -24,6 +24,7 @@ jobs:
         release-channel: stable
         version: "2.7.0"
     - run: dart --version
+    - uses: actions/checkout@v2
     - run: cd mono_repo
     - run: pub get
     - run: "ls %LOCALAPPDATA%\\Pub\\Cache\\hosted"
