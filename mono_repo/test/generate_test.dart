@@ -695,26 +695,37 @@ $lines
 
   group('mono_repo.yaml', () {
     Future<void> validConfig(
-      String monoRepoContent,
+      String monoRepoContent, {
       Object expectedTravisContent,
-    ) async {
+      Object expectedGithubContent,
+    }) async {
       await populateConfig(monoRepoContent);
 
-      // TODO: validate GitHub case
-      await d.nothing(travisFileName).validate();
+      if (expectedTravisContent != null) {
+        await d.nothing(travisFileName).validate();
+      }
+      if (expectedGithubContent != null) {
+        await d.nothing(defaultGitHubWorkflowFilePath).validate();
+      }
       await d.nothing(ciScriptPath).validate();
 
       testGenerateBothConfig(
         printMatcher: _subPkgStandardOutput,
       );
 
-      // TODO: validate GitHub case
-      await d.file(travisFileName, expectedTravisContent).validate();
+      if (expectedTravisContent != null) {
+        await d.file(travisFileName, expectedTravisContent).validate();
+      }
+      if (expectedGithubContent != null) {
+        await d
+            .file(defaultGitHubWorkflowFilePath, expectedGithubContent)
+            .validate();
+      }
       await d.file(ciScriptPath, ciShellOutput).validate();
     }
 
     test('empty travis.yml file', () async {
-      await validConfig('', travisYamlOutput);
+      await validConfig('', expectedTravisContent: travisYamlOutput);
     });
 
     test('pkg:build integration travis.yml file', () async {
@@ -731,7 +742,7 @@ travis:
   after_failure:
   - tool/report_failure.sh
 ''',
-        contains('''
+        expectedTravisContent: contains('''
 # Created with package:mono_repo v1.2.3
 language: dart
 
@@ -1186,6 +1197,24 @@ cache:
             .validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
+    });
+
+    test('global env', () async {
+      await validConfig(r'''
+travis:
+  env:
+    global: FOO=BAR
+github:
+  env:
+    FOO: BAR
+''', expectedTravisContent: contains('''
+env:
+  global: FOO=BAR
+'''), expectedGithubContent: contains('''
+env:
+  PUB_ENVIRONMENT: bot.github
+  FOO: BAR
+'''));
     });
   });
 }

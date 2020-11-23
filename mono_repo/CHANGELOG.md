@@ -3,6 +3,8 @@
 ### GitHub actions
 
 * Improved error messages for invalid configuration.
+* Add support for the github `env` key in repo level configuration for setting
+  up global environment variables.
 
 ## 3.1.0-beta.4
 
