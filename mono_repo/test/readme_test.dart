@@ -58,7 +58,8 @@ name: sub_pkg
 
       if (Platform.isWindows) {
         // Make things consistent on Windows
-        sourceContent = LineSplitter.split(sourceContent).join('\r\n');
+        sourceContent =
+            LineSplitter.split(sourceContent).map((e) => '$e\r\n').join();
       }
 
       validateOutput(
