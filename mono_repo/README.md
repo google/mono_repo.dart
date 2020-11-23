@@ -103,15 +103,15 @@ details on how you'd like tests to be run.
 # See https://docs.travis-ci.com/user/languages/dart#choosing-dart-versions-to-test-against
 # for valid values
 dart:
- - dev
+- dev
 
 stages:
-  # Register two jobs to run under the `analyze` stage.
-  - analyze:
-    - dartanalyzer
-    - dartfmt
-  - unit_test:
-    - test
+# Register two jobs to run under the `analyze` stage.
+- analyze
+  - dartanalyzer
+  - dartfmt
+- unit_test:
+  - test
 ```
 
 Running `mono_repo generate` in the root directory generates two or more files:
