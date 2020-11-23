@@ -11,6 +11,8 @@ const defaultGitHubWorkflowName = 'Dart CI';
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class GitHubConfig {
+  final Map<String, dynamic> env;
+
   final Map<String, dynamic> on;
 
   // TODO: needed until google/json_serializable.dart#747 is fixed
@@ -19,6 +21,7 @@ class GitHubConfig {
   final Map<String, GitHubWorkflow> workflows;
 
   GitHubConfig(
+    this.env,
     Map<String, dynamic> on,
     String cron,
     this.workflows,
@@ -86,7 +89,7 @@ class GitHubConfig {
         'defaults': {
           'run': {'shell': 'bash'}
         },
-        'env': {'PUB_ENVIRONMENT': 'bot.github'},
+        'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
       };
 }
 
