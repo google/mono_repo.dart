@@ -28,4 +28,4 @@ jobs:
     - run: pwd
     - run: cd mono_repo && pwd && ls && pub.bat get
     - run: export
-    - run: "ls $LOCALAPPDATA/Pub/Cache/hosted"
+    - run: "ls $LOCALAPPDATA; ls $LOCALAPPDATA/Pub; ls $LOCALAPPDATA/Pub/Cache; ls $LOCALAPPDATA/Pub/Cache/hosted"
