@@ -269,8 +269,11 @@ class _CommandEntry {
       };
 }
 
-final _pubCacheHostedDir =
-    Platform.isWindows ? '%LOCALAPPDATA%\Pub\Cache' : '~/.pub-cache/hosted';
+/// Just caching the `hosted` directory because caching git dependencies or
+/// activated packages can cause problems.
+final _pubCacheHostedDir = Platform.isWindows
+    ? r'%LOCALAPPDATA%\Pub\Cache\hosted'
+    : '~/.pub-cache/hosted';
 
 Map<String, dynamic> _cacheEntry(
   String os,
