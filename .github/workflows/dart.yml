@@ -26,4 +26,4 @@ jobs:
     - run: dart --version
     - run: cd mono_repo
     - run: pub get
-    - run: "ls %LOCALAPPDATA%\Pub\Cache\hosted"
+    - run: "ls %LOCALAPPDATA%\\Pub\\Cache\\hosted"
