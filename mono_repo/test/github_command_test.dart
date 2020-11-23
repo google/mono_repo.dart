@@ -19,7 +19,7 @@ void main() {
         'github': {'not_supported': 5}
       },
       r'''
-line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [on, cron, workflows]
+line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, cron, workflows]
   ╷
 2 │   not_supported: 5
   │   ^^^^^^^^^^^^^
@@ -53,6 +53,21 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
   ╷
 2 │   cron: some value
   │         ^^^^^^^^^^
+  ╵''',
+    ),
+  );
+
+  test(
+    'env must be a map',
+    () => _testBadConfig(
+      {
+        'github': {'env': 'notAmap'},
+      },
+      r'''
+line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' is not a subtype of type 'Map<dynamic, dynamic>' in type cast
+  ╷
+2 │   env: notAmap
+  │        ^^^^^^^
   ╵''',
     ),
   );
