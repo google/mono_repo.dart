@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
@@ -51,9 +52,16 @@ name: sub_pkg
       String fileToVerify,
       String expectedOutputFileName,
     ) {
+      final inputFile = File(p.join(d.sandbox, fileToVerify));
+
+      var sourceContent = inputFile.readAsStringSync();
+
+      // Make things consistent on Windows
+      sourceContent = LineSplitter.split(sourceContent).join('\n');
+
       validateOutput(
         'readme_$expectedOutputFileName.txt',
-        File(p.join(d.sandbox, fileToVerify)).readAsStringSync(),
+        sourceContent,
       );
     }
 
