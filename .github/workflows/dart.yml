@@ -26,6 +26,6 @@ jobs:
     - run: dart --version
     - uses: actions/checkout@v2
     - run: pwd
-    - run: cd mono_repo && pwd && ls && pub.bat get
+    - run: cd mono_repo && pwd && ls && pub.bat get && cat .packages
     - run: export
     - run: "ls $LOCALAPPDATA; ls $LOCALAPPDATA/Pub; ls $LOCALAPPDATA/Pub/Cache; ls $LOCALAPPDATA/Pub/Cache/hosted"
