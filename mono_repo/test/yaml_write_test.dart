@@ -12,6 +12,25 @@ import 'package:test/test.dart';
 import 'shared.dart';
 
 void main() {
+  group('multi-line strings', () {
+    for (var entry in {
+      '''
+bob
+alice''': r'''
+key: |
+  bob
+  alice''',
+      '''
+os:linux;pub-cache-hosted
+os:linux''': r'''
+key: |
+  os:linux;pub-cache-hosted
+  os:linux''',
+    }.entries) {
+      _testRoundTrip({'key': entry.key}, expectedEncoding: entry.value);
+    }
+  });
+
   group('special cases', () {
     for (var entry in [
       'cool_beans',
@@ -115,6 +134,13 @@ void _testRoundTrip(Object source, {String expectedEncoding}) {
   _testRoundTripCore({'somekey': source});
   // map key & value
   _testRoundTripCore({sourceAsString: sourceAsString});
+
+  if (source is String) {
+    // multi-line map value
+    _testRoundTripCore({
+      'double the value': '$source\n$source',
+    });
+  }
 }
 
 void _testRoundTripCore(Object source, {String expectedEncoding}) {
@@ -131,6 +157,7 @@ void _testRoundTripCore(Object source, {String expectedEncoding}) {
     printOnFailure(['# start yaml', output, '# end yaml'].join('\n'));
     final yaml = loadYamlChecked(output);
     expect(yaml, source);
+
     if (expectedEncoding != null) {
       expect(output, expectedEncoding);
     }
@@ -145,6 +172,7 @@ final _testItems = [
   '\"double\" and \'single\' quotes',
   '\n',
   '\t\v\r',
+  'SDK: stable; PKG: pkg_b; TASKS: chrome tests',
   '---', // special marker in Yaml
   '...', // special marker in Yaml
   'n',
