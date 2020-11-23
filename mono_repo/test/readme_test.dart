@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
@@ -53,15 +52,7 @@ name: sub_pkg
       String expectedOutputFileName,
     ) {
       final inputFile = File(p.join(d.sandbox, fileToVerify));
-
-      var sourceContent = inputFile.readAsStringSync();
-
-      if (Platform.isWindows) {
-        // Make things consistent on Windows
-        sourceContent =
-            LineSplitter.split(sourceContent).map((e) => '$e\r\n').join();
-      }
-
+      final sourceContent = inputFile.readAsStringSync();
       validateOutput(
         'readme_$expectedOutputFileName.txt',
         sourceContent,
@@ -72,7 +63,7 @@ name: sub_pkg
     validateFile(ciScriptPath, 'ci');
     validateFile(githubWorkflowFilePath('lint'), 'github_lints');
     validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
-  });
+  }, onPlatform: const {'windows': Skip('Many platform-specific differences')});
 }
 
 String _yamlWrap(String content) => '```yaml\n$content```';
