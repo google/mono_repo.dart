@@ -26,5 +26,7 @@ jobs:
     - run: dart --version
     - uses: actions/checkout@v2
     - run: cd mono_repo
+    - run: ls
+    - run: pwd
     - run: pub.bat get
     - run: "ls %LOCALAPPDATA%\\Pub\\Cache\\hosted"
