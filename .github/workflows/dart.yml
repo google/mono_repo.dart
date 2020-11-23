@@ -22,7 +22,6 @@ jobs:
     - uses: cedx/setup-dart@v2
       with:
         release-channel: stable
-        version: "2.7.0"
     - run: dart --version
     - uses: actions/checkout@v2
     - run: pwd
