@@ -45,7 +45,8 @@ Map<String, String> generateGitHubYml(
     );
 
     output[fileName] = '''
-${createdWith()}${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
+$createdWith
+${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
 
 ${toYaml({'jobs': jobList})}
 ''';

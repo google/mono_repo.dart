@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:mono_repo/mono_repo.dart';
+import 'package:mono_repo/src/ci_test_script.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart'
     show defaultGitHubWorkflowFilePath;
@@ -329,6 +330,7 @@ $_writeScriptOutput''',
 
     // TODO: validate GitHub case
     await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -431,6 +433,7 @@ $_writeScriptOutput''',
 
     // TODO: validate GitHub case
     await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -558,6 +561,7 @@ $_writeScriptOutput''',
 
     // TODO: validate GitHub case
     await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -728,6 +732,7 @@ travis:
   - tool/report_failure.sh
 ''',
         contains('''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 # Custom configuration
@@ -855,6 +860,7 @@ $_writeScriptOutput''',
 
         // TODO: validate GitHub case
         await d.file(travisFileName, r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:
@@ -986,32 +992,14 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
 
         // TODO: validate GitHub case
         await d.file(travisFileName, travisYamlOutput).validate();
-        await d.file(ciScriptPath, r'''
-#!/bin/bash
+        await d
+            .file(
+                ciScriptPath,
+                '''
+$bashScriptHeader
 
-# Support built in commands on windows out of the box.
-function pub() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-    command pub.bat "$@"
-  else
-    command pub "$@"
-  fi
-}
-function dartfmt() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-    command dartfmt.bat "$@"
-  else
-    command dartfmt "$@"
-  fi
-}
-function dartanalyzer() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-    command dartanalyzer.bat "$@"
-  else
-    command dartanalyzer "$@"
-  fi
-}
-
+'''
+                r'''
 if [[ -z ${PKGS} ]]; then
   echo -e 'PKGS environment variable must be set! - TERMINATING JOB'
   exit 64
@@ -1096,7 +1084,8 @@ done
 if [ ${#FAILURES[@]} -ne 0 ]; then
   exit 1
 fi
-''').validate();
+''')
+            .validate();
       });
     });
 
@@ -1126,6 +1115,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
                 travisFileName,
                 stringContainsInOrder([
                   r'''
+# Created with package:mono_repo v1.2.3
 language: dart
 
 jobs:

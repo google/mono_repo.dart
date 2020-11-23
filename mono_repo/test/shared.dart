@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:meta/meta.dart';
@@ -139,3 +140,32 @@ stages:
 String get ciScriptPathMessage => '''
 ${scriptLines(ciScriptPath).join('\n')}
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
+
+void validateOutput(String fileName, String output) {
+  expect(output, isNotEmpty);
+
+  final expectedOutputFile = File(p.join(
+    'test',
+    'script_integration_outputs',
+    fileName,
+  ));
+
+  if (expectedOutputFile.existsSync()) {
+    expect(output, expectedOutputFile.readAsStringSync());
+  } else {
+    expectedOutputFile
+      ..createSync(recursive: true)
+      ..writeAsStringSync(
+        output,
+        mode: FileMode.writeOnly,
+        flush: true,
+      );
+
+    // Using addTearDown here so all files in a test are processed before any
+    // error is raised. This allows the expected output files to be processed
+    // in one test run.
+    addTearDown(() {
+      fail('${expectedOutputFile.path} does not exist. Writing output.');
+    });
+  }
+}
