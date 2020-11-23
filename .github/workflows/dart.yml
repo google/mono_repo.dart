@@ -27,4 +27,5 @@ jobs:
     - uses: actions/checkout@v2
     - run: pwd
     - run: cd mono_repo && pwd && ls && pub.bat get
+    - run: export
     - run: "ls %LOCALAPPDATA%\\Pub\\Cache\\hosted"
