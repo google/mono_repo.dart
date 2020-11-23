@@ -158,6 +158,10 @@ void validateOutput(String fileName, String output) {
         mode: FileMode.writeOnly,
         flush: true,
       );
+
+    // Using addTearDown here so all files in a test are processed before any
+    // error is raised. This allows the expected output files to be processed
+    // in one test run.
     addTearDown(() {
       fail('${outputFile.path} does not exist. Writing output.');
     });
