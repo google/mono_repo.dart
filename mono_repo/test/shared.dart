@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:meta/meta.dart';
@@ -139,3 +140,26 @@ stages:
 String get ciScriptPathMessage => '''
 ${scriptLines(ciScriptPath).join('\n')}
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
+
+void validateOutput(String fileName, String output) {
+  final outputFile = File(p.join(
+    'test',
+    'script_integration_outputs',
+    fileName,
+  ));
+
+  if (outputFile.existsSync()) {
+    expect(output, outputFile.readAsStringSync());
+  } else {
+    outputFile
+      ..createSync(recursive: true)
+      ..writeAsStringSync(
+        output,
+        mode: FileMode.writeOnly,
+        flush: true,
+      );
+    addTearDown(() {
+      fail('${outputFile.path} does not exist. Writing output.');
+    });
+  }
+}

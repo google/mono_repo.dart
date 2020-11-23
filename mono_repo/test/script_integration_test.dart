@@ -1,6 +1,4 @@
 @TestOn('!windows')
-import 'dart:io';
-
 import 'package:meta/meta.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart'
     show travisFileName;
@@ -165,24 +163,7 @@ void _registerTest(
 
     final fileName = [name.toLowerCase().replaceAll(' ', '_'), '.txt'].join();
 
-    final outputFile = File(p.join(
-      'test',
-      'script_integration_outputs',
-      fileName,
-    ));
-
-    if (outputFile.existsSync()) {
-      expect(output, outputFile.readAsStringSync());
-    } else {
-      outputFile
-        ..createSync(recursive: true)
-        ..writeAsStringSync(
-          output,
-          mode: FileMode.writeOnly,
-          flush: true,
-        );
-      fail('${outputFile.path} does not exist. Writing output.');
-    }
+    validateOutput(fileName, output);
   });
 }
 
