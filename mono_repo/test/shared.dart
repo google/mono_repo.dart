@@ -144,16 +144,16 @@ Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
 void validateOutput(String fileName, String output) {
   expect(output, isNotEmpty);
 
-  final outputFile = File(p.join(
+  final expectedOutputFile = File(p.join(
     'test',
     'script_integration_outputs',
     fileName,
   ));
 
-  if (outputFile.existsSync()) {
-    expect(output, outputFile.readAsStringSync());
+  if (expectedOutputFile.existsSync()) {
+    expect(output, expectedOutputFile.readAsStringSync());
   } else {
-    outputFile
+    expectedOutputFile
       ..createSync(recursive: true)
       ..writeAsStringSync(
         output,
@@ -165,7 +165,7 @@ void validateOutput(String fileName, String output) {
     // error is raised. This allows the expected output files to be processed
     // in one test run.
     addTearDown(() {
-      fail('${outputFile.path} does not exist. Writing output.');
+      fail('${expectedOutputFile.path} does not exist. Writing output.');
     });
   }
 }

@@ -56,8 +56,10 @@ name: sub_pkg
 
       var sourceContent = inputFile.readAsStringSync();
 
-      // Make things consistent on Windows
-      sourceContent = LineSplitter.split(sourceContent).join('\n');
+      if (Platform.isWindows) {
+        // Make things consistent on Windows
+        sourceContent = LineSplitter.split(sourceContent).join('\r\n');
+      }
 
       validateOutput(
         'readme_$expectedOutputFileName.txt',
