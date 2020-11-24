@@ -36,6 +36,8 @@ jobs:
         continue-on-error: true
       - run: ls -l /home/runner/work/_temp/_github_workflow
         continue-on-error: true
+      - run: pushd /home/runner/work/_temp/ && ls -l
+        continue-on-error: true
       - run: pushd /home/runner/work/_temp/ && for f in `ls`; do echo "Processing $f file.."; cat $f; done
         continue-on-error: true
       - run: pushd /home/runner/work/_temp/_runner_file_commands/ && for f in `ls`; do echo "Processing $f file.."; cat $f; done
