@@ -194,6 +194,7 @@ jobs:
       - job_007
       - job_008
     runs_on: ubuntu-latest
+    if: always() # set always
     steps:
       # run this action to get the overall workflow result
       - uses: technote-space/workflow-conclusion-action@v2
