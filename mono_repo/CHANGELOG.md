@@ -1,3 +1,9 @@
+## 3.2.0
+
+- Added support for `on_completion` jobs in github configuration, see the
+  `README.md` for details. This allows you to configure things like webhooks
+  after failed builds, or publishing after successful builds. 
+
 ## 3.1.0
 
 * Added support for [GitHub Actions](https://docs.github.com/actions).
