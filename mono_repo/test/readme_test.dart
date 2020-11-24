@@ -69,17 +69,28 @@ name: sub_pkg
 String _yamlWrap(String content) => '```yaml\n$content```';
 
 const _repoYaml = r'''
-# Adds a job that runs `mono_repo generate --validate` to check that everything
-# is up to date.
-# You can specify the value as just `true` or give a `stage` you'd like this
-# job to run in.
-self_validate: analyze
-
-# This would enable both CI configurations, you probably only want one though.
-travis:
+# Enabled GitHub actions - https://docs.github.com/actions
+# If you have no configuration, you can set the value to `true` or just leave it
+# empty.
 github:
-  # Setting just `cron` keeps the defaults for `push` and `pull_request`
+  # Specify the `on` key to configure triggering events.
+  # See https://docs.github.com/actions/reference/workflow-syntax-for-github-actions#on
+  # The default values is
+  # on:
+  #   push:
+  #     branches:
+  #       - main
+  #       - master
+  #   pull_request:
+
+  # Setting just `cron` is a shortcut to keep the defaults for `push` and
+  # `pull_request` while adding a single `schedule` entry.
+  # `on` and `cron` cannot both be set.
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
+  
+  # Specify additional environment variables accessible to all jobs
+  env:
+    FOO: BAR
 
   # You can group stages into individual workflows  
   workflows:
@@ -92,6 +103,26 @@ github:
       - analyze
   # Any stages that are omitted here are put in a default workflow 
   # named `dart.yml`.
+
+# Enables Travis-CI - https://docs.travis-ci.com/
+# If you have no configuration, you can set the value to `true` or just leave it
+# empty.
+travis:
+  # Specify any additional top-level configuration you want in your 
+  # `.travis.yml` file.
+  # See https://config.travis-ci.com/ for more details
+  # Example:
+  after_failure:
+  - tool/report_failure.sh
+
+# Adds a job that runs `mono_repo generate --validate` to check that everything
+# is up to date. You can specify the value as just `true` or give a `stage`
+# you'd like this job to run in.
+self_validate: analyze
+
+# Use this key to merge stages across packages to create fewer jobs
+merge_stages:
+- analyze
 ''';
 
 const _pkgYaml = r'''
