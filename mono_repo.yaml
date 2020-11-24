@@ -10,6 +10,8 @@ github:
   on_completion:
     - name: "Notify failure"
       runs-on: ubuntu-latest
+      # We need this to run even if other jobs have failed
+      if: always()
       steps:
         # run this action to get the overall workflow result
         - uses: technote-space/workflow-conclusion-action@v2
