@@ -100,16 +100,18 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
+  String jobId(int number) => 'job_${(number).toString().padLeft(3, '0')}';
+
   var count = 0;
 
-  MapEntry<String, Map<String, dynamic>> _jobEntry(
+  MapEntry<String, Map<String, dynamic>> namedJobEntry(
     Map<String, dynamic> content,
   ) =>
-      MapEntry('job_${(++count).toString().padLeft(3, '0')}', content);
+      MapEntry(jobId(++count), content);
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield _jobEntry(_selfValidateTaskConfig());
+      yield namedJobEntry(_selfValidateTaskConfig());
       continue;
     }
 
@@ -134,13 +136,22 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield _jobEntry(first.jobYaml(packages));
+      yield namedJobEntry(first.jobYaml(packages));
     } else {
       yield* entry.value.map(
-        (jobEntry) => _jobEntry(jobEntry.jobYaml()),
+        (jobEntry) => namedJobEntry(jobEntry.jobYaml()),
       );
     }
   }
+
+  yield namedJobEntry({
+    'name': 'so we done?',
+    'if': 'always()',
+    'needs': [for (var i = 1; i <= count; i++) jobId(i)],
+    'steps': [
+      {'run': 'echo \$WORKFLOW_CONCLUSION'},
+    ]
+  });
 }
 
 extension on CIJobEntry {

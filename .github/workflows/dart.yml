@@ -55,3 +55,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: export
+  job_009:
+    name: "so we done?"
+    if: always()
+    needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+    steps:
+      - run: echo $WORKFLOW_CONCLUSION
