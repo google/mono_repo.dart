@@ -15,6 +15,9 @@ class GitHubConfig {
 
   final Map<String, dynamic> on;
 
+  @JsonKey(name: 'on_completion')
+  final List<Map<String, dynamic>> onCompletion;
+
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
@@ -23,15 +26,16 @@ class GitHubConfig {
   GitHubConfig(
     this.env,
     Map<String, dynamic> on,
+    this.onCompletion,
     String cron,
     this.workflows,
   ) : on = _parseOn(on, cron) {
-    if (workflows == null) {
-      return;
+    if (workflows != null) {
+      _noDefaultFileName();
+      _noDuplicateWorkflowNames();
+      _noDuplicateStageNames();
     }
-    _noDefaultFileName();
-    _noDuplicateWorkflowNames();
-    _noDuplicateStageNames();
+    _noOnCompletionNeedsConfig();
   }
 
   void _noDuplicateStageNames() {
@@ -78,6 +82,19 @@ class GitHubConfig {
         'Cannot define a workflow with the default key '
             '"$defaultGitHubWorkflowFileName".',
       );
+    }
+  }
+
+  void _noOnCompletionNeedsConfig() {
+    if (onCompletion == null) return;
+    for (var jobConfig in onCompletion) {
+      if (jobConfig.containsKey('needs')) {
+        throw ArgumentError.value(
+            jobConfig,
+            'on_completion',
+            'Cannot define a `needs` key for `on_completion` jobs, this is '
+                'filled in for you to depend on all jobs.');
+      }
     }
   }
 

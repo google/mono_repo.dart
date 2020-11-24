@@ -41,7 +41,12 @@ Map<String, String> generateGitHubYml(
       );
     }
     final jobList = Map.fromEntries(
-      _listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+      _listJobs(
+        myJobs,
+        commandsToKeys,
+        rootConfig.monoConfig.mergeStages,
+        rootConfig.monoConfig.github.onCompletion,
+      ),
     );
 
     output[fileName] = '''
@@ -97,19 +102,22 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
+  List<Map<String, dynamic>> onCompletionJobs,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
   var count = 0;
 
-  MapEntry<String, Map<String, dynamic>> _jobEntry(
+  String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
+
+  MapEntry<String, Map<String, dynamic>> jobEntry(
     Map<String, dynamic> content,
   ) =>
-      MapEntry('job_${(++count).toString().padLeft(3, '0')}', content);
+      MapEntry(jobName(++count), content);
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield _jobEntry(_selfValidateTaskConfig());
+      yield jobEntry(_selfValidateTaskConfig());
       continue;
     }
 
@@ -134,11 +142,21 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield _jobEntry(first.jobYaml(packages));
+      yield jobEntry(first.jobYaml(packages));
     } else {
-      yield* entry.value.map(
-        (jobEntry) => _jobEntry(jobEntry.jobYaml()),
-      );
+      yield* entry.value.map((e) => jobEntry(e.jobYaml()));
+    }
+  }
+
+  // Generate the jobs that run on completion of all other jobs, by adding the
+  // appropriate `needs` config to each.
+  if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
+    final needs = List.generate(count, (i) => jobName(i + 1));
+    for (var jobConfig in onCompletionJobs) {
+      yield jobEntry({
+        'needs': needs,
+        ...jobConfig,
+      });
     }
   }
 }

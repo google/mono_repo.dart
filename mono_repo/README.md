@@ -83,6 +83,9 @@ github:
     FOO: BAR
 
   # You can group stages into individual workflows  
+  #
+  # Any stages that are omitted here are put in a default workflow
+  # named `dart.yml`.
   workflows:
     # The key here is the name of the file - .github/workflows/lint.yml
     lint:
@@ -91,8 +94,25 @@ github:
       # These are the stages that are populated in the workflow file
       stages:
       - analyze
-  # Any stages that are omitted here are put in a default workflow 
-  # named `dart.yml`.
+
+  # You can add custom github actions configurations to run after completion
+  # of all other jobs here. This accepts normal github job config except that
+  # the `needs` config is filled in for you, and you aren't allowed to pass it.
+  on_completion:
+    # Example job that pings a web hook url stored in a github secret with a
+    # json payload linking to the failed run.
+    - name: "Notify failure"
+      runs-on: ubuntu-latest
+      # By default this job will only run if all dependent jobs are successful,
+      # but we want to run in the failure case for this purpose.
+      if: failure()
+      steps:
+        - run: >
+            curl -H "Content-Type: application/json" -X POST -d \
+              "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+              "${CHAT_WEBHOOK_URL}"
+          env:
+            CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
 
 # Enables Travis-CI - https://docs.travis-ci.com/
 # If you have no configuration, you can set the value to `true` or just leave it

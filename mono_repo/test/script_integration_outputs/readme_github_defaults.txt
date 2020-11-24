@@ -39,3 +39,16 @@ jobs:
           PKGS: sub_pkg
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test
+  job_002:
+    needs:
+      - job_001
+    name: Notify failure
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - run: |
+          curl -H "Content-Type: application/json" -X POST -d \
+            "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+            "${CHAT_WEBHOOK_URL}"
+        env:
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
