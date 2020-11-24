@@ -82,3 +82,15 @@ jobs:
           PKGS: sub_pkg
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt
+  job_004:
+    needs:
+      - job_001
+      - job_002
+      - job_003
+    name: Notify failure
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - run: "curl -H \"Content-Type: application/json\" -X POST -d \\\n  \"{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}\" \\\n  \"${CHAT_WEBHOOK_URL}\"\n"
+        env:
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
