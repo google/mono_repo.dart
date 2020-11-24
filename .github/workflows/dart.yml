@@ -32,11 +32,4 @@ jobs:
       - job_007
     steps:
       - run: export
-      - run: ls $GITHUB_PATH
-        continue-on-error: true
-      - run: ls -l /home/runner/work/_temp/_github_workflow
-        continue-on-error: true
-      - run: pushd /home/runner/work/_temp/ && ls -l
-        continue-on-error: true
-      - run: pushd /home/runner/work/_temp/ && for f in `ls *.sh`; do echo "Processing $f file.."; cat $f; echo 'next...'; done
-        continue-on-error: true
+      - run: ps aux
