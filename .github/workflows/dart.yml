@@ -199,6 +199,6 @@ jobs:
       - uses: technote-space/workflow-conclusion-action@v2
       - run: tool/report_failure.sh
         env:
-          CHAT_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-         # Notify only on failures during pushes to the main branch and scheduled builds
+          CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
+        # Notify only on failures during pushes to the main branch and scheduled builds
         if: env.WORKFLOW_CONCLUSION == 'failure'
