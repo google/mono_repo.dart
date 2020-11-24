@@ -38,5 +38,5 @@ jobs:
         continue-on-error: true
       - run: pushd /home/runner/work/_temp/ && ls -l
         continue-on-error: true
-      - run: pushd /home/runner/work/_temp/ && for f in `ls *.sh`; do echo "Processing $f file.."; cat $f; ; echo 'next...'; done
+      - run: pushd /home/runner/work/_temp/ && for f in `ls *.sh`; do echo "Processing $f file.."; cat $f; echo 'next...'; done
         continue-on-error: true
