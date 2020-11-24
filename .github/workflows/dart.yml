@@ -33,4 +33,4 @@ jobs:
       - job_001
       - job_007
     steps:
-      - run: echo $WORKFLOW_CONCLUSION
+      - run: export
