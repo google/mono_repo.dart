@@ -30,12 +30,11 @@ class GitHubConfig {
     String cron,
     this.workflows,
   ) : on = _parseOn(on, cron) {
-    if (workflows == null) {
-      return;
+    if (workflows != null) {
+      _noDefaultFileName();
+      _noDuplicateWorkflowNames();
+      _noDuplicateStageNames();
     }
-    _noDefaultFileName();
-    _noDuplicateWorkflowNames();
-    _noDuplicateStageNames();
     _noOnCompletionNeedsConfig();
   }
 
