@@ -182,3 +182,23 @@ jobs:
           PKGS: test_pkg
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
+  job_009:
+    name: "Notify failure"
+    needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+    runs_on: ubuntu-latest
+    steps:
+      # run this action to get the overall workflow result
+      - uses: technote-space/workflow-conclusion-action@v2
+      - run: tool/report_failure.sh
+        env:
+          CHAT_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+         # Notify only on failures during pushes to the main branch and scheduled builds
+        if: (github.event_name	== 'push' || github.event_name == 'schedule') && env.WORKFLOW_CONCLUSION == 'failure'
