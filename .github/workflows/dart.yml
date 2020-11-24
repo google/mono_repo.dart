@@ -34,5 +34,4 @@ jobs:
       - job_007
     steps:
       - run: export
-      - run: cat $GITHUB_EVENT_PATH
-      - run: cat $GITHUB_ENV
+      - run: echo ${{ env }}
