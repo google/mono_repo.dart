@@ -75,10 +75,14 @@ for PKG in ${PKGS}; do
         dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       test_0)
-        echo 'pub run test -P presubmit --test-randomize-ordering-seed=random'
-        pub run test -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random'
+        pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_1)
+        echo 'pub run test -t yaml --test-randomize-ordering-seed=random'
+        pub run test -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        ;;
+      test_2)
         echo 'pub run test --test-randomize-ordering-seed=random'
         pub run test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;

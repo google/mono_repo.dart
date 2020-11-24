@@ -86,7 +86,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartanalyzer_1
   job_004:
-    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -110,7 +110,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_0
   job_005:
-    name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+    name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: cedx/setup-dart@v2
@@ -124,7 +124,7 @@ jobs:
           TRAVIS_OS_NAME: windows
         run: tool/ci.sh test_0
   job_006:
-    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -147,7 +147,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_0
   job_007:
-    name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+    name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: cedx/setup-dart@v2
@@ -160,6 +160,53 @@ jobs:
           TRAVIS_OS_NAME: windows
         run: tool/ci.sh test_0
   job_008:
+    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:2.7.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: stable
+          version: "2.7.0"
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: mono_repo
+          TRAVIS_OS_NAME: linux
+        run: tool/ci.sh test_1
+  job_009:
+    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: mono_repo
+          TRAVIS_OS_NAME: linux
+        run: tool/ci.sh test_1
+  job_010:
     name: "OS: linux; SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -167,7 +214,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:test_pkg;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:test_pkg;commands:test_2"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:test_pkg
             os:ubuntu-latest;pub-cache-hosted;dart:dev
@@ -181,4 +228,4 @@ jobs:
       - env:
           PKGS: test_pkg
           TRAVIS_OS_NAME: linux
-        run: tool/ci.sh test_1
+        run: tool/ci.sh test_2
