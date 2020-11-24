@@ -10,8 +10,8 @@ github:
   on_completion:
     - name: "Notify failure"
       runs-on: ubuntu-latest
-      # Runun only if other jobs have failed
-      if: failure()
+      # Run only if other jobs have failed and this is a push or scheduled build.
+      if: (github.event_name == 'push' || github.event_name == 'schedule') && failure()
       steps:
         - run: >
             curl -H "Content-Type: application/json" -X POST -d \
