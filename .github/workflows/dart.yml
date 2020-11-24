@@ -35,3 +35,4 @@ jobs:
     steps:
       - run: export
       - run: cat $GITHUB_EVENT_PATH
+      - run: cat $GITHUB_ENV
