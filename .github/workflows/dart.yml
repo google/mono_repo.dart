@@ -57,6 +57,7 @@ jobs:
       - run: export
   job_009:
     name: "so we done?"
+    "runs-on:": ubuntu-latest
     if: always()
     needs:
       - job_001
