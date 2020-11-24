@@ -146,6 +146,7 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
   yield namedJobEntry({
     'name': 'so we done?',
+    'runs-on:': 'ubuntu-latest',
     'if': 'always()',
     'needs': [for (var i = 1; i <= count; i++) jobId(i)],
     'steps': [
