@@ -199,4 +199,4 @@ jobs:
       - run: "curl -H \"Content-Type: application/json\" -X POST -d \\\n  \"{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}\" \\\n  \"${CHAT_WEBHOOK_URL}\"\n"
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
-        if: "env.WORKFLOW_CONCLUSION == 'failure'"
+        if: env.WORKFLOW_CONCLUSION == 'failure'
