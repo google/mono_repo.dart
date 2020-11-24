@@ -34,5 +34,9 @@ jobs:
       - run: export
       - run: ls $GITHUB_PATH
         continue-on-error: true
-      - run: ls /home/runner/work/_temp/_runner_file_commands/
+      - run: ls -l /home/runner/work/_temp/
+        continue-on-error: true
+      - run: ls -l /home/runner/work/_temp/_runner_file_commands/
+        continue-on-error: true
+      - run: for f in `ls -l /home/runner/work/_temp/_runner_file_commands/`; do echo "Processing $f file.."; cat $f; done
         continue-on-error: true
