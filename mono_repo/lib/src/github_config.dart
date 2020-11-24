@@ -36,6 +36,7 @@ class GitHubConfig {
     _noDefaultFileName();
     _noDuplicateWorkflowNames();
     _noDuplicateStageNames();
+    _noOnCompletionNeedsConfig();
   }
 
   void _noDuplicateStageNames() {
@@ -82,6 +83,19 @@ class GitHubConfig {
         'Cannot define a workflow with the default key '
             '"$defaultGitHubWorkflowFileName".',
       );
+    }
+  }
+
+  void _noOnCompletionNeedsConfig() {
+    if (onCompletion == null) return;
+    for (var jobConfig in onCompletion) {
+      if (jobConfig.containsKey('needs')) {
+        throw ArgumentError.value(
+            jobConfig,
+            'on_completion',
+            'Cannot define a `needs` key for `on_completion` jobs, this is '
+                'filled in for you to depend on all jobs.');
+      }
     }
   }
 
