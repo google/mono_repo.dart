@@ -32,9 +32,4 @@ jobs:
       - job_007
     steps:
       - run: export
-      - run: echo ${{ env.length }}
-        continue-on-error: true
-      - run: echo ${{ env.keys }}
-        continue-on-error: true
-      - run: echo ${{ env.__proto__ }}
-        continue-on-error: true
+      - run: cat $GITHUB_PATH

@@ -2,3 +2,4 @@
 .packages
 .dart_tool/
 pubspec.lock
+node_modules
