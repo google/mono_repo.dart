@@ -146,6 +146,8 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
     }
   }
 
+  // Generate the jobs that run on completion of all other jobs, by adding the
+  // appropriate `needs` config to each.
   if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
     final needs = List.generate(count, (i) => _jobName(i + 1));
     for (var jobConfig in onCompletionJobs) {

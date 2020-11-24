@@ -20,4 +20,4 @@ github:
           env:
             CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
           # Notify only on failures during pushes to the main branch and scheduled builds
-          if: (github.event_name == 'push' || github.event_name == 'schedule') && env.WORKFLOW_CONCLUSION == 'failure'
+          if: env.WORKFLOW_CONCLUSION == 'failure'
