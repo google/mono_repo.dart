@@ -20,53 +20,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: export
-  job_002:
-    name: "OS: linux; SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`]"
-    runs-on: ubuntu-latest
-    steps:
-      - run: export
-  job_003:
-    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer .`"
-    runs-on: ubuntu-latest
-    steps:
-      - run: export
-  job_004:
-    name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: ubuntu-latest
-    steps:
-      - run: export
-  job_005:
-    name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: windows-latest
-    steps:
-      - run: not_a_command
-  job_006:
-    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: ubuntu-latest
-    steps:
-      - run: export
   job_007:
     name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - run: not_a_command
-  job_008:
-    name: "OS: linux; SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
-    runs-on: ubuntu-latest
-    steps:
-      - run: export
   job_009:
     name: "so we done?"
     runs-on: ubuntu-latest
     if: always()
     needs:
       - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
       - job_007
-      - job_008
     steps:
       - run: echo $WORKFLOW_CONCLUSION
