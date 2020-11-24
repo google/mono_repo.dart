@@ -10,16 +10,12 @@ github:
   on_completion:
     - name: "Notify failure"
       runs-on: ubuntu-latest
-      # We need this to run even if other jobs have failed
-      if: always()
+      # Runun only if other jobs have failed
+      if: failure()
       steps:
-        # run this action to get the overall workflow result
-        - uses: technote-space/workflow-conclusion-action@v2
         - run: >
             curl -H "Content-Type: application/json" -X POST -d \
               "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
               "${CHAT_WEBHOOK_URL}"
           env:
             CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
-          # Notify only on failures during pushes to the main branch and scheduled builds
-          if: env.WORKFLOW_CONCLUSION == 'failure'
