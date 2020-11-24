@@ -32,4 +32,4 @@ jobs:
       - job_007
     steps:
       - run: export
-      - run: ps aux
+      - run: ps -f
