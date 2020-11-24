@@ -183,7 +183,6 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
   job_009:
-    name: "Notify failure"
     needs:
       - job_001
       - job_002
@@ -193,15 +192,11 @@ jobs:
       - job_006
       - job_007
       - job_008
+    name: Notify failure
     runs-on: ubuntu-latest
     steps:
-      # run this action to get the overall workflow result
       - uses: technote-space/workflow-conclusion-action@v2
-      - run: >
-          curl -H "Content-Type: application/json" -X POST -d \
-            "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
-            "${CHAT_WEBHOOK_URL}"
+      - run: "curl -H \"Content-Type: application/json\" -X POST -d \\\n  \"{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}\" \\\n  \"${CHAT_WEBHOOK_URL}\"\n"
         env:
-          CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
-        # Notify only on failures during pushes to the main branch and scheduled builds
-        if: (github.event_name	== 'push' || github.event_name == 'schedule') && env.WORKFLOW_CONCLUSION == 'failure'
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+        if: "(github.event_name == 'push' || github.event_name == 'schedule') && env.WORKFLOW_CONCLUSION == 'failure'"

@@ -41,7 +41,8 @@ Map<String, String> generateGitHubYml(
       );
     }
     final jobList = Map.fromEntries(
-      _listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
+      _listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages,
+          rootConfig.monoConfig.github.onCompletion),
     );
 
     output[fileName] = '''
@@ -97,15 +98,18 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
+  List<Map<String, dynamic>> onCompletionJobs,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
   var count = 0;
 
+  String _jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
+
   MapEntry<String, Map<String, dynamic>> _jobEntry(
     Map<String, dynamic> content,
   ) =>
-      MapEntry('job_${(++count).toString().padLeft(3, '0')}', content);
+      MapEntry(_jobName(++count), content);
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
@@ -139,6 +143,16 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
       yield* entry.value.map(
         (jobEntry) => _jobEntry(jobEntry.jobYaml()),
       );
+    }
+  }
+
+  if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
+    final needs = List.generate(count, (i) => _jobName(i + 1));
+    for (var jobConfig in onCompletionJobs) {
+      yield _jobEntry({
+        'needs': needs,
+        ...jobConfig,
+      });
     }
   }
 }

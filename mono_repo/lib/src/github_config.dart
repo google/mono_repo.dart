@@ -15,6 +15,9 @@ class GitHubConfig {
 
   final Map<String, dynamic> on;
 
+  @JsonKey(name: 'on_completion')
+  final List<Map<String, dynamic>> onCompletion;
+
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
@@ -23,6 +26,7 @@ class GitHubConfig {
   GitHubConfig(
     this.env,
     Map<String, dynamic> on,
+    this.onCompletion,
     String cron,
     this.workflows,
   ) : on = _parseOn(on, cron) {

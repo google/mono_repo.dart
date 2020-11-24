@@ -10,7 +10,8 @@ part of 'github_config.dart';
 
 GitHubConfig _$GitHubConfigFromJson(Map json) {
   return $checkedNew('GitHubConfig', json, () {
-    $checkKeys(json, allowedKeys: const ['env', 'on', 'cron', 'workflows']);
+    $checkKeys(json,
+        allowedKeys: const ['env', 'on', 'on_completion', 'cron', 'workflows']);
     final val = GitHubConfig(
       $checkedConvert(
           json,
@@ -24,6 +25,14 @@ GitHubConfig _$GitHubConfigFromJson(Map json) {
           (v) => (v as Map)?.map(
                 (k, e) => MapEntry(k as String, e),
               )),
+      $checkedConvert(
+          json,
+          'on_completion',
+          (v) => (v as List)
+              ?.map((e) => (e as Map)?.map(
+                    (k, e) => MapEntry(k as String, e),
+                  ))
+              ?.toList()),
       $checkedConvert(json, 'cron', (v) => v as String),
       $checkedConvert(
           json,
@@ -34,7 +43,7 @@ GitHubConfig _$GitHubConfigFromJson(Map json) {
               )),
     );
     return val;
-  });
+  }, fieldKeyMap: const {'onCompletion': 'on_completion'});
 }
 
 GitHubWorkflow _$GitHubWorkflowFromJson(Map json) {
