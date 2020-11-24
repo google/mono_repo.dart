@@ -1,6 +1,10 @@
 # Created with package:mono_repo v1.2.3
 language: dart
 
+# Custom configuration
+after_failure:
+  - tool/report_failure.sh
+
 jobs:
   include:
     - stage: analyze

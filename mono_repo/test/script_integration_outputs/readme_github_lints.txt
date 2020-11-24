@@ -13,6 +13,7 @@ defaults:
     shell: bash
 env:
   PUB_ENVIRONMENT: bot.github
+  FOO: BAR
 
 jobs:
   job_001:
