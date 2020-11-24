@@ -9,13 +9,17 @@ stages:
     - dartfmt
     - dartanalyzer: --fatal-infos .
     dart: dev
-  - dartanalyzer: .
+  - dartanalyzer:
     dart: 2.7.0
 - unit_test:
-  - test: -P presubmit --test-randomize-ordering-seed=random
+  - test: -x yaml -P presubmit --test-randomize-ordering-seed=random
     os:
-      - linux
-      - windows
+    - linux
+    - windows
+    dart: [2.7.0, dev]
+  - test: -t yaml --test-randomize-ordering-seed=random
+    os:
+    - linux
     dart: [2.7.0, dev]
 
 cache:

@@ -22,35 +22,47 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh dartanalyzer_1
     - stage: unit_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
+      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
+    - stage: unit_test
+      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      dart: "2.7.0"
+      os: linux
+      env: PKGS="mono_repo"
+      script: tool/ci.sh test_1
+    - stage: unit_test
+      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      dart: dev
+      os: linux
+      env: PKGS="mono_repo"
+      script: tool/ci.sh test_1
     - stage: unit_test
       name: "SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="test_pkg"
-      script: tool/ci.sh test_1
+      script: tool/ci.sh test_2
 
 stages:
   - smoke_test

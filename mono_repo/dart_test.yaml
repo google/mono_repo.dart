@@ -1,4 +1,6 @@
 tags:
+  yaml:
+    # Just for the yaml tests that we want to run in a separate job
   presubmit-only:
     skip: "Should only be run during presubmit"
     presets: {presubmit: {skip: false}}
