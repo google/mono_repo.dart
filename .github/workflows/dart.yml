@@ -32,4 +32,7 @@ jobs:
       - job_007
     steps:
       - run: export
-      - run: cat $GITHUB_PATH
+      - run: type $GITHUB_PATH
+        continue-on-error: true
+      - run: ls $GITHUB_PATH
+        continue-on-error: true
