@@ -4,6 +4,7 @@
 
 // ignore_for_file: lines_longer_than_80_chars
 
+@Tags(['yaml'])
 import 'dart:convert';
 
 import 'package:mono_repo/src/yaml.dart';
@@ -26,6 +27,14 @@ os:linux''': r'''
 key: |
   os:linux;pub-cache-hosted
   os:linux''',
+      r'''
+curl -H "Content-Type: application/json" -X POST -d \
+  "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+  "${CHAT_WEBHOOK_URL}"''': r'''
+key: |
+  curl -H "Content-Type: application/json" -X POST -d \
+    "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+    "${CHAT_WEBHOOK_URL}"'''
     }.entries) {
       _testRoundTrip({'key': entry.key}, expectedEncoding: entry.value);
     }
@@ -139,6 +148,9 @@ void _testRoundTrip(Object source, {String expectedEncoding}) {
     // multi-line map value
     _testRoundTripCore({
       'double the value': '$source\n$source',
+    });
+    _testRoundTripCore({
+      'double the value, indent second': '$source\n  $source',
     });
   }
 }
