@@ -41,8 +41,12 @@ Map<String, String> generateGitHubYml(
       );
     }
     final jobList = Map.fromEntries(
-      _listJobs(myJobs, commandsToKeys, rootConfig.monoConfig.mergeStages,
-          rootConfig.monoConfig.github.onCompletion),
+      _listJobs(
+        myJobs,
+        commandsToKeys,
+        rootConfig.monoConfig.mergeStages,
+        rootConfig.monoConfig.github.onCompletion,
+      ),
     );
 
     output[fileName] = '''
