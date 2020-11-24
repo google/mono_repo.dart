@@ -16,13 +16,11 @@ env:
 
 jobs:
   job_001:
-    name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
     steps:
       - run: export
   job_007:
-    name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - run: not_a_command
   job_009:
@@ -34,4 +32,9 @@ jobs:
       - job_007
     steps:
       - run: export
-      - run: echo ${{ env }}
+      - run: echo ${{ env.length }}
+        continue-on-error: true
+      - run: echo ${{ env.keys }}
+        continue-on-error: true
+      - run: echo ${{ env.__proto__ }}
+        continue-on-error: true
