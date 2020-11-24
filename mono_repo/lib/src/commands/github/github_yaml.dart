@@ -257,18 +257,10 @@ Map<String, dynamic> _githubJobYaml(
       'name': jobName,
       'runs-on': runsOn,
       'steps': [
-        if (!runsOn.startsWith('windows'))
-          _cacheEntries(
-            runsOn,
-            additionalCacheKeys: {
-              'dart': dartVersion,
-              if (additionalCacheKeys != null) ...additionalCacheKeys,
-            },
-          ),
-        _createDartSetup(dartVersion),
-        {'run': 'dart --version'},
-        {'uses': 'actions/checkout@v2'},
-        for (var command in runCommands) command.runContent,
+        if (runsOn.startsWith('windows'))
+          {'run': 'not_a_command'}
+        else
+          {'run': 'export'},
       ],
     };
 
