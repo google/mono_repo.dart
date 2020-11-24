@@ -184,20 +184,6 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
   job_009:
-    name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
-    runs-on: windows-latest
-    steps:
-      - uses: cedx/setup-dart@v2
-        with:
-          release-channel: stable
-          version: "2.7.0"
-      - run: dart --version
-      - uses: actions/checkout@v2
-      - env:
-          PKGS: mono_repo
-          TRAVIS_OS_NAME: windows
-        run: tool/ci.sh test_1
-  job_010:
     name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -220,20 +206,7 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
-  job_011:
-    name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
-    runs-on: windows-latest
-    steps:
-      - uses: cedx/setup-dart@v2
-        with:
-          release-channel: dev
-      - run: dart --version
-      - uses: actions/checkout@v2
-      - env:
-          PKGS: mono_repo
-          TRAVIS_OS_NAME: windows
-        run: tool/ci.sh test_1
-  job_012:
+  job_010:
     name: "OS: linux; SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:

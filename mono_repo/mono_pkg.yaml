@@ -20,7 +20,6 @@ stages:
   - test: -t yaml --test-randomize-ordering-seed=random
     os:
     - linux
-    - windows
     dart: [2.7.0, dev]
 
 cache:

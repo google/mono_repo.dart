@@ -52,21 +52,9 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
-      dart: "2.7.0"
-      os: windows
-      env: PKGS="mono_repo"
-      script: tool/ci.sh test_1
-    - stage: unit_test
       name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
-      env: PKGS="mono_repo"
-      script: tool/ci.sh test_1
-    - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
-      dart: dev
-      os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1
     - stage: unit_test
