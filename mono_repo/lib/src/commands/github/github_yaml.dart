@@ -104,16 +104,16 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
   var count = 0;
 
-  String _jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
+  String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
-  MapEntry<String, Map<String, dynamic>> _jobEntry(
+  MapEntry<String, Map<String, dynamic>> jobEntry(
     Map<String, dynamic> content,
   ) =>
-      MapEntry(_jobName(++count), content);
+      MapEntry(jobName(++count), content);
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield _jobEntry(_selfValidateTaskConfig());
+      yield jobEntry(_selfValidateTaskConfig());
       continue;
     }
 
@@ -138,20 +138,18 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield _jobEntry(first.jobYaml(packages));
+      yield jobEntry(first.jobYaml(packages));
     } else {
-      yield* entry.value.map(
-        (jobEntry) => _jobEntry(jobEntry.jobYaml()),
-      );
+      yield* entry.value.map((e) => jobEntry(e.jobYaml()));
     }
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
   // appropriate `needs` config to each.
   if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
-    final needs = List.generate(count, (i) => _jobName(i + 1));
+    final needs = List.generate(count, (i) => jobName(i + 1));
     for (var jobConfig in onCompletionJobs) {
-      yield _jobEntry({
+      yield jobEntry({
         'needs': needs,
         ...jobConfig,
       });
