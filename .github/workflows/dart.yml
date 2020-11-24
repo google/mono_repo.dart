@@ -38,5 +38,5 @@ jobs:
         continue-on-error: true
       - run: ls -l /home/runner/work/_temp/_runner_file_commands/
         continue-on-error: true
-      - run: for f in `ls /home/runner/work/_temp/_runner_file_commands/`; do echo "Processing $f file.."; cat $f; done
+      - run: pushd /home/runner/work/_temp/_runner_file_commands/ && for f in `ls`; do echo "Processing $f file.."; cat $f; done
         continue-on-error: true
