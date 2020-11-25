@@ -246,17 +246,8 @@ List<String> calculateOrderedStages(
     }
   }
 
-  final orderedStages = components
-      .map((c) {
-        final stageName = c.first;
-
-        final matchingStage = conditionalStages[stageName];
-
-        return matchingStage.name ?? stageName;
-      })
-      .toList()
-      .reversed
-      .toList();
+  final orderedStages =
+      components.map((c) => c.first).toList().reversed.toList();
 
   if (rootConfig.monoConfig.selfValidateStage != null &&
       !orderedStages.contains(rootConfig.monoConfig.selfValidateStage)) {
