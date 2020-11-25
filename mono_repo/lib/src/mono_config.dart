@@ -86,7 +86,7 @@ class MonoConfig {
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
       selfValidateStage: selfValidateStage,
-      travis: travis.map((k, v) => MapEntry(k as String, v)),
+      travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
       github: GitHubConfig.fromJson(github),
     );
   }
