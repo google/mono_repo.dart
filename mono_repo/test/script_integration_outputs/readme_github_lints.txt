@@ -83,10 +83,6 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt
   job_004:
-    needs:
-      - job_001
-      - job_002
-      - job_003
     name: Notify failure
     runs-on: ubuntu-latest
     if: failure()
@@ -97,3 +93,7 @@ jobs:
             "${CHAT_WEBHOOK_URL}"
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+    needs:
+      - job_001
+      - job_002
+      - job_003
