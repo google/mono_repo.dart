@@ -29,10 +29,23 @@ jobs:
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh test
+    - stage: cron
+      name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+      dart: dev
+      os: linux
+      env: PKGS="sub_pkg"
+      script: tool/ci.sh test
+    - stage: cron
+      name: "SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+      dart: dev
+      os: windows
+      env: PKGS="sub_pkg"
+      script: tool/ci.sh test
 
 stages:
   - analyze
   - unit_test
+  - cron
 
 # Only building master means that we don't run two builds for each pull request.
 branches:

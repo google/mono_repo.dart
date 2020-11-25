@@ -40,6 +40,48 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test
   job_002:
+    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:test"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: sub_pkg
+          TRAVIS_OS_NAME: linux
+        run: tool/ci.sh test
+    if: "github.event_name == 'schedule'"
+    needs:
+      - job_001
+  job_003:
+    name: "OS: windows; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+    runs-on: windows-latest
+    steps:
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: sub_pkg
+          TRAVIS_OS_NAME: windows
+        run: tool/ci.sh test
+    if: "github.event_name == 'schedule'"
+    needs:
+      - job_001
+  job_004:
     name: Notify failure
     runs-on: ubuntu-latest
     if: failure()
@@ -51,4 +93,5 @@ jobs:
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
     needs:
-      - job_001
+      - job_002
+      - job_003
