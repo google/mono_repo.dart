@@ -21,6 +21,9 @@ class GitHubConfig {
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
+  // Either Strings or Maps are supported here.
+  final List<dynamic> stages;
+
   final Map<String, GitHubWorkflow> workflows;
 
   GitHubConfig(
@@ -28,6 +31,7 @@ class GitHubConfig {
     Map<String, dynamic> on,
     this.onCompletion,
     String cron,
+    this.stages,
     this.workflows,
   ) : on = _parseOn(on, cron) {
     if (workflows != null) {
