@@ -7,6 +7,7 @@ import 'package:pub_semver/pub_semver.dart';
 
 import '../../ci_shared.dart';
 import '../../github_config.dart';
+import '../../mono_config.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
@@ -50,6 +51,7 @@ Map<String, String> generateGitHubYml(
       commandsToKeys,
       rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
+      rootConfig.monoConfig.githubConditionalStages,
     ).toList()
       ..sort((a, b) => orderedStages
           .indexOf(a.stageName)
@@ -126,6 +128,7 @@ Iterable<MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
   List<Map<String, dynamic>> onCompletionJobs,
+  Map<String, ConditionalStage> conditionalStages,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
@@ -136,8 +139,13 @@ Iterable<MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
   MapEntryWithStage<String, Map<String, dynamic>> jobEntry(
     Map<String, dynamic> content,
     String stage,
-  ) =>
-      MapEntryWithStage(jobName(++count), content, stage);
+  ) {
+    final conditional = conditionalStages[stage];
+    if (conditional != null) {
+      content['if'] = conditional.ifCondition;
+    }
+    return MapEntryWithStage(jobName(++count), content, stage);
+  }
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
