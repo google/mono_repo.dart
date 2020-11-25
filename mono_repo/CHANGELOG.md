@@ -1,3 +1,9 @@
+## 3.3.0
+
+- Implemented proper support for `stages` in github actions. Jobs will now
+  be dependent on previous stages jobs. Conditional stages are also supported
+  in the same manner as travis was, see the README.md for more details.
+
 ## 3.2.0
 
 - Added support for `on_completion` jobs in github configuration, see the

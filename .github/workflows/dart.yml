@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.2.0
+# Created with package:mono_repo v3.3.0
 name: Dart CI
 on:
   push:
@@ -109,6 +109,10 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_0
+    needs:
+      - job_001
+      - job_002
+      - job_003
   job_005:
     name: "OS: windows; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
@@ -123,6 +127,10 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: windows
         run: tool/ci.sh test_0
+    needs:
+      - job_001
+      - job_002
+      - job_003
   job_006:
     name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -146,6 +154,10 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_0
+    needs:
+      - job_001
+      - job_002
+      - job_003
   job_007:
     name: "OS: windows; SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
@@ -159,6 +171,10 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: windows
         run: tool/ci.sh test_0
+    needs:
+      - job_001
+      - job_002
+      - job_003
   job_008:
     name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -183,6 +199,10 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
+    needs:
+      - job_001
+      - job_002
+      - job_003
   job_009:
     name: "OS: linux; SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -206,6 +226,10 @@ jobs:
           PKGS: mono_repo
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
+    needs:
+      - job_001
+      - job_002
+      - job_003
   job_010:
     name: "OS: linux; SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -229,18 +253,11 @@ jobs:
           PKGS: test_pkg
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_2
-  job_011:
     needs:
       - job_001
       - job_002
       - job_003
-      - job_004
-      - job_005
-      - job_006
-      - job_007
-      - job_008
-      - job_009
-      - job_010
+  job_011:
     name: Notify failure
     runs-on: ubuntu-latest
     if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
@@ -251,3 +268,11 @@ jobs:
             "${CHAT_WEBHOOK_URL}"
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+    needs:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+      - job_009
+      - job_010

@@ -114,6 +114,15 @@ github:
           env:
             CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
 
+  # You can customize stage ordering as well as make certain stages be
+  # conditional here, this is supported for all CI providers. The `if`
+  # condition should use the appropriate syntax for the provider it is being
+  # configured for.
+  stages:
+    - name: cron
+      # Only run this stage for scheduled cron jobs
+      if: github.event_name == 'schedule'
+
 # Enables Travis-CI - https://docs.travis-ci.com/
 # If you have no configuration, you can set the value to `true` or just leave it
 # empty.
@@ -163,6 +172,16 @@ stages:
     - dartfmt
   - unit_test:
     - test
+  # Example cron stage which will only run for scheduled jobs (here we run
+  # multiple OS configs for extra validation as an example).
+  #
+  # See the `mono_repo.yaml` example above for where this stage is specially
+  # configured.
+  - cron:
+    - test:
+      os:
+        - linux
+        - windows
 ```
 
 Running `mono_repo generate` in the root directory generates two or more files:

@@ -14,12 +14,12 @@ void main() {
 
   test(
     'only supported keys',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {'not_supported': 5}
       },
       r'''
-line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, cron, workflows]
+line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, cron, stages, workflows]
   ╷
 2 │   not_supported: 5
   │   ^^^^^^^^^^^^^
@@ -29,7 +29,7 @@ line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supporte
 
   test(
     '"on" must be a Map',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {'on': 'not a map'}
       },
@@ -44,7 +44,7 @@ line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is
 
   test(
     'no cron with on',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {'cron': 'some value', 'on': {}}
       },
@@ -59,7 +59,7 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
 
   test(
     'env must be a map',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {'env': 'notAmap'},
       },
@@ -74,7 +74,7 @@ line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' i
 
   test(
     '"on_completion" does not allow setting "needs"',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'on_completion': [
@@ -93,13 +93,100 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Canno
     ),
   );
 
+  test(
+    'stages config only accepts a list',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {'stages': 5}
+      },
+      r'''
+line 2, column 11 of mono_repo.yaml: Unsupported value for "stages". `stages` must be an array.
+  ╷
+2 │   stages: 5
+  │           ^
+  ╵''',
+    ),
+  );
+
+  test(
+    'stages config only accepts a list of Strings or Maps',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'stages': [5]
+        }
+      },
+      r'''
+line 3, column 5 of mono_repo.yaml: Unsupported value for "stages". All values must be String or Map instances.
+  ╷
+3 │     - 5
+  │     ^^^
+  ╵''',
+    ),
+  );
+
+  test(
+    'stages only accepts known stage names',
+    () => _testBadConfigWithUserException(
+      {
+        'github': {
+          'stages': ['missing']
+        }
+      },
+      'Error parsing mono_repo.yaml',
+      expectedDetails: r'''
+One or more stage was referenced in `mono_repo.yaml` that do not exist in any `mono_pkg.yaml` files: `missing`.''',
+      // In this case there is some output printed before we get to the user
+      // exception, but it isn't relevant.
+      printMatcher: anything,
+    ),
+  );
+
+  test(
+    'conditional stages only accept string if values',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'stages': [
+            {'name': 'foo', 'if': 1}
+          ],
+        }
+      },
+      r'''
+line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is not a subtype of type 'String' in type cast
+  ╷
+4 │       if: 1
+  │           ^
+  ╵''',
+    ),
+  );
+
+  test(
+    'conditional stages throw for unrecognized keys',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'stages': [
+            {'foo': 'bar'}
+          ],
+        }
+      },
+      r'''
+line 3, column 7 of mono_repo.yaml: Unrecognized keys: [foo]; supported keys: [name, if]
+  ╷
+3 │     - foo: bar
+  │       ^^^
+  ╵''',
+    ),
+  );
+
   group('workflows', _testWorkflows);
 }
 
 void _testWorkflows() {
   test(
     'must be a map',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {'workflows': 'some value'}
       },
@@ -114,7 +201,7 @@ line 2, column 14 of mono_repo.yaml: Unsupported value for "workflows". type 'St
 
   test(
     'must have required keys',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {'bob': {}}
@@ -131,7 +218,7 @@ line 3, column 10 of mono_repo.yaml: Required keys are missing: name, stages.
 
   test(
     'cannot have extra keys',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {
@@ -154,7 +241,7 @@ line 7, column 7 of mono_repo.yaml: Unrecognized keys: [extra]; supported keys: 
 
   test(
     'stages cannot be empty',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {
@@ -176,7 +263,7 @@ line 5, column 15 of mono_repo.yaml: Unsupported value for "stages". Cannot be e
 
   test(
     'stages cannot have null values',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {
@@ -198,7 +285,7 @@ line 6, column 9 of mono_repo.yaml: Unsupported value for "stages". Stage values
 
   test(
     'workflows cannot have the default key `$defaultGitHubWorkflowFileName`',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {
@@ -223,7 +310,7 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Cannot de
   test(
     'workflows cannot have the same name as the default '
     'workflow `$defaultGitHubWorkflowName`',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {
@@ -272,7 +359,7 @@ line 4, column 13 of mono_repo.yaml: Unsupported value for "name". Cannot be the
 
   test(
     'two workflows cannot have the same stage',
-    () => _testBadConfig(
+    () => _testBadConfigWithYamlException(
       {
         'github': {
           'workflows': {
@@ -304,7 +391,7 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Stage "st
 
   test(
     'two workflows cannot have the same name',
-    () => _testBadConfig({
+    () => _testBadConfigWithYamlException({
       'github': {
         'workflows': {
           'alice': {
@@ -332,7 +419,7 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Workflows
   );
 }
 
-Future<void> _testBadConfig(
+Future<void> _testBadConfigWithYamlException(
   Object monoRepoYaml,
   Object expectedParsedYaml,
 ) async {
@@ -341,5 +428,19 @@ Future<void> _testBadConfig(
   expect(
     testGenerateGitHubConfig,
     throwsAParsedYamlException(expectedParsedYaml),
+  );
+}
+
+Future<void> _testBadConfigWithUserException(
+  Object monoRepoYaml,
+  Object expectedMessage, {
+  Object expectedDetails,
+  Object printMatcher,
+}) async {
+  final monoConfigContent = toYaml(monoRepoYaml);
+  await populateConfig(monoConfigContent);
+  expect(
+    () => testGenerateGitHubConfig(printMatcher: printMatcher),
+    throwsUserExceptionWith(expectedMessage, details: expectedDetails),
   );
 }

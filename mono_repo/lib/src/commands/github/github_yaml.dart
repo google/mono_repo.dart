@@ -7,11 +7,14 @@ import 'package:pub_semver/pub_semver.dart';
 
 import '../../ci_shared.dart';
 import '../../github_config.dart';
+import '../../mono_config.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
+
+const _onCompletionStage = '_on_completion';
 
 Map<String, String> generateGitHubYml(
   RootConfig rootConfig,
@@ -27,6 +30,9 @@ Map<String, String> generateGitHubYml(
   }
 
   final allJobStages = {for (var job in jobs) job.stageName};
+  final orderedStages = calculateOrderedStages(
+      rootConfig, rootConfig.monoConfig.githubConditionalStages)
+    ..add(_onCompletionStage);
 
   final output = <String, String>{};
 
@@ -40,14 +46,33 @@ Map<String, String> generateGitHubYml(
         'Should not get here – duplicate workflow "$fileName".',
       );
     }
-    final jobList = Map.fromEntries(
-      _listJobs(
-        myJobs,
-        commandsToKeys,
-        rootConfig.monoConfig.mergeStages,
-        rootConfig.monoConfig.github.onCompletion,
-      ),
-    );
+    final allJobs = _listJobs(
+      myJobs,
+      commandsToKeys,
+      rootConfig.monoConfig.mergeStages,
+      rootConfig.monoConfig.github.onCompletion,
+      rootConfig.monoConfig.githubConditionalStages,
+    ).toList()
+      ..sort((a, b) => orderedStages
+          .indexOf(a.stageName)
+          .compareTo(orderedStages.indexOf(b.stageName)));
+
+    var currStageJobs = <String>{};
+    var prevStageJobs = <String>{};
+    String currStageName;
+    for (var job in allJobs) {
+      if (job.stageName != currStageName) {
+        currStageName = job.stageName;
+        prevStageJobs = currStageJobs;
+        currStageJobs = {};
+      }
+      currStageJobs.add(job.key);
+      if (prevStageJobs.isNotEmpty) {
+        job.value['needs'] = prevStageJobs;
+      }
+    }
+
+    final jobList = Map.fromEntries(allJobs);
 
     output[fileName] = '''
 $createdWith
@@ -98,11 +123,12 @@ ${toYaml({'jobs': jobList})}
 }
 
 /// Lists all the jobs, setting their stage, environment, and script.
-Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
+Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
   List<Map<String, dynamic>> onCompletionJobs,
+  Map<String, ConditionalStage> conditionalStages,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
 
@@ -110,14 +136,20 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
-  MapEntry<String, Map<String, dynamic>> jobEntry(
+  _MapEntryWithStage<String, Map<String, dynamic>> jobEntry(
     Map<String, dynamic> content,
-  ) =>
-      MapEntry(jobName(++count), content);
+    String stage,
+  ) {
+    final conditional = conditionalStages[stage];
+    if (conditional != null) {
+      content['if'] = conditional.ifCondition;
+    }
+    return _MapEntryWithStage(jobName(++count), content, stage);
+  }
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield jobEntry(_selfValidateTaskConfig());
+      yield jobEntry(_selfValidateTaskConfig(), job.stageName);
       continue;
     }
 
@@ -142,21 +174,19 @@ Iterable<MapEntry<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield jobEntry(first.jobYaml(packages));
+      yield jobEntry(first.jobYaml(packages), first.job.stageName);
     } else {
-      yield* entry.value.map((e) => jobEntry(e.jobYaml()));
+      yield* entry.value.map((e) => jobEntry(e.jobYaml(), e.job.stageName));
     }
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
   // appropriate `needs` config to each.
   if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
-    final needs = List.generate(count, (i) => jobName(i + 1));
     for (var jobConfig in onCompletionJobs) {
       yield jobEntry({
-        'needs': needs,
         ...jobConfig,
-      });
+      }, _onCompletionStage);
     }
   }
 }
@@ -363,4 +393,15 @@ class _SelfValidateJob implements HasStageName {
   final String stageName;
 
   _SelfValidateJob(this.stageName);
+}
+
+class _MapEntryWithStage<K, V> implements MapEntry<K, V> {
+  @override
+  final K key;
+  @override
+  final V value;
+
+  final String stageName;
+
+  _MapEntryWithStage(this.key, this.value, this.stageName);
 }
