@@ -192,7 +192,7 @@ void logPackages(Iterable<PackageConfig> configs) {
 ///
 /// The [conditionalStages] are CI specific, as they use CI specific expression
 /// syntax.
-List<Object /*ConditionalStage|String*/ > calculateOrderedStages(
+List<String> calculateOrderedStages(
     RootConfig rootConfig, Map<String, ConditionalStage> conditionalStages) {
   // Convert the configs to a graph so we can run strongly connected components.
   final edges = <String, Set<String>>{};
@@ -252,7 +252,7 @@ List<Object /*ConditionalStage|String*/ > calculateOrderedStages(
 
         final matchingStage = conditionalStages[stageName];
 
-        return matchingStage?.toJson() ?? stageName;
+        return matchingStage.name ?? stageName;
       })
       .toList()
       .reversed

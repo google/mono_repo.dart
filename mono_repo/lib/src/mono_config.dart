@@ -34,6 +34,7 @@ const _allowedPubActions = {
 
 class MonoConfig {
   final Set<CI> ci;
+  final Map<String, ConditionalStage> githubConditionalStages;
   final Map<String, ConditionalStage> travisConditionalStages;
   final Set<String> mergeStages;
   final bool prettyAnsi;
@@ -44,6 +45,7 @@ class MonoConfig {
 
   MonoConfig._({
     @required Set<CI> ci,
+    @required this.githubConditionalStages,
     @required this.travisConditionalStages,
     @required this.mergeStages,
     @required this.prettyAnsi,
@@ -73,52 +75,21 @@ class MonoConfig {
       );
     }
 
-    final travisConditionalStages = <String, ConditionalStage>{};
-    final rawStageValue = travis['stages'];
-    if (rawStageValue != null) {
-      if (rawStageValue is List) {
-        for (var item in rawStageValue) {
-          if (item is Map || item is String) {
-            final stage = ConditionalStage.fromJson(item);
-            if (travisConditionalStages.containsKey(stage.name)) {
-              throw CheckedFromJsonException(
-                travis,
-                'stages',
-                'MonoConfig',
-                '`${stage.name}` appears more than once.',
-              );
-            }
-            travisConditionalStages[stage.name] = stage;
-          } else {
-            throw CheckedFromJsonException(
-              travis,
-              'stages',
-              'MonoConfig',
-              'All values must be String or Map instances.',
-            );
-          }
-        }
-      } else {
-        throw CheckedFromJsonException(
-          travis,
-          'stages',
-          'MonoConfig',
-          '`stages` must be an array.',
-        );
-      }
-    }
+    final githubConditionalStages = _readConditionalStages(github);
+    final travisConditionalStages = _readConditionalStages(travis);
+    // We are done with these values now
+    github.remove('stages');
+    travis.remove('stages');
 
     return MonoConfig._(
       ci: ci,
+      githubConditionalStages: githubConditionalStages,
       travisConditionalStages: travisConditionalStages,
       mergeStages: mergeStages,
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
       selfValidateStage: selfValidateStage,
-      // Removing 'stages' so any `throw CheckedFromJsonException` will have the
-      // right value, but the code that writes the values won't write stages
-      // separately
-      travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
+      travis: travis.map((k, v) => MapEntry(k as String, v)),
       github: GitHubConfig.fromJson(github),
     );
   }
@@ -246,6 +217,47 @@ class MonoConfig {
 
     return createWithCheck(() => MonoConfig.fromJson(yaml));
   }
+}
+
+/// Parses the `stages` key from a CI config map, into a Map from stage name
+/// to [ConditionalStage] instance.
+Map<String, ConditionalStage> _readConditionalStages(
+    Map<dynamic, dynamic> ciJson) {
+  final conditionalStages = <String, ConditionalStage>{};
+  final rawValue = ciJson['stages'];
+  if (rawValue != null) {
+    if (rawValue is List) {
+      for (var item in rawValue) {
+        if (item is Map || item is String) {
+          final stage = ConditionalStage.fromJson(item);
+          if (conditionalStages.containsKey(stage.name)) {
+            throw CheckedFromJsonException(
+              ciJson,
+              'stages',
+              'MonoConfig',
+              '`${stage.name}` appears more than once.',
+            );
+          }
+          conditionalStages[stage.name] = stage;
+        } else {
+          throw CheckedFromJsonException(
+            ciJson,
+            'stages',
+            'MonoConfig',
+            'All values must be String or Map instances.',
+          );
+        }
+      }
+    } else {
+      throw CheckedFromJsonException(
+        ciJson,
+        'stages',
+        'MonoConfig',
+        '`stages` must be an array.',
+      );
+    }
+  }
+  return conditionalStages;
 }
 
 const _selfValidateStageName = 'mono_repo_self_validate';

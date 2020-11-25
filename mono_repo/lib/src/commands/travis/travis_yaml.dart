@@ -38,20 +38,14 @@ ${toYaml({
         })}
 ''';
 
-  int stageIndex(String value) => orderedStages.indexWhere((e) {
-        if (e is String) {
-          return e == value;
-        }
-
-        return (e as Map)['name'] == value;
-      });
-
   final jobList = [
     ..._listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
     if (rootConfig.monoConfig.selfValidateStage != null)
       _selfValidateTaskConfig(rootConfig.monoConfig.selfValidateStage),
   ]..sort((a, b) {
-      var value = stageIndex(a['stage']).compareTo(stageIndex(b['stage']));
+      var value = orderedStages
+          .indexOf(a['stage'])
+          .compareTo(orderedStages.indexOf(b['stage']));
 
       for (var key in const ['env', 'script', 'dart', 'os']) {
         if (value != 0) {
@@ -78,6 +72,11 @@ ${toYaml({
       return value;
     });
 
+  final stageConfigs = orderedStages.map((stage) {
+    final conditional = rootConfig.monoConfig.travisConditionalStages[stage];
+    return conditional == null ? stage : conditional.toJson();
+  }).toList();
+
   return '''
 $createdWith
 ${toYaml({'language': 'dart'})}
@@ -86,7 +85,7 @@ ${toYaml({
     'jobs': {'include': jobList}
   })}
 
-${toYaml({'stages': orderedStages})}
+${toYaml({'stages': stageConfigs})}
 $branchConfig
 ${toYaml({
     'cache': {'directories': _cacheDirs(rootConfig)}
