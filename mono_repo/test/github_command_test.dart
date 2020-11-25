@@ -19,7 +19,7 @@ void main() {
         'github': {'not_supported': 5}
       },
       r'''
-line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, cron, workflows]
+line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, cron, stages, workflows]
   ╷
 2 │   not_supported: 5
   │   ^^^^^^^^^^^^^
