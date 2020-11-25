@@ -4,13 +4,11 @@
 
 import 'dart:collection';
 
-import 'package:graphs/graphs.dart';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
 import '../../package_config.dart';
 import '../../root_config.dart';
-import '../../user_exception.dart';
 import '../../yaml.dart';
 import '../ci_script/generate.dart';
 
@@ -18,7 +16,8 @@ String generateTravisYml(
   RootConfig rootConfig,
   Map<String, String> commandsToKeys,
 ) {
-  final orderedStages = _calculateOrderedStages(rootConfig);
+  final orderedStages = calculateOrderedStages(
+      rootConfig, rootConfig.monoConfig.travisConditionalStages);
 
   final jobs = rootConfig.expand((config) => config.jobs);
 
@@ -105,82 +104,6 @@ Iterable<String> _cacheDirs(Iterable<PackageConfig> configs) {
   }
 
   return items;
-}
-
-/// Calculates the global stages ordering, and throws a [UserException] if it
-/// detects any cycles.
-List<Object> _calculateOrderedStages(RootConfig rootConfig) {
-  // Convert the configs to a graph so we can run strongly connected components.
-  final edges = <String, Set<String>>{};
-
-  String previous;
-  for (var stage in rootConfig.monoConfig.conditionalStages.keys) {
-    edges.putIfAbsent(stage, () => <String>{});
-    if (previous != null) {
-      edges[previous].add(stage);
-    }
-    previous = stage;
-  }
-
-  final rootMentionedStages = <String>{
-    ...rootConfig.monoConfig.conditionalStages.keys,
-    ...rootConfig.monoConfig.mergeStages,
-  };
-
-  for (var config in rootConfig) {
-    String previous;
-    for (var stage in config.stageNames) {
-      rootMentionedStages.remove(stage);
-      edges.putIfAbsent(stage, () => <String>{});
-      if (previous != null) {
-        edges[previous].add(stage);
-      }
-      previous = stage;
-    }
-  }
-
-  if (rootMentionedStages.isNotEmpty) {
-    final items = rootMentionedStages.map((e) => '`$e`').join(', ');
-
-    throw UserException(
-      'Error parsing mono_repo.yaml',
-      details: 'One or more stage was referenced in `mono_repo.yaml` that do '
-          'not exist in any `mono_pkg.yaml` files: $items.',
-    );
-  }
-
-  // Running strongly connected components lets us detect cycles (which aren't
-  // allowed), and gives us the reverse order of what we ultimately want.
-  final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
-  for (var component in components) {
-    if (component.length > 1) {
-      final items = component.map((e) => '`$e`').join(', ');
-      throw UserException(
-        'Not all packages agree on `stages` ordering, found '
-        'a cycle between the following stages: $items.',
-      );
-    }
-  }
-
-  final orderedStages = components
-      .map((c) {
-        final stageName = c.first;
-
-        final matchingStage =
-            rootConfig.monoConfig.conditionalStages[stageName];
-
-        return matchingStage?.toJson() ?? stageName;
-      })
-      .toList()
-      .reversed
-      .toList();
-
-  if (rootConfig.monoConfig.selfValidateStage != null &&
-      !orderedStages.contains(rootConfig.monoConfig.selfValidateStage)) {
-    orderedStages.insert(0, rootConfig.monoConfig.selfValidateStage);
-  }
-
-  return orderedStages;
 }
 
 /// Lists all the jobs, setting their stage, environment, and script.

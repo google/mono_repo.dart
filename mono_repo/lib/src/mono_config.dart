@@ -34,7 +34,7 @@ const _allowedPubActions = {
 
 class MonoConfig {
   final Set<CI> ci;
-  final Map<String, ConditionalStage> conditionalStages;
+  final Map<String, ConditionalStage> travisConditionalStages;
   final Set<String> mergeStages;
   final bool prettyAnsi;
   final String pubAction;
@@ -44,7 +44,7 @@ class MonoConfig {
 
   MonoConfig._({
     @required Set<CI> ci,
-    @required this.conditionalStages,
+    @required this.travisConditionalStages,
     @required this.mergeStages,
     @required this.prettyAnsi,
     @required this.pubAction,
@@ -73,14 +73,14 @@ class MonoConfig {
       );
     }
 
-    final conditionalStages = <String, ConditionalStage>{};
+    final travisConditionalStages = <String, ConditionalStage>{};
     final rawStageValue = travis['stages'];
     if (rawStageValue != null) {
       if (rawStageValue is List) {
         for (var item in rawStageValue) {
           if (item is Map || item is String) {
             final stage = ConditionalStage.fromJson(item);
-            if (conditionalStages.containsKey(stage.name)) {
+            if (travisConditionalStages.containsKey(stage.name)) {
               throw CheckedFromJsonException(
                 travis,
                 'stages',
@@ -88,7 +88,7 @@ class MonoConfig {
                 '`${stage.name}` appears more than once.',
               );
             }
-            conditionalStages[stage.name] = stage;
+            travisConditionalStages[stage.name] = stage;
           } else {
             throw CheckedFromJsonException(
               travis,
@@ -110,7 +110,7 @@ class MonoConfig {
 
     return MonoConfig._(
       ci: ci,
-      conditionalStages: conditionalStages,
+      travisConditionalStages: travisConditionalStages,
       mergeStages: mergeStages,
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
