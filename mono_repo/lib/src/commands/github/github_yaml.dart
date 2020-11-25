@@ -123,7 +123,7 @@ ${toYaml({'jobs': jobList})}
 }
 
 /// Lists all the jobs, setting their stage, environment, and script.
-Iterable<MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
+Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
@@ -136,7 +136,7 @@ Iterable<MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
-  MapEntryWithStage<String, Map<String, dynamic>> jobEntry(
+  _MapEntryWithStage<String, Map<String, dynamic>> jobEntry(
     Map<String, dynamic> content,
     String stage,
   ) {
@@ -144,7 +144,7 @@ Iterable<MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
     if (conditional != null) {
       content['if'] = conditional.ifCondition;
     }
-    return MapEntryWithStage(jobName(++count), content, stage);
+    return _MapEntryWithStage(jobName(++count), content, stage);
   }
 
   for (var job in jobs) {
@@ -395,7 +395,7 @@ class _SelfValidateJob implements HasStageName {
   _SelfValidateJob(this.stageName);
 }
 
-class MapEntryWithStage<K, V> implements MapEntry<K, V> {
+class _MapEntryWithStage<K, V> implements MapEntry<K, V> {
   @override
   final K key;
   @override
@@ -403,5 +403,5 @@ class MapEntryWithStage<K, V> implements MapEntry<K, V> {
 
   final String stageName;
 
-  MapEntryWithStage(this.key, this.value, this.stageName);
+  _MapEntryWithStage(this.key, this.value, this.stageName);
 }
