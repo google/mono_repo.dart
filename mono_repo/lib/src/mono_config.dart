@@ -77,9 +77,6 @@ class MonoConfig {
 
     final githubConditionalStages = _readConditionalStages(github);
     final travisConditionalStages = _readConditionalStages(travis);
-    // We are done with these values now
-    github = Map.of(github)..remove('stages');
-    travis = Map.of(travis)..remove('stages');
 
     return MonoConfig._(
       ci: ci,
