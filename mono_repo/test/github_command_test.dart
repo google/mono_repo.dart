@@ -432,8 +432,11 @@ Future<void> _testBadConfigWithYamlException(
 }
 
 Future<void> _testBadConfigWithUserException(
-    Object monoRepoYaml, Object expectedMessage,
-    {Object expectedDetails, Object printMatcher}) async {
+  Object monoRepoYaml,
+  Object expectedMessage, {
+  Object expectedDetails,
+  Object printMatcher,
+}) async {
   final monoConfigContent = toYaml(monoRepoYaml);
   await populateConfig(monoConfigContent);
   expect(
