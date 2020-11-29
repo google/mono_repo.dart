@@ -1,64 +1,64 @@
-# Created with package:mono_repo v3.3.0
+# Created with package:mono_repo v3.3.1-dev
 language: dart
 
 jobs:
   include:
     - stage: smoke_test
-      name: "SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`]"
+      name: "Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
       dart: dev
       os: linux
       env: PKGS="mono_repo test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
+      name: "Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh command
     - stage: smoke_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer .`"
+      name: "Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh dartanalyzer_1
     - stage: unit_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      name: "Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "SDK: dev; PKG: mono_repo; TASKS: `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "SDK: dev; PKG: test_pkg; TASKS: `pub run test --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="test_pkg"

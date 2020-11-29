@@ -4,6 +4,7 @@
 
 import 'dart:collection';
 
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
@@ -120,28 +121,52 @@ Iterable<Map<String, String>> _listJobs(
     jobEntries.add(CIJobEntry(job, commands));
   }
 
+  final differentPackages = <String>{};
+  final differentSdks = <String>{};
+
+  for (var entry in jobEntries) {
+    differentPackages.add(entry.job.package);
+    differentSdks.add(entry.job.sdk);
+  }
+
   final groupedItems = groupCIJobEntries(jobEntries);
 
   for (var entry in groupedItems.entries) {
     final first = entry.value.first;
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield first.jobYaml(packages);
+      yield first.jobYaml(
+        packages: packages,
+        oneSdk: differentSdks.length == 1,
+        onePackage: differentPackages.length == 1,
+      );
     } else {
-      yield* entry.value.map((jobEntry) => jobEntry.jobYaml());
+      yield* entry.value.map((jobEntry) => jobEntry.jobYaml(
+            oneSdk: differentSdks.length == 1,
+            onePackage: differentPackages.length == 1,
+          ));
     }
   }
 }
 
 extension on CIJobEntry {
-  Map<String, String> jobYaml([List<String> packages]) {
+  Map<String, String> jobYaml({
+    List<String> packages,
+    @required bool oneSdk,
+    @required bool onePackage,
+  }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 
     return {
       'stage': job.stageName,
-      'name': jobName(packages),
+      'name': jobName(
+        packages,
+        oneOs: true,
+        oneSdk: oneSdk,
+        onePackage: onePackage,
+      ),
       'dart': job.sdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
