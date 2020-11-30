@@ -45,11 +45,23 @@ class CIJobEntry {
 
   CIJobEntry(this.job, this.commands);
 
-  String jobName(List<String> packages) {
-    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
+  String jobName(
+    List<String> packages, {
+    @required bool includeOs,
+    @required bool includeSdk,
+    @required bool includePackage,
+    @required bool includeStage,
+  }) {
+    final packageLabel = packages.length == 1 ? 'PKG' : 'PKGS';
+    final sections = [
+      if (includeStage && job.stageName != null) job.stageName,
+      if (!includeOs) job.os,
+      if (!includeSdk) 'Dart ${job.sdk}',
+      if (!includePackage) '$packageLabel: ${packages.join(', ')}',
+      job.name,
+    ];
 
-    return 'SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
-        'TASKS: ${job.name}';
+    return sections.join('; ');
   }
 }
 
