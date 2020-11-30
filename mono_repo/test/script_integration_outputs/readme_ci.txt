@@ -3,21 +3,21 @@
 
 # Support built in commands on windows out of the box.
 function pub() {
-  if [[ $TRAVIS_OS_NAME == "windows" ] || [ "$OSTYPE" == "msys" ]]; then
+  if [[ $TRAVIS_OS_NAME == "windows" ]] || [[ "$OSTYPE" == "msys" ]]; then
     command pub.bat "$@"
   else
     command pub "$@"
   fi
 }
 function dartfmt() {
-  if [[ $TRAVIS_OS_NAME == "windows" ] || [ "$OSTYPE" == "msys" ]]; then
+  if [[ $TRAVIS_OS_NAME == "windows" ]] || [[ "$OSTYPE" == "msys" ]]; then
     command dartfmt.bat "$@"
   else
     command dartfmt "$@"
   fi
 }
 function dartanalyzer() {
-  if [[ $TRAVIS_OS_NAME == "windows" ] || [ "$OSTYPE" == "msys" ]]; then
+  if [[ $TRAVIS_OS_NAME == "windows" ]] || [[ "$OSTYPE" == "msys" ]]; then
     command dartanalyzer.bat "$@"
   else
     command dartanalyzer "$@"
