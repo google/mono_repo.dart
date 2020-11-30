@@ -47,16 +47,19 @@ Map<String, String> generateGitHubYml(
         'Should not get here – duplicate workflow "$fileName".',
       );
     }
+
+    myJobs = myJobs.toList()
+      ..sort((a, b) => orderedStages
+          .indexOf(a.stageName)
+          .compareTo(orderedStages.indexOf(b.stageName)));
+
     final allJobs = _listJobs(
       myJobs,
       commandsToKeys,
       rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
-    ).toList()
-      ..sort((a, b) => orderedStages
-          .indexOf(a.stageName)
-          .compareTo(orderedStages.indexOf(b.stageName)));
+    ).toList();
 
     var currStageJobs = <String>{};
     var prevStageJobs = <String>{};
