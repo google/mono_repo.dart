@@ -9,7 +9,7 @@ import 'user_exception.dart';
 
 String _dartCommandContent(String commandName) => '''
 function $commandName() {
-  if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+  if [[ \$TRAVIS_OS_NAME == "windows" ]] || [[ "\$OSTYPE" == "msys" ]]; then
     command $commandName.bat "\$@"
   else
     command $commandName "\$@"

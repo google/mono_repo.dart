@@ -57,7 +57,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: sub_pkg
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartanalyzer
   job_003:
     name: "analyze; `dartfmt -n --set-exit-if-changed .`"
@@ -80,7 +79,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: sub_pkg
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt
   job_004:
     name: Notify failure

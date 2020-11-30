@@ -1,12 +1,13 @@
 ## 3.3.1-dev
 
-- Cleanup the names generated for each job.
-
-### GitHub Actions
-
 - Shorten the generated names for a job if a given component of the name is
   identical for all tasks. Makes it easier to read the names in the GitHub
   Action UI.
+
+### GitHub Actions
+
+- Detect running on Windows on GitHub without setting an extra environment
+  variable.
 
 ## 3.3.0
 
