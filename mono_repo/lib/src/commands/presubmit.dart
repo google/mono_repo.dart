@@ -21,7 +21,7 @@ class PresubmitCommand extends MonoRepoCommand {
   String get name => 'presubmit';
 
   @override
-  String get description => 'Run the ci presubmits locally.';
+  String get description => 'Run the CI presubmits locally.';
 
   PresubmitCommand() {
     argParser
