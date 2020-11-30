@@ -226,7 +226,6 @@ extension on CIJobEntry {
           '$ciScriptPath ${commands.join(' ')}',
           env: {
             'PKGS': packages.join(' '),
-            'TRAVIS_OS_NAME': job.os,
           },
         )
       ],

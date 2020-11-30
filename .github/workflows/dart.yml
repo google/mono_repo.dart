@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.3.0
+# Created with package:mono_repo v3.3.1-dev
 name: Dart CI
 on:
   push:
@@ -36,7 +36,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh command
   job_002:
     name: "OS: linux; SDK: dev; PKGS: mono_repo, test_pkg; TASKS: [`dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`]"
@@ -59,7 +58,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo test_pkg
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt dartanalyzer_0
   job_003:
     name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `dartanalyzer .`"
@@ -83,7 +81,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartanalyzer_1
   job_004:
     name: "OS: linux; SDK: 2.7.0; PKG: mono_repo; TASKS: `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
@@ -107,7 +104,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_0
     needs:
       - job_001
@@ -125,7 +121,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: windows
         run: tool/ci.sh test_0
     needs:
       - job_001
@@ -152,7 +147,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_0
     needs:
       - job_001
@@ -169,7 +163,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: windows
         run: tool/ci.sh test_0
     needs:
       - job_001
@@ -197,7 +190,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
     needs:
       - job_001
@@ -224,7 +216,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: mono_repo
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_1
     needs:
       - job_001
@@ -251,7 +242,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: test_pkg
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test_2
     needs:
       - job_001

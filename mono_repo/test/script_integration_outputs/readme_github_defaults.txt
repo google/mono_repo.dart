@@ -37,7 +37,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: sub_pkg
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test
   job_002:
     name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
@@ -60,7 +59,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: sub_pkg
-          TRAVIS_OS_NAME: linux
         run: tool/ci.sh test
     if: "github.event_name == 'schedule'"
     needs:
@@ -76,7 +74,6 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           PKGS: sub_pkg
-          TRAVIS_OS_NAME: windows
         run: tool/ci.sh test
     if: "github.event_name == 'schedule'"
     needs:

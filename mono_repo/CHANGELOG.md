@@ -1,3 +1,8 @@
+## 3.3.1-dev
+
+- Detect running on Windows on GitHub without setting an extra environment
+  variable.
+
 ## 3.3.0
 
 - Implemented proper support for `stages` in github actions. Jobs will now
