@@ -37,7 +37,7 @@ jobs:
       - run: pub global activate mono_repo 1.2.3
       - run: pub global run mono_repo generate --validate
   job_002:
-    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartanalyzer .`"
+    name: "analyze; `dartanalyzer .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -60,7 +60,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartanalyzer
   job_003:
-    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `dartfmt -n --set-exit-if-changed .`"
+    name: "analyze; `dartfmt -n --set-exit-if-changed .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies

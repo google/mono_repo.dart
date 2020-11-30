@@ -17,7 +17,7 @@ env:
 
 jobs:
   job_001:
-    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+    name: "unit_test; linux; `pub run test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -40,7 +40,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh test
   job_002:
-    name: "OS: linux; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+    name: "cron; linux; `pub run test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -66,7 +66,7 @@ jobs:
     needs:
       - job_001
   job_003:
-    name: "OS: windows; SDK: dev; PKG: sub_pkg; TASKS: `pub run test`"
+    name: "cron; windows; `pub run test`"
     runs-on: windows-latest
     steps:
       - uses: cedx/setup-dart@v2

@@ -336,19 +336,19 @@ language: dart
 jobs:
   include:
     - stage: format
-      name: "SDK: dev; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt
     - stage: format
-      name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart stable; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt
     - stage: format
-      name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_b; `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
@@ -439,19 +439,19 @@ language: dart
 jobs:
   include:
     - stage: format
-      name: "SDK: dev; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt_0
     - stage: format
-      name: "SDK: stable; PKG: pkg_a; TASKS: `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart stable; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt_0
     - stage: format
-      name: "SDK: dev; PKG: pkg_b; TASKS: `dartfmt --dry-run --fix --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_b; `dartfmt --dry-run --fix --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
@@ -567,25 +567,25 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "SDK: 1.23.0; PKG: pkg_a; TASKS: `dartanalyzer .`"
+      name: "Dart 1.23.0; `dartanalyzer .`"
       dart: "1.23.0"
       os: windows
       env: PKGS="pkg_a"
       script: tool/ci.sh dartanalyzer
     - stage: analyze
-      name: "SDK: dev; PKG: pkg_a; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
+      name: "Dart dev; `dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`"
       dart: dev
       os: osx
       env: PKGS="pkg_a"
       script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
-      name: "SDK: dev; PKG: pkg_a; TASKS: chrome tests"
+      name: Dart dev; chrome tests
       dart: dev
       os: macos
       env: PKGS="pkg_a"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
+      name: "Dart stable; `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
@@ -877,31 +877,31 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "SDK: stable; PKGS: pkg_a, pkg_b; TASKS: [`dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`]"
+      name: "PKGS: pkg_a, pkg_b; `dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a pkg_b"
       script: tool/ci.sh dartanalyzer dartfmt
     - stage: unit_test
-      name: "SDK: stable; PKG: pkg_a; TASKS: chrome tests"
+      name: "PKG: pkg_a; chrome tests"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: stable; PKG: pkg_a; TASKS: `pub run test --preset travis`"
+      name: "PKG: pkg_a; `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "SDK: stable; PKG: pkg_b; TASKS: chrome tests"
+      name: "PKG: pkg_b; chrome tests"
       dart: stable
       os: linux
       env: PKGS="pkg_b"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "SDK: stable; PKG: pkg_b; TASKS: `pub run test --preset travis`"
+      name: "PKG: pkg_b; `pub run test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_b"

@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:io/ansi.dart';
+import 'package:meta/meta.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 import '../../ci_shared.dart';
@@ -123,7 +124,7 @@ ${toYaml({'jobs': jobList})}
 }
 
 /// Lists all the jobs, setting their stage, environment, and script.
-Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
+Iterable<_MapEntryWithStage> _listJobs(
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
@@ -136,7 +137,7 @@ Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
-  _MapEntryWithStage<String, Map<String, dynamic>> jobEntry(
+  _MapEntryWithStage jobEntry(
     Map<String, dynamic> content,
     String stage,
   ) {
@@ -161,6 +162,16 @@ Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
     jobEntries.add(CIJobEntry(ciJob, commands));
   }
 
+  final differentOperatingSystems = <String>{};
+  final differentPackages = <String>{};
+  final differentSdks = <String>{};
+
+  for (var entry in jobEntries) {
+    differentOperatingSystems.add(entry.job.os);
+    differentPackages.add(entry.job.package);
+    differentSdks.add(entry.job.sdk);
+  }
+
   // Group jobs by all of the values that would allow them to merge
   final groupedItems = groupCIJobEntries(jobEntries);
 
@@ -174,9 +185,24 @@ Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
-      yield jobEntry(first.jobYaml(packages), first.job.stageName);
+      yield jobEntry(
+          first.jobYaml(
+            packages: packages,
+            oneOs: differentOperatingSystems.length == 1,
+            oneSdk: differentSdks.length == 1,
+            onePackage: differentPackages.length == 1,
+          ),
+          first.job.stageName);
     } else {
-      yield* entry.value.map((e) => jobEntry(e.jobYaml(), e.job.stageName));
+      yield* entry.value.map(
+        (e) => jobEntry(
+            e.jobYaml(
+              oneOs: differentOperatingSystems.length == 1,
+              oneSdk: differentSdks.length == 1,
+              onePackage: differentPackages.length == 1,
+            ),
+            e.job.stageName),
+      );
     }
   }
 
@@ -192,13 +218,6 @@ Iterable<_MapEntryWithStage<String, Map<String, dynamic>>> _listJobs(
 }
 
 extension on CIJobEntry {
-  String _jobName(List<String> packages) {
-    final pkgLabel = packages.length == 1 ? 'PKG' : 'PKGS';
-
-    return 'OS: ${job.os}; SDK: ${job.sdk}; $pkgLabel: ${packages.join(', ')}; '
-        'TASKS: ${job.name}';
-  }
-
   String get _githubJobOs {
     switch (job.os) {
       case 'linux':
@@ -212,13 +231,24 @@ extension on CIJobEntry {
     throw UnsupportedError('Not sure how to map `${job.os}` to GitHub!');
   }
 
-  Map<String, dynamic> jobYaml([List<String> packages]) {
+  Map<String, dynamic> jobYaml({
+    List<String> packages,
+    @required bool oneOs,
+    @required bool oneSdk,
+    @required bool onePackage,
+  }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
 
     return _githubJobYaml(
-      _jobName(packages),
+      jobName(
+        packages,
+        includeOs: oneOs,
+        includeSdk: oneSdk,
+        includePackage: onePackage,
+        includeStage: true,
+      ),
       _githubJobOs,
       job.sdk,
       [
@@ -395,11 +425,11 @@ class _SelfValidateJob implements HasStageName {
   _SelfValidateJob(this.stageName);
 }
 
-class _MapEntryWithStage<K, V> implements MapEntry<K, V> {
+class _MapEntryWithStage implements MapEntry<String, Map<String, dynamic>> {
   @override
-  final K key;
+  final String key;
   @override
-  final V value;
+  final Map<String, dynamic> value;
 
   final String stageName;
 

@@ -183,12 +183,8 @@ class CIJob implements HasStageName {
   Iterable<String> get _taskCommandsTickQuoted =>
       tasks.map((t) => '`${t.command}`');
 
-  /// The description of the job to use for the job in the travis dashboard.
-  String get name =>
-      description ??
-      (tasks.length > 1
-          ? _taskCommandsTickQuoted.toList().toString()
-          : _taskCommandsTickQuoted.first);
+  /// The description of the job in the CI environment.
+  String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
   CIJob(
     this.os,
