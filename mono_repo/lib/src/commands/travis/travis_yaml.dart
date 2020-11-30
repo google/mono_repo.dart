@@ -163,9 +163,9 @@ extension on CIJobEntry {
       'stage': job.stageName,
       'name': jobName(
         packages,
-        oneOs: true,
-        oneSdk: oneSdk,
-        onePackage: onePackage,
+        includeOs: true,
+        includeSdk: oneSdk,
+        includePackage: onePackage,
       ),
       'dart': job.sdk,
       'os': job.os,

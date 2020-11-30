@@ -47,15 +47,15 @@ class CIJobEntry {
 
   String jobName(
     List<String> packages, {
-    @required bool oneOs,
-    @required bool oneSdk,
-    @required bool onePackage,
+    @required bool includeOs,
+    @required bool includeSdk,
+    @required bool includePackage,
   }) {
     final packageLabel = packages.length == 1 ? 'PKG' : 'PKGS';
     final sections = [
-      if (!oneOs) job.os,
-      if (!oneSdk) 'Dart ${job.sdk}',
-      if (!onePackage) '$packageLabel: ${packages.join(', ')}',
+      if (!includeOs) job.os,
+      if (!includeSdk) 'Dart ${job.sdk}',
+      if (!includePackage) '$packageLabel: ${packages.join(', ')}',
       job.name,
     ];
 

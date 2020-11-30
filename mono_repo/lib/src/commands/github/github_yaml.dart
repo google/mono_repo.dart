@@ -242,7 +242,7 @@ extension on CIJobEntry {
     assert(packages.contains(job.package));
 
     return _githubJobYaml(
-      jobName(packages, oneOs: oneOs, oneSdk: oneSdk, onePackage: onePackage),
+      jobName(packages, includeOs: oneOs, includeSdk: oneSdk, includePackage: onePackage),
       _githubJobOs,
       job.sdk,
       [
