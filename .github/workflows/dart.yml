@@ -16,7 +16,7 @@ env:
 
 jobs:
   job_001:
-    name: "linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
+    name: "smoke_test; linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -39,7 +39,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh command
   job_002:
-    name: "linux; Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -62,7 +62,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartfmt dartanalyzer_0
   job_003:
-    name: "linux; Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
+    name: "smoke_test; linux; Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -86,7 +86,7 @@ jobs:
           TRAVIS_OS_NAME: linux
         run: tool/ci.sh dartanalyzer_1
   job_004:
-    name: "linux; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -114,7 +114,7 @@ jobs:
       - job_002
       - job_003
   job_005:
-    name: "windows; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; windows; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: cedx/setup-dart@v2
@@ -132,7 +132,7 @@ jobs:
       - job_002
       - job_003
   job_006:
-    name: "linux; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -159,7 +159,7 @@ jobs:
       - job_002
       - job_003
   job_007:
-    name: "windows; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; windows; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: cedx/setup-dart@v2
@@ -176,7 +176,7 @@ jobs:
       - job_002
       - job_003
   job_008:
-    name: "linux; Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -204,7 +204,7 @@ jobs:
       - job_002
       - job_003
   job_009:
-    name: "linux; Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -231,7 +231,7 @@ jobs:
       - job_002
       - job_003
   job_010:
-    name: "linux; Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies

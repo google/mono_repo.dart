@@ -50,9 +50,11 @@ class CIJobEntry {
     @required bool includeOs,
     @required bool includeSdk,
     @required bool includePackage,
+    @required bool includeStage,
   }) {
     final packageLabel = packages.length == 1 ? 'PKG' : 'PKGS';
     final sections = [
+      if (includeStage && job.stageName != null) job.stageName,
       if (!includeOs) job.os,
       if (!includeSdk) 'Dart ${job.sdk}',
       if (!includePackage) '$packageLabel: ${packages.join(', ')}',

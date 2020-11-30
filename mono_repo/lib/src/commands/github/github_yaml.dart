@@ -247,6 +247,7 @@ extension on CIJobEntry {
         includeOs: oneOs,
         includeSdk: oneSdk,
         includePackage: onePackage,
+        includeStage: true,
       ),
       _githubJobOs,
       job.sdk,
