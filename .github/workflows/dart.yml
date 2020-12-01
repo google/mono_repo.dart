@@ -170,7 +170,10 @@ jobs:
       - job_003
   job_008:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2
