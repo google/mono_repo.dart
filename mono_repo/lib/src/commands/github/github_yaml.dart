@@ -258,7 +258,7 @@ extension on CIJobEntry {
         for (var package in packages)
           for (var i = 0; i < commands.length; i++)
             _CommandEntry(
-              job.tasks[i].command,
+              '$package; ${job.tasks[i].command}',
               '$ciScriptPath ${commands[i]}',
               env: {
                 'PKGS': package,
