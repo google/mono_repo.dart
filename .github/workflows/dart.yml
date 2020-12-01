@@ -34,7 +34,8 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh command
   job_002:
@@ -56,9 +57,22 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
-          PKGS: mono_repo test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+      - name: dartfmt -n --set-exit-if-changed .
+        env:
+          PKGS: mono_repo
+        run: tool/ci.sh dartfmt
+      - name: dartanalyzer --fatal-infos .
+        env:
+          PKGS: mono_repo
+        run: tool/ci.sh dartanalyzer_0
+      - name: dartfmt -n --set-exit-if-changed .
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartfmt
+      - name: dartanalyzer --fatal-infos .
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
   job_003:
     name: "smoke_test; linux; Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
     runs-on: ubuntu-latest
@@ -79,7 +93,8 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: dartanalyzer .
+        env:
           PKGS: mono_repo
         run: tool/ci.sh dartanalyzer_1
   job_004:
@@ -102,7 +117,8 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
     needs:
@@ -119,7 +135,8 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
     needs:
@@ -145,7 +162,8 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
     needs:
@@ -161,7 +179,8 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
     needs:
@@ -188,7 +207,8 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test -t yaml --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
     needs:
@@ -214,7 +234,8 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test -t yaml --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
     needs:
@@ -240,7 +261,8 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - name: "pub run test --test-randomize-ordering-seed=random"
+        env:
           PKGS: test_pkg
         run: tool/ci.sh test_2
     needs:

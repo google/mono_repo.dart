@@ -255,12 +255,15 @@ extension on CIJobEntry {
       _githubJobOs,
       job.sdk,
       [
-        _CommandEntry(
-          '$ciScriptPath ${commands.join(' ')}',
-          env: {
-            'PKGS': packages.join(' '),
-          },
-        )
+        for (var package in packages)
+          for (var i = 0; i < commands.length; i++)
+            _CommandEntry(
+              job.tasks[i].command,
+              '$ciScriptPath ${commands[i]}',
+              env: {
+                'PKGS': package,
+              },
+            )
       ],
       additionalCacheKeys: {
         'packages': packages.join('-'),
@@ -353,10 +356,12 @@ Map<String, dynamic> _githubJobYaml(
     };
 
 class _CommandEntry {
+  final String name;
   final String run;
   final Map<String, String> env;
 
   _CommandEntry(
+    this.name,
     this.run, {
     this.env,
   });
@@ -365,6 +370,7 @@ class _CommandEntry {
   ///
   /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
   Map<String, dynamic> get runContent => {
+        'name': name,
         if (env != null && env.isNotEmpty) 'env': env,
         'run': run,
       };
@@ -414,7 +420,8 @@ Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
       'ubuntu-latest',
       'stable',
       [
-        for (var command in selfValidateCommands) _CommandEntry(command),
+        for (var command in selfValidateCommands)
+          _CommandEntry(selfValidateJobName, command),
       ],
     );
 
