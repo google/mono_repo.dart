@@ -34,7 +34,7 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
+      - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         env:
           PKGS: mono_repo
         run: tool/ci.sh command
@@ -57,19 +57,19 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: dartfmt -n --set-exit-if-changed .
+      - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
         env:
           PKGS: mono_repo
         run: tool/ci.sh dartfmt
-      - name: dartanalyzer --fatal-infos .
+      - name: "mono_repo; dartanalyzer --fatal-infos ."
         env:
           PKGS: mono_repo
         run: tool/ci.sh dartanalyzer_0
-      - name: dartfmt -n --set-exit-if-changed .
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         env:
           PKGS: test_pkg
         run: tool/ci.sh dartfmt
-      - name: dartanalyzer --fatal-infos .
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
         env:
           PKGS: test_pkg
         run: tool/ci.sh dartanalyzer_0
@@ -93,7 +93,7 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: dartanalyzer .
+      - name: mono_repo; dartanalyzer .
         env:
           PKGS: mono_repo
         run: tool/ci.sh dartanalyzer_1
@@ -117,7 +117,7 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
@@ -135,7 +135,7 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
@@ -162,7 +162,7 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
@@ -179,7 +179,7 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
@@ -207,7 +207,7 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test -t yaml --test-randomize-ordering-seed=random"
+      - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
@@ -234,7 +234,7 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test -t yaml --test-randomize-ordering-seed=random"
+      - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
@@ -261,7 +261,7 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - name: "pub run test --test-randomize-ordering-seed=random"
+      - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
         env:
           PKGS: test_pkg
         run: tool/ci.sh test_2
