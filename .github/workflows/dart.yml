@@ -194,10 +194,6 @@ jobs:
       - env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
-    needs:
-      - job_001
-      - job_002
-      - job_003
   job_009:
     name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
