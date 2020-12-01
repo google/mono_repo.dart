@@ -373,6 +373,9 @@ class _CommandEntry {
         'name': name,
         if (env != null && env.isNotEmpty) 'env': env,
         'run': run,
+        // We want to run even if other steps failed, use stages if you want
+        // to block things on previous failures.
+        'if': 'always()',
       };
 }
 
