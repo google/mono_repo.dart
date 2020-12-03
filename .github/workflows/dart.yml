@@ -83,6 +83,96 @@ jobs:
           PKGS: mono_repo
         run: tool/ci.sh dartanalyzer_1
   job_004:
+    name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:beta;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:beta;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:beta
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: beta
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartfmt dartanalyzer_0
+  job_005:
+    name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: stable
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartfmt dartanalyzer_0
+  job_006:
+    name: "smoke_test; linux; Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: dev
+          version: "2.12.0-0.0.dev"
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartfmt dartanalyzer_0
+  job_007:
+    name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-29.10.beta;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-29.10.beta;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-29.10.beta
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: cedx/setup-dart@v2
+        with:
+          release-channel: beta
+          version: "2.12.0-29.10.beta"
+      - run: dart --version
+      - uses: actions/checkout@v2
+      - env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartfmt dartanalyzer_0
+  job_008:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -109,7 +199,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_005:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_009:
     name: "unit_test; windows; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
@@ -126,7 +220,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_006:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_010:
     name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -152,7 +250,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_007:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_011:
     name: "unit_test; windows; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
@@ -168,7 +270,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_008:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_012:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -195,7 +301,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_009:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_013:
     name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -221,7 +331,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_010:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_014:
     name: "unit_test; linux; Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -247,7 +361,11 @@ jobs:
       - job_001
       - job_002
       - job_003
-  job_011:
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+  job_015:
     name: Notify failure
     runs-on: ubuntu-latest
     if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
@@ -259,10 +377,10 @@ jobs:
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
     needs:
-      - job_004
-      - job_005
-      - job_006
-      - job_007
       - job_008
       - job_009
       - job_010
+      - job_011
+      - job_012
+      - job_013
+      - job_014

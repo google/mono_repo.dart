@@ -21,6 +21,30 @@ jobs:
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh dartanalyzer_1
+    - stage: smoke_test
+      name: "Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: "2.12.0-0.0.dev"
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/ci.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
+      name: "Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: "2.12.0-29.10.beta"
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/ci.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
+      name: "Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: beta
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/ci.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
+      name: "Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: stable
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: unit_test
       name: "Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.7.0"
