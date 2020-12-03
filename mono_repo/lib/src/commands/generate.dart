@@ -55,5 +55,7 @@ void generate(
   if (!config.monoConfig.ci.contains(CI.github) && forceGitHub) {
     generateGitHubActions(config, validateOnly: validateOnly);
   }
-  generateCIScript(config, validateOnly: validateOnly);
+  if (config.monoConfig.ci.contains(CI.travis) || forceTravis) {
+    generateCIScript(config, validateOnly: validateOnly);
+  }
 }

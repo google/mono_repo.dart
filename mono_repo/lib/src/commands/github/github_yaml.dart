@@ -13,7 +13,6 @@ import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
-import '../ci_script/generate.dart';
 
 const _onCompletionStage = '_on_completion';
 
@@ -256,19 +255,18 @@ extension on CIJobEntry {
       final pubStepId = '${package}_pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(_CommandEntry(
         '$package; $pubCommand',
-        'cd $package && $pubCommand',
+        pubCommand,
         id: pubStepId,
+        workingDirectory: package,
       ));
       for (var i = 0; i < commands.length; i++) {
         commandEntries.add(_CommandEntry(
           '$package; ${job.tasks[i].command}',
-          '$ciScriptPath ${commands[i]}',
-          env: {
-            'PKGS': package,
-          },
+          _commandForOs(job.tasks[i].command),
           // Run this regardless of the success of other steps other than the
           // pub step.
           ifCondition: "steps.$pubStepId.conclusion == 'success'",
+          workingDirectory: package,
         ));
       }
     }
@@ -289,6 +287,17 @@ extension on CIJobEntry {
         'commands': commands.join('-'),
       },
     );
+  }
+
+  String _commandForOs(String command) {
+    if (job.os == 'windows') {
+      final split = command.split(' ');
+      if (const ['dartfmt', 'pub', 'dartanalyzer'].contains(split.first)) {
+        split[0] = '${split[0]}.bat';
+        command = split.join(' ');
+      }
+    }
+    return command;
   }
 }
 
@@ -390,6 +399,7 @@ class _CommandEntry {
   final Map<String, String> /*?*/ env;
   final String /*?*/ id;
   final String /*?*/ ifCondition;
+  final String /*?*/ workingDirectory;
 
   _CommandEntry(
     this.name,
@@ -397,6 +407,7 @@ class _CommandEntry {
     this.env,
     this.id,
     this.ifCondition,
+    this.workingDirectory,
   });
 
   /// The entry in the GitHub Action stage representing this object.
@@ -406,8 +417,9 @@ class _CommandEntry {
         if (id != null) 'id': id,
         'name': name,
         if (env != null && env.isNotEmpty) 'env': env,
-        'run': run,
         if (ifCondition != null) 'if': ifCondition,
+        if (workingDirectory != null) 'working-directory': workingDirectory,
+        'run': run,
       };
 }
 

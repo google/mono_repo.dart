@@ -58,12 +58,12 @@ jobs:
       - uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
-        run: "cd sub_pkg && pub upgrade --no-precompile"
+        working-directory: sub_pkg
+        run: pub upgrade --no-precompile
       - name: sub_pkg; dartanalyzer .
-        env:
-          PKGS: sub_pkg
-        run: tool/ci.sh dartanalyzer
         if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dartanalyzer .
   job_003:
     name: "analyze; `dartfmt -n --set-exit-if-changed .`"
     runs-on: ubuntu-latest
@@ -85,12 +85,12 @@ jobs:
       - uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
-        run: "cd sub_pkg && pub upgrade --no-precompile"
+        working-directory: sub_pkg
+        run: pub upgrade --no-precompile
       - name: "sub_pkg; dartfmt -n --set-exit-if-changed ."
-        env:
-          PKGS: sub_pkg
-        run: tool/ci.sh dartfmt
         if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dartfmt -n --set-exit-if-changed .
   job_004:
     name: Notify failure
     runs-on: ubuntu-latest
