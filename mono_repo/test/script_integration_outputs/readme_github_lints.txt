@@ -33,8 +33,10 @@ jobs:
           release-channel: stable
       - run: dart --version
       - uses: actions/checkout@v2
-      - run: pub global activate mono_repo 1.2.3
-      - run: pub global run mono_repo generate --validate
+      - name: mono_repo self validate
+        run: pub global activate mono_repo 1.2.3
+      - name: mono_repo self validate
+        run: pub global run mono_repo generate --validate
   job_002:
     name: "analyze; `dartanalyzer .`"
     runs-on: ubuntu-latest
@@ -54,9 +56,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: sub_pkg_pub_upgrade
+        name: "sub_pkg; pub upgrade --no-precompile"
+        run: "cd sub_pkg && pub upgrade --no-precompile"
+      - name: sub_pkg; dartanalyzer .
+        env:
           PKGS: sub_pkg
         run: tool/ci.sh dartanalyzer
+        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
   job_003:
     name: "analyze; `dartfmt -n --set-exit-if-changed .`"
     runs-on: ubuntu-latest
@@ -76,9 +83,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: sub_pkg_pub_upgrade
+        name: "sub_pkg; pub upgrade --no-precompile"
+        run: "cd sub_pkg && pub upgrade --no-precompile"
+      - name: "sub_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: sub_pkg
         run: tool/ci.sh dartfmt
+        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
   job_004:
     name: Notify failure
     runs-on: ubuntu-latest
