@@ -248,7 +248,7 @@ extension on CIJobEntry {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
-    final pubCommand = 'pub${job.os == 'windows' ? '.bat' : ''} '
+    final pubCommand = 'cd pub${job.os == 'windows' ? '.bat' : ''} '
         '${rootConfig.monoConfig.pubAction} --no-precompile';
 
     final commandEntries = <_CommandEntry>[];
@@ -256,7 +256,7 @@ extension on CIJobEntry {
       final pubStepId = '${package}_pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(_CommandEntry(
         '$package; $pubCommand',
-        pubCommand,
+        'cd $package && $pubCommand',
         id: pubStepId,
       ));
       for (var i = 0; i < commands.length; i++) {
