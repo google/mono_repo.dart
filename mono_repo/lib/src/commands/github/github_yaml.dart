@@ -54,6 +54,7 @@ Map<String, String> generateGitHubYml(
           .compareTo(orderedStages.indexOf(b.stageName)));
 
     final allJobs = _listJobs(
+      rootConfig,
       myJobs,
       commandsToKeys,
       rootConfig.monoConfig.mergeStages,
@@ -128,6 +129,7 @@ ${toYaml({'jobs': jobList})}
 
 /// Lists all the jobs, setting their stage, environment, and script.
 Iterable<_MapEntryWithStage> _listJobs(
+  RootConfig rootConfig,
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
@@ -190,6 +192,7 @@ Iterable<_MapEntryWithStage> _listJobs(
       final packages = entry.value.map((t) => t.job.package).toList();
       yield jobEntry(
           first.jobYaml(
+            rootConfig,
             packages: packages,
             oneOs: differentOperatingSystems.length == 1,
             oneSdk: differentSdks.length == 1,
@@ -200,6 +203,7 @@ Iterable<_MapEntryWithStage> _listJobs(
       yield* entry.value.map(
         (e) => jobEntry(
             e.jobYaml(
+              rootConfig,
               oneOs: differentOperatingSystems.length == 1,
               oneSdk: differentSdks.length == 1,
               onePackage: differentPackages.length == 1,
@@ -234,7 +238,8 @@ extension on CIJobEntry {
     throw UnsupportedError('Not sure how to map `${job.os}` to GitHub!');
   }
 
-  Map<String, dynamic> jobYaml({
+  Map<String, dynamic> jobYaml(
+    RootConfig rootConfig, {
     List<String> packages,
     @required bool oneOs,
     @required bool oneSdk,
@@ -243,6 +248,28 @@ extension on CIJobEntry {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
+    final pubCommand = 'pub${job.os == 'windows' ? '.bat' : ''} '
+        '${rootConfig.monoConfig.pubAction} --no-precompile';
+
+    final commandEntries = <_CommandEntry>[];
+    for (var package in packages) {
+      final pubStepId = '${package}_pub_${rootConfig.monoConfig.pubAction}';
+      commandEntries.add(_CommandEntry(
+        '$package; $pubCommand',
+        pubCommand,
+        id: pubStepId,
+      ));
+      for (var i = 0; i < commands.length; i++) {
+        commandEntries.add(_CommandEntry(
+          '$package; ${job.tasks[i].command}',
+          '$ciScriptPath ${commands[i]}',
+          env: {
+            'PKGS': package,
+          },
+          ifCondition: 'steps.$pubStepId.conclusion == "success"',
+        ));
+      }
+    }
 
     return _githubJobYaml(
       jobName(
@@ -254,17 +281,7 @@ extension on CIJobEntry {
       ),
       _githubJobOs,
       job.sdk,
-      [
-        for (var package in packages)
-          for (var i = 0; i < commands.length; i++)
-            _CommandEntry(
-              '$package; ${job.tasks[i].command}',
-              '$ciScriptPath ${commands[i]}',
-              env: {
-                'PKGS': package,
-              },
-            )
-      ],
+      commandEntries,
       additionalCacheKeys: {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
@@ -358,24 +375,29 @@ Map<String, dynamic> _githubJobYaml(
 class _CommandEntry {
   final String name;
   final String run;
-  final Map<String, String> env;
+  final Map<String, String> /*?*/ env;
+  final String /*?*/ id;
+  final String /*?*/ ifCondition;
 
   _CommandEntry(
     this.name,
     this.run, {
     this.env,
+    this.id,
+    this.ifCondition,
   });
 
   /// The entry in the GitHub Action stage representing this object.
   ///
   /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
   Map<String, dynamic> get runContent => {
+        if (id != null) 'id': id,
         'name': name,
         if (env != null && env.isNotEmpty) 'env': env,
         'run': run,
         // We want to run even if other steps failed, use stages if you want
         // to block things on previous failures.
-        'if': 'always()',
+        if (ifCondition != null) 'if': ifCondition,
       };
 }
 
