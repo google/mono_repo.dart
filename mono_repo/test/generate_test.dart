@@ -38,7 +38,7 @@ void main() {
                 'Wrote `${p.join(d.sandbox, travisFileName)}`.',
               if (ci == 'github' && value != false)
                 'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
-              if (ci == 'travis' && value != false) ciScriptPathMessage,
+              ciScriptPathMessage,
             ].join('\n');
 
             testGenerateConfig(
