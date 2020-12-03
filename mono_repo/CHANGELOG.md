@@ -1,5 +1,8 @@
 ## 3.3.1-dev
 
+- Configuring the target Dart SDK:
+  - Allow specifying specific `dev` releases.
+  - Allow specifying just `beta`.
 - Shorten the generated names for a job if a given component of the name is
   identical for all tasks. Makes it easier to read the names in the GitHub
   Action UI.

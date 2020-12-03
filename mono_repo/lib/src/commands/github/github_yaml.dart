@@ -303,24 +303,34 @@ Map<String, dynamic> _createDartSetup(String sdk) {
     // noop
   }
 
-  if (realVersion != null) {
-    if (realVersion.isPreRelease) {
-      throw UnsupportedError(
-        'Unsupported Dart SDK configuration: `$sdk`.',
+  @alwaysThrows
+  void unsupported() => throw UnsupportedError(
+        'Unsupported Dart SDK configuration: `$sdk`.\n'
+        "We are currently limited by what's supported by "
+        'https://github.com/marketplace/actions/setup-dart-action',
       );
+
+  if (realVersion != null) {
+    var channel = 'stable';
+    if (realVersion.isPreRelease) {
+      if (realVersion.preRelease.first == 'dev' ||
+          realVersion.preRelease.last == 'dev') {
+        channel = 'dev';
+      } else if (realVersion.preRelease.first == 'beta' ||
+          realVersion.preRelease.last == 'beta') {
+        channel = 'beta';
+      } else {
+        unsupported();
+      }
     }
     withMap = {
-      'release-channel': 'stable',
+      'release-channel': channel,
       'version': sdk,
     };
-  } else if (sdk == 'dev') {
-    withMap = {'release-channel': 'dev'};
-  } else if (sdk == 'stable') {
-    withMap = {'release-channel': 'stable', 'version': 'latest'};
+  } else if (const {'beta', 'dev', 'stable'}.contains(sdk)) {
+    withMap = {'release-channel': sdk};
   } else {
-    throw UnsupportedError(
-      'Unsupported Dart SDK configuration: `$sdk`.',
-    );
+    unsupported();
   }
 
   final map = {

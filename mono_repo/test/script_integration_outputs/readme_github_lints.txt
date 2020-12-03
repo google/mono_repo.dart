@@ -31,7 +31,6 @@ jobs:
       - uses: cedx/setup-dart@v2
         with:
           release-channel: stable
-          version: latest
       - run: dart --version
       - uses: actions/checkout@v2
       - run: pub global activate mono_repo 1.2.3
