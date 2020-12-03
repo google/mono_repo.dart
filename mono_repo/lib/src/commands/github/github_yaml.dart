@@ -268,7 +268,7 @@ extension on CIJobEntry {
           },
           // Run this regardless of the success of other steps other than the
           // pub step.
-          ifCondition: 'steps.$pubStepId.conclusion == success()',
+          ifCondition: "steps.$pubStepId.conclusion == 'success'",
         ));
       }
     }
