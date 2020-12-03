@@ -248,7 +248,7 @@ extension on CIJobEntry {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
-    final pubCommand = 'cd pub${job.os == 'windows' ? '.bat' : ''} '
+    final pubCommand = 'pub${job.os == 'windows' ? '.bat' : ''} '
         '${rootConfig.monoConfig.pubAction} --no-precompile';
 
     final commandEntries = <_CommandEntry>[];
