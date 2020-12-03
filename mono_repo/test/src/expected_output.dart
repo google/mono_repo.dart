@@ -29,7 +29,7 @@ for PKG in ${PKGS}; do
   fi
 
   # Github actions runs this as a separate "step" before we get into this script
-  if [[ -z \${GITHUB_ACTIONS} ]] || [[ ! -z \${FORCE_PUB_COMMAND} ]]; then
+  if [[ -z ${GITHUB_ACTIONS} ]] || [[ ! -z ${FORCE_PUB_COMMAND} ]]; then
     pub upgrade --no-precompile || EXIT_CODE=$?
   fi
 
