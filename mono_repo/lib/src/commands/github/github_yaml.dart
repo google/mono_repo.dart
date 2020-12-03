@@ -408,8 +408,6 @@ class _CommandEntry {
         if (env != null && env.isNotEmpty) 'env': env,
         'run': run,
         if (ifCondition != null) 'if': ifCondition,
-        // Required to access the conclusion condition of previous steps
-        'continue-on-error': true,
       };
 }
 
