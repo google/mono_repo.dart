@@ -34,9 +34,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh command
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
   job_002:
     name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -56,9 +61,32 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
-          PKGS: mono_repo test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
+        env:
+          PKGS: mono_repo
+        run: tool/ci.sh dartfmt
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+      - name: "mono_repo; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: mono_repo
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
   job_003:
     name: "smoke_test; linux; Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
     runs-on: ubuntu-latest
@@ -79,9 +107,14 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: mono_repo; dartanalyzer .
+        env:
           PKGS: mono_repo
         run: tool/ci.sh dartanalyzer_1
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
   job_004:
     name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -101,9 +134,19 @@ jobs:
           release-channel: beta
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
   job_005:
     name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -123,9 +166,19 @@ jobs:
           release-channel: stable
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
   job_006:
     name: "smoke_test; linux; Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -146,9 +199,19 @@ jobs:
           version: "2.12.0-0.0.dev"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
   job_007:
     name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -169,9 +232,19 @@ jobs:
           version: "2.12.0-29.10.beta"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
   job_008:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -192,9 +265,14 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002
@@ -213,9 +291,14 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub.bat upgrade --no-precompile"
+        run: "cd mono_repo && pub.bat upgrade --no-precompile"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002
@@ -243,9 +326,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002
@@ -263,9 +351,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub.bat upgrade --no-precompile"
+        run: "cd mono_repo && pub.bat upgrade --no-precompile"
+      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_0
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002
@@ -294,9 +387,14 @@ jobs:
           version: "2.7.0"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002
@@ -324,9 +422,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: mono_repo_pub_upgrade
+        name: "mono_repo; pub upgrade --no-precompile"
+        run: "cd mono_repo && pub upgrade --no-precompile"
+      - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
+        env:
           PKGS: mono_repo
         run: tool/ci.sh test_1
+        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002
@@ -354,9 +457,14 @@ jobs:
           release-channel: dev
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+      - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
+        env:
           PKGS: test_pkg
         run: tool/ci.sh test_2
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
     needs:
       - job_001
       - job_002

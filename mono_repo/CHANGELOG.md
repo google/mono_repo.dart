@@ -11,6 +11,9 @@
 
 - Detect running on Windows on GitHub without setting an extra environment
   variable.
+- Separate job commands into a step for each. This makes it easier to see
+  exactly what commands were ran on what packages, as well as their individual
+  status and output.
 
 ## 3.3.0
 
