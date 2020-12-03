@@ -266,7 +266,7 @@ extension on CIJobEntry {
           env: {
             'PKGS': package,
           },
-          ifCondition: 'steps.$pubStepId.conclusion == "success"',
+          ifCondition: 'steps.$pubStepId.conclusion == success()',
         ));
       }
     }
