@@ -57,7 +57,7 @@ for PKG in \${PKGS}; do
   fi
 
   # Github actions runs this as a separate "step" before we get into this script
-  if [[ -z \${GITHUB_ACTIONS} ]]; then
+  if [[ -z \${GITHUB_ACTIONS} ]] || [[ ! -z \${FORCE_PUB_COMMAND} ]]; then
     pub $pubDependencyCommand --no-precompile || EXIT_CODE=\$?
   fi
 

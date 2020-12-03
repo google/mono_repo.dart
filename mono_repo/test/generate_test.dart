@@ -974,7 +974,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(ciScriptPath, contains(r'''
   # Github actions runs this as a separate "step" before we get into this script
-  if [[ -z ${GITHUB_ACTIONS} ]]; then
+  if [[ -z \${GITHUB_ACTIONS} ]] || [[ ! -z \${FORCE_PUB_COMMAND} ]]; then
     pub get --no-precompile || EXIT_CODE=$?
   fi
 
@@ -1038,7 +1038,7 @@ for PKG in ${PKGS}; do
   fi
 
   # Github actions runs this as a separate "step" before we get into this script
-  if [[ -z ${GITHUB_ACTIONS} ]]; then
+  if [[ -z \${GITHUB_ACTIONS} ]] || [[ ! -z \${FORCE_PUB_COMMAND} ]]; then
     pub upgrade --no-precompile || EXIT_CODE=$?
   fi
 
