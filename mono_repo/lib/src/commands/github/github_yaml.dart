@@ -266,6 +266,8 @@ extension on CIJobEntry {
           env: {
             'PKGS': package,
           },
+          // Run this regardless of the success of other steps other than the
+          // pub step.
           ifCondition: 'steps.$pubStepId.conclusion == success()',
         ));
       }
@@ -395,9 +397,9 @@ class _CommandEntry {
         'name': name,
         if (env != null && env.isNotEmpty) 'env': env,
         'run': run,
-        // We want to run even if other steps failed, use stages if you want
-        // to block things on previous failures.
         if (ifCondition != null) 'if': ifCondition,
+        // Required to access the conclusion condition of previous steps
+        'continue-on-error': true,
       };
 }
 
