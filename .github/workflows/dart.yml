@@ -35,8 +35,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         env:
           PKGS: mono_repo
@@ -62,8 +62,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
         env:
           PKGS: mono_repo
@@ -75,8 +75,8 @@ jobs:
         run: tool/ci.sh dartanalyzer_0
         if: steps.mono_repo_pub_upgrade.conclusion == success()
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "test_pkg; cd pub upgrade --no-precompile"
+        run: "cd test_pkg && cd pub upgrade --no-precompile"
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         env:
           PKGS: test_pkg
@@ -108,8 +108,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: mono_repo; dartanalyzer .
         env:
           PKGS: mono_repo
@@ -136,8 +136,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
@@ -158,8 +158,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub.bat upgrade --no-precompile"
-        run: pub.bat upgrade --no-precompile
+        name: "mono_repo; cd pub.bat upgrade --no-precompile"
+        run: "cd mono_repo && cd pub.bat upgrade --no-precompile"
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
@@ -189,8 +189,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
@@ -210,8 +210,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub.bat upgrade --no-precompile"
-        run: pub.bat upgrade --no-precompile
+        name: "mono_repo; cd pub.bat upgrade --no-precompile"
+        run: "cd mono_repo && cd pub.bat upgrade --no-precompile"
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
@@ -242,8 +242,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
@@ -273,8 +273,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "mono_repo; cd pub upgrade --no-precompile"
+        run: "cd mono_repo && cd pub upgrade --no-precompile"
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
         env:
           PKGS: mono_repo
@@ -304,8 +304,8 @@ jobs:
       - run: dart --version
       - uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
-        run: pub upgrade --no-precompile
+        name: "test_pkg; cd pub upgrade --no-precompile"
+        run: "cd test_pkg && cd pub upgrade --no-precompile"
       - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
         env:
           PKGS: test_pkg
