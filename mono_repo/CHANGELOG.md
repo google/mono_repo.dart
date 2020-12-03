@@ -1,4 +1,4 @@
-## 3.3.1-dev
+## 3.4.0
 
 - Configuring the target Dart SDK:
   - Allow specifying specific `dev` releases.
