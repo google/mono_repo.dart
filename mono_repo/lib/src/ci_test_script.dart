@@ -56,10 +56,7 @@ for PKG in \${PKGS}; do
     exit 64
   fi
 
-  # Github actions runs this as a separate "step" before we get into this script
-  if [[ -z \${GITHUB_ACTIONS} ]] || [[ ! -z \${FORCE_PUB_COMMAND} ]]; then
-    pub $pubDependencyCommand --no-precompile || EXIT_CODE=\$?
-  fi
+  pub $pubDependencyCommand --no-precompile || EXIT_CODE=\$?
 
   if [[ \${EXIT_CODE} -ne 0 ]]; then
     ${echoWithEvaluation(prettyAnsi, red, "PKG: \${PKG}; 'pub $pubDependencyCommand' - FAILED  (\${EXIT_CODE})")}
