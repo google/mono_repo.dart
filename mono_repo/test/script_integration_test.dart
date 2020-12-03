@@ -152,7 +152,6 @@ void _registerTest(
       ],
       environment: {
         'PKGS': pkgsEnvironment,
-        'FORCE_PUB_COMMAND': '1',
       },
       workingDirectory: d.sandbox,
     );

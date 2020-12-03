@@ -55,5 +55,6 @@ void generate(
   if (!config.monoConfig.ci.contains(CI.github) && forceGitHub) {
     generateGitHubActions(config, validateOnly: validateOnly);
   }
+  // Generate in all cases, since this is used by `presumbit`
   generateCIScript(config, validateOnly: validateOnly);
 }

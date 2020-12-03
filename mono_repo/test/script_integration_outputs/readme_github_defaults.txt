@@ -37,12 +37,12 @@ jobs:
       - uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
-        run: "cd sub_pkg && pub upgrade --no-precompile"
+        working-directory: sub_pkg
+        run: pub upgrade --no-precompile
       - name: sub_pkg; pub run test
-        env:
-          PKGS: sub_pkg
-        run: tool/ci.sh test
         if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: pub run test
   job_002:
     name: "cron; linux; `pub run test`"
     runs-on: ubuntu-latest
@@ -64,12 +64,12 @@ jobs:
       - uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
-        run: "cd sub_pkg && pub upgrade --no-precompile"
+        working-directory: sub_pkg
+        run: pub upgrade --no-precompile
       - name: sub_pkg; pub run test
-        env:
-          PKGS: sub_pkg
-        run: tool/ci.sh test
         if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: pub run test
     if: "github.event_name == 'schedule'"
     needs:
       - job_001
@@ -84,12 +84,12 @@ jobs:
       - uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub.bat upgrade --no-precompile"
-        run: "cd sub_pkg && pub.bat upgrade --no-precompile"
+        working-directory: sub_pkg
+        run: pub.bat upgrade --no-precompile
       - name: sub_pkg; pub run test
-        env:
-          PKGS: sub_pkg
-        run: tool/ci.sh test
         if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: pub.bat run test
     if: "github.event_name == 'schedule'"
     needs:
       - job_001

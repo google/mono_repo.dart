@@ -3,21 +3,21 @@
 
 # Support built in commands on windows out of the box.
 function pub() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]] || [[ "$OSTYPE" == "msys" ]]; then
+  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command pub.bat "$@"
   else
     command pub "$@"
   fi
 }
 function dartfmt() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]] || [[ "$OSTYPE" == "msys" ]]; then
+  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command dartfmt.bat "$@"
   else
     command dartfmt "$@"
   fi
 }
 function dartanalyzer() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]] || [[ "$OSTYPE" == "msys" ]]; then
+  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
     command dartanalyzer.bat "$@"
   else
     command dartanalyzer "$@"
@@ -47,10 +47,7 @@ for PKG in ${PKGS}; do
     exit 64
   fi
 
-  # Github actions runs this as a separate "step" before we get into this script
-  if [[ -z ${GITHUB_ACTIONS} ]] || [[ ! -z ${FORCE_PUB_COMMAND} ]]; then
-    pub upgrade --no-precompile || EXIT_CODE=$?
-  fi
+  pub upgrade --no-precompile || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
     echo -e "\033[31mPKG: ${PKG}; 'pub upgrade' - FAILED  (${EXIT_CODE})\033[0m"

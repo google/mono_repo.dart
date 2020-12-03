@@ -9,6 +9,7 @@
 
 ### GitHub Actions
 
+- Stop using `tool/ci.sh`. It won't be created when using only GitHub Actions.
 - Detect running on Windows on GitHub without setting an extra environment
   variable.
 - Separate job commands into a step for each. This makes it easier to see
