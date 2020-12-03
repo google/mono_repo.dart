@@ -252,7 +252,8 @@ extension on CIJobEntry {
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
-      final pubStepId = '${package}_pub_${rootConfig.monoConfig.pubAction}';
+      final pubStepId = '${package.replaceAll('/', '_')}_'
+          'pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(_CommandEntry(
         '$package; $pubCommand',
         pubCommand,
