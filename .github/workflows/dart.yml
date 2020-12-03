@@ -144,9 +144,22 @@ jobs:
           release-channel: beta
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+        continue-on-error: true
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
   job_005:
     name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -166,9 +179,22 @@ jobs:
           release-channel: stable
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+        continue-on-error: true
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
   job_006:
     name: "smoke_test; linux; Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -189,9 +215,22 @@ jobs:
           version: "2.12.0-0.0.dev"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+        continue-on-error: true
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
   job_007:
     name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -212,9 +251,22 @@ jobs:
           version: "2.12.0-29.10.beta"
       - run: dart --version
       - uses: actions/checkout@v2
-      - env:
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        run: "cd test_pkg && pub upgrade --no-precompile"
+        continue-on-error: true
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        env:
           PKGS: test_pkg
-        run: tool/ci.sh dartfmt dartanalyzer_0
+        run: tool/ci.sh dartfmt
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        env:
+          PKGS: test_pkg
+        run: tool/ci.sh dartanalyzer_0
+        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        continue-on-error: true
   job_008:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
