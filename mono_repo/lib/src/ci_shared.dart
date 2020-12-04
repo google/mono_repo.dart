@@ -16,11 +16,10 @@ import 'version.dart';
 /// Run [function] (using the optional [zoneSpec] while override the version
 /// to `1.2.3` and forcing off ANSI color output.
 T testGenerate<T>(T Function() function, {ZoneSpecification zoneSpec}) =>
-    Zone.current.fork(
-      zoneValues: {_testingZoneKey: true},
-      specification: zoneSpec,
-    ).run(
+    runZoned(
       () => overrideAnsiOutput(false, function),
+      zoneValues: {_testingZoneKey: true},
+      zoneSpecification: zoneSpec,
     );
 
 /// Object used to flag if code is running in a test.
