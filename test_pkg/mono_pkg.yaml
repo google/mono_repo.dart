@@ -7,7 +7,7 @@ stages:
   - group:
     - dartfmt
     - dartanalyzer: --fatal-infos .
-    dart: [beta, dev, stable, 2.12.0-0.0.dev, 2.12.0-29.10.beta]
+    dart: [edge, dev, 2.12.0-0.0.dev, beta, 2.12.0-29.10.beta, stable, 2.10.4]
 - unit_test:
   - test: --test-randomize-ordering-seed=random
     os:

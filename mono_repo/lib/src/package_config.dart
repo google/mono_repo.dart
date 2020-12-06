@@ -186,6 +186,28 @@ class CIJob implements HasStageName {
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
+  String get travisSdk {
+    // Map from Travis Dart SDK lingo to setup-dart-action
+    for (var entry in _travisToGitHubOsMap.entries) {
+      if (sdk == entry.value) {
+        return entry.key;
+      }
+    }
+
+    return sdk;
+  }
+
+  String get githubSDk {
+    // Map from Travis Dart SDK lingo to setup-dart-action
+    for (var entry in _travisToGitHubOsMap.entries) {
+      if (sdk == entry.key) {
+        return entry.value;
+      }
+    }
+
+    return sdk;
+  }
+
   CIJob(
     this.os,
     this.package,
@@ -243,6 +265,10 @@ class CIJob implements HasStageName {
 
   List get _items => [description, package, sdk, stageName, tasks];
 }
+
+const _travisToGitHubOsMap = {
+  'be/raw/latest': 'edge',
+};
 
 @JsonSerializable(includeIfNull: false)
 class Task {

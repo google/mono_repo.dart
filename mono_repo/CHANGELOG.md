@@ -1,3 +1,7 @@
+## 3.4.1-dev
+
+- Support `be/raw/latest` or `edge` Dart SDKs.
+
 ## 3.4.0
 
 - Configuring the target Dart SDK:
