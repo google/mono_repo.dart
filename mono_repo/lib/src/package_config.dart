@@ -186,13 +186,9 @@ class CIJob implements HasStageName {
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
-  String get travisSdk =>
-      _travisToGitHubOsMap.entries
-          .firstWhere((element) => element.value == sdk, orElse: () => null)
-          ?.key ??
-      sdk;
+  String get travisSdk => sdk == 'edge' ? 'be/raw/latest' : sdk;
 
-  String get githubSdk => _travisToGitHubOsMap[sdk] ?? sdk;
+  String get githubSdk => sdk == 'be/raw/latest' ? 'edge' : sdk;
 
   CIJob(
     this.os,
@@ -251,12 +247,6 @@ class CIJob implements HasStageName {
 
   List get _items => [description, package, sdk, stageName, tasks];
 }
-
-/// We allow both `be/raw/latest` as well as `edge` to mean the same thing, and
-/// set up the correct corresponding config for each CI provider.
-const _travisToGitHubOsMap = {
-  'be/raw/latest': 'edge',
-};
 
 @JsonSerializable(includeIfNull: false)
 class Task {
