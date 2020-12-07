@@ -197,16 +197,7 @@ class CIJob implements HasStageName {
     return sdk;
   }
 
-  String get githubSDk {
-    // Map from Travis Dart SDK lingo to setup-dart-action
-    for (var entry in _travisToGitHubOsMap.entries) {
-      if (sdk == entry.key) {
-        return entry.value;
-      }
-    }
-
-    return sdk;
-  }
+  String get githubSdk => _travisToGitHubOsMap[sdk] ?? sdk;
 
   CIJob(
     this.os,
@@ -266,6 +257,8 @@ class CIJob implements HasStageName {
   List get _items => [description, package, sdk, stageName, tasks];
 }
 
+/// We allow both `be/raw/latest` as well as `edge` to mean the same thing, and
+/// set up the correct corresponding config for each CI provider.
 const _travisToGitHubOsMap = {
   'be/raw/latest': 'edge',
 };
