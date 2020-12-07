@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.4.0
+# Created with package:mono_repo v3.4.1-dev
 language: dart
 
 jobs:
@@ -22,6 +22,12 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh dartanalyzer_1
     - stage: smoke_test
+      name: "Dart 2.10.4; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: "2.10.4"
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/ci.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
       name: "Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
       dart: "2.12.0-0.0.dev"
       os: linux
@@ -30,6 +36,12 @@ jobs:
     - stage: smoke_test
       name: "Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
       dart: "2.12.0-29.10.beta"
+      os: linux
+      env: PKGS="test_pkg"
+      script: tool/ci.sh dartfmt dartanalyzer_0
+    - stage: smoke_test
+      name: "Dart edge; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: be/raw/latest
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0

@@ -168,7 +168,7 @@ extension on CIJobEntry {
         includePackage: onePackage,
         includeStage: false,
       ),
-      'dart': job.sdk,
+      'dart': job.travisSdk,
       'os': job.os,
       'env': 'PKGS="${packages.join(' ')}"',
       'script': '$ciScriptPath ${commands.join(' ')}',

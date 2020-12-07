@@ -2,7 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -182,11 +181,6 @@ Iterable<_MapEntryWithStage> _listJobs(
   for (var entry in groupedItems.entries) {
     final first = entry.value.first;
 
-    if (first.job.sdk == 'be/raw/latest') {
-      print(red.wrap('SKIPPING OS `be/raw/latest` TODO GET SUPPORT!'));
-      continue;
-    }
-
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList();
       yield jobEntry(
@@ -314,10 +308,10 @@ Map<String, dynamic> _createDartSetup(String sdk) {
   }
 
   @alwaysThrows
-  void unsupported() => throw UnsupportedError(
-        'Unsupported Dart SDK configuration: `$sdk`.\n'
-        "We are currently limited by what's supported by "
-        'https://github.com/marketplace/actions/setup-dart-action',
+  void unsupported() => throw UserException(
+        'Unsupported Dart SDK configuration: `$sdk`.',
+        details: "We are currently limited by what's supported by "
+            'https://github.com/marketplace/actions/setup-dart-action',
       );
 
   if (realVersion != null) {
@@ -337,7 +331,7 @@ Map<String, dynamic> _createDartSetup(String sdk) {
       'release-channel': channel,
       'version': sdk,
     };
-  } else if (const {'beta', 'dev', 'stable'}.contains(sdk)) {
+  } else if (const {'beta', 'dev', 'stable', 'edge'}.contains(sdk)) {
     withMap = {'release-channel': sdk};
   } else {
     unsupported();

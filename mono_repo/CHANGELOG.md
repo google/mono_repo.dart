@@ -1,3 +1,9 @@
+## 3.4.1-dev
+
+### GitHub Actions
+
+- Support `edge` Dart SDKs.
+
 ## 3.4.0
 
 - Configuring the target Dart SDK:
