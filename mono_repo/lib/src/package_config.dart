@@ -186,16 +186,11 @@ class CIJob implements HasStageName {
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
-  String get travisSdk {
-    // Map from Travis Dart SDK lingo to setup-dart-action
-    for (var entry in _travisToGitHubOsMap.entries) {
-      if (sdk == entry.value) {
-        return entry.key;
-      }
-    }
-
-    return sdk;
-  }
+  String get travisSdk =>
+      _travisToGitHubOsMap.entries
+          .firstWhere((element) => element.value == sdk, orElse: () => null)
+          ?.key ??
+      sdk;
 
   String get githubSdk => _travisToGitHubOsMap[sdk] ?? sdk;
 
