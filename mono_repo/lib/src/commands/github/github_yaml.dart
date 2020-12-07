@@ -275,7 +275,7 @@ extension on CIJobEntry {
         includeStage: true,
       ),
       _githubJobOs,
-      job.githubSdk,
+      job.sdk,
       commandEntries,
       additionalCacheKeys: {
         'packages': packages.join('-'),

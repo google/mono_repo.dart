@@ -1,6 +1,8 @@
 ## 3.4.1-dev
 
-- Support `be/raw/latest` or `edge` Dart SDKs.
+### GitHub Actions
+
+- Support `edge` Dart SDKs.
 
 ## 3.4.0
 

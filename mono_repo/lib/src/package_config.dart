@@ -164,6 +164,9 @@ abstract class HasStageName {
 
 @JsonSerializable(explicitToJson: true)
 class CIJob implements HasStageName {
+  static const _travisEdgeSdk = 'be/raw/latest';
+  static const _supportedSdkLiterals = {'edge', 'dev', 'beta', 'stable'};
+
   @JsonKey(includeIfNull: false)
   final String description;
 
@@ -186,9 +189,8 @@ class CIJob implements HasStageName {
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
-  String get travisSdk => sdk == 'edge' ? 'be/raw/latest' : sdk;
-
-  String get githubSdk => sdk == 'be/raw/latest' ? 'edge' : sdk;
+  /// Same as [sdk] except it handles Travis-specific naming for the edge SDK.
+  String get travisSdk => sdk == 'edge' ? _travisEdgeSdk : sdk;
 
   CIJob(
     this.os,
@@ -197,7 +199,17 @@ class CIJob implements HasStageName {
     this.stageName,
     this.tasks, {
     this.description,
-  });
+  }) {
+    if (explicitSdkVersion == null && !_supportedSdkLiterals.contains(sdk)) {
+      final literalsPretty =
+          _supportedSdkLiterals.map((e) => '"$e"').join(', ');
+      throw ArgumentError.value(
+        sdk,
+        'sdk',
+        'If `sdk` is not a version string, it must be one of $literalsPretty.',
+      );
+    }
+  }
 
   factory CIJob.fromJson(Map<String, dynamic> json) => _$CIJobFromJson(json);
 
@@ -220,7 +232,7 @@ class CIJob implements HasStageName {
     return CIJob(
       os,
       package,
-      sdk,
+      sdk == _travisEdgeSdk ? 'edge' : sdk,
       stageName,
       tasks,
       description: description,

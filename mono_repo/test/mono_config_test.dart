@@ -385,6 +385,29 @@ line 12, column 4: Stages must be unique. "a" appears more than once.
    ╵''',
       );
     });
+
+    test('SDKs must be versions or in the allow-list', () {
+      final monoYaml = {
+        'dart': ['latest'],
+        'stages': [
+          {
+            'a': ['test']
+          },
+        ]
+      };
+
+      expect(
+        () => _parse(monoYaml),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            'If `sdk` is not a version string, it must be one of '
+                '"edge", "dev", "beta", "stable".',
+          ),
+        ),
+      );
+    });
   });
 }
 
