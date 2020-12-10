@@ -61,17 +61,17 @@ Map<String, String> generateGitHubYml(
     ).toList();
 
     var currStageJobs = <String>{};
-    var prevStageJobs = <String>{};
+    final allPrevStageJobs = <String>{};
     String currStageName;
     for (var job in allJobs) {
       if (job.stageName != currStageName) {
         currStageName = job.stageName;
-        prevStageJobs = currStageJobs;
+        allPrevStageJobs.addAll(currStageJobs);
         currStageJobs = {};
       }
       currStageJobs.add(job.key);
-      if (prevStageJobs.isNotEmpty) {
-        job.value['needs'] = prevStageJobs;
+      if (allPrevStageJobs.isNotEmpty) {
+        job.value['needs'] = allPrevStageJobs;
       }
     }
 

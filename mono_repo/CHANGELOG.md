@@ -1,3 +1,11 @@
+## 3.4.2
+
+### GitHub Actions
+
+- Fix `needs` config to depend on all previous jobs from all stages instead
+  of just the previous stage. This fixes issues with skipped stages causing
+  subsequent stages to not properly respect certain `if` conditions.
+
 ## 3.4.1
 
 ### GitHub Actions
