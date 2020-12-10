@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.4.1
+# Created with package:mono_repo v3.4.2
 name: Dart CI
 on:
   push:
@@ -556,6 +556,15 @@ jobs:
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
     needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+      - job_009
       - job_010
       - job_011
       - job_012

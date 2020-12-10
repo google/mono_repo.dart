@@ -105,5 +105,6 @@ jobs:
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
     needs:
+      - job_001
       - job_002
       - job_003
