@@ -71,7 +71,7 @@ Map<String, String> generateGitHubYml(
       }
       currStageJobs.add(job.key);
       if (allPrevStageJobs.isNotEmpty) {
-        job.value['needs'] = allPrevStageJobs;
+        job.value['needs'] = allPrevStageJobs.toList();
       }
     }
 

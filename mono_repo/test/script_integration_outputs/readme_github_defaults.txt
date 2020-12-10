@@ -73,8 +73,6 @@ jobs:
     if: "github.event_name == 'schedule'"
     needs:
       - job_001
-      - job_002
-      - job_003
   job_003:
     name: "cron; windows; `pub run test`"
     runs-on: windows-latest
@@ -95,8 +93,6 @@ jobs:
     if: "github.event_name == 'schedule'"
     needs:
       - job_001
-      - job_002
-      - job_003
   job_004:
     name: Notify failure
     runs-on: ubuntu-latest
