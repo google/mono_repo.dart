@@ -13,7 +13,7 @@ const _pkgCfgFileName = 'mono_pkg.yaml';
 const _repoCfgFileName = 'mono_repo.yaml';
 const _recursiveScanFlag = 'recursive';
 
-const _repoCfgContents = r"""
+const _repoCfgContents = r'''
 # See with https://github.com/dart-lang/mono_repo for details on this file
 self_validate: analyze_and_format
 
@@ -35,9 +35,9 @@ github:
 
 merge_stages:
 - analyze_and_format
-""";
+''';
 
-const _pkgCfgContents = r"""
+const _pkgCfgContents = r'''
 dart:
 - dev
 - stable
@@ -51,7 +51,7 @@ stages:
   - dartfmt: sdk
 - unit_test:
   - test:
-""";
+''';
 
 class InitCommand extends Command<void> {
   @override
