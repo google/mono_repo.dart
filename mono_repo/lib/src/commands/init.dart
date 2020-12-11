@@ -7,12 +7,12 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:path/path.dart' as p;
 
-const pubspecFileName = 'pubspec.yaml';
-const pkgCfgFileName = 'mono_pkg.yaml';
-const repoCfgFileName = 'mono_repo.yaml';
-const recursiveScanFlag = 'recursive';
+const _pubspecFileName = 'pubspec.yaml';
+const _pkgCfgFileName = 'mono_pkg.yaml';
+const _repoCfgFileName = 'mono_repo.yaml';
+const _recursiveScanFlag = 'recursive';
 
-const commentText =
+const _commentText =
     '# See with https://github.com/dart-lang/mono_repo for details on this file\n';
 
 class InitCommand extends Command<void> {
@@ -23,7 +23,7 @@ class InitCommand extends Command<void> {
   String get description => 'Scaffold a new mono repo.';
 
   @override
-  void run() => scaffold(p.current, globalResults[recursiveScanFlag] as bool);
+  void run() => scaffold(p.current, globalResults[_recursiveScanFlag] as bool);
 }
 
 void scaffold(String rootDir, bool recursive) {
@@ -35,27 +35,27 @@ void configureDirectory(String rootDir,
   currentDir ??= rootDir;
 
   if (currentDir == rootDir) {
-    final repoCfgPath = p.join(rootDir, repoCfgFileName);
+    final repoCfgPath = p.join(rootDir, _repoCfgFileName);
     if (!File(repoCfgPath).existsSync()) {
-      File(repoCfgPath).writeAsStringSync(commentText);
-      print('Added $repoCfgFileName to $rootDir');
+      File(repoCfgPath).writeAsStringSync(_commentText);
+      print('Added $_repoCfgFileName to $rootDir');
     } else {
-      print('$repoCfgFileName already present in $rootDir. Exiting...');
+      print('$_repoCfgFileName already present in $rootDir. Exiting...');
       return;
     }
   } else {
-    final pkgCfgPath = p.join(currentDir, pkgCfgFileName);
-    final pubspecPath = p.join(currentDir, pubspecFileName);
+    final pkgCfgPath = p.join(currentDir, _pkgCfgFileName);
+    final pubspecPath = p.join(currentDir, _pubspecFileName);
 
     if (!File(pubspecPath).existsSync()) {
       final pubspecContents = 'name: ${p.basename(currentDir)}\n';
       File(pubspecPath).writeAsStringSync(pubspecContents);
-      print('Added $pubspecFileName to $currentDir');
+      print('Added $_pubspecFileName to $currentDir');
     }
 
     if (!File(pkgCfgPath).existsSync()) {
-      File(pkgCfgPath).writeAsStringSync(commentText);
-      print('Added $pkgCfgFileName to $currentDir');
+      File(pkgCfgPath).writeAsStringSync(_commentText);
+      print('Added $_pkgCfgFileName to $currentDir');
     }
   }
 
