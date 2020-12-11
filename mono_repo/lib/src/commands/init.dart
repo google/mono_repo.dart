@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
-import 'package:pubspec_parse/pubspec_parse.dart';
 
 const _pubspecFileName = 'pubspec.yaml';
 const _pkgCfgFileName = 'mono_pkg.yaml';
