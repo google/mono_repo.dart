@@ -43,6 +43,7 @@ Global options:
 Available commands:
   check       Check the state of the repository.
   generate    Generates the CI configuration for child packages.
+  init        Scaffold a new mono repo.
   presubmit   Run the CI presubmits locally.
   pub         Run `pub get` or `pub upgrade` against all packages.
   travis      (Deprecated, use `generate`) Configure Travis-CI for child packages.
