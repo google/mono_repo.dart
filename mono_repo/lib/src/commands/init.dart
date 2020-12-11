@@ -23,7 +23,7 @@ class InitCommand extends Command<void> {
   String get description => 'Scaffold a new mono repo.';
 
   @override
-  void run() => scaffold(p.current, globalResults[recursiveScanFlag]);
+  void run() => scaffold(p.current, globalResults[recursiveScanFlag] as bool);
 }
 
 void scaffold(String rootDir, bool recursive) {
@@ -35,7 +35,7 @@ void configureDirectory(String rootDir,
   currentDir ??= rootDir;
 
   if (currentDir == rootDir) {
-    final String repoCfgPath = p.join(rootDir, repoCfgFileName);
+    final repoCfgPath = p.join(rootDir, repoCfgFileName);
     if (!File(repoCfgPath).existsSync()) {
       File(repoCfgPath).writeAsStringSync(commentText);
       print('Added $repoCfgFileName to $rootDir');
@@ -44,24 +44,24 @@ void configureDirectory(String rootDir,
       return;
     }
   } else {
-    final String pkgCfgPath = p.join(currentDir, pkgCfgFileName);
-    final String pubspecPath = p.join(currentDir, pubspecFileName);
+    final pkgCfgPath = p.join(currentDir, pkgCfgFileName);
+    final pubspecPath = p.join(currentDir, pubspecFileName);
 
     if (!File(pubspecPath).existsSync()) {
-      final String pubspecContents = 'name: ${p.basename(currentDir)}\n';
+      final pubspecContents = 'name: ${p.basename(currentDir)}\n';
       File(pubspecPath).writeAsStringSync(pubspecContents);
-      print("Added $pubspecFileName to $currentDir");
+      print('Added $pubspecFileName to $currentDir');
     }
 
     if (!File(pkgCfgPath).existsSync()) {
       File(pkgCfgPath).writeAsStringSync(commentText);
-      print("Added $pkgCfgFileName to $currentDir");
+      print('Added $pkgCfgFileName to $currentDir');
     }
   }
 
-  List<Directory> subdirs =
+  final subdirs =
       Directory(currentDir).listSync().whereType<Directory>().toList();
-  for (Directory subdir in subdirs) {
+  for (var subdir in subdirs) {
     if (recursive || currentDir == rootDir) {
       configureDirectory(rootDir,
           currentDir: subdir.path, recursive: recursive);
