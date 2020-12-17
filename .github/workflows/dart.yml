@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.4.2
+# Created with package:mono_repo v3.4.3
 name: Dart CI
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
   job_002:
@@ -66,11 +66,11 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: dartfmt -n --set-exit-if-changed .
       - name: "mono_repo; dartanalyzer --fatal-infos ."
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: dartanalyzer --fatal-infos .
       - id: test_pkg_pub_upgrade
@@ -78,11 +78,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_003:
@@ -110,7 +110,7 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: mono_repo; dartanalyzer .
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: dartanalyzer .
   job_004:
@@ -137,11 +137,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_005:
@@ -169,11 +169,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_006:
@@ -200,11 +200,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_007:
@@ -232,11 +232,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_008:
@@ -263,11 +263,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_009:
@@ -295,11 +295,11 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartfmt -n --set-exit-if-changed .
       - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_010:
@@ -327,7 +327,7 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
@@ -355,7 +355,7 @@ jobs:
         working-directory: mono_repo
         run: pub.bat upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "pub.bat run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
@@ -392,7 +392,7 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
@@ -419,7 +419,7 @@ jobs:
         working-directory: mono_repo
         run: pub.bat upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "pub.bat run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
@@ -457,7 +457,7 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "pub run test -t yaml --test-randomize-ordering-seed=random"
     needs:
@@ -494,7 +494,7 @@ jobs:
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
-        if: "steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "pub run test -t yaml --test-randomize-ordering-seed=random"
     needs:
@@ -531,7 +531,7 @@ jobs:
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
-        if: "steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: "pub run test --test-randomize-ordering-seed=random"
     needs:
