@@ -1,3 +1,10 @@
+## 3.4.3
+
+### GitHub Actions
+
+- Adds `always() &&` to `if` condition for steps. This makes them run even if
+  other steps failed instead of being skipped.
+
 ## 3.4.2
 
 ### GitHub Actions

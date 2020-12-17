@@ -260,7 +260,7 @@ extension on CIJobEntry {
           _commandForOs(job.tasks[i].command),
           // Run this regardless of the success of other steps other than the
           // pub step.
-          ifCondition: "steps.$pubStepId.conclusion == 'success'",
+          ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
           workingDirectory: package,
         ));
       }
