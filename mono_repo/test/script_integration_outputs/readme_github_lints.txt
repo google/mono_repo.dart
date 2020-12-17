@@ -61,7 +61,7 @@ jobs:
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: sub_pkg; dartanalyzer .
-        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
         run: dartanalyzer .
   job_003:
@@ -88,7 +88,7 @@ jobs:
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: "sub_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
         run: dartfmt -n --set-exit-if-changed .
   job_004:

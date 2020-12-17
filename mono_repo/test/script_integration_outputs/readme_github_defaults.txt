@@ -40,7 +40,7 @@ jobs:
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: sub_pkg; pub run test
-        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub run test
   job_002:
@@ -67,7 +67,7 @@ jobs:
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: sub_pkg; pub run test
-        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub run test
     if: "github.event_name == 'schedule'"
@@ -87,7 +87,7 @@ jobs:
         working-directory: sub_pkg
         run: pub.bat upgrade --no-precompile
       - name: sub_pkg; pub run test
-        if: "steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub.bat run test
     if: "github.event_name == 'schedule'"
