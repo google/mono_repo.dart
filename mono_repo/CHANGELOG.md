@@ -1,3 +1,11 @@
+## 3.4.4
+
+### GitHub Actions
+
+- Always run `pub upgrade|get` steps if checkout succeeds. This ensures that
+  tests runs for all packages, even if one package test fails in the same
+  job.
+
 ## 3.4.3
 
 ### GitHub Actions

@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.4.3
+# Created with package:mono_repo v3.4.4
 name: Dart CI
 on:
   push:
@@ -33,9 +33,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
@@ -60,9 +62,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
@@ -75,6 +79,7 @@ jobs:
         run: dartanalyzer --fatal-infos .
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -104,9 +109,11 @@ jobs:
           release-channel: stable
           version: "2.7.0"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: mono_repo; dartanalyzer .
@@ -131,9 +138,11 @@ jobs:
         with:
           release-channel: edge
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -163,9 +172,11 @@ jobs:
           release-channel: dev
           version: "2.12.0-0.0.dev"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -194,9 +205,11 @@ jobs:
         with:
           release-channel: beta
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -226,9 +239,11 @@ jobs:
           release-channel: beta
           version: "2.12.0-29.10.beta"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -257,9 +272,11 @@ jobs:
         with:
           release-channel: stable
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -289,9 +306,11 @@ jobs:
           release-channel: stable
           version: "2.10.4"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
@@ -321,9 +340,11 @@ jobs:
           release-channel: stable
           version: "2.7.0"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
@@ -349,9 +370,11 @@ jobs:
           release-channel: stable
           version: "2.7.0"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub.bat upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub.bat upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
@@ -386,9 +409,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
@@ -413,9 +438,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub.bat upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub.bat upgrade --no-precompile
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
@@ -451,9 +478,11 @@ jobs:
           release-channel: stable
           version: "2.7.0"
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
@@ -488,9 +517,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
         name: "mono_repo; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade --no-precompile
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
@@ -525,9 +556,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
         name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade --no-precompile
       - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
