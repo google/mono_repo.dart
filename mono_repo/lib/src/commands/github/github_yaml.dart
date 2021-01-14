@@ -252,6 +252,9 @@ extension on CIJobEntry {
         '$package; $pubCommand',
         pubCommand,
         id: pubStepId,
+        // Run this regardless of the success of other steps other than the
+        // pub step.
+        ifCondition: "always() && steps.checkout.conclusion == 'success'",
         workingDirectory: package,
       ));
       for (var i = 0; i < commands.length; i++) {
@@ -383,7 +386,10 @@ Map<String, dynamic> _githubJobYaml(
           ),
         _createDartSetup(dartVersion),
         {'run': 'dart --version'},
-        {'uses': 'actions/checkout@v2'},
+        {
+          'id': 'checkout',
+          'uses': 'actions/checkout@v2',
+        },
         for (var command in runCommands) command.runContent,
       ],
     };

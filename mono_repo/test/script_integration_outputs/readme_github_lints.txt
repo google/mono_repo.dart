@@ -32,7 +32,8 @@ jobs:
         with:
           release-channel: stable
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - name: mono_repo self validate
         run: pub global activate mono_repo 1.2.3
       - name: mono_repo self validate
@@ -55,9 +56,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: sub_pkg; dartanalyzer .
@@ -82,9 +85,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: "sub_pkg; dartfmt -n --set-exit-if-changed ."

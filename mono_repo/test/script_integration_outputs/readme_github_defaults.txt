@@ -34,9 +34,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: sub_pkg; pub run test
@@ -61,9 +63,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade --no-precompile
       - name: sub_pkg; pub run test
@@ -81,9 +85,11 @@ jobs:
         with:
           release-channel: dev
       - run: dart --version
-      - uses: actions/checkout@v2
+      - id: checkout
+        uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub.bat upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub.bat upgrade --no-precompile
       - name: sub_pkg; pub run test
