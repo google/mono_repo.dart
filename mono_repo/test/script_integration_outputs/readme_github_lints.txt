@@ -28,10 +28,9 @@ jobs:
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: stable
-      - run: dart --version
+          sdk: stable
       - id: checkout
         uses: actions/checkout@v2
       - name: mono_repo self validate
@@ -52,10 +51,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
-      - run: dart --version
+          sdk: dev
       - id: checkout
         uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
@@ -81,10 +79,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
-      - run: dart --version
+          sdk: dev
       - id: checkout
         uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade

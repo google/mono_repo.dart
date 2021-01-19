@@ -334,19 +334,28 @@ Map<String, dynamic> _createDartSetup(String sdk) {
       'release-channel': channel,
       'version': sdk,
     };
-  } else if (const {'beta', 'dev', 'stable', 'edge'}.contains(sdk)) {
-    withMap = {'release-channel': sdk};
+  } else if (const {'beta', 'dev', 'stable', _edgeSdk}.contains(sdk)) {
+    withMap = {
+      // TODO: https://github.com/dart-lang/setup-dart/issues/4
+      sdk == _edgeSdk ? 'release-channel' : 'sdk': sdk,
+    };
   } else {
     unsupported();
   }
 
   final map = {
-    'uses': 'cedx/setup-dart@v2',
+    'uses':
+        // TODO: https://github.com/dart-lang/setup-dart/issues/4
+        sdk == _edgeSdk ? 'cedx/setup-dart@v2' : 'dart-lang/setup-dart@v0.2',
     'with': withMap,
   };
 
   return map;
 }
+
+// TODO: Need to special-case `edge` SDKS until
+//  https://github.com/dart-lang/setup-dart/issues/4 is fixed.
+const _edgeSdk = 'edge';
 
 /// Returns the content of a Github Action Job.
 ///
@@ -385,7 +394,8 @@ Map<String, dynamic> _githubJobYaml(
             },
           ),
         _createDartSetup(dartVersion),
-        {'run': 'dart --version'},
+        // TODO: https://github.com/dart-lang/setup-dart/issues/4
+        if (dartVersion == _edgeSdk) {'run': 'dart --version'},
         {
           'id': 'checkout',
           'uses': 'actions/checkout@v2',

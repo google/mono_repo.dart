@@ -30,10 +30,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
-      - run: dart --version
+          sdk: dev
       - id: checkout
         uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
@@ -59,10 +58,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
-      - run: dart --version
+          sdk: dev
       - id: checkout
         uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
@@ -81,10 +79,9 @@ jobs:
     name: "cron; windows; `pub run test`"
     runs-on: windows-latest
     steps:
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
-      - run: dart --version
+          sdk: dev
       - id: checkout
         uses: actions/checkout@v2
       - id: sub_pkg_pub_upgrade
