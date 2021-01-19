@@ -278,7 +278,7 @@ extension on CIJobEntry {
         includeStage: true,
       ),
       _githubJobOs,
-      job.sdk,
+      job.githubSdk,
       commandEntries,
       additionalCacheKeys: {
         'packages': packages.join('-'),
@@ -334,9 +334,9 @@ Map<String, dynamic> _createDartSetup(String sdk) {
       'release-channel': channel,
       'version': sdk,
     };
-  } else if (const {'beta', 'dev', 'stable', _edgeSdk}.contains(sdk)) {
+  } else if (const {'beta', 'dev', 'stable', 'main'}.contains(sdk)) {
     withMap = {
-      'sdk': sdk == _edgeSdk ? 'main' : sdk,
+      'sdk': sdk,
     };
   } else {
     unsupported();
@@ -349,10 +349,6 @@ Map<String, dynamic> _createDartSetup(String sdk) {
 
   return map;
 }
-
-// TODO: Need to special-case `edge` SDKS until
-//  https://github.com/dart-lang/setup-dart/issues/4 is fixed.
-const _edgeSdk = 'edge';
 
 /// Returns the content of a Github Action Job.
 ///
@@ -391,7 +387,6 @@ Map<String, dynamic> _githubJobYaml(
             },
           ),
         _createDartSetup(dartVersion),
-        // TODO: https://github.com/dart-lang/setup-dart/issues/4
         {
           'id': 'checkout',
           'uses': 'actions/checkout@v2',
