@@ -29,9 +29,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
+          sdk: 'dev'
       - run: dart --version
       - id: checkout
         uses: actions/checkout@v2
@@ -58,9 +58,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
+          sdk: 'dev'
       - run: dart --version
       - id: checkout
         uses: actions/checkout@v2
@@ -104,10 +104,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: stable
-          version: "2.7.0"
+          sdk: '2.7.0'
       - run: dart --version
       - id: checkout
         uses: actions/checkout@v2
@@ -167,10 +166,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: dev
-          version: "2.12.0-0.0.dev"
+          sdk: '2.12.0-0.0.dev'
       - run: dart --version
       - id: checkout
         uses: actions/checkout@v2
@@ -201,9 +199,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: beta
+          sdk: 'beta'
       - run: dart --version
       - id: checkout
         uses: actions/checkout@v2
@@ -234,10 +232,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-29.10.beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.2
         with:
-          release-channel: beta
-          version: "2.12.0-29.10.beta"
+          sdk: '2.12.0-29.10.beta'
       - run: dart --version
       - id: checkout
         uses: actions/checkout@v2
