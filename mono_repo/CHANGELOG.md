@@ -1,3 +1,11 @@
+## 3.4.5
+
+### GitHub Actions
+
+- Move to use [dart-lang/setup-dart](https://github.com/dart-lang/setup-dart)
+  to setup the Dart SDK.
+  - Remove explicit `dart --version` call. This is handled in the new action.
+
 ## 3.4.4
 
 ### GitHub Actions

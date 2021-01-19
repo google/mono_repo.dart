@@ -164,8 +164,10 @@ abstract class HasStageName {
 
 @JsonSerializable(explicitToJson: true)
 class CIJob implements HasStageName {
+  static const _edgeSdk = 'edge';
   static const _travisEdgeSdk = 'be/raw/latest';
-  static const _supportedSdkLiterals = {'edge', 'dev', 'beta', 'stable'};
+  static const githubSetupMainSdk = 'main';
+  static const _supportedSdkLiterals = {_edgeSdk, 'dev', 'beta', 'stable'};
 
   @JsonKey(includeIfNull: false)
   final String description;
@@ -190,7 +192,9 @@ class CIJob implements HasStageName {
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
   /// Same as [sdk] except it handles Travis-specific naming for the edge SDK.
-  String get travisSdk => sdk == 'edge' ? _travisEdgeSdk : sdk;
+  String get travisSdk => sdk == _edgeSdk ? _travisEdgeSdk : sdk;
+
+  String get githubSdk => sdk == _edgeSdk ? githubSetupMainSdk : sdk;
 
   CIJob(
     this.os,
@@ -232,7 +236,7 @@ class CIJob implements HasStageName {
     return CIJob(
       os,
       package,
-      sdk == _travisEdgeSdk ? 'edge' : sdk,
+      {_travisEdgeSdk, githubSetupMainSdk}.contains(sdk) ? _edgeSdk : sdk,
       stageName,
       tasks,
       description: description,

@@ -278,7 +278,7 @@ extension on CIJobEntry {
         includeStage: true,
       ),
       _githubJobOs,
-      job.sdk,
+      job.githubSdk,
       commandEntries,
       additionalCacheKeys: {
         'packages': packages.join('-'),
@@ -334,14 +334,21 @@ Map<String, dynamic> _createDartSetup(String sdk) {
       'release-channel': channel,
       'version': sdk,
     };
-  } else if (const {'beta', 'dev', 'stable', 'edge'}.contains(sdk)) {
-    withMap = {'release-channel': sdk};
+  } else if (const {
+    'beta',
+    'dev',
+    'stable',
+    CIJob.githubSetupMainSdk,
+  }.contains(sdk)) {
+    withMap = {
+      'sdk': sdk,
+    };
   } else {
     unsupported();
   }
 
   final map = {
-    'uses': 'cedx/setup-dart@v2',
+    'uses': 'dart-lang/setup-dart@v0.3',
     'with': withMap,
   };
 
@@ -385,7 +392,6 @@ Map<String, dynamic> _githubJobYaml(
             },
           ),
         _createDartSetup(dartVersion),
-        {'run': 'dart --version'},
         {
           'id': 'checkout',
           'uses': 'actions/checkout@v2',
