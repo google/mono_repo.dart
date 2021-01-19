@@ -336,17 +336,14 @@ Map<String, dynamic> _createDartSetup(String sdk) {
     };
   } else if (const {'beta', 'dev', 'stable', _edgeSdk}.contains(sdk)) {
     withMap = {
-      // TODO: https://github.com/dart-lang/setup-dart/issues/4
-      sdk == _edgeSdk ? 'release-channel' : 'sdk': sdk,
+      'sdk': sdk == _edgeSdk ? 'main' : sdk,
     };
   } else {
     unsupported();
   }
 
   final map = {
-    'uses':
-        // TODO: https://github.com/dart-lang/setup-dart/issues/4
-        sdk == _edgeSdk ? 'cedx/setup-dart@v2' : 'dart-lang/setup-dart@v0.2',
+    'uses': 'dart-lang/setup-dart@v0.3',
     'with': withMap,
   };
 
@@ -395,7 +392,6 @@ Map<String, dynamic> _githubJobYaml(
           ),
         _createDartSetup(dartVersion),
         // TODO: https://github.com/dart-lang/setup-dart/issues/4
-        if (dartVersion == _edgeSdk) {'run': 'dart --version'},
         {
           'id': 'checkout',
           'uses': 'actions/checkout@v2',

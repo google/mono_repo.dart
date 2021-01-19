@@ -29,7 +29,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: dev
       - id: checkout
@@ -57,7 +57,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: dev
       - id: checkout
@@ -102,7 +102,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: stable
           version: "2.7.0"
@@ -131,10 +131,9 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:edge
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: cedx/setup-dart@v2
+      - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: edge
-      - run: dart --version
+          sdk: main
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -164,7 +163,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: dev
           version: "2.12.0-0.0.dev"
@@ -197,7 +196,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: beta
       - id: checkout
@@ -229,7 +228,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-29.10.beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: beta
           version: "2.12.0-29.10.beta"
@@ -262,7 +261,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: stable
       - id: checkout
@@ -294,7 +293,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.10.4
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: stable
           version: "2.10.4"
@@ -327,7 +326,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: stable
           version: "2.7.0"
@@ -356,7 +355,7 @@ jobs:
     name: "unit_test; windows; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: stable
           version: "2.7.0"
@@ -395,7 +394,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: dev
       - id: checkout
@@ -423,7 +422,7 @@ jobs:
     name: "unit_test; windows; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: dev
       - id: checkout
@@ -461,7 +460,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:2.7.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           release-channel: stable
           version: "2.7.0"
@@ -500,7 +499,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: dev
       - id: checkout
@@ -538,7 +537,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.2
+      - uses: dart-lang/setup-dart@v0.3
         with:
           sdk: dev
       - id: checkout
