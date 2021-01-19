@@ -334,7 +334,12 @@ Map<String, dynamic> _createDartSetup(String sdk) {
       'release-channel': channel,
       'version': sdk,
     };
-  } else if (const {'beta', 'dev', 'stable', 'main'}.contains(sdk)) {
+  } else if (const {
+    'beta',
+    'dev',
+    'stable',
+    CIJob.githubSetupMainSdk,
+  }.contains(sdk)) {
     withMap = {
       'sdk': sdk,
     };
