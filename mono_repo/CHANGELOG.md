@@ -1,3 +1,10 @@
+## 3.4.6
+
+- Fix a bug in `3.4.5` with incorrectly configuring the Dart SDK when a semantic
+  version is provided.
+
+### GitHub Actions
+
 ## 3.4.5
 
 ### GitHub Actions

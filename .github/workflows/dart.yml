@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.4.5
+# Created with package:mono_repo v3.4.6
 name: Dart CI
 on:
   push:
@@ -104,8 +104,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: stable
-          version: "2.7.0"
+          sdk: "2.7.0"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -165,8 +164,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: dev
-          version: "2.12.0-0.0.dev"
+          sdk: "2.12.0-0.0.dev"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -230,8 +228,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: beta
-          version: "2.12.0-29.10.beta"
+          sdk: "2.12.0-29.10.beta"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -295,8 +292,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: stable
-          version: "2.10.4"
+          sdk: "2.10.4"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -328,8 +324,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: stable
-          version: "2.7.0"
+          sdk: "2.7.0"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -357,8 +352,7 @@ jobs:
     steps:
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: stable
-          version: "2.7.0"
+          sdk: "2.7.0"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -462,8 +456,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.3
         with:
-          release-channel: stable
-          version: "2.7.0"
+          sdk: "2.7.0"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
