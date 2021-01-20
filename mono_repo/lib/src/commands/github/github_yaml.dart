@@ -300,8 +300,6 @@ extension on CIJobEntry {
 }
 
 Map<String, dynamic> _createDartSetup(String sdk) {
-  Map<String, String> withMap;
-
   Version realVersion;
 
   try {
@@ -317,22 +315,10 @@ Map<String, dynamic> _createDartSetup(String sdk) {
             'https://github.com/marketplace/actions/setup-dart-action',
       );
 
+  Map<String, String> withMap;
   if (realVersion != null) {
-    var channel = 'stable';
-    if (realVersion.isPreRelease) {
-      if (realVersion.preRelease.first == 'dev' ||
-          realVersion.preRelease.last == 'dev') {
-        channel = 'dev';
-      } else if (realVersion.preRelease.first == 'beta' ||
-          realVersion.preRelease.last == 'beta') {
-        channel = 'beta';
-      } else {
-        unsupported();
-      }
-    }
     withMap = {
-      'release-channel': channel,
-      'version': sdk,
+      'sdk': sdk,
     };
   } else if (const {
     'beta',
