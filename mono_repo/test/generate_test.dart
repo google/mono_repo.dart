@@ -186,8 +186,9 @@ name: pkg_name
             testGenerateBothConfig,
             throwsAParsedYamlException(
               startsWith(
-                'line 1, column 9 of sub_pkg/mono_pkg.yaml: Unsupported value '
-                'for "dart". "${values.first}" appears more than once.',
+                'line 1, column 9 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
+                'Unsupported value for "dart". "${values.first}" appears more '
+                'than once.',
               ),
             ),
           );
