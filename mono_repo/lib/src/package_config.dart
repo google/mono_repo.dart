@@ -90,7 +90,7 @@ class PackageConfig {
           final jobValue = job['dart'];
 
           jobSdks = (jobValue is List)
-              ? jobSdks = [...jobValue.cast<String>()]
+              ? jobSdks = List.from(jobValue)
               : [jobValue as String];
 
           sortNormalizeVerifySdksList(
