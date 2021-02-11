@@ -117,22 +117,22 @@ jobs:
         working-directory: mono_repo
         run: dartanalyzer .
   job_004:
-    name: "smoke_test; linux; Dart edge; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.10.4; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:main;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.10.4;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:main;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;dart:main
+            os:ubuntu-latest;pub-cache-hosted;dart:2.10.4;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:2.10.4
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: main
+          sdk: "2.10.4"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -181,38 +181,6 @@ jobs:
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_006:
-    name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:beta;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:beta;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;dart:beta
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.5
-        with:
-          sdk: beta
-      - id: checkout
-        uses: actions/checkout@v2
-      - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: test_pkg
-        run: pub upgrade --no-precompile
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
-  job_007:
     name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
@@ -244,23 +212,55 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
-  job_008:
-    name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+  job_007:
+    name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:beta;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted;dart:beta;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: stable
+          sdk: beta
+      - id: checkout
+        uses: actions/checkout@v2
+      - id: test_pkg_pub_upgrade
+        name: "test_pkg; pub upgrade --no-precompile"
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: test_pkg
+        run: pub upgrade --no-precompile
+      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
+        run: dartfmt -n --set-exit-if-changed .
+      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
+        run: dartanalyzer --fatal-infos .
+  job_008:
+    name: "smoke_test; linux; Dart main; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:main;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:main;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:main
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v0.5
+        with:
+          sdk: main
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -277,22 +277,22 @@ jobs:
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_009:
-    name: "smoke_test; linux; Dart 2.10.4; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.10.4;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:2.10.4;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;dart:2.10.4
+            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.10.4"
+          sdk: stable
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade

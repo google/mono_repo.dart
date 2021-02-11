@@ -2,9 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-// Doing a copy-paste from JSON – which uses double-quotes
-// ignore_for_file: prefer_single_quotes
-
 import 'dart:convert';
 
 import 'package:mono_repo/src/package_config.dart';
@@ -54,7 +51,7 @@ void main() {
 
     final config = _parse(monoYaml);
 
-    expect(config.sdks, unorderedEquals(['dev', 'stable', '1.23.0']));
+    expect(config.sdks, ['1.23.0', 'dev', 'stable']);
 
     final jobs = config.jobs.map((tj) => tj.toJson()).toList();
 
@@ -396,17 +393,15 @@ line 12, column 4: Stages must be unique. "a" appears more than once.
         ]
       };
 
-      expect(
-        () => _parse(monoYaml),
-        throwsA(
-          isA<ArgumentError>().having(
-            (e) => e.message,
-            'message',
-            'If `sdk` is not a version string, it must be one of '
-                '"edge", "dev", "beta", "stable".',
-          ),
-        ),
-      );
+      _expectParseThrows(monoYaml, r'''
+line 2, column 10: Unsupported value for "dart". The value "latest" is neither a version string nor one of "main", "dev", "beta", "stable".
+  ╷
+2 │    "dart": [
+  │ ┌──────────^
+3 │ │   "latest"
+4 │ │  ],
+  │ └──^
+  ╵''');
     });
   });
 }
@@ -444,160 +439,160 @@ stages:
 
 List get _testConfig1expectedOutput => [
       {
-        "description": "dartanalyzer && dartfmt",
-        "os": "windows",
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "analyze_and_format",
-        "tasks": [
-          {"name": "dartanalyzer", "args": "--fatal-infos --fatal-warnings ."},
-          {"name": "dartfmt"}
+        'description': 'dartanalyzer && dartfmt',
+        'os': 'windows',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'analyze_and_format',
+        'tasks': [
+          {'name': 'dartanalyzer', 'args': '--fatal-infos --fatal-warnings .'},
+          {'name': 'dartfmt'}
         ]
       },
       {
-        "description": "dartanalyzer && dartfmt",
-        "os": "linux",
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "analyze_and_format",
-        "tasks": [
-          {"name": "dartanalyzer", "args": "--fatal-infos --fatal-warnings ."},
-          {"name": "dartfmt"}
+        'description': 'dartanalyzer && dartfmt',
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'analyze_and_format',
+        'tasks': [
+          {'name': 'dartanalyzer', 'args': '--fatal-infos --fatal-warnings .'},
+          {'name': 'dartfmt'}
         ]
       },
       {
-        "os": "osx",
-        "package": "a",
-        "sdk": "1.23.0",
-        "stageName": "analyze_and_format",
-        "tasks": [
-          {"name": "dartanalyzer", "args": "--fatal-infos --fatal-warnings ."}
+        'os': 'osx',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'analyze_and_format',
+        'tasks': [
+          {'name': 'dartanalyzer', 'args': '--fatal-infos --fatal-warnings .'}
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "unit_test",
-        "tasks": [
-          {"name": "test", "args": "--platform chrome"}
+        'os': 'linux',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'name': 'test', 'args': '--platform chrome'}
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "stable",
-        "stageName": "unit_test",
-        "tasks": [
-          {"name": "test", "args": "--platform chrome"}
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'name': 'test', 'args': '--platform chrome'}
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "1.23.0",
-        "stageName": "unit_test",
-        "tasks": [
-          {"name": "test", "args": "--platform chrome"}
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'stable',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'name': 'test', 'args': '--platform chrome'}
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "unit_test",
-        "tasks": [
+        'os': 'linux',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'unit_test',
+        'tasks': [
           {
-            "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 0"
+            'name': 'test',
+            'args': '--preset travis --total-shards 5 --shard-index 0'
           }
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "stable",
-        "stageName": "unit_test",
-        "tasks": [
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'unit_test',
+        'tasks': [
           {
-            "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 0"
+            'name': 'test',
+            'args': '--preset travis --total-shards 5 --shard-index 0'
           }
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "1.23.0",
-        "stageName": "unit_test",
-        "tasks": [
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'stable',
+        'stageName': 'unit_test',
+        'tasks': [
           {
-            "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 0"
+            'name': 'test',
+            'args': '--preset travis --total-shards 5 --shard-index 0'
           }
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "unit_test",
-        "tasks": [
+        'os': 'linux',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'unit_test',
+        'tasks': [
           {
-            "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 1"
+            'name': 'test',
+            'args': '--preset travis --total-shards 5 --shard-index 1'
           }
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "stable",
-        "stageName": "unit_test",
-        "tasks": [
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'unit_test',
+        'tasks': [
           {
-            "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 1"
+            'name': 'test',
+            'args': '--preset travis --total-shards 5 --shard-index 1'
           }
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "1.23.0",
-        "stageName": "unit_test",
-        "tasks": [
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'stable',
+        'stageName': 'unit_test',
+        'tasks': [
           {
-            "name": "test",
-            "args": "--preset travis --total-shards 5 --shard-index 1"
+            'name': 'test',
+            'args': '--preset travis --total-shards 5 --shard-index 1'
           }
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "dev",
-        "stageName": "unit_test",
-        "tasks": [
-          {"name": "test"}
+        'os': 'linux',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'name': 'test'}
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "stable",
-        "stageName": "unit_test",
-        "tasks": [
-          {"name": "test"}
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'name': 'test'}
         ]
       },
       {
-        "os": "linux",
-        "package": "a",
-        "sdk": "1.23.0",
-        "stageName": "unit_test",
-        "tasks": [
-          {"name": "test"}
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'stable',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'name': 'test'}
         ]
       }
     ];

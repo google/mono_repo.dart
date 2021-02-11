@@ -4,6 +4,8 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'utilities.dart';
+
 part 'raw_config.g.dart';
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
@@ -22,7 +24,15 @@ class RawConfig {
       : stages = stages ??
             [
               RawStage('unit_test', ['test'])
-            ];
+            ] {
+    if (sdks != null) {
+      sortNormalizeVerifySdksList(
+        sdks,
+        (m) => ArgumentError.value(sdks, 'sdks', m),
+      );
+    }
+    if (oses != null) oses.sort();
+  }
 
   factory RawConfig.fromJson(Map json) {
     final config = _$RawConfigFromJson(json);

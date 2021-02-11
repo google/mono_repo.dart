@@ -40,7 +40,7 @@ jobs:
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart edge; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart main; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
       dart: be/raw/latest
       os: linux
       env: PKGS="test_pkg"

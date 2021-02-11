@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:meta/meta.dart';
-import 'package:pub_semver/pub_semver.dart';
 
 import '../../ci_shared.dart';
 import '../../github_config.dart';
@@ -278,7 +277,7 @@ extension on CIJobEntry {
         includeStage: true,
       ),
       _githubJobOs,
-      job.githubSdk,
+      job.sdk,
       commandEntries,
       additionalCacheKeys: {
         'packages': packages.join('-'),
@@ -297,48 +296,6 @@ extension on CIJobEntry {
     }
     return command;
   }
-}
-
-Map<String, dynamic> _createDartSetup(String sdk) {
-  Version realVersion;
-
-  try {
-    realVersion = Version.parse(sdk);
-  } on FormatException {
-    // noop
-  }
-
-  @alwaysThrows
-  void unsupported() => throw UserException(
-        'Unsupported Dart SDK configuration: `$sdk`.',
-        details: "We are currently limited by what's supported by "
-            'https://github.com/marketplace/actions/setup-dart-action',
-      );
-
-  Map<String, String> withMap;
-  if (realVersion != null) {
-    withMap = {
-      'sdk': sdk,
-    };
-  } else if (const {
-    'beta',
-    'dev',
-    'stable',
-    CIJob.githubSetupMainSdk,
-  }.contains(sdk)) {
-    withMap = {
-      'sdk': sdk,
-    };
-  } else {
-    unsupported();
-  }
-
-  final map = {
-    'uses': 'dart-lang/setup-dart@v0.5',
-    'with': withMap,
-  };
-
-  return map;
 }
 
 /// Returns the content of a Github Action Job.
@@ -377,7 +334,12 @@ Map<String, dynamic> _githubJobYaml(
               if (additionalCacheKeys != null) ...additionalCacheKeys,
             },
           ),
-        _createDartSetup(dartVersion),
+        {
+          'uses': 'dart-lang/setup-dart@v0.5',
+          'with': {
+            'sdk': dartVersion,
+          },
+        },
         {
           'id': 'checkout',
           'uses': 'actions/checkout@v2',

@@ -1,6 +1,8 @@
 ## 3.4.7-dev
 
 - Use the latest `dart-lang/setup-dart@v0.5`.
+- Normalize Dart SDK configurations. Throw on duplicate SDKs. Sort SDKs to
+  maintain stable output.
 
 ## 3.4.6
 

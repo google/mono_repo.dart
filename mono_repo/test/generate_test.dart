@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/ci_test_script.dart';
@@ -128,6 +129,104 @@ name: pkg_name
         ),
       ),
     );
+  });
+
+  test('fails with unsupported Dart version', () async {
+    await d.dir('sub_pkg', [
+      d.file(monoPkgFileName, r'''
+dart:
+  - not_a_dart
+
+stages:
+  - unit_test:
+    - test
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+    ]).create();
+
+    expect(
+      testGenerateBothConfig,
+      throwsAParsedYamlException(
+        startsWith(
+          'line 2, column 3 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
+          'Unsupported value for "dart". The value "not_a_dart" is neither a '
+          'version string nor one of "main", "dev", "beta", "stable".',
+        ),
+      ),
+    );
+  });
+
+  group('fails with duplicate dart versions', () {
+    for (var values in [
+      ['stable', 'stable'],
+      ['main', 'edge'],
+      ['main', 'be/raw/latest'],
+    ]) {
+      group('$values', () {
+        test('root of mono_pkg', () async {
+          await d.dir('sub_pkg', [
+            d.file(
+                monoPkgFileName,
+                jsonEncode({
+                  'dart': values,
+                  'stages': [
+                    {
+                      'unit_test': ['test']
+                    }
+                  ]
+                })),
+            d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+          ]).create();
+
+          expect(
+            testGenerateBothConfig,
+            throwsAParsedYamlException(
+              startsWith(
+                'line 1, column 9 of sub_pkg/mono_pkg.yaml: Unsupported value '
+                'for "dart". "${values.first}" appears more than once.',
+              ),
+            ),
+          );
+        });
+
+        test('within test', () async {
+          await d.dir('sub_pkg', [
+            d.file(
+                monoPkgFileName,
+                jsonEncode({
+                  'stages': [
+                    {
+                      'unit_test': [
+                        {
+                          'test': '',
+                          'dart': values,
+                        }
+                      ]
+                    }
+                  ]
+                })),
+            d.file('pubspec.yaml', '''
+name: pkg_name
+      ''')
+          ]).create();
+
+          expect(
+            testGenerateBothConfig,
+            throwsAParsedYamlException(
+              startsWith(
+                'line 1, column 44 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
+                'Unsupported value for "dart". "${values.first}" appears more '
+                'than once.',
+              ),
+            ),
+          );
+        });
+      });
+    }
   });
 
   test('fails with legacy file name', () async {
@@ -519,7 +618,7 @@ line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: A "dart" key is requi
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
 dart:
-- unneeded
+- stable
 os:
 - unneeded
 
@@ -554,7 +653,7 @@ name: pkg_a
     testGenerateBothConfig(
       printMatcher: '''
 package:pkg_a
-  `dart` values (unneeded) are not used and can be removed.
+  `dart` values (stable) are not used and can be removed.
   `os` values (unneeded) are not used and can be removed.
 $_writeScriptOutput''',
     );
