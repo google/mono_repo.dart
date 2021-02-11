@@ -1,3 +1,7 @@
+## 3.4.7-dev
+
+- Use the latest `dart-lang/setup-dart@v0.5`.
+
 ## 3.4.6
 
 - Fix a bug in `3.4.5` with incorrectly configuring the Dart SDK when a semantic

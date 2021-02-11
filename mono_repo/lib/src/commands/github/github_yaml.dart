@@ -334,7 +334,7 @@ Map<String, dynamic> _createDartSetup(String sdk) {
   }
 
   final map = {
-    'uses': 'dart-lang/setup-dart@v0.3',
+    'uses': 'dart-lang/setup-dart@v0.5',
     'with': withMap,
   };
 
