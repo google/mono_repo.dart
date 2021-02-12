@@ -324,6 +324,12 @@ Map<String, dynamic> _githubJobYaml(
 }) =>
     {
       'name': jobName,
+      'strategy': {
+        'fail-fast': false,
+        'matrix': {
+          'sdk': [dartVersion],
+        },
+      },
       'runs-on': runsOn,
       'steps': [
         if (!runsOn.startsWith('windows'))
@@ -337,7 +343,7 @@ Map<String, dynamic> _githubJobYaml(
         {
           'uses': 'dart-lang/setup-dart@v0.5',
           'with': {
-            'sdk': dartVersion,
+            'sdk': r'${{ matrix.sdk }}',
           },
         },
         {

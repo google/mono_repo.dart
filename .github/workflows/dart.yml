@@ -17,6 +17,11 @@ env:
 jobs:
   job_001:
     name: "smoke_test; linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - dev
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -31,7 +36,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: dev
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -45,6 +50,11 @@ jobs:
         run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
   job_002:
     name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - dev
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -59,7 +69,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: dev
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -90,6 +100,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_003:
     name: "smoke_test; linux; Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.7.0"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -104,7 +119,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.7.0"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -118,6 +133,11 @@ jobs:
         run: dartanalyzer .
   job_004:
     name: "smoke_test; linux; Dart 2.10.4; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.10.4"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -132,7 +152,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.10.4"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -150,6 +170,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_005:
     name: "smoke_test; linux; Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.12.0-0.0.dev"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -164,7 +189,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.12.0-0.0.dev"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -182,6 +207,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_006:
     name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.12.0-29.10.beta"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -196,7 +226,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.12.0-29.10.beta"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -214,6 +244,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_007:
     name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - beta
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -228,7 +263,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: beta
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -246,6 +281,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_008:
     name: "smoke_test; linux; Dart main; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - main
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -260,7 +300,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: main
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -278,6 +318,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_009:
     name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - stable
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -292,7 +337,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: stable
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
@@ -310,6 +355,11 @@ jobs:
         run: dartanalyzer --fatal-infos .
   job_010:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.7.0"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -324,7 +374,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.7.0"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -348,11 +398,16 @@ jobs:
       - job_009
   job_011:
     name: "unit_test; windows; Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.7.0"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.7.0"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -376,6 +431,11 @@ jobs:
       - job_009
   job_012:
     name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - dev
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -390,7 +450,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: dev
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -414,11 +474,16 @@ jobs:
       - job_009
   job_013:
     name: "unit_test; windows; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - dev
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: dev
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -442,6 +507,11 @@ jobs:
       - job_009
   job_014:
     name: "unit_test; linux; Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.7.0"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -456,7 +526,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: "2.7.0"
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -480,6 +550,11 @@ jobs:
       - job_009
   job_015:
     name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - dev
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -494,7 +569,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: dev
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: mono_repo_pub_upgrade
@@ -518,6 +593,11 @@ jobs:
       - job_009
   job_016:
     name: "unit_test; linux; Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - dev
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -532,7 +612,7 @@ jobs:
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v0.5
         with:
-          sdk: dev
+          sdk: "${{ matrix.sdk }}"
       - id: checkout
         uses: actions/checkout@v2
       - id: test_pkg_pub_upgrade
