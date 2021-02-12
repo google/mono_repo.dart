@@ -10,6 +10,7 @@ import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
 
 import 'raw_config.dart';
+import 'utilities.dart';
 import 'yaml.dart';
 
 part 'package_config.g.dart';
@@ -38,7 +39,11 @@ class PackageConfig {
     this.cacheDirectories,
     this.dartSdkConfigUsed,
     this.osConfigUsed,
-  );
+  ) : assert(() {
+          if (sdks == null) return true;
+          sortNormalizeVerifySdksList(sdks, (m) => AssertionError(m));
+          return true;
+        }());
 
   factory PackageConfig.parse(
     String relativePath,
@@ -83,11 +88,15 @@ class PackageConfig {
         var jobSdks = rawConfig.sdks;
         if (job is Map && job.containsKey('dart')) {
           final jobValue = job['dart'];
-          if (jobValue is List) {
-            jobSdks = jobValue.cast<String>();
-          } else {
-            jobSdks = [jobValue as String];
-          }
+
+          jobSdks = (jobValue is List)
+              ? jobSdks = List.from(jobValue)
+              : [jobValue as String];
+
+          sortNormalizeVerifySdksList(
+            jobSdks,
+            (m) => CheckedFromJsonException(job, 'dart', 'RawConfig', m),
+          );
         } else if (jobSdks == null || jobSdks.isEmpty) {
           if (monoPkgYaml.containsKey('dart')) {
             throw CheckedFromJsonException(
@@ -164,11 +173,6 @@ abstract class HasStageName {
 
 @JsonSerializable(explicitToJson: true)
 class CIJob implements HasStageName {
-  static const _edgeSdk = 'edge';
-  static const _travisEdgeSdk = 'be/raw/latest';
-  static const githubSetupMainSdk = 'main';
-  static const _supportedSdkLiterals = {_edgeSdk, 'dev', 'beta', 'stable'};
-
   @JsonKey(includeIfNull: false)
   final String description;
 
@@ -192,9 +196,7 @@ class CIJob implements HasStageName {
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
   /// Same as [sdk] except it handles Travis-specific naming for the edge SDK.
-  String get travisSdk => sdk == _edgeSdk ? _travisEdgeSdk : sdk;
-
-  String get githubSdk => sdk == _edgeSdk ? githubSetupMainSdk : sdk;
+  String get travisSdk => sdk == githubSetupMainSdk ? travisEdgeSdk : sdk;
 
   CIJob(
     this.os,
@@ -203,17 +205,10 @@ class CIJob implements HasStageName {
     this.stageName,
     this.tasks, {
     this.description,
-  }) {
-    if (explicitSdkVersion == null && !_supportedSdkLiterals.contains(sdk)) {
-      final literalsPretty =
-          _supportedSdkLiterals.map((e) => '"$e"').join(', ');
-      throw ArgumentError.value(
-        sdk,
-        'sdk',
-        'If `sdk` is not a version string, it must be one of $literalsPretty.',
-      );
-    }
-  }
+  }) : assert(
+          errorForSdkConfig(sdk) == null,
+          'Should have caught bad sdk value `$sdk` before here!',
+        );
 
   factory CIJob.fromJson(Map<String, dynamic> json) => _$CIJobFromJson(json);
 
@@ -236,7 +231,7 @@ class CIJob implements HasStageName {
     return CIJob(
       os,
       package,
-      {_travisEdgeSdk, githubSetupMainSdk}.contains(sdk) ? _edgeSdk : sdk,
+      sdk,
       stageName,
       tasks,
       description: description,
