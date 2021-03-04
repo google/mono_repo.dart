@@ -335,7 +335,7 @@ Map<String, dynamic> _githubJobYaml(
             },
           ),
         {
-          'uses': 'dart-lang/setup-dart@v0.5',
+          'uses': 'dart-lang/setup-dart@v1.0',
           'with': {
             'sdk': dartVersion,
           },
