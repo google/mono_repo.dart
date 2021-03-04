@@ -30,7 +30,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.5
+      - uses: dart-lang/setup-dart@v1.0
         with:
           sdk: dev
       - id: checkout
@@ -58,7 +58,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v0.5
+      - uses: dart-lang/setup-dart@v1.0
         with:
           sdk: dev
       - id: checkout
@@ -79,7 +79,7 @@ jobs:
     name: "cron; windows; `pub run test`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v0.5
+      - uses: dart-lang/setup-dart@v1.0
         with:
           sdk: dev
       - id: checkout

@@ -223,7 +223,7 @@ class CIJob implements HasStageName {
     dynamic withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
       withoutDescription = transferYamlMap(yaml as YamlMap);
-      description = withoutDescription.remove('description') as String;
+      description = (withoutDescription as Map).remove('description') as String;
     } else {
       withoutDescription = yaml;
     }
