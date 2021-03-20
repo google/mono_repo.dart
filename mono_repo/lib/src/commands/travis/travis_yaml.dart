@@ -33,10 +33,10 @@ String generateTravisYml(
       : '''
 \n# Only building master means that we don't run two builds for each pull request.
 ${toYaml({
-          'branches': {
-            'only': ['master']
-          }
-        })}
+              'branches': {
+                'only': ['master']
+              }
+            })}
 ''';
 
   final jobList = [
@@ -83,14 +83,14 @@ $createdWith
 ${toYaml({'language': 'dart'})}
 $customTravis
 ${toYaml({
-    'jobs': {'include': jobList}
-  })}
+        'jobs': {'include': jobList}
+      })}
 
 ${toYaml({'stages': stageConfigs})}
 $branchConfig
 ${toYaml({
-    'cache': {'directories': _cacheDirs(rootConfig)}
-  })}
+        'cache': {'directories': _cacheDirs(rootConfig)}
+      })}
 ''';
 }
 
