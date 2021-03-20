@@ -1,5 +1,4 @@
 @TestOn('!windows')
-import 'package:meta/meta.dart';
 import 'package:mono_repo/src/commands/travis/generate.dart'
     show travisFileName;
 import 'package:mono_repo/src/package_config.dart';
@@ -134,9 +133,9 @@ $ciScriptPathMessage''',
 
 void _registerTest(
   String name, {
-  @required List<String> args,
-  @required String pkgsEnvironment,
-  @required int expectedExitCode,
+  required List<String> args,
+  required String pkgsEnvironment,
+  required int expectedExitCode,
 }) {
   test(name, () async {
     // Make sure we're executing from the right directory!

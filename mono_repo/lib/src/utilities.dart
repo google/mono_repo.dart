@@ -8,7 +8,7 @@ const travisEdgeSdk = 'be/raw/latest';
 
 const githubSetupMainSdk = 'main'; // this maps to `be/raw/latest`
 
-String errorForSdkConfig(String sdk) {
+String? errorForSdkConfig(String sdk) {
   try {
     Version.parse(sdk);
     return null;

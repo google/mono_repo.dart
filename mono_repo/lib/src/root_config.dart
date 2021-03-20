@@ -16,7 +16,7 @@ import 'yaml.dart';
 const _legacyPkgConfigFileName = '.mono_repo.yml';
 const _pubspecFileName = 'pubspec.yaml';
 
-PackageConfig _packageConfigFromDir(
+PackageConfig? _packageConfigFromDir(
   String rootDirectory,
   String pkgRelativePath,
 ) {
@@ -50,7 +50,7 @@ PackageConfig _packageConfigFromDir(
 
   final pubspec = Pubspec.parse(
     pubspecFile.readAsStringSync(),
-    sourceUrl: pubspecFile.path,
+    sourceUrl: Uri.parse(pubspecFile.path),
   );
 
   return PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
@@ -63,8 +63,7 @@ class RootConfig extends ListBase<PackageConfig> {
 
   RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
 
-  factory RootConfig({String rootDirectory, bool recursive = true}) {
-    recursive ??= true;
+  factory RootConfig({String? rootDirectory, bool recursive = true}) {
     rootDirectory ??= p.current;
 
     final configs = <PackageConfig>[];
@@ -76,7 +75,7 @@ class RootConfig extends ListBase<PackageConfig> {
         final relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
 
         final pkgConfig =
-            _packageConfigFromDir(rootDirectory, relativeSubDirPath);
+            _packageConfigFromDir(rootDirectory!, relativeSubDirPath);
         if (pkgConfig != null) {
           configs.add(pkgConfig);
         }

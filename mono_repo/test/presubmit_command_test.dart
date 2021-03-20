@@ -41,8 +41,8 @@ void main() {
   });
 
   group('golden path', () {
-    String repoPath;
-    String pkgAPath;
+    late String repoPath;
+    late String pkgAPath;
     String pkgBPath;
 
     setUpAll(() async {
@@ -197,14 +197,15 @@ pkg_b
     });
 
     group('failing tasks', () {
-      File failingTestFile;
+      late File failingTestFile;
       setUp(() {
         failingTestFile = File(p.join(pkgAPath, 'test', 'failing_test.dart'))
           ..createSync()
           ..writeAsStringSync(failingTest);
-      });
-      tearDown(() {
-        failingTestFile.deleteSync();
+
+        addTearDown(() {
+          failingTestFile.deleteSync();
+        });
       });
 
       test('cause an error and are reported', () async {

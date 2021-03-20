@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:meta/meta.dart';
-
 import '../../ci_shared.dart';
 import '../../github_config.dart';
 import '../../mono_config.dart';
@@ -61,7 +59,7 @@ Map<String, String> generateGitHubYml(
 
     var currStageJobs = <String>{};
     final allPrevStageJobs = <String>{};
-    String currStageName;
+    String? currStageName;
     for (var job in allJobs) {
       if (job.stageName != currStageName) {
         currStageName = job.stageName;
@@ -130,7 +128,7 @@ Iterable<_MapEntryWithStage> _listJobs(
   Iterable<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
-  List<Map<String, dynamic>> onCompletionJobs,
+  List<Map<String, dynamic>>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
@@ -159,7 +157,7 @@ Iterable<_MapEntryWithStage> _listJobs(
     final ciJob = job as CIJob;
 
     final commands =
-        ciJob.tasks.map((task) => commandsToKeys[task.command]).toList();
+        ciJob.tasks.map((task) => commandsToKeys[task.command]!).toList();
 
     jobEntries.add(CIJobEntry(ciJob, commands));
   }
@@ -232,10 +230,10 @@ extension on CIJobEntry {
 
   Map<String, dynamic> jobYaml(
     RootConfig rootConfig, {
-    List<String> packages,
-    @required bool oneOs,
-    @required bool oneSdk,
-    @required bool onePackage,
+    List<String>? packages,
+    required bool oneOs,
+    required bool oneSdk,
+    required bool onePackage,
   }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
@@ -320,7 +318,7 @@ Map<String, dynamic> _githubJobYaml(
   String runsOn,
   String dartVersion,
   List<_CommandEntry> runCommands, {
-  Map<String, String> additionalCacheKeys,
+  Map<String, String>? additionalCacheKeys,
 }) =>
     {
       'name': jobName,
@@ -351,10 +349,10 @@ Map<String, dynamic> _githubJobYaml(
 class _CommandEntry {
   final String name;
   final String run;
-  final Map<String, String> /*?*/ env;
-  final String /*?*/ id;
-  final String /*?*/ ifCondition;
-  final String /*?*/ workingDirectory;
+  final Map<String, String>? env;
+  final String? id;
+  final String? ifCondition;
+  final String? workingDirectory;
 
   _CommandEntry(
     this.name,
@@ -371,7 +369,7 @@ class _CommandEntry {
   Map<String, dynamic> get runContent => {
         if (id != null) 'id': id,
         'name': name,
-        if (env != null && env.isNotEmpty) 'env': env,
+        if (env != null && env!.isNotEmpty) 'env': env,
         if (ifCondition != null) 'if': ifCondition,
         if (workingDirectory != null) 'working-directory': workingDirectory,
         'run': run,
@@ -386,7 +384,7 @@ class _CommandEntry {
 /// store and retrieve the cache.
 Map<String, dynamic> _cacheEntries(
   String runsOn, {
-  Map<String, String> additionalCacheKeys,
+  Map<String, String>? additionalCacheKeys,
 }) {
   final cacheKeyParts = [
     'os:$runsOn',

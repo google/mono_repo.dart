@@ -12,5 +12,5 @@ const recursiveFlag = 'recursive';
 abstract class MonoRepoCommand extends Command<void> {
   RootConfig rootConfig() => RootConfig(
       rootDirectory: p.current,
-      recursive: globalResults[recursiveFlag] as bool);
+      recursive: globalResults![recursiveFlag] as bool);
 }

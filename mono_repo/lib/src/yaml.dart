@@ -35,7 +35,7 @@ T createWithCheck<T>(T Function() constructor) {
   }
 }
 
-ParsedYamlException toParsedYamlExceptionOrNull(
+ParsedYamlException? toParsedYamlExceptionOrNull(
   CheckedFromJsonException exception,
 ) {
   final yamlMap = exception.map is y.YamlMap
@@ -55,13 +55,13 @@ ParsedYamlException toParsedYamlExceptionOrNull(
 ///   - if its content is a [Map], the map is returned.
 ///   - if its content is `null`, an empty [Map] is returned.
 ///   - if its content is anything else, a [UserException] is thrown.
-Map yamlMapOrNull(String rootDir, String relativeFilePath) {
+Map? yamlMapOrNull(String rootDir, String relativeFilePath) {
   final yamlFile = File(p.join(rootDir, relativeFilePath));
 
   if (yamlFile.existsSync()) {
     final pkgConfigYaml = loadYamlChecked(
       yamlFile.readAsStringSync(),
-      sourceUrl: relativeFilePath,
+      sourceUrl: Uri.parse(relativeFilePath),
     );
 
     if (pkgConfigYaml == null) {
@@ -77,7 +77,7 @@ Map yamlMapOrNull(String rootDir, String relativeFilePath) {
 
 /// Returns [source] parsed as Yaml, but tries to convert thrown
 /// [y.YamlException] instances to [ParsedYamlException] instances.
-Object loadYamlChecked(String source, {dynamic sourceUrl}) {
+Object? loadYamlChecked(String source, {Uri? sourceUrl}) {
   try {
     return y.loadYaml(source, sourceUrl: sourceUrl);
   } on y.YamlException catch (e) {
@@ -85,7 +85,7 @@ Object loadYamlChecked(String source, {dynamic sourceUrl}) {
   }
 }
 
-String toYaml(Object source) {
+String toYaml(Object? source) {
   final buffer = StringBuffer();
   _writeYaml(buffer, source, 0, null);
   return buffer.toString();
@@ -127,23 +127,23 @@ String _escapeString(String source) {
     return source;
   }
   final output = source.replaceAllMapped(_escapeRegExp, (match) {
-    final value = match[0];
+    final value = match[0]!;
     return _escapeMap[value] ?? _getHexLiteral(value);
   }).replaceAll('"', r'\"');
 
   return '"$output"';
 }
 
-bool _isSimple(Object source) =>
+bool _isSimple(Object? source) =>
     source == null || source is bool || source is num || source is String;
 
 enum _ParentType { list, map }
 
 void _writeYaml(
   StringBuffer buffer,
-  Object source,
+  Object? source,
   int indent,
-  _ParentType parentType,
+  _ParentType? parentType,
 ) {
   final spaces = '  ' * indent;
   if (source is String) {

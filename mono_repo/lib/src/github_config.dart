@@ -11,26 +11,26 @@ const defaultGitHubWorkflowName = 'Dart CI';
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class GitHubConfig {
-  final Map<String, dynamic> env;
+  final Map<String, dynamic>? env;
 
-  final Map<String, dynamic> on;
+  final Map<String, dynamic>? on;
 
   @JsonKey(name: 'on_completion')
-  final List<Map<String, dynamic>> onCompletion;
+  final List<Map<String, dynamic>>? onCompletion;
 
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
   // Either Strings or Maps are supported here.
-  final List<dynamic> stages;
+  final List<dynamic>? stages;
 
-  final Map<String, GitHubWorkflow> workflows;
+  final Map<String, GitHubWorkflow>? workflows;
 
   GitHubConfig(
     this.env,
-    Map<String, dynamic> on,
+    Map<String, dynamic>? on,
     this.onCompletion,
-    String cron,
+    String? cron,
     this.stages,
     this.workflows,
   ) : on = _parseOn(on, cron) {
@@ -44,7 +44,7 @@ class GitHubConfig {
 
   void _noDuplicateStageNames() {
     final stageToWorkflow = <String, String>{};
-    for (var entry in workflows.entries) {
+    for (var entry in workflows!.entries) {
       for (var stage in entry.value.stages) {
         final existing = stageToWorkflow[stage];
         if (existing != null) {
@@ -61,7 +61,7 @@ class GitHubConfig {
 
   void _noDuplicateWorkflowNames() {
     final nameCounts = <String, int>{};
-    for (var name in workflows.values.map((e) => e.name)) {
+    for (var name in workflows!.values.map((e) => e.name)) {
       nameCounts[name] = (nameCounts[name] ?? 0) + 1;
     }
     final moreThanOne = nameCounts.entries
@@ -79,7 +79,7 @@ class GitHubConfig {
   }
 
   void _noDefaultFileName() {
-    if (workflows.containsKey(defaultGitHubWorkflowFileName)) {
+    if (workflows!.containsKey(defaultGitHubWorkflowFileName)) {
       throw ArgumentError.value(
         workflows,
         'workflows',
@@ -91,7 +91,7 @@ class GitHubConfig {
 
   void _noOnCompletionNeedsConfig() {
     if (onCompletion == null) return;
-    for (var jobConfig in onCompletion) {
+    for (var jobConfig in onCompletion!) {
       if (jobConfig.containsKey('needs')) {
         throw ArgumentError.value(
             jobConfig,
@@ -116,9 +116,9 @@ class GitHubConfig {
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class GitHubWorkflow {
-  @JsonKey(nullable: false, disallowNullValue: true, required: true)
+  @JsonKey(disallowNullValue: true, required: true)
   final String name;
-  @JsonKey(nullable: false, disallowNullValue: true, required: true)
+  @JsonKey(disallowNullValue: true, required: true)
   final Set<String> stages;
 
   GitHubWorkflow(this.name, this.stages) {
@@ -132,19 +132,12 @@ class GitHubWorkflow {
     if (stages.isEmpty) {
       throw ArgumentError.value(stages, 'stages', 'Cannot be empty.');
     }
-    if (stages.any((element) => element == null)) {
-      throw ArgumentError.value(
-        stages,
-        'stages',
-        'Stage values cannot be null.',
-      );
-    }
   }
 
   factory GitHubWorkflow.fromJson(Map json) => _$GitHubWorkflowFromJson(json);
 }
 
-Map<String, dynamic> _parseOn(Map<String, dynamic> on, String cron) {
+Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
   if (on == null) {
     if (cron == null) {
       return _defaultOn;

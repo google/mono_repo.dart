@@ -34,7 +34,7 @@ class TravisCommand extends MonoRepoCommand {
     final config = rootConfig();
     _checkCIConfig(config);
     logPackages(config);
-    final validateOnly = argResults['validate'] as bool;
+    final validateOnly = argResults!['validate'] as bool;
     validateRootConfig(config);
     generateTravisConfig(
       config,

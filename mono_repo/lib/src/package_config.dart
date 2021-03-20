@@ -22,7 +22,7 @@ class PackageConfig {
   final Pubspec pubspec;
 
   final List<String> oses;
-  final List<String> sdks;
+  final List<String>? sdks;
   final List<String> stageNames;
   final List<CIJob> jobs;
   final List<String> cacheDirectories;
@@ -136,7 +136,9 @@ class PackageConfig {
 
         for (var sdk in jobSdks) {
           for (var os in jobOses) {
-            jobs.add(CIJob.parse(os, relativePath, sdk, stage.name, job));
+            jobs.add(
+              CIJob.parse(os, relativePath, sdk, stage.name, job as Object),
+            );
           }
         }
       }
@@ -157,7 +159,7 @@ class PackageConfig {
   }
 
   bool get hasFlutterDependency {
-    if (pubspec.environment.containsKey('flutter')) {
+    if (pubspec.environment!.containsKey('flutter')) {
       return true;
     }
     return pubspec.dependencies.values.any(
@@ -174,7 +176,7 @@ abstract class HasStageName {
 @JsonSerializable(explicitToJson: true)
 class CIJob implements HasStageName {
   @JsonKey(includeIfNull: false)
-  final String description;
+  final String? description;
 
   final String os;
 
@@ -219,8 +221,8 @@ class CIJob implements HasStageName {
     String stageName,
     Object yaml,
   ) {
-    String description;
-    dynamic withoutDescription;
+    String? description;
+    Object withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
       withoutDescription = transferYamlMap(yaml as YamlMap);
       description = (withoutDescription as Map).remove('description') as String;
@@ -239,7 +241,7 @@ class CIJob implements HasStageName {
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
-  Version get explicitSdkVersion {
+  Version? get explicitSdkVersion {
     try {
       return Version.parse(sdk);
     } on FormatException {
@@ -266,7 +268,7 @@ class Task {
 
   final String name;
 
-  final String args;
+  final String? args;
 
   final String command;
 
@@ -279,7 +281,9 @@ class Task {
       final group = yamlValue['group'];
       if (group != null) {
         if (group is List) {
-          return group.map((taskYaml) => Task.parse(taskYaml)).toList();
+          return group
+              .map((taskYaml) => Task.parse(taskYaml as Object))
+              .toList();
         } else {
           throw CheckedFromJsonException(
             yamlValue,
@@ -305,7 +309,7 @@ class Task {
       final taskNames =
           yamlValue.keys.where(_tasks.contains).cast<String>().toList();
       if (taskNames.isEmpty) {
-        String key;
+        String? key;
         if (yamlValue.isNotEmpty) {
           key = yamlValue.keys.first as String;
         }
@@ -327,7 +331,7 @@ class Task {
         );
       }
       final taskName = taskNames.single;
-      String args;
+      String? args;
       switch (taskName) {
         case 'command':
           final taskValue = yamlValue[taskName];
@@ -346,7 +350,7 @@ class Task {
           }
           break;
         default:
-          args = yamlValue[taskName] as String;
+          args = yamlValue[taskName] as String?;
       }
 
       final extraConfig = Set<String>.from(yamlValue.keys)
@@ -376,7 +380,7 @@ class Task {
 
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 
-  static String _commandValue(String name, String args) {
+  static String _commandValue(String name, String? args) {
     switch (name) {
       case 'dartfmt':
         if (args == null || args == 'sdk') {
@@ -396,7 +400,7 @@ class Task {
         }
         return value;
       case 'command':
-        return args;
+        return args!;
       default:
         throw UnsupportedError('Cannot generate the command for `$name`.');
     }

@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import 'github_config.dart';
@@ -39,30 +38,30 @@ class MonoConfig {
   final Set<String> mergeStages;
   final bool prettyAnsi;
   final String pubAction;
-  final String selfValidateStage;
+  final String? selfValidateStage;
   final Map<String, dynamic> travis;
   final GitHubConfig github;
 
   MonoConfig._({
-    @required Set<CI> ci,
-    @required this.githubConditionalStages,
-    @required this.travisConditionalStages,
-    @required this.mergeStages,
-    @required this.prettyAnsi,
-    @required this.pubAction,
-    @required this.selfValidateStage,
-    @required this.travis,
-    @required this.github,
+    required Set<CI>? ci,
+    required this.githubConditionalStages,
+    required this.travisConditionalStages,
+    required this.mergeStages,
+    required this.prettyAnsi,
+    required this.pubAction,
+    required this.selfValidateStage,
+    required this.travis,
+    required this.github,
   }) : ci = ci ?? const {CI.travis};
 
   factory MonoConfig({
-    @required Set<CI> ci,
-    @required Set<String> mergeStages,
-    @required bool prettyAnsi,
-    @required String pubAction,
-    @required String selfValidateStage,
-    @required Map travis,
-    @required Map github,
+    required Set<CI>? ci,
+    required Set<String> mergeStages,
+    required bool prettyAnsi,
+    required String pubAction,
+    required String? selfValidateStage,
+    required Map travis,
+    required Map github,
   }) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
@@ -128,13 +127,13 @@ class MonoConfig {
         );
       }
 
-      return value as Map;
+      return value;
     }
 
     final travis = parseCI(CI.travis);
     final github = parseCI(CI.github);
 
-    final selfValidate = json['self_validate'] ?? false;
+    final selfValidate = json['self_validate'] as Object? ?? false;
     if (selfValidate is! bool && selfValidate is! String) {
       throw CheckedFromJsonException(
         json,
@@ -180,8 +179,8 @@ class MonoConfig {
       return MonoConfig(
         ci: ci,
         mergeStages: Set.from(mergeStages),
-        prettyAnsi: prettyAnsi as bool,
-        pubAction: pubAction as String,
+        prettyAnsi: prettyAnsi,
+        pubAction: pubAction,
         selfValidateStage: _selfValidateFromValue(selfValidate),
         travis: travis,
         github: github,
@@ -196,7 +195,7 @@ class MonoConfig {
     }
   }
 
-  factory MonoConfig.fromRepo({String rootDirectory}) {
+  factory MonoConfig.fromRepo({String? rootDirectory}) {
     rootDirectory ??= p.current;
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
@@ -226,7 +225,7 @@ Map<String, ConditionalStage> _readConditionalStages(
     if (rawValue is List) {
       for (var item in rawValue) {
         if (item is Map || item is String) {
-          final stage = ConditionalStage.fromJson(item);
+          final stage = ConditionalStage.fromJson(item as Object);
           if (conditionalStages.containsKey(stage.name)) {
             throw CheckedFromJsonException(
               ciJson,
@@ -259,7 +258,7 @@ Map<String, ConditionalStage> _readConditionalStages(
 
 const _selfValidateStageName = 'mono_repo_self_validate';
 
-String _selfValidateFromValue(Object value) {
+String? _selfValidateFromValue(Object? value) {
   if (value == null) return null;
   if (value is bool) return value ? _selfValidateStageName : null;
   if (value is String) return value;
@@ -272,7 +271,7 @@ class ConditionalStage {
   final String name;
 
   @JsonKey(name: 'if', required: true, disallowNullValue: true)
-  final String ifCondition;
+  final String? ifCondition;
 
   ConditionalStage(this.name, [this.ifCondition]);
 

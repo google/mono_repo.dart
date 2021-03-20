@@ -24,7 +24,6 @@ void generateGitHubActions(
   RootConfig rootConfig, {
   bool validateOnly = false,
 }) {
-  validateOnly ??= false;
   final githubConfig = _GeneratedGitHubConfig.generate(
     rootConfig,
   );

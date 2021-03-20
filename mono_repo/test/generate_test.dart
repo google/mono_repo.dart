@@ -796,8 +796,8 @@ $lines
   group('mono_repo.yaml', () {
     Future<void> validConfig(
       String monoRepoContent, {
-      Object expectedTravisContent,
-      Object expectedGithubContent,
+      Object? expectedTravisContent,
+      Object? expectedGithubContent,
     }) async {
       await populateConfig(monoRepoContent);
 

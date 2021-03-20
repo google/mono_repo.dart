@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:checked_yaml/checked_yaml.dart';
-import 'package:meta/meta.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/generate.dart';
@@ -29,7 +28,7 @@ name: pkg_name
 
 void testGenerateTravisConfig({
   bool validateOnly = false,
-  Object printMatcher,
+  Object? printMatcher,
 }) =>
     testGenerateConfig(
       forceTravis: true,
@@ -40,7 +39,7 @@ void testGenerateTravisConfig({
 
 void testGenerateGitHubConfig({
   bool validateOnly = false,
-  Object printMatcher,
+  Object? printMatcher,
 }) =>
     testGenerateConfig(
       forceTravis: false,
@@ -51,7 +50,7 @@ void testGenerateGitHubConfig({
 
 void testGenerateBothConfig({
   bool validateOnly = false,
-  Object printMatcher,
+  Object? printMatcher,
 }) =>
     testGenerateConfig(
       forceGitHub: true,
@@ -61,10 +60,10 @@ void testGenerateBothConfig({
     );
 
 void testGenerateConfig({
-  @required bool forceTravis,
-  @required bool forceGitHub,
+  required bool forceTravis,
+  required bool forceGitHub,
   bool validateOnly = false,
-  Object printMatcher,
+  Object? printMatcher,
 }) {
   printMatcher ??= isEmpty;
   final printOutput = <String>[];
@@ -90,7 +89,7 @@ void testGenerateConfig({
   }
 }
 
-Matcher throwsUserExceptionWith(Object message, {Object details}) => throwsA(
+Matcher throwsUserExceptionWith(Object message, {Object? details}) => throwsA(
       const TypeMatcher<UserException>()
           .having((e) => e.message, 'message', message)
           .having((e) => e.details, 'details', details ?? isNull),

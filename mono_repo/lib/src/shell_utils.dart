@@ -27,5 +27,5 @@ String echoWithEvaluation(bool prettyAnsi, AnsiCode code, String value) {
   return 'echo -e "${wrapAnsi(prettyAnsi, code, value)}"';
 }
 
-String wrapAnsi(bool doWrap, AnsiCode code, String value) =>
+String? wrapAnsi(bool doWrap, AnsiCode code, String value) =>
     doWrap ? code.wrap(value, forScript: true) : value;

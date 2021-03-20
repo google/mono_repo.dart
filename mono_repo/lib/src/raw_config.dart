@@ -14,24 +14,24 @@ class RawConfig {
   final List<String> oses;
 
   @JsonKey(name: 'dart')
-  final List<String> sdks;
+  final List<String>? sdks;
 
   final List<RawStage> stages;
 
-  final RawCache cache;
+  final RawCache? cache;
 
-  RawConfig(this.oses, this.sdks, List<RawStage> stages, this.cache)
+  RawConfig(this.oses, this.sdks, List<RawStage>? stages, this.cache)
       : stages = stages ??
             [
               RawStage('unit_test', ['test'])
             ] {
     if (sdks != null) {
       sortNormalizeVerifySdksList(
-        sdks,
+        sdks!,
         (m) => ArgumentError.value(sdks, 'sdks', m),
       );
     }
-    if (oses != null) oses.sort();
+    oses.sort();
   }
 
   factory RawConfig.fromJson(Map json) {
