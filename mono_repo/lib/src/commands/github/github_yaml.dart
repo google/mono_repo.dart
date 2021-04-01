@@ -43,14 +43,38 @@ Map<String, String> generateGitHubYml(
       );
     }
 
-    myJobs = myJobs.toList()
-      ..sort((a, b) => orderedStages
-          .indexOf(a.stageName)
-          .compareTo(orderedStages.indexOf(b.stageName)));
+    final sortedJobs = myJobs.toList()
+      ..sort((a, b) {
+        var value = orderedStages
+            .indexOf(a.stageName)
+            .compareTo(orderedStages.indexOf(b.stageName));
+
+        if (value == 0) {
+          if (a is _SelfValidateJob) {
+            value = -1;
+          }
+          if (b is _SelfValidateJob) {
+            value = 1;
+          }
+        }
+
+        if (value == 0 && a is CIJob && b is CIJob) {
+          value = a.sortBits.compareTo(b.sortBits);
+        }
+        if (value == 0) {
+          assert(() {
+            print(
+              ['Job sort not clear. Please file an issue!', a, b].join('\n'),
+            );
+            return true;
+          }());
+        }
+        return value;
+      });
 
     final allJobs = _listJobs(
       rootConfig,
-      myJobs,
+      sortedJobs,
       commandsToKeys,
       rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
@@ -125,7 +149,7 @@ ${toYaml({'jobs': jobList})}
 /// Lists all the jobs, setting their stage, environment, and script.
 Iterable<_MapEntryWithStage> _listJobs(
   RootConfig rootConfig,
-  Iterable<HasStageName> jobs,
+  List<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
   List<Map<String, dynamic>>? onCompletionJobs,
@@ -179,7 +203,7 @@ Iterable<_MapEntryWithStage> _listJobs(
     final first = entry.value.first;
 
     if (mergeStages.contains(first.job.stageName)) {
-      final packages = entry.value.map((t) => t.job.package).toList();
+      final packages = entry.value.map((t) => t.job.package).toList()..sort();
       yield jobEntry(
           first.jobYaml(
             rootConfig,

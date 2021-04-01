@@ -68,14 +68,12 @@ class CIJobEntry {
 /// Group jobs by all of the values that would allow them to merge
 Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
     groupBy<CIJobEntry, String>(
-        jobEntries,
-        (e) => [
-              e.job.os,
-              e.job.stageName,
-              e.job.sdk,
-              // TODO: sort these? Would merge jobs with different orders
-              e.commands,
-            ].join(':::'));
+      jobEntries,
+      (e) => [
+        ...e.job.groupByKeys,
+        e.commands,
+      ].join(':::'),
+    );
 
 void validateRootConfig(RootConfig rootConfig) {
   for (var config in rootConfig) {
