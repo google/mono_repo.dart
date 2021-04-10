@@ -4,7 +4,7 @@
 
 class UserException implements Exception {
   final String message;
-  final String details;
+  final String? details;
 
   UserException(this.message, {this.details});
 

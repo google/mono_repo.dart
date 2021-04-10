@@ -24,10 +24,8 @@ Future<void> main(List<String> arguments) async {
     exitCode = ExitCode.config.code;
   } on UsageException catch (e) {
     print(ansi.red.wrap(e.message));
-    if (e.usage != null) {
-      print('');
-      print(e.usage);
-    }
+    print('');
+    print(e.usage);
     exitCode = ExitCode.usage.code;
   }
 }

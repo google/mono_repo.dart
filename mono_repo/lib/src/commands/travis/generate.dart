@@ -17,7 +17,6 @@ void generateTravisConfig(
   RootConfig rootConfig, {
   bool validateOnly = false,
 }) {
-  validateOnly ??= false;
   final travisConfig = _GeneratedTravisConfig.generate(
     rootConfig,
   );

@@ -34,7 +34,7 @@ line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supporte
         'github': {'on': 'not a map'}
       },
       r'''
-line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is not a subtype of type 'Map<dynamic, dynamic>' in type cast
+line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
 2 │   on: not a map
   │       ^^^^^^^^^
@@ -64,7 +64,7 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
         'github': {'env': 'notAmap'},
       },
       r'''
-line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' is not a subtype of type 'Map<dynamic, dynamic>' in type cast
+line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
 2 │   env: notAmap
   │        ^^^^^^^
@@ -153,7 +153,7 @@ One or more stage was referenced in `mono_repo.yaml` that do not exist in any `m
         }
       },
       r'''
-line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is not a subtype of type 'String' in type cast
+line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is not a subtype of type 'String?' in type cast
   ╷
 4 │       if: 1
   │           ^
@@ -191,7 +191,7 @@ void _testWorkflows() {
         'github': {'workflows': 'some value'}
       },
       r'''
-line 2, column 14 of mono_repo.yaml: Unsupported value for "workflows". type 'String' is not a subtype of type 'Map<dynamic, dynamic>' in type cast
+line 2, column 14 of mono_repo.yaml: Unsupported value for "workflows". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
 2 │   workflows: some value
   │              ^^^^^^^^^^
@@ -275,7 +275,7 @@ line 5, column 15 of mono_repo.yaml: Unsupported value for "stages". Cannot be e
         },
       },
       r'''
-line 6, column 9 of mono_repo.yaml: Unsupported value for "stages". Stage values cannot be null.
+line 6, column 9 of mono_repo.yaml: Unsupported value for "stages". type 'Null' is not a subtype of type 'String' in type cast
   ╷
 6 │         - null
   │         ^^^^^^
@@ -434,8 +434,8 @@ Future<void> _testBadConfigWithYamlException(
 Future<void> _testBadConfigWithUserException(
   Object monoRepoYaml,
   Object expectedMessage, {
-  Object expectedDetails,
-  Object printMatcher,
+  Object? expectedDetails,
+  Object? printMatcher,
 }) async {
   final monoConfigContent = toYaml(monoRepoYaml);
   await populateConfig(monoConfigContent);

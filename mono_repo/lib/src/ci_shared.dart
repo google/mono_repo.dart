@@ -6,6 +6,7 @@ import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
+import 'package:pub_semver/pub_semver.dart';
 
 import 'mono_config.dart';
 import 'package_config.dart';
@@ -15,7 +16,7 @@ import 'version.dart';
 
 /// Run [function] (using the optional [zoneSpec] while override the version
 /// to `1.2.3` and forcing off ANSI color output.
-T testGenerate<T>(T Function() function, {ZoneSpecification zoneSpec}) =>
+T testGenerate<T>(T Function() function, {ZoneSpecification? zoneSpec}) =>
     runZoned(
       () => overrideAnsiOutput(false, function),
       zoneValues: {_testingZoneKey: true},
@@ -46,14 +47,14 @@ class CIJobEntry {
 
   String jobName(
     List<String> packages, {
-    @required bool includeOs,
-    @required bool includeSdk,
-    @required bool includePackage,
-    @required bool includeStage,
+    required bool includeOs,
+    required bool includeSdk,
+    required bool includePackage,
+    required bool includeStage,
   }) {
     final packageLabel = packages.length == 1 ? 'PKG' : 'PKGS';
     final sections = [
-      if (includeStage && job.stageName != null) job.stageName,
+      if (includeStage) job.stageName,
       if (!includeOs) job.os,
       if (!includeSdk) 'Dart ${job.sdk}',
       if (!includePackage) '$packageLabel: ${packages.join(', ')}',
@@ -78,7 +79,7 @@ Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
 
 void validateRootConfig(RootConfig rootConfig) {
   for (var config in rootConfig) {
-    final sdkConstraint = config.pubspec.environment['sdk'];
+    final sdkConstraint = config.pubspec.environment?['sdk'];
 
     if (sdkConstraint == null) {
       continue;
@@ -86,7 +87,7 @@ void validateRootConfig(RootConfig rootConfig) {
 
     final disallowedExplicitVersions = config.jobs
         .map((tj) => tj.explicitSdkVersion)
-        .where((v) => v != null)
+        .whereType<Version>()
         .toSet()
         .where((v) => !sdkConstraint.allows(v))
         .toList()
@@ -109,7 +110,7 @@ void writeFile(
   String rootDirectory,
   String targetFilePath,
   String fileContent, {
-  @required bool isScript,
+  required bool isScript,
 }) {
   final fullPath = p.join(rootDirectory, targetFilePath);
   final scriptFile = File(fullPath);
@@ -178,12 +179,12 @@ void logPackages(Iterable<PackageConfig> configs) {
     if (pkg.sdks != null && !pkg.dartSdkConfigUsed) {
       print(
         yellow.wrap(
-          '  `dart` values (${pkg.sdks.join(', ')}) are not used '
+          '  `dart` values (${pkg.sdks!.join(', ')}) are not used '
           'and can be removed.',
         ),
       );
     }
-    if (pkg.oses != null && !pkg.osConfigUsed) {
+    if (!pkg.osConfigUsed) {
       print(
         yellow.wrap(
           '  `os` values (${pkg.oses.join(', ')}) are not used '
@@ -210,11 +211,11 @@ List<String> calculateOrderedStages(
   // Convert the configs to a graph so we can run strongly connected components.
   final edges = <String, Set<String>>{};
 
-  String previous;
+  String? previous;
   for (var stage in conditionalStages.keys) {
     edges.putIfAbsent(stage, () => <String>{});
     if (previous != null) {
-      edges[previous].add(stage);
+      edges[previous]!.add(stage);
     }
     previous = stage;
   }
@@ -225,12 +226,12 @@ List<String> calculateOrderedStages(
   };
 
   for (var config in rootConfig) {
-    String previous;
+    String? previous;
     for (var stage in config.stageNames) {
       rootMentionedStages.remove(stage);
       edges.putIfAbsent(stage, () => <String>{});
       if (previous != null) {
-        edges[previous].add(stage);
+        edges[previous]!.add(stage);
       }
       previous = stage;
     }
@@ -248,7 +249,7 @@ List<String> calculateOrderedStages(
 
   // Running strongly connected components lets us detect cycles (which aren't
   // allowed), and gives us the reverse order of what we ultimately want.
-  final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]);
+  final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]!);
   for (var component in components) {
     if (component.length > 1) {
       final items = component.map((e) => '`$e`').join(', ');
@@ -264,7 +265,7 @@ List<String> calculateOrderedStages(
 
   if (rootConfig.monoConfig.selfValidateStage != null &&
       !orderedStages.contains(rootConfig.monoConfig.selfValidateStage)) {
-    orderedStages.insert(0, rootConfig.monoConfig.selfValidateStage);
+    orderedStages.insert(0, rootConfig.monoConfig.selfValidateStage!);
   }
 
   return orderedStages;

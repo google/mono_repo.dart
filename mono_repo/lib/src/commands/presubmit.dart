@@ -37,9 +37,9 @@ class PresubmitCommand extends MonoRepoCommand {
   @override
   Future<void> run() async {
     final passed = await presubmit(rootConfig(),
-        packages: argResults['package'] as List<String>,
-        tasks: argResults['task'] as List<String>,
-        sdkToRun: argResults['sdk'] as String);
+        packages: argResults!['package'] as List<String>,
+        tasks: argResults!['task'] as List<String>,
+        sdkToRun: argResults!['sdk'] as String);
 
     // Set a bad exit code if it failed.
     if (!passed) exitCode = 1;
@@ -58,14 +58,14 @@ final _currentSdk =
 
 Future<bool> presubmit(
   RootConfig rootConfig, {
-  Iterable<String> packages,
-  Iterable<String> tasks,
-  String sdkToRun,
+  Iterable<String>? packages,
+  Iterable<String>? tasks,
+  String? sdkToRun,
 }) async {
   packages ??= <String>[];
   tasks ??= <String>[];
   sdkToRun ??= _currentSdk;
-  Directory tmpDir;
+  Directory? tmpDir;
 
   if (!File(ciScriptPath).existsSync()) {
     throw UserException(
@@ -111,7 +111,7 @@ Future<bool> presubmit(
     for (var job in config.jobs) {
       final sdk = job.sdk;
       for (var task in job.tasks) {
-        final taskKey = commandsToKeys[task.command];
+        final taskKey = commandsToKeys[task.command]!;
         // Skip tasks that weren't specified
         if (!tasks.contains(task.name)) continue;
 

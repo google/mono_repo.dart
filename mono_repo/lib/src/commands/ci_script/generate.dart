@@ -17,7 +17,6 @@ void generateCIScript(
   RootConfig rootConfig, {
   bool validateOnly = false,
 }) {
-  validateOnly ??= false;
   final ciScript = _GeneratedCIScript.generate(rootConfig).ciScript;
   if (validateOnly) {
     _validateFile(

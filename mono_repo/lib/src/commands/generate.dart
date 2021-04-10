@@ -28,7 +28,7 @@ class GenerateCommand extends MonoRepoCommand {
   }
 
   @override
-  void run() => generate(rootConfig(), argResults['validate'] as bool);
+  void run() => generate(rootConfig(), argResults!['validate'] as bool);
 }
 
 void generate(

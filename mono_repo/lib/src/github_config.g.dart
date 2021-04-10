@@ -22,31 +22,29 @@ GitHubConfig _$GitHubConfigFromJson(Map json) {
       $checkedConvert(
           json,
           'env',
-          (v) => (v as Map)?.map(
+          (v) => (v as Map?)?.map(
                 (k, e) => MapEntry(k as String, e),
               )),
       $checkedConvert(
           json,
           'on',
-          (v) => (v as Map)?.map(
+          (v) => (v as Map?)?.map(
                 (k, e) => MapEntry(k as String, e),
               )),
       $checkedConvert(
           json,
           'on_completion',
-          (v) => (v as List)
-              ?.map((e) => (e as Map)?.map(
-                    (k, e) => MapEntry(k as String, e),
-                  ))
-              ?.toList()),
-      $checkedConvert(json, 'cron', (v) => v as String),
-      $checkedConvert(json, 'stages', (v) => v as List),
+          (v) => (v as List<dynamic>?)
+              ?.map((e) => Map<String, dynamic>.from(e as Map))
+              .toList()),
+      $checkedConvert(json, 'cron', (v) => v as String?),
+      $checkedConvert(json, 'stages', (v) => v as List<dynamic>?),
       $checkedConvert(
           json,
           'workflows',
-          (v) => (v as Map)?.map(
-                (k, e) => MapEntry(k as String,
-                    e == null ? null : GitHubWorkflow.fromJson(e as Map)),
+          (v) => (v as Map?)?.map(
+                (k, e) =>
+                    MapEntry(k as String, GitHubWorkflow.fromJson(e as Map)),
               )),
     );
     return val;
@@ -61,8 +59,8 @@ GitHubWorkflow _$GitHubWorkflowFromJson(Map json) {
         disallowNullValues: const ['name', 'stages']);
     final val = GitHubWorkflow(
       $checkedConvert(json, 'name', (v) => v as String),
-      $checkedConvert(
-          json, 'stages', (v) => (v as List).map((e) => e as String).toSet()),
+      $checkedConvert(json, 'stages',
+          (v) => (v as List<dynamic>).map((e) => e as String).toSet()),
     );
     return val;
   });

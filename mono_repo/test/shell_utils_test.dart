@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:io/ansi.dart';
 import 'package:mono_repo/src/shell_utils.dart';
 import 'package:test/test.dart';
 
@@ -17,7 +18,7 @@ void main() {
           "echo -e 'Repeated single quotes '\\'''\\'''\\'' in the '\\'''\\'' middle'",
     }.entries) {
       test(entry.key, () {
-        expect(safeEcho(false, null, entry.key), entry.value);
+        expect(safeEcho(false, styleBold, entry.key), entry.value);
       });
     }
   });

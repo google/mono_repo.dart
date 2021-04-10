@@ -15,7 +15,7 @@ import 'shared.dart';
 
 final _dummyPubspec = Pubspec('_example');
 
-String _encodeJson(Object input) =>
+String _encodeJson(Object? input) =>
     const JsonEncoder.withIndent(' ').convert(input);
 
 PackageConfig _parse(map) => PackageConfig.parse(
@@ -96,7 +96,7 @@ stages:
     - [dartfmt]
     - dartanalyzer: --fatal-infos --fatal-warnings .
     dart: dev
-'''),
+''') as Object,
         r'''
 line 4, column 7: Must be a map or a string.
   ╷
@@ -201,7 +201,7 @@ stages:
   - description: 'bob'
     group: funky
     dart: dev
-''');
+''') as Object;
 
       _expectParseThrows(
         monoYaml,

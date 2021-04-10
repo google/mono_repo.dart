@@ -32,7 +32,7 @@ void main() {
       expect(reports.keys,
           ['bar', 'baz', p.join('baz', 'recursive'), 'flutter', 'foo']);
 
-      final fooReport = reports['foo'];
+      final fooReport = reports['foo']!;
       expect(fooReport.packageName, 'foo');
       expect(fooReport.published, isFalse);
 
@@ -43,7 +43,7 @@ void main() {
       expect((fooDeps['implied_any'] as HostedDependency).version,
           VersionConstraint.any);
 
-      final barReport = reports['bar'];
+      final barReport = reports['bar']!;
       expect(barReport.packageName, 'bar');
       expect(barReport.published, isFalse);
 
@@ -54,7 +54,7 @@ void main() {
       expect(gitDep.path, 'build');
       expect(gitDep.ref, 'hacking');
 
-      final bazReport = reports['baz'];
+      final bazReport = reports['baz']!;
       expect(bazReport.packageName, 'baz');
       expect(bazReport.published, isFalse);
 
@@ -66,7 +66,7 @@ void main() {
       expect(gitDep.path, isNull);
       expect(gitDep.ref, isNull);
 
-      final flutterReport = reports['flutter'];
+      final flutterReport = reports['flutter']!;
       expect(flutterReport.packageName, 'flutter');
       expect(flutterReport.published, isFalse);
       expect(flutterReport.pubspec.dependencies, hasLength(2));
@@ -76,7 +76,7 @@ void main() {
           flutterReport.pubspec.dependencies['flutter'] as SdkDependency;
       expect(sdkDep.sdk, 'flutter');
 
-      final recursiveReport = reports[p.join('baz', 'recursive')];
+      final recursiveReport = reports[p.join('baz', 'recursive')]!;
       expect(recursiveReport.packageName, 'baz.recursive');
       expect(recursiveReport.published, isTrue);
       expect(recursiveReport.pubspec.dependencies, hasLength(1));

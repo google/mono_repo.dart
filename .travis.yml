@@ -1,4 +1,4 @@
-# Created with package:mono_repo v3.4.7
+# Created with package:mono_repo v4.0.0-dev
 language: dart
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh command
     - stage: smoke_test
-      name: "Dart 2.7.0; PKG: mono_repo; `dartanalyzer .`"
-      dart: "2.7.0"
+      name: "Dart 2.12.0; PKG: mono_repo; `dartanalyzer .`"
+      dart: "2.12.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh dartanalyzer_1
@@ -58,14 +58,14 @@ jobs:
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: unit_test
-      name: "Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
-      dart: "2.7.0"
+      name: "Dart 2.12.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      dart: "2.12.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart 2.7.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
-      dart: "2.7.0"
+      name: "Dart 2.12.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      dart: "2.12.0"
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
@@ -82,8 +82,8 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart 2.7.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
-      dart: "2.7.0"
+      name: "Dart 2.12.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      dart: "2.12.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1

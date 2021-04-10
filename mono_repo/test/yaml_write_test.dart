@@ -121,7 +121,7 @@ void _asciiTest(List<int> bytes) {
   });
 }
 
-void _testRoundTrip(Object source, {String expectedEncoding}) {
+void _testRoundTrip(Object? source, {String? expectedEncoding}) {
   _testRoundTripCore(source, expectedEncoding: expectedEncoding);
 
   final sourceAsString = source.toString();
@@ -155,7 +155,7 @@ void _testRoundTrip(Object source, {String expectedEncoding}) {
   }
 }
 
-void _testRoundTripCore(Object source, {String expectedEncoding}) {
+void _testRoundTripCore(Object? source, {String? expectedEncoding}) {
   String testTitle;
   try {
     testTitle = jsonEncode(source);

@@ -7,7 +7,6 @@ import 'dart:io';
 
 import 'package:args/command_runner.dart';
 import 'package:io/ansi.dart';
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../root_config.dart';
@@ -55,18 +54,18 @@ class _PubSubCommand extends MonoRepoCommand {
   Future<void> run() => pub(
         rootConfig(),
         name,
-        offline: argResults[_offline] as bool,
-        dryRun: argResults[_dryRun] as bool,
-        preCompile: argResults[_precompile] as bool,
+        offline: argResults![_offline] as bool,
+        dryRun: argResults![_dryRun] as bool,
+        preCompile: argResults![_precompile] as bool,
       );
 }
 
 Future<void> pub(
   RootConfig rootConfig,
   String pubCommand, {
-  @required bool offline,
-  @required bool dryRun,
-  @required bool preCompile,
+  required bool offline,
+  required bool dryRun,
+  required bool preCompile,
 }) async {
   final pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
 

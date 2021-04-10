@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
@@ -49,8 +50,8 @@ void _print(String relativePath, PackageReport report) {
   print('  published: ${report.published}');
   if (report.version != null) {
     var value = '    version: ${report.version}';
-    if (report.version.isPreRelease) {
-      value = yellow.wrap(value);
+    if (report.version!.isPreRelease) {
+      value = yellow.wrap(value)!;
     }
     print(value);
   }
@@ -59,7 +60,7 @@ void _print(String relativePath, PackageReport report) {
     for (var entry in report.siblings.entries) {
       var value = '     ${entry.key}: ${entry.value}';
       if (report.published && entry.value.overrideData != null) {
-        value = yellow.wrap(value);
+        value = yellow.wrap(value)!;
       }
       print(value);
     }
@@ -76,7 +77,7 @@ class PackageReport {
 
   String get packageName => pubspec.name;
 
-  Version get version => pubspec.version;
+  Version? get version => pubspec.version;
 
   PackageReport(this.pubspec, this.siblings);
 
@@ -101,26 +102,29 @@ enum DependencyType { direct, dev, indirect }
 
 class SiblingReference {
   final DependencyType type;
-  final Dependency normalData;
-  final Dependency overrideData;
+  final Dependency? normalData;
+  final Dependency? overrideData;
 
   SiblingReference(this.type, this.normalData, this.overrideData);
 
-  factory SiblingReference.create(Pubspec sourcePubspec, Pubspec sibling) {
+  static SiblingReference? create(Pubspec sourcePubspec, Pubspec sibling) {
     for (var dep in sourcePubspec.dependencies.entries) {
       if (dep.key == sibling.name) {
         // a match!
         final override = sourcePubspec.dependencyOverrides.entries
-            .firstWhere((d) => d.key == dep.key, orElse: () => null);
+            .firstWhereOrNull((d) => d.key == dep.key);
         return SiblingReference(
-            DependencyType.direct, dep.value, override?.value);
+          DependencyType.direct,
+          dep.value,
+          override?.value,
+        );
       }
     }
     for (var dep in sourcePubspec.devDependencies.entries) {
       if (dep.key == sibling.name) {
         // a match!
         final override = sourcePubspec.dependencyOverrides.entries
-            .firstWhere((d) => d.key == dep.key, orElse: () => null);
+            .firstWhereOrNull((d) => d.key == dep.key);
         return SiblingReference(DependencyType.dev, dep.value, override?.value);
       }
     }

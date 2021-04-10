@@ -4,7 +4,6 @@
 
 import 'dart:collection';
 
-import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
@@ -42,11 +41,11 @@ ${toYaml({
   final jobList = [
     ..._listJobs(jobs, commandsToKeys, rootConfig.monoConfig.mergeStages),
     if (rootConfig.monoConfig.selfValidateStage != null)
-      _selfValidateTaskConfig(rootConfig.monoConfig.selfValidateStage),
+      _selfValidateTaskConfig(rootConfig.monoConfig.selfValidateStage!),
   ]..sort((a, b) {
       var value = orderedStages
-          .indexOf(a['stage'])
-          .compareTo(orderedStages.indexOf(b['stage']));
+          .indexOf(a['stage']!)
+          .compareTo(orderedStages.indexOf(b['stage']!));
 
       for (var key in const ['env', 'script', 'dart', 'os']) {
         if (value != 0) {
@@ -116,7 +115,7 @@ Iterable<Map<String, String>> _listJobs(
 
   for (var job in jobs) {
     final commands =
-        job.tasks.map((task) => commandsToKeys[task.command]).toList();
+        job.tasks.map((task) => commandsToKeys[task.command]!).toList();
 
     jobEntries.add(CIJobEntry(job, commands));
   }
@@ -151,9 +150,9 @@ Iterable<Map<String, String>> _listJobs(
 
 extension on CIJobEntry {
   Map<String, String> jobYaml({
-    List<String> packages,
-    @required bool oneSdk,
-    @required bool onePackage,
+    List<String>? packages,
+    required bool oneSdk,
+    required bool onePackage,
   }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);

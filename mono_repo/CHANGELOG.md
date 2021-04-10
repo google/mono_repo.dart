@@ -1,3 +1,8 @@
+## 4.0.0-dev
+
+- Migrate code to null safety.
+- Require Dart 2.12.
+
 ## 3.4.7
 
 - Use the latest `dart-lang/setup-dart@v1.0`.
