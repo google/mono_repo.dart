@@ -93,10 +93,10 @@ Future<void> pub(
     String executable;
 
     if (config.hasFlutterDependency) {
-      executable = 'flutter';
+      executable = _flutterPath;
       packageArgs = ['packages', ...args];
     } else {
-      executable = pubPath;
+      executable = _pubPath;
       packageArgs = args;
     }
 
@@ -131,5 +131,8 @@ final String _sdkDir = (() {
   return aboveExecutable;
 })();
 
-final String pubPath =
+final String _pubPath =
     p.join(_sdkDir, 'bin', Platform.isWindows ? 'pub.bat' : 'pub');
+
+/// The "flutter[.bat]" command.
+final String _flutterPath = Platform.isWindows ? 'flutter.bat' : 'flutter';
