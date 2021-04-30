@@ -16,12 +16,32 @@ function $commandName() {
   fi
 }''';
 
+String _dartCommandContentPub(String commandName) => '''
+# When it is a flutter repo (check the pubspec.yaml for "sdk: flutter")
+# then "flutter" is called instead of "pub".
+# This assumes that the Flutter SDK has been installed in a previous step.
+function $commandName() {
+  if grep -Fq "sdk: flutter" "\${PWD}/pubspec.yaml"; then
+    if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+      command flutter.bat pub "\$@"
+    else
+      command flutter pub "\$@"
+    fi
+  else
+    if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
+      command pub.bat "\$@"
+    else
+      command pub "\$@"
+    fi
+  fi
+}''';
+
 final bashScriptHeader = '''
 #!/bin/bash
 $createdWith
 
 # Support built in commands on windows out of the box.
-${_dartCommandContent('pub')}
+${_dartCommandContentPub('pub')}
 ${_dartCommandContent('dartfmt')}
 ${_dartCommandContent('dartanalyzer')}''';
 
