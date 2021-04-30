@@ -2,6 +2,7 @@
 
 - Migrate code to null safety.
 - Require Dart 2.12.
+- Use latest `actions/cache@v2.1.5`.
 
 ## 3.4.7
 
