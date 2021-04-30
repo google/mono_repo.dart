@@ -1,5 +1,7 @@
 ## 4.0.0-dev
 
+- Use `FLUTTER_HOME`, if it exists, when using the `pub` command.
+- Use `flutter[.bat]` instead of `pub[.bat]` in generated `tool/ci.sh`.
 - Migrate code to null safety.
 - Require Dart 2.12.
 
