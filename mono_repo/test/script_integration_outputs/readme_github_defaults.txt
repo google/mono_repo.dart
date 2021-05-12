@@ -34,7 +34,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -62,7 +62,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub upgrade --no-precompile"
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -83,7 +83,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - id: sub_pkg_pub_upgrade
         name: "sub_pkg; pub.bat upgrade --no-precompile"
         if: "always() && steps.checkout.conclusion == 'success'"

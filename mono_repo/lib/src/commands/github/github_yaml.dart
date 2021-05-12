@@ -340,7 +340,7 @@ Map<String, dynamic> _githubJobYaml(
         },
         {
           'id': 'checkout',
-          'uses': 'actions/checkout@v2',
+          'uses': 'actions/checkout@v2.3.4',
         },
         for (var command in runCommands) command.runContent,
       ],

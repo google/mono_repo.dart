@@ -5,6 +5,7 @@
 - Migrate code to null safety.
 - Require Dart 2.12.
 - Use latest `actions/cache@v2.1.5`.
+- Use latest `actions/checkout@v2.3.4`.
 
 ## 3.4.7
 
