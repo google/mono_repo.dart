@@ -1,4 +1,4 @@
-## 4.0.0-dev
+## 4.0.0
 
 - Use `FLUTTER_HOME`, if it exists, when using the `pub` command.
 - Use `flutter[.bat]` instead of `pub[.bat]` in generated `tool/ci.sh`.
