@@ -19,3 +19,7 @@ github:
               "${CHAT_WEBHOOK_URL}"
           env:
             CHAT_WEBHOOK_URL: ${{ secrets.CHAT_WEBHOOK_URL }}
+
+dependency_overrides:
+  shelf_static:
+    git: https://github.com/dart-lang/shelf_static/

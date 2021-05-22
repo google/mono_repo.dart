@@ -4,6 +4,8 @@
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
+// ignore: implementation_imports
+import 'package:pubspec_parse/src/dependency.dart';
 
 import 'github_config.dart';
 import 'yaml.dart';
@@ -16,6 +18,7 @@ const _monoConfigFileName = 'mono_repo.yaml';
 const _reservedTravisKeys = {'cache', 'jobs', 'language'};
 
 const _allowedMonoConfigKeys = {
+  'dependency_overrides',
   'github',
   'merge_stages',
   'pretty_ansi',
@@ -41,6 +44,7 @@ class MonoConfig {
   final String? selfValidateStage;
   final Map<String, dynamic> travis;
   final GitHubConfig github;
+  final Map<String, Dependency> dependencyOverrides;
 
   MonoConfig._({
     required Set<CI>? ci,
@@ -52,6 +56,7 @@ class MonoConfig {
     required this.selfValidateStage,
     required this.travis,
     required this.github,
+    required this.dependencyOverrides,
   }) : ci = ci ?? const {CI.travis};
 
   factory MonoConfig({
@@ -62,6 +67,7 @@ class MonoConfig {
     required String? selfValidateStage,
     required Map travis,
     required Map github,
+    required Map dependencyOverrides,
   }) {
     final overlappingKeys =
         travis.keys.where(_reservedTravisKeys.contains).toList();
@@ -87,6 +93,7 @@ class MonoConfig {
       selfValidateStage: selfValidateStage,
       travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
       github: GitHubConfig.fromJson(github),
+      dependencyOverrides: parseDeps(dependencyOverrides),
     );
   }
 
@@ -184,6 +191,7 @@ class MonoConfig {
         selfValidateStage: _selfValidateFromValue(selfValidate),
         travis: travis,
         github: github,
+        dependencyOverrides: json['dependency_overrides'] as Map? ?? {},
       );
     } else {
       throw CheckedFromJsonException(
@@ -208,6 +216,7 @@ class MonoConfig {
         selfValidateStage: null,
         travis: {},
         github: {},
+        dependencyOverrides: {},
       );
     }
 

@@ -1,6 +1,7 @@
 ## 4.2.0-dev
 
 - Change calls from `pub` to `dart pub` within generated scripts.
+- WIP on `add-overrides`
 
 ## 4.1.0
 
