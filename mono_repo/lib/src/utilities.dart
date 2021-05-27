@@ -6,7 +6,8 @@ import 'package:pub_semver/pub_semver.dart';
 
 const travisEdgeSdk = 'be/raw/latest';
 
-const githubSetupMainSdk = 'main'; // this maps to `be/raw/latest`
+/// Maps to `be/raw/latest` or "bleeding edge".
+const githubSetupMainSdk = 'main';
 
 String? errorForSdkConfig(String sdk) {
   try {
