@@ -10,33 +10,33 @@ jobs:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
+      script: "dart pub global activate mono_repo 1.2.3 && dart pub global run mono_repo generate --validate"
     - stage: analyze
-      name: "`dartanalyzer .`"
+      name: "`dart analyze`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh dartanalyzer
     - stage: analyze
-      name: "`dartfmt -n --set-exit-if-changed .`"
+      name: "`dart format --output=none --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh dartfmt
     - stage: unit_test
-      name: "`pub run test`"
+      name: "`dart test`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh test
     - stage: cron
-      name: "`pub run test`"
+      name: "`dart test`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh test
     - stage: cron
-      name: "`pub run test`"
+      name: "`dart test`"
       dart: dev
       os: windows
       env: PKGS="sub_pkg"

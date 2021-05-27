@@ -4,7 +4,7 @@ language: dart
 jobs:
   include:
     - stage: smoke_test
-      name: "Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart dev; PKGS: mono_repo, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: dev
       os: linux
       env: PKGS="mono_repo test_pkg"
@@ -16,85 +16,85 @@ jobs:
       env: PKGS="mono_repo"
       script: tool/ci.sh command
     - stage: smoke_test
-      name: "Dart 2.12.0; PKG: mono_repo; `dartanalyzer .`"
+      name: "Dart 2.12.0; PKG: mono_repo; `dart analyze`"
       dart: "2.12.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh dartanalyzer_1
     - stage: smoke_test
-      name: "Dart 2.10.4; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart 2.10.4; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: "2.10.4"
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart 2.12.0-259.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart 2.12.0-259.0.dev; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: "2.12.0-259.0.dev"
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart 2.12.0-29.10.beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: "2.12.0-29.10.beta"
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart main; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart main; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: be/raw/latest
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: beta
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      name: "Dart stable; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
       dart: stable
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: unit_test
-      name: "Dart 2.12.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart 2.12.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.12.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart 2.12.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart 2.12.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: "2.12.0"
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
       dart: dev
       os: windows
       env: PKGS="mono_repo"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart 2.12.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      name: "Dart 2.12.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
       dart: "2.12.0"
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="mono_repo"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
+      name: "Dart dev; PKG: test_pkg; `dart test --test-randomize-ordering-seed=random`"
       dart: dev
       os: linux
       env: PKGS="test_pkg"

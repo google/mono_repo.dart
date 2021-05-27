@@ -31,7 +31,7 @@ function $commandName() {
     if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
       command pub.bat "\$@"
     else
-      command pub "\$@"
+      command dart pub "\$@"
     fi
   fi
 }''';
@@ -76,11 +76,11 @@ for PKG in \${PKGS}; do
     exit 64
   fi
 
-  pub $pubDependencyCommand || EXIT_CODE=\$?
+  dart pub $pubDependencyCommand || EXIT_CODE=\$?
 
   if [[ \${EXIT_CODE} -ne 0 ]]; then
-    ${echoWithEvaluation(prettyAnsi, red, "PKG: \${PKG}; 'pub $pubDependencyCommand' - FAILED  (\${EXIT_CODE})")}
-    FAILURES+=("\${PKG}; 'pub $pubDependencyCommand'")
+    ${echoWithEvaluation(prettyAnsi, red, "PKG: \${PKG}; 'dart pub $pubDependencyCommand' - FAILED  (\${EXIT_CODE})")}
+    FAILURES+=("\${PKG}; 'dart pub $pubDependencyCommand'")
   else
     for TASK in "\$@"; do
       EXIT_CODE=0

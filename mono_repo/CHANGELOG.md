@@ -4,6 +4,7 @@
 - Drop `--no-precompile` as the default for `pub` `get` and `upgrade` commands.
   It's now the default across Dart tools.
 - Use latest `actions/cache@v2.1.6`.
+- Migrate to new command pattern supported in Dart 2.10+
 
 ## 4.0.0
 

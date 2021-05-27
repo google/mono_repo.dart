@@ -35,8 +35,8 @@ String get _pkgVersion => _isTesting ? '1.2.3' : packageVersion;
 const selfValidateJobName = 'mono_repo self validate';
 
 final selfValidateCommands = [
-  'pub global activate mono_repo $_pkgVersion',
-  'pub global run mono_repo generate --validate',
+  'dart pub global activate mono_repo $_pkgVersion',
+  'dart pub global run mono_repo generate --validate',
 ];
 
 class CIJobEntry {

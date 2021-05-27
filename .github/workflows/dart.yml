@@ -16,7 +16,7 @@ env:
 
 jobs:
   job_001:
-    name: "smoke_test; linux; Dart 2.10.4; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.10.4; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -39,16 +39,16 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_002:
-    name: "smoke_test; linux; Dart 2.12.0-259.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.12.0-259.0.dev; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -71,16 +71,16 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_003:
-    name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -103,16 +103,16 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_004:
-    name: "smoke_test; linux; Dart 2.12.0; PKG: mono_repo; `dartanalyzer .`"
+    name: "smoke_test; linux; Dart 2.12.0; PKG: mono_repo; `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -135,12 +135,12 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade
-      - name: mono_repo; dartanalyzer .
+      - name: mono_repo; dart analyze
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: dartanalyzer .
+        run: dart analyze
   job_005:
-    name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -163,14 +163,14 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_006:
     name: "smoke_test; linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
@@ -200,7 +200,7 @@ jobs:
         working-directory: mono_repo
         run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
   job_007:
-    name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -223,29 +223,29 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade
-      - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
+      - name: "mono_repo; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "mono_repo; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "mono_repo; dart analyze --fatal-infos ."
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
       - id: test_pkg_pub_upgrade
         name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_008:
-    name: "smoke_test; linux; Dart main; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart main; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -268,16 +268,16 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_009:
-    name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -300,16 +300,16 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartfmt -n --set-exit-if-changed .
-      - name: "test_pkg; dartanalyzer --fatal-infos ."
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: dartanalyzer --fatal-infos .
+        run: dart analyze --fatal-infos .
   job_010:
-    name: "unit_test; linux; Dart 2.12.0; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart 2.12.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -332,10 +332,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade
-      - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
+      - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "pub run test -t yaml --test-randomize-ordering-seed=random"
+        run: "dart test -t yaml --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -347,7 +347,7 @@ jobs:
       - job_008
       - job_009
   job_011:
-    name: "unit_test; linux; Dart 2.12.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart 2.12.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -370,10 +370,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade
-      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -385,7 +385,7 @@ jobs:
       - job_008
       - job_009
   job_012:
-    name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -t yaml --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart dev; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -408,10 +408,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade
-      - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
+      - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "pub run test -t yaml --test-randomize-ordering-seed=random"
+        run: "dart test -t yaml --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -423,7 +423,7 @@ jobs:
       - job_008
       - job_009
   job_013:
-    name: "unit_test; linux; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -446,10 +446,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub upgrade
-      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -461,7 +461,7 @@ jobs:
       - job_008
       - job_009
   job_014:
-    name: "unit_test; linux; Dart dev; PKG: test_pkg; `pub run test --test-randomize-ordering-seed=random`"
+    name: "unit_test; linux; Dart dev; PKG: test_pkg; `dart test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -484,10 +484,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
         run: pub upgrade
-      - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
+      - name: "test_pkg; dart test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: "pub run test --test-randomize-ordering-seed=random"
+        run: "dart test --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -499,7 +499,7 @@ jobs:
       - job_008
       - job_009
   job_015:
-    name: "unit_test; windows; Dart 2.12.0; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; windows; Dart 2.12.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v1.0
@@ -512,10 +512,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub.bat upgrade
-      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "pub.bat run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -527,7 +527,7 @@ jobs:
       - job_008
       - job_009
   job_016:
-    name: "unit_test; windows; Dart dev; PKG: mono_repo; `pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "unit_test; windows; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v1.0
@@ -540,10 +540,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
         run: pub.bat upgrade
-      - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+      - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "pub.bat run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002

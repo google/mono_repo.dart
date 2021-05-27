@@ -285,7 +285,7 @@ class Task {
 
   final String command;
 
-  Task(this.name, {this.args}) : command = _commandValue(name, args);
+  Task(this.name, {this.args}) : command = _commandValue(name, args).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
@@ -393,27 +393,24 @@ class Task {
 
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 
-  static String _commandValue(String name, String? args) {
+  static List<String> _commandValue(String name, String? args) {
     switch (name) {
       case 'dartfmt':
-        if (args == null || args == 'sdk') {
-          return 'dartfmt -n --set-exit-if-changed .';
-        }
-        return 'dartfmt $args';
+        return [
+          'dart format',
+          (args == null || args == 'sdk')
+              ? '--output=none --set-exit-if-changed .'
+              : args,
+        ];
       case 'dartanalyzer':
-        if (args == null) {
-          return 'dartanalyzer .';
-        }
-        return 'dartanalyzer $args';
-
+        return ['dart analyze', if (args != null) args];
       case 'test':
-        var value = 'pub run test';
-        if (args != null) {
-          value = '$value $args';
-        }
-        return value;
+        return [
+          'dart test',
+          if (args != null) args,
+        ];
       case 'command':
-        return args!;
+        return [args!];
       default:
         throw UnsupportedError('Cannot generate the command for `$name`.');
     }

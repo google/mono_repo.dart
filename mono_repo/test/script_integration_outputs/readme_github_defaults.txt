@@ -17,7 +17,7 @@ env:
 
 jobs:
   job_001:
-    name: "unit_test; linux; `pub run test`"
+    name: "unit_test; linux; `dart test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -40,12 +40,12 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade
-      - name: sub_pkg; pub run test
+      - name: sub_pkg; dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: pub run test
+        run: dart test
   job_002:
-    name: "cron; linux; `pub run test`"
+    name: "cron; linux; `dart test`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -68,15 +68,15 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade
-      - name: sub_pkg; pub run test
+      - name: sub_pkg; dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: pub run test
+        run: dart test
     if: "github.event_name == 'schedule'"
     needs:
       - job_001
   job_003:
-    name: "cron; windows; `pub run test`"
+    name: "cron; windows; `dart test`"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v1.0
@@ -89,10 +89,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub.bat upgrade
-      - name: sub_pkg; pub run test
+      - name: sub_pkg; dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: pub.bat run test
+        run: dart test
     if: "github.event_name == 'schedule'"
     needs:
       - job_001

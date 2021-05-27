@@ -44,7 +44,7 @@ Available commands:
   check       Check the state of the repository.
   generate    Generates the CI configuration for child packages.
   presubmit   Run the CI presubmits locally.
-  pub         Run `pub get` or `pub upgrade` against all packages.
+  pub         Run `dart pub get` or `dart pub upgrade` against all packages.
   travis      (Deprecated, use `generate`) Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.''';

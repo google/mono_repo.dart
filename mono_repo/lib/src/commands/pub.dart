@@ -23,7 +23,7 @@ class PubCommand extends Command<void> {
 
   @override
   String get description =>
-      'Run `pub get` or `pub upgrade` against all packages.';
+      'Run `dart pub get` or `dart pub upgrade` against all packages.';
 }
 
 const _offline = 'offline';
@@ -53,7 +53,7 @@ class _PubSubCommand extends MonoRepoCommand {
   }
 
   @override
-  String get description => 'Run `pub $name` against all packages.';
+  String get description => 'Run `dart pub $name` against all packages.';
 
   @override
   Future<void> run() => pub(
@@ -89,8 +89,12 @@ Future<void> pub(
     args.add('--$_precompile');
   }
 
-  print(lightBlue.wrap(
-      'Running `pub ${args.join(' ')}` across ${pkgDirs.length} package(s).'));
+  print(
+    lightBlue.wrap(
+      'Running `dart pub ${args.join(' ')}` across ${pkgDirs.length} '
+      'package(s).',
+    ),
+  );
 
   for (var config in rootConfig) {
     final dir = config.relativePath;

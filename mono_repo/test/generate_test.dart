@@ -436,19 +436,19 @@ language: dart
 jobs:
   include:
     - stage: format
-      name: "Dart dev; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt
     - stage: format
-      name: "Dart stable; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart stable; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt
     - stage: format
-      name: "Dart dev; PKG: pkg_b; `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_b; `dart format --output=none --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
@@ -473,8 +473,8 @@ cache:
     await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
       dartfmt)
-        echo 'dartfmt -n --set-exit-if-changed .'
-        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        echo 'dart format --output=none --set-exit-if-changed .'
+        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
@@ -539,19 +539,19 @@ language: dart
 jobs:
   include:
     - stage: format
-      name: "Dart dev; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt_0
     - stage: format
-      name: "Dart stable; PKG: pkg_a; `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart stable; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
       script: tool/ci.sh dartfmt_0
     - stage: format
-      name: "Dart dev; PKG: pkg_b; `dartfmt --dry-run --fix --set-exit-if-changed .`"
+      name: "Dart dev; PKG: pkg_b; `dart format --dry-run --fix --set-exit-if-changed .`"
       dart: dev
       os: linux
       env: PKGS="pkg_b"
@@ -576,12 +576,12 @@ cache:
     await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
       dartfmt_0)
-        echo 'dartfmt -n --set-exit-if-changed .'
-        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        echo 'dart format --output=none --set-exit-if-changed .'
+        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       dartfmt_1)
-        echo 'dartfmt --dry-run --fix --set-exit-if-changed .'
-        dartfmt --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
+        echo 'dart format --dry-run --fix --set-exit-if-changed .'
+        dart format --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
@@ -667,13 +667,13 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "Dart 1.23.0; `dartanalyzer .`"
+      name: "Dart 1.23.0; `dart analyze`"
       dart: "1.23.0"
       os: windows
       env: PKGS="pkg_a"
       script: tool/ci.sh dartanalyzer
     - stage: analyze
-      name: "Dart dev; `dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
       dart: dev
       os: osx
       env: PKGS="pkg_a"
@@ -685,7 +685,7 @@ jobs:
       env: PKGS="pkg_a"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart stable; `pub run test --preset travis`"
+      name: "Dart stable; `dart test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
@@ -977,7 +977,7 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "PKGS: pkg_a, pkg_b; `dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`"
+      name: "PKGS: pkg_a, pkg_b; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
       dart: stable
       os: linux
       env: PKGS="pkg_a pkg_b"
@@ -989,7 +989,7 @@ jobs:
       env: PKGS="pkg_a"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "PKG: pkg_a; `pub run test --preset travis`"
+      name: "PKG: pkg_a; `dart test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_a"
@@ -1001,7 +1001,7 @@ jobs:
       env: PKGS="pkg_b"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "PKG: pkg_b; `pub run test --preset travis`"
+      name: "PKG: pkg_b; `dart test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="pkg_b"
@@ -1073,11 +1073,11 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         // TODO: validate GitHub case
         await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(ciScriptPath, contains(r'''
-  pub get || EXIT_CODE=$?
+  dart pub get || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
-    echo -e "\033[31mPKG: ${PKG}; 'pub get' - FAILED  (${EXIT_CODE})\033[0m"
-    FAILURES+=("${PKG}; 'pub get'")
+    echo -e "\033[31mPKG: ${PKG}; 'dart pub get' - FAILED  (${EXIT_CODE})\033[0m"
+    FAILURES+=("${PKG}; 'dart pub get'")
   else
 ''')).validate();
       });
@@ -1134,11 +1134,11 @@ for PKG in ${PKGS}; do
     exit 64
   fi
 
-  pub upgrade || EXIT_CODE=$?
+  dart pub upgrade || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
-    echo -e "PKG: ${PKG}; 'pub upgrade' - FAILED  (${EXIT_CODE})"
-    FAILURES+=("${PKG}; 'pub upgrade'")
+    echo -e "PKG: ${PKG}; 'dart pub upgrade' - FAILED  (${EXIT_CODE})"
+    FAILURES+=("${PKG}; 'dart pub upgrade'")
   else
     for TASK in "$@"; do
       EXIT_CODE=0
@@ -1146,20 +1146,20 @@ for PKG in ${PKGS}; do
       echo -e "PKG: ${PKG}; TASK: ${TASK}"
       case ${TASK} in
       dartanalyzer)
-        echo 'dartanalyzer .'
-        dartanalyzer . || EXIT_CODE=$?
+        echo 'dart analyze'
+        dart analyze || EXIT_CODE=$?
         ;;
       dartfmt)
-        echo 'dartfmt -n --set-exit-if-changed .'
-        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        echo 'dart format --output=none --set-exit-if-changed .'
+        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       test_0)
-        echo 'pub run test --platform chrome'
-        pub run test --platform chrome || EXIT_CODE=$?
+        echo 'dart test --platform chrome'
+        dart test --platform chrome || EXIT_CODE=$?
         ;;
       test_1)
-        echo 'pub run test --preset travis'
-        pub run test --preset travis || EXIT_CODE=$?
+        echo 'dart test --preset travis'
+        dart test --preset travis || EXIT_CODE=$?
         ;;
       *)
         echo -e "Unknown TASK '${TASK}' - TERMINATING JOB"
@@ -1234,7 +1234,7 @@ jobs:
     - stage: mono_repo_self_validate
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
+      script: "dart pub global activate mono_repo 1.2.3 && dart pub global run mono_repo generate --validate"
 ''',
                   r'''
 stages:
@@ -1276,7 +1276,7 @@ jobs:
     - stage: analyze
       name: mono_repo self validate
       os: linux
-      script: "pub global activate mono_repo 1.2.3 && pub global run mono_repo generate --validate"
+      script: "dart pub global activate mono_repo 1.2.3 && dart pub global run mono_repo generate --validate"
     - stage: analyze
 ''',
                   r'''

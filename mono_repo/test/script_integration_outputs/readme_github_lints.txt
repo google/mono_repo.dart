@@ -34,11 +34,11 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - name: mono_repo self validate
-        run: pub global activate mono_repo 1.2.3
+        run: dart pub global activate mono_repo 1.2.3
       - name: mono_repo self validate
-        run: pub global run mono_repo generate --validate
+        run: dart pub global run mono_repo generate --validate
   job_002:
-    name: "analyze; `dartanalyzer .`"
+    name: "analyze; `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -61,12 +61,12 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade
-      - name: sub_pkg; dartanalyzer .
+      - name: sub_pkg; dart analyze
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dartanalyzer .
+        run: dart analyze
   job_003:
-    name: "analyze; `dartfmt -n --set-exit-if-changed .`"
+    name: "analyze; `dart format --output=none --set-exit-if-changed .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -89,10 +89,10 @@ jobs:
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
         run: pub upgrade
-      - name: "sub_pkg; dartfmt -n --set-exit-if-changed ."
+      - name: "sub_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dartfmt -n --set-exit-if-changed .
+        run: "dart format --output=none --set-exit-if-changed ."
   job_004:
     name: Notify failure
     runs-on: ubuntu-latest

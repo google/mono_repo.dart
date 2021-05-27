@@ -3,7 +3,7 @@ Resolving dependencies...
 No dependencies changed.
 
 PKG: pkg_c; TASK: dartanalyzer
-dartanalyzer .
+dart analyze
 Analyzing pkg_c...
 No issues found!
 PKG: pkg_c; TASK: dartanalyzer - SUCCEEDED

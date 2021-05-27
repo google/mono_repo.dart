@@ -28,11 +28,11 @@ for PKG in ${PKGS}; do
     exit 64
   fi
 
-  pub upgrade || EXIT_CODE=$?
+  dart pub upgrade || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
-    echo -e "\033[31mPKG: ${PKG}; 'pub upgrade' - FAILED  (${EXIT_CODE})\033[0m"
-    FAILURES+=("${PKG}; 'pub upgrade'")
+    echo -e "\033[31mPKG: ${PKG}; 'dart pub upgrade' - FAILED  (${EXIT_CODE})\033[0m"
+    FAILURES+=("${PKG}; 'dart pub upgrade'")
   else
     for TASK in "$@"; do
       EXIT_CODE=0
@@ -40,20 +40,20 @@ for PKG in ${PKGS}; do
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
       dartanalyzer)
-        echo 'dartanalyzer .'
-        dartanalyzer . || EXIT_CODE=$?
+        echo 'dart analyze'
+        dart analyze || EXIT_CODE=$?
         ;;
       dartfmt)
-        echo 'dartfmt -n --set-exit-if-changed .'
-        dartfmt -n --set-exit-if-changed . || EXIT_CODE=$?
+        echo 'dart format --output=none --set-exit-if-changed .'
+        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       test_0)
-        echo 'pub run test --platform chrome'
-        pub run test --platform chrome || EXIT_CODE=$?
+        echo 'dart test --platform chrome'
+        dart test --platform chrome || EXIT_CODE=$?
         ;;
       test_1)
-        echo 'pub run test --preset travis'
-        pub run test --preset travis || EXIT_CODE=$?
+        echo 'dart test --preset travis'
+        dart test --preset travis || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
@@ -98,13 +98,13 @@ language: dart
 jobs:
   include:
     - stage: analyze
-      name: "Dart 1.23.0; `dartanalyzer .`"
+      name: "Dart 1.23.0; `dart analyze`"
       dart: "1.23.0"
       os: windows
       env: PKGS="sub_pkg"
       script: tool/ci.sh dartanalyzer
     - stage: analyze
-      name: "Dart dev; `dartanalyzer .`, `dartfmt -n --set-exit-if-changed .`"
+      name: "Dart dev; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
       dart: dev
       os: osx
       env: PKGS="sub_pkg"
@@ -146,37 +146,37 @@ jobs:
       env: PKGS="sub_pkg"
       script: tool/ci.sh test_0
     - stage: unit_test
-      name: "Dart 1.23.0; `pub run test --preset travis`"
+      name: "Dart 1.23.0; `dart test --preset travis`"
       dart: "1.23.0"
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart 1.23.0; `pub run test --preset travis`"
+      name: "Dart 1.23.0; `dart test --preset travis`"
       dart: "1.23.0"
       os: windows
       env: PKGS="sub_pkg"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart dev; `pub run test --preset travis`"
+      name: "Dart dev; `dart test --preset travis`"
       dart: dev
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart dev; `pub run test --preset travis`"
+      name: "Dart dev; `dart test --preset travis`"
       dart: dev
       os: windows
       env: PKGS="sub_pkg"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart stable; `pub run test --preset travis`"
+      name: "Dart stable; `dart test --preset travis`"
       dart: stable
       os: linux
       env: PKGS="sub_pkg"
       script: tool/ci.sh test_1
     - stage: unit_test
-      name: "Dart stable; `pub run test --preset travis`"
+      name: "Dart stable; `dart test --preset travis`"
       dart: stable
       os: windows
       env: PKGS="sub_pkg"

@@ -3,34 +3,32 @@ Resolving dependencies...
 No dependencies changed.
 
 PKG: pkg_a; TASK: dartanalyzer
-dartanalyzer .
+dart analyze
 Analyzing pkg_a...
-PKG: pkg_a; TASK: dartanalyzer - FAILED (3)
+No issues found!
+PKG: pkg_a; TASK: dartanalyzer - SUCCEEDED
 
 PKG: pkg_a; TASK: command_0
 echo "testing 1 2 3"
 testing 1 2 3
 PKG: pkg_a; TASK: command_0 - SUCCEEDED
 
-SUCCESS COUNT: 1
-FAILURES: 1
-  pkg_a; TASK: dartanalyzer
+SUCCESS COUNT: 2
 
 PKG: pkg_b
 Resolving dependencies...
-PKG: pkg_b; 'pub upgrade' - FAILED  (69)
+PKG: pkg_b; 'dart pub upgrade' - FAILED  (69)
 
-SUCCESS COUNT: 1
-FAILURES: 2
-  pkg_a; TASK: dartanalyzer
-  pkg_b; 'pub upgrade'
+SUCCESS COUNT: 2
+FAILURES: 1
+  pkg_b; 'dart pub upgrade'
 
 PKG: pkg_c
 Resolving dependencies...
 No dependencies changed.
 
 PKG: pkg_c; TASK: dartanalyzer
-dartanalyzer .
+dart analyze
 Analyzing pkg_c...
 No issues found!
 PKG: pkg_c; TASK: dartanalyzer - SUCCEEDED
@@ -40,7 +38,6 @@ echo "testing 1 2 3"
 testing 1 2 3
 PKG: pkg_c; TASK: command_0 - SUCCEEDED
 
-SUCCESS COUNT: 3
-FAILURES: 2
-  pkg_a; TASK: dartanalyzer
-  pkg_b; 'pub upgrade'
+SUCCESS COUNT: 4
+FAILURES: 1
+  pkg_b; 'dart pub upgrade'

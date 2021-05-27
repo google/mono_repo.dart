@@ -118,22 +118,22 @@ environment:
             reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
         expect(result.stdout, '''
 pkg_a
-  SDK: dev TASK: dartanalyzer .
+  SDK: dev TASK: dart analyze
     success
-  SDK: stable TASK: dartanalyzer .
+  SDK: stable TASK: dart analyze
     skipped, mismatched sdk
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+  SDK: dev TASK: dart format --output=none --set-exit-if-changed .
     success
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+  SDK: stable TASK: dart format --output=none --set-exit-if-changed .
     skipped, mismatched sdk
-  SDK: dev TASK: pub run test
+  SDK: dev TASK: dart test
     success
-  SDK: stable TASK: pub run test
+  SDK: stable TASK: dart test
     skipped, mismatched sdk
 pkg_b
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+  SDK: dev TASK: dart format --output=none --set-exit-if-changed .
     success
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+  SDK: stable TASK: dart format --output=none --set-exit-if-changed .
     skipped, mismatched sdk
 ''');
       },
@@ -160,9 +160,9 @@ pkg_b
       );
       expect(result.stdout, '''
 pkg_b
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+  SDK: dev TASK: dart format --output=none --set-exit-if-changed .
     success
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+  SDK: stable TASK: dart format --output=none --set-exit-if-changed .
     skipped, mismatched sdk
 ''');
     });
@@ -184,14 +184,14 @@ pkg_b
           reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
       expect(result.stdout, '''
 pkg_a
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+  SDK: dev TASK: dart format --output=none --set-exit-if-changed .
     success
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+  SDK: stable TASK: dart format --output=none --set-exit-if-changed .
     skipped, mismatched sdk
 pkg_b
-  SDK: dev TASK: dartfmt -n --set-exit-if-changed .
+  SDK: dev TASK: dart format --output=none --set-exit-if-changed .
     success
-  SDK: stable TASK: dartfmt -n --set-exit-if-changed .
+  SDK: stable TASK: dart format --output=none --set-exit-if-changed .
     skipped, mismatched sdk
 ''');
     });
@@ -229,7 +229,7 @@ pkg_b
           result.stdout,
           startsWith('''
 pkg_a
-  SDK: dev TASK: pub run test
+  SDK: dev TASK: dart test
     failure, '''),
         );
         printOnFailure(result.stdout as String);
