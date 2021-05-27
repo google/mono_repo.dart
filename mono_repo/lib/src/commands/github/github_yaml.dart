@@ -61,14 +61,10 @@ Map<String, String> generateGitHubYml(
         if (value == 0 && a is CIJob && b is CIJob) {
           value = a.sortBits.compareTo(b.sortBits);
         }
-        if (value == 0) {
-          assert(() {
-            print(
-              ['Job sort not clear. Please file an issue!', a, b].join('\n'),
-            );
-            return true;
-          }());
-        }
+        assert(
+          value != 0,
+          ['Job sort not clear. Please file an issue!', a, b].join('\n'),
+        );
         return value;
       });
 
