@@ -76,7 +76,7 @@ for PKG in \${PKGS}; do
     exit 64
   fi
 
-  pub $pubDependencyCommand --no-precompile || EXIT_CODE=\$?
+  pub $pubDependencyCommand || EXIT_CODE=\$?
 
   if [[ \${EXIT_CODE} -ne 0 ]]; then
     ${echoWithEvaluation(prettyAnsi, red, "PKG: \${PKG}; 'pub $pubDependencyCommand' - FAILED  (\${EXIT_CODE})")}

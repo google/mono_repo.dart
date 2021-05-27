@@ -28,8 +28,8 @@ jobs:
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0
     - stage: smoke_test
-      name: "Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
-      dart: "2.12.0-0.0.dev"
+      name: "Dart 2.12.0-259.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+      dart: "2.12.0-259.0.dev"
       os: linux
       env: PKGS="test_pkg"
       script: tool/ci.sh dartfmt dartanalyzer_0

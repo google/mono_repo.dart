@@ -1073,7 +1073,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         // TODO: validate GitHub case
         await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(ciScriptPath, contains(r'''
-  pub get --no-precompile || EXIT_CODE=$?
+  pub get || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
     echo -e "\033[31mPKG: ${PKG}; 'pub get' - FAILED  (${EXIT_CODE})\033[0m"
@@ -1134,7 +1134,7 @@ for PKG in ${PKGS}; do
     exit 64
   fi
 
-  pub upgrade --no-precompile || EXIT_CODE=$?
+  pub upgrade || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
     echo -e "PKG: ${PKG}; 'pub upgrade' - FAILED  (${EXIT_CODE})"
