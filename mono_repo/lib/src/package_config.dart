@@ -200,6 +200,16 @@ class CIJob implements HasStageName {
   /// Same as [sdk] except it handles Travis-specific naming for the edge SDK.
   String get travisSdk => sdk == githubSetupMainSdk ? travisEdgeSdk : sdk;
 
+  /// Values used to group jobs together.
+  List<String> get groupByKeys => [os, stageName, sdk];
+
+  /// Values used to sort jobs within a group.
+  String get sortBits => [
+        ...groupByKeys,
+        package,
+        name,
+      ].join(':::');
+
   CIJob(
     this.os,
     this.package,
@@ -250,6 +260,9 @@ class CIJob implements HasStageName {
   }
 
   Map<String, dynamic> toJson() => _$CIJobToJson(this);
+
+  @override
+  String toString() => 'CIJob: ${toJson()}';
 
   @override
   bool operator ==(Object other) =>

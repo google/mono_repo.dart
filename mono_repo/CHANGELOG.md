@@ -1,3 +1,7 @@
+## 4.1.0-dev
+
+- Improve the stability of ordering in Github workflow definitions.
+
 ## 4.0.0
 
 - Use `FLUTTER_HOME`, if it exists, when using the `pub` command.
