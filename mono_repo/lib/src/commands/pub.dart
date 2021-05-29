@@ -36,15 +36,20 @@ class _PubSubCommand extends MonoRepoCommand {
 
   _PubSubCommand(this.name) {
     argParser
-      ..addFlag(_offline,
-          help: 'Use cached packages instead of accessing the network.')
-      ..addFlag(_dryRun,
-          abbr: 'n',
-          negatable: false,
-          help: 'Precompile executables and transformed dependencies.')
-      ..addFlag(_precompile,
-          defaultsTo: true,
-          help: "Report what dependencies would change but don't change any.");
+      ..addFlag(
+        _offline,
+        help: 'Use cached packages instead of accessing the network.',
+      )
+      ..addFlag(
+        _dryRun,
+        abbr: 'n',
+        negatable: false,
+        help: "Report what dependencies would change but don't change any.",
+      )
+      ..addFlag(
+        _precompile,
+        help: 'Precompile executables and transformed dependencies.',
+      );
   }
 
   @override
@@ -79,9 +84,9 @@ Future<void> pub(
     args.add('--$_dryRun');
   }
 
-  // Note: the default is `true`
-  if (!preCompile) {
-    args.add('--no-$_precompile');
+  // Note: the default is `false`
+  if (preCompile) {
+    args.add('--$_precompile');
   }
 
   print(lightBlue.wrap(

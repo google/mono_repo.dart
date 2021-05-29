@@ -35,10 +35,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -48,29 +48,29 @@ jobs:
         working-directory: test_pkg
         run: dartanalyzer --fatal-infos .
   job_002:
-    name: "smoke_test; linux; Dart 2.12.0-0.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.12.0-259.0.dev; PKG: test_pkg; `dartfmt -n --set-exit-if-changed .`, `dartanalyzer --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2.1.5
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-259.0.dev;packages:test_pkg;commands:dartfmt-dartanalyzer_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-0.0.dev
+            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-259.0.dev;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:2.12.0-259.0.dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.0
         with:
-          sdk: "2.12.0-0.0.dev"
+          sdk: "2.12.0-259.0.dev"
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -99,10 +99,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -131,10 +131,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: mono_repo; dartanalyzer .
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -159,10 +159,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -191,10 +191,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -219,10 +219,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "mono_repo; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -232,10 +232,10 @@ jobs:
         working-directory: mono_repo
         run: dartanalyzer --fatal-infos .
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -264,10 +264,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -296,10 +296,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; dartfmt -n --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -328,10 +328,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -366,10 +366,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -404,10 +404,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "mono_repo; pub run test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -442,10 +442,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub upgrade --no-precompile"
+        name: mono_repo; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -480,10 +480,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: "test_pkg; pub upgrade --no-precompile"
+        name: test_pkg; pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade --no-precompile
+        run: pub upgrade
       - name: "test_pkg; pub run test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -508,10 +508,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub.bat upgrade --no-precompile"
+        name: mono_repo; pub.bat upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub.bat upgrade --no-precompile
+        run: pub.bat upgrade
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -536,10 +536,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: "mono_repo; pub.bat upgrade --no-precompile"
+        name: mono_repo; pub.bat upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub.bat upgrade --no-precompile
+        run: pub.bat upgrade
       - name: "mono_repo; pub run test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
