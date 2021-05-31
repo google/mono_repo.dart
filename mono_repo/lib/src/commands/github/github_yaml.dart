@@ -426,7 +426,7 @@ Map<String, dynamic> _cacheEntries(
 
   return {
     'name': 'Cache Pub hosted dependencies',
-    'uses': 'actions/cache@v2.1.5',
+    'uses': 'actions/cache@v2.1.6',
     'with': {
       'path': pubCacheHosted,
       'key': cacheKeyParts.join(';'),
