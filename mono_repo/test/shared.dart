@@ -9,12 +9,16 @@ import 'package:checked_yaml/checked_yaml.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/generate.dart';
+import 'package:mono_repo/src/commands/github/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
+
+@Deprecated('kill me!')
+final travisFileName = defaultGitHubWorkflowFilePath;
 
 Future<void> populateConfig(String monoRepoContent) async {
   await d.file('mono_repo.yaml', monoRepoContent).create();
@@ -31,7 +35,6 @@ void testGenerateTravisConfig({
   Object? printMatcher,
 }) =>
     testGenerateConfig(
-      forceTravis: true,
       forceGitHub: false,
       validateOnly: validateOnly,
       printMatcher: printMatcher,
@@ -42,7 +45,6 @@ void testGenerateGitHubConfig({
   Object? printMatcher,
 }) =>
     testGenerateConfig(
-      forceTravis: false,
       forceGitHub: true,
       validateOnly: validateOnly,
       printMatcher: printMatcher,
@@ -54,13 +56,11 @@ void testGenerateBothConfig({
 }) =>
     testGenerateConfig(
       forceGitHub: true,
-      forceTravis: true,
       validateOnly: validateOnly,
       printMatcher: printMatcher,
     );
 
 void testGenerateConfig({
-  required bool forceTravis,
   required bool forceGitHub,
   bool validateOnly = false,
   Object? printMatcher,
@@ -74,7 +74,6 @@ void testGenerateConfig({
         generate(
           config,
           validateOnly,
-          forceTravis: forceTravis,
           forceGitHub: forceGitHub,
         );
       },
@@ -140,6 +139,11 @@ String get ciScriptPathMessage => '''
 ${scriptLines(ciScriptPath).join('\n')}
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
 
+void validateSandbox(String expectFileName, String sandboxPath) {
+  final output = File(p.join(d.sandbox, sandboxPath)).readAsStringSync();
+  validateOutput(expectFileName, output);
+}
+
 void validateOutput(String fileName, String output) {
   expect(output, isNotEmpty);
 
@@ -150,7 +154,12 @@ void validateOutput(String fileName, String output) {
   ));
 
   if (expectedOutputFile.existsSync()) {
-    expect(output, expectedOutputFile.readAsStringSync());
+    final expected =
+        expectedOutputFile.readAsStringSync().replaceAll('\r\n', '\n');
+    expect(
+      output,
+      expected,
+    );
   } else {
     expectedOutputFile
       ..createSync(recursive: true)

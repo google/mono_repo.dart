@@ -10,7 +10,6 @@ import 'package:io/ansi.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
-import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
@@ -77,7 +76,6 @@ environment:
           () {
             final config = RootConfig(rootDirectory: repoPath);
             logPackages(config);
-            generateTravisConfig(config);
             generateCIScript(config);
           },
           prints(

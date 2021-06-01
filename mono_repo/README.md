@@ -36,7 +36,6 @@ Available commands:
   generate    Generates the CI configuration for child packages.
   presubmit   Run the CI presubmits locally.
   pub         Runs the `pub` command with the provided arguments across all packages.
-  travis      (Deprecated, use `generate`) Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.
 ```
@@ -50,8 +49,7 @@ To start, you should create a `mono_repo.yaml` file at the root of your repo.
 This controls repo wide configuration.
 
 One option you likely want to configure is which CI providers you want to
-generate config for. Today both `travis` and `github` are supported, and
-can be configured by adding corresponding entries.
+generate config for. `github` can be configured by adding a corresponding entry.
 
 You probably also want to enable the `self_validate` option, which will add a
 job to ensure that your configuration is up to date.
@@ -122,17 +120,6 @@ github:
     - name: cron
       # Only run this stage for scheduled cron jobs
       if: github.event_name == 'schedule'
-
-# Enables Travis-CI - https://docs.travis-ci.com/
-# If you have no configuration, you can set the value to `true` or just leave it
-# empty.
-travis:
-  # Specify any additional top-level configuration you want in your 
-  # `.travis.yml` file.
-  # See https://config.travis-ci.com/ for more details
-  # Example:
-  after_failure:
-  - tool/report_failure.sh
 
 # Adds a job that runs `mono_repo generate --validate` to check that everything
 # is up to date. You can specify the value as just `true` or give a `stage`

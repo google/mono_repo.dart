@@ -10,8 +10,7 @@ import 'package:mono_repo/src/ci_test_script.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart'
     show defaultGitHubWorkflowFilePath;
-import 'package:mono_repo/src/commands/travis/generate.dart'
-    show travisFileName;
+import 'package:mono_repo/src/github_config.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -26,29 +25,21 @@ void main() {
   glyph.ascii = false;
 
   group('simple bits for configurations', () {
-    for (var ci in ['github', 'travis']) {
-      group('ci $ci', () {
-        for (var value in const [true, false, null]) {
-          test('value `$value`', () async {
-            final monoConfigContent = toYaml({ci: value});
-            await populateConfig(monoConfigContent);
+    for (var value in const [true, false, null]) {
+      test('value `$value`', () async {
+        final monoConfigContent = toYaml({'github': value});
+        await populateConfig(monoConfigContent);
 
-            final expected = [
-              'package:sub_pkg',
-              if (ci == 'travis' && value != false)
-                'Wrote `${p.join(d.sandbox, travisFileName)}`.',
-              if (ci == 'github' && value != false)
-                'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
-              ciScriptPathMessage,
-            ].join('\n');
+        final expected = [
+          'package:sub_pkg',
+          'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
+          ciScriptPathMessage,
+        ].join('\n');
 
-            testGenerateConfig(
-              forceGitHub: false,
-              forceTravis: false,
-              printMatcher: expected,
-            );
-          });
-        }
+        testGenerateConfig(
+          forceGitHub: false,
+          printMatcher: expected,
+        );
       });
     }
   });
@@ -94,8 +85,7 @@ name: pkg_name
         printMatcher: '''
 package:sub_pkg
   `dart` values () are not used and can be removed.
-  `os` values () are not used and can be removed.
-Wrote `${p.join(d.sandbox, travisFileName)}`.''',
+  `os` values () are not used and can be removed.''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
@@ -315,11 +305,7 @@ name: pkg_name
     });
 
     test("throws if the previous config doesn't match", () async {
-      // TODO: validate GitHub case
-      await d.file(travisFileName, '').create();
-      await d.dir('tool', [
-        d.file('travis.sh', ''),
-      ]).create();
+      await d.file(defaultGitHubWorkflowFileName, '').create();
       expect(
         () => testGenerateBothConfig(
           validateOnly: true,
@@ -337,7 +323,6 @@ name: pkg_name
       // Just check that this doesn't throw.
       testGenerateBothConfig(printMatcher: '''
 package:sub_pkg
-Wrote `${p.join(d.sandbox, travisFileName)}`.
 Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''');
     });
@@ -354,8 +339,6 @@ name: pkg_name
     testGenerateBothConfig(
       printMatcher: _subPkgStandardOutput,
     );
-    // TODO: validate GitHub case
-    await d.file(travisFileName, travisYamlOutput).validate();
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
@@ -376,8 +359,6 @@ package:sub_pkg
 $_writeScriptOutput''',
     );
 
-    // TODO: validate GitHub case
-    await d.file(travisFileName, travisYamlOutput).validate();
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
@@ -428,47 +409,10 @@ package:pkg_b
 $_writeScriptOutput''',
     );
 
-    // TODO: validate GitHub case
-    await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
-language: dart
-
-jobs:
-  include:
-    - stage: format
-      name: "Dart dev; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
-      dart: dev
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh dartfmt
-    - stage: format
-      name: "Dart stable; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh dartfmt
-    - stage: format
-      name: "Dart dev; PKG: pkg_b; `dart format --output=none --set-exit-if-changed .`"
-      dart: dev
-      os: linux
-      env: PKGS="pkg_b"
-      script: tool/ci.sh dartfmt
-
-stages:
-  - format
-
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - $HOME/.pub-cache
-    - /some_repo_root_dir
-    - pkg_a/.dart_tool
-    - pkg_b/.dart_tool
-''').validate();
+    validateSandbox(
+      'two_dartfmt_flavors.txt',
+      defaultGitHubWorkflowFilePath,
+    );
 
     await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
@@ -531,47 +475,10 @@ package:pkg_b
 $_writeScriptOutput''',
     );
 
-    // TODO: validate GitHub case
-    await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
-language: dart
-
-jobs:
-  include:
-    - stage: format
-      name: "Dart dev; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
-      dart: dev
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh dartfmt_0
-    - stage: format
-      name: "Dart stable; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh dartfmt_0
-    - stage: format
-      name: "Dart dev; PKG: pkg_b; `dart format --dry-run --fix --set-exit-if-changed .`"
-      dart: dev
-      os: linux
-      env: PKGS="pkg_b"
-      script: tool/ci.sh dartfmt_1
-
-stages:
-  - format
-
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - $HOME/.pub-cache
-    - /some_repo_root_dir
-    - pkg_a/.dart_tool
-    - pkg_b/.dart_tool
-''').validate();
+    validateSandbox(
+      'two_dartfmt_flavors_different_args.txt',
+      defaultGitHubWorkflowFilePath,
+    );
 
     await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
@@ -659,51 +566,11 @@ package:pkg_a
 $_writeScriptOutput''',
     );
 
-    // TODO: validate GitHub case
-    await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
-language: dart
+    validateSandbox(
+      'github_output_group_overrides.txt',
+      defaultGitHubWorkflowFilePath,
+    );
 
-jobs:
-  include:
-    - stage: analyze
-      name: "Dart 1.23.0; `dart analyze`"
-      dart: "1.23.0"
-      os: windows
-      env: PKGS="pkg_a"
-      script: tool/ci.sh dartanalyzer
-    - stage: analyze
-      name: "Dart dev; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
-      dart: dev
-      os: osx
-      env: PKGS="pkg_a"
-      script: tool/ci.sh dartanalyzer dartfmt
-    - stage: unit_test
-      name: Dart dev; chrome tests
-      dart: dev
-      os: macos
-      env: PKGS="pkg_a"
-      script: tool/ci.sh test_0
-    - stage: unit_test
-      name: "Dart stable; `dart test --preset travis`"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh test_1
-
-stages:
-  - analyze
-  - unit_test
-
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - $HOME/.pub-cache
-''').validate();
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
@@ -796,14 +663,10 @@ $lines
   group('mono_repo.yaml', () {
     Future<void> validConfig(
       String monoRepoContent, {
-      Object? expectedTravisContent,
       Object? expectedGithubContent,
     }) async {
       await populateConfig(monoRepoContent);
 
-      if (expectedTravisContent != null) {
-        await d.nothing(travisFileName).validate();
-      }
       if (expectedGithubContent != null) {
         await d.nothing(defaultGitHubWorkflowFilePath).validate();
       }
@@ -813,9 +676,6 @@ $lines
         printMatcher: _subPkgStandardOutput,
       );
 
-      if (expectedTravisContent != null) {
-        await d.file(travisFileName, expectedTravisContent).validate();
-      }
       if (expectedGithubContent != null) {
         await d
             .file(defaultGitHubWorkflowFilePath, expectedGithubContent)
@@ -824,51 +684,12 @@ $lines
       await d.file(ciScriptPath, ciShellOutput).validate();
     }
 
-    test('empty travis.yml file', () async {
-      await validConfig('', expectedTravisContent: travisYamlOutput);
-    });
-
-    test('pkg:build integration travis.yml file', () async {
-      await validConfig(
-        r'''
-travis:
-  sudo: required
-  addons:
-    chrome: stable
-  branches:
-    only:
-      - master
-      - not_master
-  after_failure:
-  - tool/report_failure.sh
-''',
-        expectedTravisContent: contains('''
-# Created with package:mono_repo v1.2.3
-language: dart
-
-# Custom configuration
-sudo: required
-addons:
-  chrome: stable
-branches:
-  only:
-    - master
-    - not_master
-after_failure:
-  - tool/report_failure.sh
-
-jobs:
-  include:
-'''),
-      );
-    });
-
     test(
       'disallows unsupported keys',
       () => _testBadConfig({
         'other': {'stages': 5}
       }, r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `travis` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
@@ -969,57 +790,11 @@ package:pkg_b
 $_writeScriptOutput''',
         );
 
-        // TODO: validate GitHub case
-        await d.file(travisFileName, r'''
-# Created with package:mono_repo v1.2.3
-language: dart
+        validateSandbox(
+          'should_merge_correctly.txt',
+          defaultGitHubWorkflowFilePath,
+        );
 
-jobs:
-  include:
-    - stage: analyze
-      name: "PKGS: pkg_a, pkg_b; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_a pkg_b"
-      script: tool/ci.sh dartanalyzer dartfmt
-    - stage: unit_test
-      name: "PKG: pkg_a; chrome tests"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh test_0
-    - stage: unit_test
-      name: "PKG: pkg_a; `dart test --preset travis`"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_a"
-      script: tool/ci.sh test_1
-    - stage: unit_test
-      name: "PKG: pkg_b; chrome tests"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_b"
-      script: tool/ci.sh test_0
-    - stage: unit_test
-      name: "PKG: pkg_b; `dart test --preset travis`"
-      dart: stable
-      os: linux
-      env: PKGS="pkg_b"
-      script: tool/ci.sh test_1
-
-stages:
-  - analyze
-  - unit_test
-
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - $HOME/.pub-cache
-''').validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
@@ -1057,7 +832,6 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         // TODO: validate GitHub case
-        await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
 
@@ -1071,7 +845,6 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         // TODO: validate GitHub case
-        await d.file(travisFileName, travisYamlOutput).validate();
         await d.file(ciScriptPath, contains(r'''
   dart pub get || EXIT_CODE=$?
 
@@ -1102,7 +875,6 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
         );
 
         // TODO: validate GitHub case
-        await d.file(travisFileName, travisYamlOutput).validate();
         await d
             .file(
                 ciScriptPath,
@@ -1223,33 +995,32 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
         // TODO: validate GitHub case
         await d
             .file(
-                travisFileName,
+                defaultGitHubWorkflowFilePath,
                 stringContainsInOrder([
                   r'''
-# Created with package:mono_repo v1.2.3
-language: dart
-
 jobs:
-  include:
-    - stage: mono_repo_self_validate
-      name: mono_repo self validate
-      os: linux
-      script: "dart pub global activate mono_repo 1.2.3 && dart pub global run mono_repo generate --validate"
-''',
-                  r'''
-stages:
-  - mono_repo_self_validate
-  - analyze
-  - unit_test
-
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - $HOME/.pub-cache
+  job_001:
+    name: mono_repo self validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.0
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - name: mono_repo self validate
+        run: dart pub global activate mono_repo 1.2.3
+      - name: mono_repo self validate
+        run: dart pub global run mono_repo generate --validate
+  job_002:
 '''
                 ]))
             .validate();
@@ -1268,32 +1039,32 @@ cache:
         // TODO: validate GitHub case
         await d
             .file(
-                travisFileName,
-                stringContainsInOrder([
+                defaultGitHubWorkflowFilePath,
+                contains(
                   r'''
-jobs:
-  include:
-    - stage: analyze
-      name: mono_repo self validate
-      os: linux
-      script: "dart pub global activate mono_repo 1.2.3 && dart pub global run mono_repo generate --validate"
-    - stage: analyze
+  job_001:
+    name: mono_repo self validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.0
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - name: mono_repo self validate
+        run: dart pub global activate mono_repo 1.2.3
+      - name: mono_repo self validate
+        run: dart pub global run mono_repo generate --validate
 ''',
-                  r'''
-stages:
-  - analyze
-  - unit_test
-
-# Only building master means that we don't run two builds for each pull request.
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - $HOME/.pub-cache
-'''
-                ]))
+                ))
             .validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
@@ -1301,16 +1072,10 @@ cache:
 
     test('global env', () async {
       await validConfig(r'''
-travis:
-  env:
-    global: FOO=BAR
 github:
   env:
     FOO: BAR
-''', expectedTravisContent: contains('''
-env:
-  global: FOO=BAR
-'''), expectedGithubContent: contains('''
+''', expectedGithubContent: contains('''
 env:
   PUB_ENVIRONMENT: bot.github
   FOO: BAR
@@ -1324,7 +1089,6 @@ package:sub_pkg
 $_writeScriptOutput''';
 
 String get _writeScriptOutput => '''
-Wrote `${p.join(d.sandbox, travisFileName)}`.
 Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 $ciScriptPathMessage''';
 

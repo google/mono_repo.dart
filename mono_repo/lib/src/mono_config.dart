@@ -12,16 +12,12 @@ part 'mono_config.g.dart';
 
 const _monoConfigFileName = 'mono_repo.yaml';
 
-/// The top-level keys that cannot be set under `travis:` in  `mono_repo.yaml`
-const _reservedTravisKeys = {'cache', 'jobs', 'language'};
-
 const _allowedMonoConfigKeys = {
   'github',
   'merge_stages',
   'pretty_ansi',
   'pub_action',
   'self_validate',
-  'travis',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -32,60 +28,37 @@ const _allowedPubActions = {
 };
 
 class MonoConfig {
-  final Set<CI> ci;
   final Map<String, ConditionalStage> githubConditionalStages;
-  final Map<String, ConditionalStage> travisConditionalStages;
   final Set<String> mergeStages;
   final bool prettyAnsi;
   final String pubAction;
   final String? selfValidateStage;
-  final Map<String, dynamic> travis;
   final GitHubConfig github;
 
   MonoConfig._({
-    required Set<CI>? ci,
     required this.githubConditionalStages,
-    required this.travisConditionalStages,
     required this.mergeStages,
     required this.prettyAnsi,
     required this.pubAction,
     required this.selfValidateStage,
-    required this.travis,
     required this.github,
-  }) : ci = ci ?? const {CI.travis};
+  });
 
   factory MonoConfig({
-    required Set<CI>? ci,
     required Set<String> mergeStages,
     required bool prettyAnsi,
     required String pubAction,
     required String? selfValidateStage,
-    required Map travis,
     required Map github,
   }) {
-    final overlappingKeys =
-        travis.keys.where(_reservedTravisKeys.contains).toList();
-    if (overlappingKeys.isNotEmpty) {
-      throw CheckedFromJsonException(
-        travis,
-        overlappingKeys.first.toString(),
-        'MonoConfig',
-        'Contains illegal keys: ${overlappingKeys.join(', ')}',
-      );
-    }
-
     final githubConditionalStages = _readConditionalStages(github);
-    final travisConditionalStages = _readConditionalStages(travis);
 
     return MonoConfig._(
-      ci: ci,
       githubConditionalStages: githubConditionalStages,
-      travisConditionalStages: travisConditionalStages,
       mergeStages: mergeStages,
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
       selfValidateStage: selfValidateStage,
-      travis: travis.map((k, v) => MapEntry(k as String, v))..remove('stages'),
       github: GitHubConfig.fromJson(github),
     );
   }
@@ -105,7 +78,6 @@ class MonoConfig {
     }
 
     final ci = {
-      if (json.containsKey('travis')) CI.travis,
       if (json.containsKey('github')) CI.github,
     };
 
@@ -130,7 +102,6 @@ class MonoConfig {
       return value;
     }
 
-    final travis = parseCI(CI.travis);
     final github = parseCI(CI.github);
 
     final selfValidate = json['self_validate'] as Object? ?? false;
@@ -177,12 +148,10 @@ class MonoConfig {
       }
 
       return MonoConfig(
-        ci: ci,
         mergeStages: Set.from(mergeStages),
         prettyAnsi: prettyAnsi,
         pubAction: pubAction,
         selfValidateStage: _selfValidateFromValue(selfValidate),
-        travis: travis,
         github: github,
       );
     } else {
@@ -201,12 +170,10 @@ class MonoConfig {
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
       return MonoConfig(
-        ci: null,
         mergeStages: <String>{},
         pubAction: _defaultPubAction,
         prettyAnsi: true,
         selfValidateStage: null,
-        travis: {},
         github: {},
       );
     }
@@ -293,5 +260,4 @@ class ConditionalStage {
 // The available CI providers that we generate config for.
 enum CI {
   github,
-  travis,
 }
