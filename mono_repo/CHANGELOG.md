@@ -1,10 +1,13 @@
 ## 4.1.0-dev
 
 - Improve the stability of ordering in Github workflow definitions.
-- Drop `--no-precompile` as the default for `pub` `get` and `upgrade` commands.
-  It's now the default across Dart tools.
 - Use latest `actions/cache@v2.1.6`.
-- Migrate to new command pattern supported in Dart 2.10+
+- Migrate to new command pattern supported in Dart 2.10
+- `pub` command
+  - Now allows any `pub` command and argument combination to be provided.
+  - Dropped `--no-precompile` since it is now the default.
+  - Now prints a summary of execution progress. Useful for repositories with
+    many packages.
 
 ## 4.0.0
 
