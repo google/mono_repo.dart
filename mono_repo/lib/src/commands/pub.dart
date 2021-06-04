@@ -5,89 +5,33 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:args/command_runner.dart';
+import 'package:args/args.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../root_config.dart';
 import 'mono_repo_command.dart';
 
-class PubCommand extends Command<void> {
-  PubCommand() {
-    addSubcommand(_PubSubCommand('get'));
-    addSubcommand(_PubSubCommand('upgrade'));
-  }
+class PubCommand extends MonoRepoCommand {
+  @override
+  final ArgParser argParser = ArgParser.allowAnything();
 
   @override
   String get name => 'pub';
 
   @override
   String get description =>
-      'Run `dart pub get` or `dart pub upgrade` against all packages.';
-}
-
-const _offline = 'offline';
-const _dryRun = 'dry-run';
-const _precompile = 'precompile';
-
-class _PubSubCommand extends MonoRepoCommand {
-  @override
-  final String name;
-
-  _PubSubCommand(this.name) {
-    argParser
-      ..addFlag(
-        _offline,
-        help: 'Use cached packages instead of accessing the network.',
-      )
-      ..addFlag(
-        _dryRun,
-        abbr: 'n',
-        negatable: false,
-        help: "Report what dependencies would change but don't change any.",
-      )
-      ..addFlag(
-        _precompile,
-        help: 'Precompile executables and transformed dependencies.',
-      );
-  }
-
-  @override
-  String get description => 'Run `dart pub $name` against all packages.';
+      'Runs the `pub` command with the provided arguments across all packages.';
 
   @override
   Future<void> run() => pub(
         rootConfig(),
-        name,
-        offline: argResults![_offline] as bool,
-        dryRun: argResults![_dryRun] as bool,
-        preCompile: argResults![_precompile] as bool,
+        argResults?.rest ?? const [],
       );
 }
 
-Future<void> pub(
-  RootConfig rootConfig,
-  String pubCommand, {
-  required bool offline,
-  required bool dryRun,
-  required bool preCompile,
-}) async {
+Future<void> pub(RootConfig rootConfig, List<String> args) async {
   final pkgDirs = rootConfig.map((pc) => pc.relativePath).toList();
-
-  // TODO(kevmoo): use UI-as-code features when min SDK is >= 2.3.0
-  final args = [pubCommand];
-  if (offline) {
-    args.add('--$_offline');
-  }
-
-  if (dryRun) {
-    args.add('--$_dryRun');
-  }
-
-  // Note: the default is `false`
-  if (preCompile) {
-    args.add('--$_precompile');
-  }
 
   print(
     lightBlue.wrap(
@@ -96,23 +40,25 @@ Future<void> pub(
     ),
   );
 
+  final packageArgs = ['pub', ...args];
+
+  var successCount = 0;
+  final failSet = <String>{};
+
   for (var config in rootConfig) {
     final dir = config.relativePath;
-    List<String> packageArgs;
     String executable;
 
     if (config.hasFlutterDependency) {
       executable = _flutterPath;
-      packageArgs = ['packages', ...args];
     } else {
-      executable = _pubPath;
-      packageArgs = args;
+      executable = _dartPath;
     }
 
     print('');
     print(
       wrapWith(
-        'Starting `$executable ${packageArgs.join(' ')}` in `$dir`...',
+        '`$dir`: Starting `$executable ${packageArgs.join(' ')}`',
         [styleBold, lightBlue],
       ),
     );
@@ -124,9 +70,26 @@ Future<void> pub(
     final exit = await proc.exitCode;
 
     if (exit == 0) {
+      successCount++;
       print(wrapWith('`$dir`: success!', [styleBold, green]));
     } else {
+      failSet.add(dir);
       print(wrapWith('`$dir`: failed!', [styleBold, red]));
+    }
+
+    if (rootConfig.length > 1) {
+      print('');
+      print('Successes: $successCount');
+      if (failSet.isNotEmpty) {
+        print(
+          'Failures:  ${failSet.length}\n'
+          '${failSet.map((e) => '  $e').join('\n')}',
+        );
+      }
+      final remaining = rootConfig.length - (successCount + failSet.length);
+      if (remaining > 0) {
+        print('Remaining: $remaining');
+      }
     }
   }
 }
@@ -140,8 +103,8 @@ final String _sdkDir = (() {
   return aboveExecutable;
 })();
 
-final String _pubPath =
-    p.join(_sdkDir, 'bin', Platform.isWindows ? 'pub.bat' : 'pub');
+final String _dartPath =
+    p.join(_sdkDir, 'bin', Platform.isWindows ? 'dart.bat' : 'dart');
 
 /// The "flutter[.bat]" command.
 final String _flutterPath = Platform.isWindows ? 'flutter.bat' : 'flutter';
