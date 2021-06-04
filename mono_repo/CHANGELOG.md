@@ -1,4 +1,4 @@
-## 4.1.0-dev
+## 4.1.0
 
 - Improve the stability of ordering in Github workflow definitions.
 - Use latest `actions/cache@v2.1.6`.
