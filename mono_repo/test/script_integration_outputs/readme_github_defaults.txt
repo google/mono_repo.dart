@@ -36,10 +36,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: sub_pkg_pub_upgrade
-        name: sub_pkg; pub upgrade
+        name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: sub_pkg; dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
@@ -64,10 +64,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: sub_pkg_pub_upgrade
-        name: sub_pkg; pub upgrade
+        name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: sub_pkg; dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
@@ -85,10 +85,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: sub_pkg_pub_upgrade
-        name: sub_pkg; pub.bat upgrade
+        name: sub_pkg; dart pub.bat upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-        run: pub.bat upgrade
+        run: dart pub.bat upgrade
       - name: sub_pkg; dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg

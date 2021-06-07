@@ -1,3 +1,7 @@
+## 4.2.0-dev
+
+- Change calls from `pub` to `dart pub` within generated scripts.
+
 ## 4.1.0
 
 - Improve the stability of ordering in Github workflow definitions.
