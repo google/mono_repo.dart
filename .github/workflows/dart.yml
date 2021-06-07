@@ -508,10 +508,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; dart pub.bat upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub.bat upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -536,10 +536,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; dart pub.bat upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub.bat upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
