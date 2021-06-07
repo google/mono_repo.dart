@@ -1,4 +1,4 @@
-# Created with package:mono_repo v4.1.0
+# Created with package:mono_repo v4.2.0-dev
 name: Dart CI
 on:
   push:
@@ -35,10 +35,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -67,10 +67,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -99,10 +99,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -131,10 +131,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: mono_repo; dart analyze
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -159,10 +159,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -191,10 +191,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -219,10 +219,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -232,10 +232,10 @@ jobs:
         working-directory: mono_repo
         run: dart analyze --fatal-infos .
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -264,10 +264,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -296,10 +296,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -328,10 +328,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -366,10 +366,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -404,10 +404,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -442,10 +442,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -480,10 +480,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: test_pkg_pub_upgrade
-        name: test_pkg; pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -508,10 +508,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub.bat upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub.bat upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
@@ -536,10 +536,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.3.4
       - id: mono_repo_pub_upgrade
-        name: mono_repo; pub.bat upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: pub.bat upgrade
+        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
