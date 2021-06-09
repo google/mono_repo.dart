@@ -1,6 +1,5 @@
 @TestOn('!windows')
-import 'package:mono_repo/src/commands/travis/generate.dart'
-    show travisFileName;
+import 'package:mono_repo/src/commands/github/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -60,7 +59,7 @@ environment:
 package:pkg_a
 package:pkg_b
 package:pkg_c
-Wrote `${p.join(d.sandbox, travisFileName)}`.
+Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
 $ciScriptPathMessage''',
     );
   });

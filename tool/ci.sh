@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v4.2.0-dev
+# Created with package:mono_repo v5.0.0-dev
 
 # Support built in commands on windows out of the box.
 # When it is a flutter repo (check the pubspec.yaml for "sdk: flutter")
@@ -7,32 +7,16 @@
 # This assumes that the Flutter SDK has been installed in a previous step.
 function pub() {
   if grep -Fq "sdk: flutter" "${PWD}/pubspec.yaml"; then
-    if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-      command flutter.bat pub "$@"
-    else
-      command flutter pub "$@"
-    fi
+    command flutter pub "$@"
   else
-    if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-      command pub.bat "$@"
-    else
-      command dart pub "$@"
-    fi
+    command dart pub "$@"
   fi
 }
 function dartfmt() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-    command dartfmt.bat "$@"
-  else
-    command dartfmt "$@"
-  fi
+  command dartfmt "$@"
 }
 function dartanalyzer() {
-  if [[ $TRAVIS_OS_NAME == "windows" ]]; then
-    command dartanalyzer.bat "$@"
-  else
-    command dartanalyzer "$@"
-  fi
+  command dartanalyzer "$@"
 }
 
 if [[ -z ${PKGS} ]]; then

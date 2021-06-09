@@ -3,12 +3,10 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import '../ci_shared.dart';
-import '../mono_config.dart';
 import '../root_config.dart';
 import 'ci_script/generate.dart';
 import 'github/generate.dart';
 import 'mono_repo_command.dart';
-import 'travis/generate.dart';
 
 class GenerateCommand extends MonoRepoCommand {
   @override
@@ -34,27 +32,11 @@ class GenerateCommand extends MonoRepoCommand {
 void generate(
   RootConfig config,
   bool validateOnly, {
-  bool forceTravis = false,
   bool forceGitHub = false,
 }) {
   logPackages(config);
   validateRootConfig(config);
-  for (var ci in config.monoConfig.ci) {
-    switch (ci) {
-      case CI.github:
-        generateGitHubActions(config, validateOnly: validateOnly);
-        break;
-      case CI.travis:
-        generateTravisConfig(config, validateOnly: validateOnly);
-        break;
-    }
-  }
-  if (!config.monoConfig.ci.contains(CI.travis) && forceTravis) {
-    generateTravisConfig(config, validateOnly: validateOnly);
-  }
-  if (!config.monoConfig.ci.contains(CI.github) && forceGitHub) {
-    generateGitHubActions(config, validateOnly: validateOnly);
-  }
+  generateGitHubActions(config, validateOnly: validateOnly);
   // Generate in all cases, since this is used by `presumbit`
   generateCIScript(config, validateOnly: validateOnly);
 }

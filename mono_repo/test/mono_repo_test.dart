@@ -45,6 +45,5 @@ Available commands:
   generate    Generates the CI configuration for child packages.
   presubmit   Run the CI presubmits locally.
   pub         Runs the `pub` command with the provided arguments across all packages.
-  travis      (Deprecated, use `generate`) Configure Travis-CI for child packages.
 
 Run "mono_repo help <command>" for more information about a command.''';

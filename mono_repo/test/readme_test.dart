@@ -6,7 +6,6 @@ import 'dart:io';
 
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart';
-import 'package:mono_repo/src/commands/travis/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -36,7 +35,6 @@ name: sub_pkg
     ]).create();
 
     testGenerateConfig(
-      forceTravis: false,
       forceGitHub: false,
       printMatcher: stringContainsInOrder(
         [
@@ -59,7 +57,6 @@ name: sub_pkg
       );
     }
 
-    validateFile(travisFileName, 'travis');
     validateFile(ciScriptPath, 'ci');
     validateFile(githubWorkflowFilePath('lint'), 'github_lints');
     validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
@@ -132,17 +129,6 @@ github:
     - name: cron
       # Only run this stage for scheduled cron jobs
       if: github.event_name == 'schedule'
-
-# Enables Travis-CI - https://docs.travis-ci.com/
-# If you have no configuration, you can set the value to `true` or just leave it
-# empty.
-travis:
-  # Specify any additional top-level configuration you want in your 
-  # `.travis.yml` file.
-  # See https://config.travis-ci.com/ for more details
-  # Example:
-  after_failure:
-  - tool/report_failure.sh
 
 # Adds a job that runs `mono_repo generate --validate` to check that everything
 # is up to date. You can specify the value as just `true` or give a `stage`

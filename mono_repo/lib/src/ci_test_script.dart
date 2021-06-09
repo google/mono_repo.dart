@@ -9,11 +9,7 @@ import 'user_exception.dart';
 
 String _dartCommandContent(String commandName) => '''
 function $commandName() {
-  if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-    command $commandName.bat "\$@"
-  else
-    command $commandName "\$@"
-  fi
+  command $commandName "\$@"
 }''';
 
 String _dartCommandContentPub(String commandName) => '''
@@ -22,17 +18,9 @@ String _dartCommandContentPub(String commandName) => '''
 # This assumes that the Flutter SDK has been installed in a previous step.
 function $commandName() {
   if grep -Fq "sdk: flutter" "\${PWD}/pubspec.yaml"; then
-    if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-      command flutter.bat pub "\$@"
-    else
-      command flutter pub "\$@"
-    fi
+    command flutter pub "\$@"
   else
-    if [[ \$TRAVIS_OS_NAME == "windows" ]]; then
-      command pub.bat "\$@"
-    else
-      command dart pub "\$@"
-    fi
+    command dart pub "\$@"
   fi
 }''';
 

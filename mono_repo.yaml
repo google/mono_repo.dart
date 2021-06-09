@@ -2,7 +2,6 @@
 merge_stages:
 - smoke_test
 
-travis:
 github:
   # Setting just `cron` keeps the defaults for `push` and `pull_request`
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”

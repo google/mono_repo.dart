@@ -197,9 +197,6 @@ class CIJob implements HasStageName {
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
 
-  /// Same as [sdk] except it handles Travis-specific naming for the edge SDK.
-  String get travisSdk => sdk == githubSetupMainSdk ? travisEdgeSdk : sdk;
-
   /// Values used to group jobs together.
   List<String> get groupByKeys => [os, stageName, sdk];
 

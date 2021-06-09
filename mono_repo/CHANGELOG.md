@@ -1,5 +1,6 @@
-## 4.2.0-dev
+## 5.0.0-dev
 
+- *BREAKING* Drop support for Travis-CI.
 - Change calls from `pub` to `dart pub` within generated scripts.
 
 ## 4.1.0
