@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
+import 'commands/add_overrides.dart';
 import 'commands/check.dart';
 import 'commands/generate.dart';
 import 'commands/mono_repo_command.dart';
@@ -22,6 +23,7 @@ final commands = List<Command<void>>.unmodifiable(
     PresubmitCommand(),
     PubCommand(),
     TravisCommand(),
+    AddOverridesCommand(),
   ],
 );
 
