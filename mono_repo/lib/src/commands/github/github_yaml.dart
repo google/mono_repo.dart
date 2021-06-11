@@ -342,20 +342,18 @@ Map<String, dynamic> _githubJobYaml(
 }) =>
     {
       'name': jobName,
-      'runs-on': runsOn,
+      'runs-on': r'${{ matrix.os }}',
       'steps': [
-        if (!runsOn.startsWith('windows'))
-          _cacheEntries(
-            runsOn,
-            additionalCacheKeys: {
-              'dart': dartVersion,
-              if (additionalCacheKeys != null) ...additionalCacheKeys,
-            },
-          ),
+        _cacheEntries(
+          additionalCacheKeys: {
+            'dart': r'${{ matrix.sdk }}',
+            if (additionalCacheKeys != null) ...additionalCacheKeys,
+          },
+        ),
         {
           'uses': 'dart-lang/setup-dart@v1.0',
           'with': {
-            'sdk': dartVersion,
+            'sdk': r'${{ matrix.sdk }}',
           },
         },
         {
@@ -400,14 +398,13 @@ class _CommandEntry {
 ///
 /// See https://github.com/marketplace/actions/cache
 ///
-/// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
+/// [additionalCacheKeys] are used to create a unique key used to
 /// store and retrieve the cache.
-Map<String, dynamic> _cacheEntries(
-  String runsOn, {
+Map<String, dynamic> _cacheEntries({
   Map<String, String>? additionalCacheKeys,
 }) {
   final cacheKeyParts = [
-    'os:$runsOn',
+    r'os:${{ matrix.os }}',
     'pub-cache-hosted',
     if (additionalCacheKeys != null) ...[
       for (var entry in additionalCacheKeys.entries)
@@ -426,6 +423,7 @@ Map<String, dynamic> _cacheEntries(
 
   return {
     'name': 'Cache Pub hosted dependencies',
+    'if': r"${{ runner.os == 'Linux' || runner.os == 'macOS' }}",
     'uses': 'actions/cache@v2.1.6',
     'with': {
       'path': pubCacheHosted,
