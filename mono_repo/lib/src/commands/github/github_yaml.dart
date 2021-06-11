@@ -318,7 +318,6 @@ Map<String, dynamic> _githubJobYaml(
     {
       'name': jobName,
       'strategy': {
-        'fail-fast': false,
         'matrix': {
           'os': [runsOn],
           'sdk': [dartVersion]
