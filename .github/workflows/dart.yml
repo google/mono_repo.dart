@@ -16,7 +16,7 @@ env:
 
 jobs:
   job_001:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -55,7 +55,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_002:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -94,7 +94,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_003:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -133,7 +133,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_004:
-    name: "smoke_test; PKG: mono_repo"
+    name: "smoke_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -168,7 +168,7 @@ jobs:
         working-directory: mono_repo
         run: dart analyze
   job_005:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -207,7 +207,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_006:
-    name: "smoke_test; PKG: mono_repo"
+    name: "smoke_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -242,7 +242,7 @@ jobs:
         working-directory: mono_repo
         run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
   job_007:
-    name: "smoke_test; PKG: mono_repo"
+    name: "smoke_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -281,7 +281,7 @@ jobs:
         working-directory: mono_repo
         run: dart analyze --fatal-infos .
   job_008:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -320,7 +320,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_009:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -359,7 +359,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_010:
-    name: "smoke_test; PKG: test_pkg"
+    name: "smoke_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -398,7 +398,7 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_011:
-    name: "unit_test; PKG: mono_repo"
+    name: "unit_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -444,7 +444,7 @@ jobs:
       - job_009
       - job_010
   job_012:
-    name: "unit_test; PKG: mono_repo"
+    name: "unit_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -490,7 +490,7 @@ jobs:
       - job_009
       - job_010
   job_013:
-    name: "unit_test; PKG: mono_repo"
+    name: "unit_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -536,7 +536,7 @@ jobs:
       - job_009
       - job_010
   job_014:
-    name: "unit_test; PKG: mono_repo"
+    name: "unit_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -582,7 +582,7 @@ jobs:
       - job_009
       - job_010
   job_015:
-    name: "unit_test; PKG: test_pkg"
+    name: "unit_test: test_pkg"
     strategy:
       matrix:
         os:
@@ -628,7 +628,7 @@ jobs:
       - job_009
       - job_010
   job_016:
-    name: "unit_test; PKG: mono_repo"
+    name: "unit_test: mono_repo"
     strategy:
       matrix:
         os:
@@ -674,7 +674,7 @@ jobs:
       - job_009
       - job_010
   job_017:
-    name: "unit_test; PKG: mono_repo"
+    name: "unit_test: mono_repo"
     strategy:
       matrix:
         os:

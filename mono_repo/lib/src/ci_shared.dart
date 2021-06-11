@@ -50,13 +50,12 @@ class CIJobEntry {
     required bool includePackage,
     required bool includeStage,
   }) {
-    final packageLabel = packages.length == 1 ? 'PKG' : 'PKGS';
     final sections = [
       if (includeStage) job.stageName,
-      if (!includePackage) '$packageLabel: ${packages.join(', ')}',
+      if (!includePackage) packages.join(', '),
     ];
 
-    return sections.join('; ');
+    return sections.join(': ');
   }
 }
 
