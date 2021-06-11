@@ -182,45 +182,24 @@ Iterable<_MapEntryWithStage> _listJobs(
     jobEntries.add(CIJobEntry(ciJob, commands));
   }
 
-  final differentOperatingSystems = <String>{};
   final differentPackages = <String>{};
-  final differentSdks = <String>{};
 
   for (var entry in jobEntries) {
-    differentOperatingSystems.add(entry.job.os);
     differentPackages.add(entry.job.package);
-    differentSdks.add(entry.job.sdk);
   }
 
   // Group jobs by all of the values that would allow them to merge
   final groupedItems = groupCIJobEntries(jobEntries);
 
   for (var entry in groupedItems.entries) {
-    final first = entry.value.first;
-
-    if (mergeStages.contains(first.job.stageName)) {
-      final packages = entry.value.map((t) => t.job.package).toList()..sort();
-      yield jobEntry(
-          first.jobYaml(
+    yield* entry.value.map(
+      (e) => jobEntry(
+          e.jobYaml(
             rootConfig,
-            packages: packages,
-            oneOs: differentOperatingSystems.length == 1,
-            oneSdk: differentSdks.length == 1,
             onePackage: differentPackages.length == 1,
           ),
-          first.job.stageName);
-    } else {
-      yield* entry.value.map(
-        (e) => jobEntry(
-            e.jobYaml(
-              rootConfig,
-              oneOs: differentOperatingSystems.length == 1,
-              oneSdk: differentSdks.length == 1,
-              onePackage: differentPackages.length == 1,
-            ),
-            e.job.stageName),
-      );
-    }
+          e.job.stageName),
+    );
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
@@ -251,8 +230,6 @@ extension on CIJobEntry {
   Map<String, dynamic> jobYaml(
     RootConfig rootConfig, {
     List<String>? packages,
-    required bool oneOs,
-    required bool oneSdk,
     required bool onePackage,
   }) {
     packages ??= [job.package];
@@ -289,8 +266,6 @@ extension on CIJobEntry {
     return _githubJobYaml(
       jobName(
         packages,
-        includeOs: oneOs,
-        includeSdk: oneSdk,
         includePackage: onePackage,
         includeStage: true,
       ),
@@ -342,6 +317,13 @@ Map<String, dynamic> _githubJobYaml(
 }) =>
     {
       'name': jobName,
+      'strategy': {
+        'fail-fast': false,
+        'matrix': {
+          'os': [runsOn],
+          'sdk': [dartVersion]
+        },
+      },
       'runs-on': r'${{ matrix.os }}',
       'steps': [
         _cacheEntries(
