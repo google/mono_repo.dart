@@ -6,10 +6,10 @@ stages:
   - command: cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate
     dart: dev
   - group:
-    - dartfmt
-    - dartanalyzer: --fatal-infos .
+    - format
+    - analyze: --fatal-infos .
     dart: dev
-  - dartanalyzer:
+  - analyze:
     dart: 2.12.0
 - unit_test:
   - test: -x yaml -P presubmit --test-randomize-ordering-seed=random

@@ -2,11 +2,11 @@ PKG: pkg_c
 Resolving dependencies...
 No dependencies changed.
 
-PKG: pkg_c; TASK: dartanalyzer
+PKG: pkg_c; TASK: analyze
 dart analyze
 Analyzing pkg_c...
 No issues found!
-PKG: pkg_c; TASK: dartanalyzer - SUCCEEDED
+PKG: pkg_c; TASK: analyze - SUCCEEDED
 
 PKG: pkg_c; TASK: command_0
 echo "testing 1 2 3"

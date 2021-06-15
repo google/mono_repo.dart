@@ -4,6 +4,7 @@
 
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:collection/collection.dart';
+import 'package:io/ansi.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
@@ -273,7 +274,16 @@ class CIJob implements HasStageName {
 
 @JsonSerializable(includeIfNull: false)
 class Task {
-  static const _tasks = {'dartfmt', 'dartanalyzer', 'test', 'command'};
+  static const _oldToNewTaskNames = {
+    'dartfmt': 'format',
+    'dartanalyzer': 'analyze',
+  };
+  static const _tasks = {'format', 'analyze', 'test', 'command'};
+  static final _allowedTaskNames = UnmodifiableSetView({
+    ..._oldToNewTaskNames.keys,
+    ..._tasks,
+  });
+
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
   final String name;
@@ -312,12 +322,14 @@ class Task {
       if (yamlValue == 'command') {
         throw ArgumentError.value(yamlValue, 'command', 'requires a value');
       }
-      return Task(yamlValue);
+      return Task(_normalizeTaskName(yamlValue));
     }
 
     if (yamlValue is Map) {
-      final taskNames =
-          yamlValue.keys.where(_tasks.contains).cast<String>().toList();
+      final taskNames = yamlValue.keys
+          .where(_allowedTaskNames.contains)
+          .cast<String>()
+          .toList();
       if (taskNames.isEmpty) {
         String? key;
         if (yamlValue.isNotEmpty) {
@@ -340,7 +352,8 @@ class Task {
           badKey: true,
         );
       }
-      final taskName = taskNames.single;
+      final taskName = _normalizeTaskName(taskNames.single);
+
       String? args;
       switch (taskName) {
         case 'command':
@@ -360,11 +373,12 @@ class Task {
           }
           break;
         default:
-          args = yamlValue[taskName] as String?;
+          // NOTE: using `taskName.single` in case it's a deprecated name
+          args = yamlValue[taskNames.single] as String?;
       }
 
       final extraConfig = Set<String>.from(yamlValue.keys)
-        ..removeAll([taskName, 'dart', 'os']);
+        ..removeAll([taskNames.single, taskName, 'dart', 'os']);
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (extraConfig.isNotEmpty) {
@@ -390,16 +404,32 @@ class Task {
 
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 
+  /// Stores the job names we've already warned about. Only warn once!
+  static final _warnedNames = <String>{};
+
+  static String _normalizeTaskName(String input) {
+    final taskName = _oldToNewTaskNames[input] ?? input;
+    if (taskName != input && _warnedNames.add(taskName)) {
+      print(
+        yellow.wrap(
+          '"$input" is deprecated. Use "$taskName" instead to define tasks in '
+          '`$monoPkgFileName`.',
+        ),
+      );
+    }
+    return taskName;
+  }
+
   static List<String> _commandValue(String name, String? args) {
     switch (name) {
-      case 'dartfmt':
+      case 'format':
         return [
           'dart format',
           (args == null || args == 'sdk')
               ? '--output=none --set-exit-if-changed .'
               : args,
         ];
-      case 'dartanalyzer':
+      case 'analyze':
         return ['dart analyze', if (args != null) args];
       case 'test':
         return [

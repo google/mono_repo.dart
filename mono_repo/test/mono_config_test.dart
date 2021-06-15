@@ -231,7 +231,7 @@ line 4, column 12: Unsupported value for "group". expected a list of tasks
       _expectParseThrows(
         monoYaml,
         r'''
-line 9, column 6: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
+line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`.
   ╷
 9 │      "weird": "thing"
   │      ^^^^^^^
@@ -254,7 +254,7 @@ line 9, column 6: Must have one key of `dartfmt`, `dartanalyzer`, `test`, `comma
       _expectParseThrows(
         monoYaml,
         r'''
-line 10, column 6: Must have one and only one key of `dartfmt`, `dartanalyzer`, `test`, `command`.
+line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`.
    ╷
 10 │      "command": "other thing"
    │      ^^^^^^^^^
@@ -445,8 +445,8 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'analyze_and_format',
         'tasks': [
-          {'name': 'dartanalyzer', 'args': '--fatal-infos --fatal-warnings .'},
-          {'name': 'dartfmt'}
+          {'name': 'analyze', 'args': '--fatal-infos --fatal-warnings .'},
+          {'name': 'format'}
         ]
       },
       {
@@ -456,8 +456,8 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'analyze_and_format',
         'tasks': [
-          {'name': 'dartanalyzer', 'args': '--fatal-infos --fatal-warnings .'},
-          {'name': 'dartfmt'}
+          {'name': 'analyze', 'args': '--fatal-infos --fatal-warnings .'},
+          {'name': 'format'}
         ]
       },
       {
@@ -466,7 +466,7 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'analyze_and_format',
         'tasks': [
-          {'name': 'dartanalyzer', 'args': '--fatal-infos --fatal-warnings .'}
+          {'name': 'analyze', 'args': '--fatal-infos --fatal-warnings .'}
         ]
       },
       {

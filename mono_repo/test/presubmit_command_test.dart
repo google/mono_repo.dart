@@ -175,7 +175,7 @@ pkg_b
             'presubmit',
             '--sdk=dev',
             '-t',
-            'dartfmt'
+            'format'
           ],
           workingDirectory: repoPath);
       expect(result.exitCode, 0,
@@ -255,8 +255,8 @@ dart:
 
 stages:
   - analyze_and_format:
-    - dartanalyzer
-    - dartfmt
+    - analyze
+    - format
   - unit_test:
     - test
 ''';
@@ -268,7 +268,7 @@ dart:
 
 stages:
   - format:
-    - dartfmt
+    - format
 ''';
 
 const pkgAPubspec = '''

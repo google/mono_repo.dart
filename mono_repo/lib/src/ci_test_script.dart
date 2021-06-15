@@ -7,20 +7,15 @@ import 'package_config.dart';
 import 'shell_utils.dart';
 import 'user_exception.dart';
 
-String _dartCommandContent(String commandName) => '''
-function $commandName() {
-  command $commandName "\$@"
-}''';
-
-String _dartCommandContentPub(String commandName) => '''
+String _commandContent(String commandName) => '''
 # When it is a flutter repo (check the pubspec.yaml for "sdk: flutter")
 # then "flutter" is called instead of "pub".
 # This assumes that the Flutter SDK has been installed in a previous step.
 function $commandName() {
   if grep -Fq "sdk: flutter" "\${PWD}/pubspec.yaml"; then
-    command flutter pub "\$@"
+    command flutter $commandName "\$@"
   else
-    command dart pub "\$@"
+    command dart $commandName "\$@"
   fi
 }''';
 
@@ -29,9 +24,9 @@ final bashScriptHeader = '''
 $createdWith
 
 # Support built in commands on windows out of the box.
-${_dartCommandContentPub('pub')}
-${_dartCommandContent('dartfmt')}
-${_dartCommandContent('dartanalyzer')}''';
+${_commandContent('pub')}
+${_commandContent('format')}
+${_commandContent('analyze')}''';
 
 String generateTestScript(
   Map<String, String> commandsToKeys,

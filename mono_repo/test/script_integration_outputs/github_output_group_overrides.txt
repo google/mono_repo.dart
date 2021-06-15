@@ -21,7 +21,7 @@ jobs:
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:macos-latest;pub-cache-hosted;dart:dev;packages:pkg_a;commands:dartanalyzer-dartfmt"
+          key: "os:macos-latest;pub-cache-hosted;dart:dev;packages:pkg_a;commands:analyze-format"
           restore-keys: |
             os:macos-latest;pub-cache-hosted;dart:dev;packages:pkg_a
             os:macos-latest;pub-cache-hosted;dart:dev

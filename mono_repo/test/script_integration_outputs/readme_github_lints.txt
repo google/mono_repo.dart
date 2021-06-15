@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:dartanalyzer"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:analyze"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;dart:dev
@@ -73,7 +73,7 @@ jobs:
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:dartfmt"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:format"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;dart:dev

@@ -2,6 +2,9 @@
 
 - *BREAKING* Drop support for Travis-CI.
 - Change calls from `pub` to `dart pub` within generated scripts.
+- Support and encourage up-to-date task names:
+  - `analyze` instead of `dartanalyzer`
+  - `format` instead of `dartfmt`.
 
 ## 4.1.0
 
@@ -284,8 +287,8 @@ stages:
 stages:
   - analyze_and_format:
     - group:
-        - dartanalyzer
-        - dartfmt
+        - analyze
+        - format
 ```
 
 ## 0.3.0
