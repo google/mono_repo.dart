@@ -12,11 +12,25 @@ function pub() {
     command dart pub "$@"
   fi
 }
-function dartfmt() {
-  command dartfmt "$@"
+# When it is a flutter repo (check the pubspec.yaml for "sdk: flutter")
+# then "flutter" is called instead of "pub".
+# This assumes that the Flutter SDK has been installed in a previous step.
+function format() {
+  if grep -Fq "sdk: flutter" "${PWD}/pubspec.yaml"; then
+    command flutter format "$@"
+  else
+    command dart format "$@"
+  fi
 }
-function dartanalyzer() {
-  command dartanalyzer "$@"
+# When it is a flutter repo (check the pubspec.yaml for "sdk: flutter")
+# then "flutter" is called instead of "pub".
+# This assumes that the Flutter SDK has been installed in a previous step.
+function analyze() {
+  if grep -Fq "sdk: flutter" "${PWD}/pubspec.yaml"; then
+    command flutter analyze "$@"
+  else
+    command dart analyze "$@"
+  fi
 }
 
 if [[ -z ${PKGS} ]]; then
@@ -53,19 +67,19 @@ for PKG in ${PKGS}; do
       echo
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
+      analyze_0)
+        echo 'dart analyze --fatal-infos .'
+        dart analyze --fatal-infos . || EXIT_CODE=$?
+        ;;
+      analyze_1)
+        echo 'dart analyze'
+        dart analyze || EXIT_CODE=$?
+        ;;
       command)
         echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
         cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate || EXIT_CODE=$?
         ;;
-      dartanalyzer_0)
-        echo 'dart analyze --fatal-infos .'
-        dart analyze --fatal-infos . || EXIT_CODE=$?
-        ;;
-      dartanalyzer_1)
-        echo 'dart analyze'
-        dart analyze || EXIT_CODE=$?
-        ;;
-      dartfmt)
+      format)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;

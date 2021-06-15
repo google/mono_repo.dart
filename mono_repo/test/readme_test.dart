@@ -151,8 +151,8 @@ dart:
 stages:
   # Register two jobs to run under the `analyze` stage.
   - analyze:
-    - dartanalyzer
-    - dartfmt
+    - analyze
+    - format
   - unit_test:
     - test
   # Example cron stage which will only run for scheduled jobs (here we run

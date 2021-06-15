@@ -9,16 +9,12 @@ import 'package:checked_yaml/checked_yaml.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/generate.dart';
-import 'package:mono_repo/src/commands/github/generate.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/user_exception.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
-
-@Deprecated('kill me!')
-final travisFileName = defaultGitHubWorkflowFilePath;
 
 Future<void> populateConfig(String monoRepoContent) async {
   await d.file('mono_repo.yaml', monoRepoContent).create();
@@ -118,13 +114,13 @@ os:
 stages:
   - analyze:
     - group:
-        - dartanalyzer
-        - dartfmt
+        - analyze
+        - format
       dart:
         - dev
       os:
         - osx
-    - dartanalyzer:
+    - analyze:
       dart:
         - 1.23.0
       os:

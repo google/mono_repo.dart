@@ -241,7 +241,7 @@ List<String> calculateOrderedStages(
     throw UserException(
       'Error parsing mono_repo.yaml',
       details: 'One or more stage was referenced in `mono_repo.yaml` that do '
-          'not exist in any `mono_pkg.yaml` files: $items.',
+          'not exist in any `$monoPkgFileName` files: $items.',
     );
   }
 

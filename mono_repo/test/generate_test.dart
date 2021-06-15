@@ -246,9 +246,9 @@ dart:
 
 stages:
   - format:
-    - dartfmt
+    - format
   - analyze:
-    - dartanalyzer
+    - analyze
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
@@ -262,9 +262,9 @@ dart:
 
 stages:
   - analyze:
-    - dartanalyzer
+    - analyze
   - format:
-    - dartfmt: sdk
+    - format: sdk
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_b
@@ -371,7 +371,7 @@ dart:
 
 stages:
   - format:
-    - dartfmt
+    - format
 
 cache:
   directories:
@@ -390,7 +390,7 @@ dart:
 
 stages:
   - format:
-    - dartfmt: sdk
+    - format: sdk
 
 cache:
   directories:
@@ -416,7 +416,7 @@ $_writeScriptOutput''',
 
     await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
-      dartfmt)
+      format)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
@@ -437,7 +437,7 @@ dart:
 
 stages:
   - format:
-    - dartfmt: sdk
+    - format: sdk
 
 cache:
   directories:
@@ -456,7 +456,7 @@ dart:
 
 stages:
   - format:
-    - dartfmt: --dry-run --fix --set-exit-if-changed .
+    - format: --dry-run --fix --set-exit-if-changed .
 
 cache:
   directories:
@@ -482,11 +482,11 @@ $_writeScriptOutput''',
 
     await d.file(ciScriptPath, contains(r'''
       case ${TASK} in
-      dartfmt_0)
+      format_0)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
-      dartfmt_1)
+      format_1)
         echo 'dart format --dry-run --fix --set-exit-if-changed .'
         dart format --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
         ;;
@@ -533,13 +533,13 @@ os:
 stages:
   - analyze:
     - group:
-        - dartanalyzer
-        - dartfmt
+        - analyze
+        - format
       dart:
         - dev
       os:
         - osx
-    - dartanalyzer:
+    - analyze:
       dart:
         - 1.23.0
       os:
@@ -752,8 +752,8 @@ dart:
 stages:
   - analyze:
     - group:
-        - dartanalyzer
-        - dartfmt
+        - analyze
+        - format
   - unit_test:
     - description: "chrome tests"
       test: --platform chrome
@@ -771,8 +771,8 @@ dart:
 stages:
   - analyze:
     - group:
-        - dartanalyzer
-        - dartfmt
+        - analyze
+        - format
   - unit_test:
     - description: "chrome tests"
       test: --platform chrome
@@ -874,7 +874,6 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
           printMatcher: _subPkgStandardOutput,
         );
 
-        // TODO: validate GitHub case
         await d
             .file(
                 ciScriptPath,
@@ -917,11 +916,11 @@ for PKG in ${PKGS}; do
       echo
       echo -e "PKG: ${PKG}; TASK: ${TASK}"
       case ${TASK} in
-      dartanalyzer)
+      analyze)
         echo 'dart analyze'
         dart analyze || EXIT_CODE=$?
         ;;
-      dartfmt)
+      format)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;

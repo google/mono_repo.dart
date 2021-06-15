@@ -67,7 +67,7 @@ $ciScriptPathMessage''',
   _registerTest(
     'all packages with task failures',
     args: [
-      'dartanalyzer',
+      'analyze',
       'command_0',
     ],
     pkgsEnvironment: 'pkg_a pkg_b pkg_c',
@@ -77,7 +77,7 @@ $ciScriptPathMessage''',
   _registerTest(
     'just successes',
     args: [
-      'dartanalyzer',
+      'analyze',
       'command_0',
     ],
     pkgsEnvironment: 'pkg_c',
@@ -103,7 +103,7 @@ $ciScriptPathMessage''',
   _registerTest(
     'bad PKGS provided',
     args: [
-      'dartanalyzer',
+      'analyze',
       'command_0',
     ],
     pkgsEnvironment: 'pkg_d',
@@ -113,7 +113,7 @@ $ciScriptPathMessage''',
   _registerTest(
     'no PKGS set',
     args: [
-      'dartanalyzer',
+      'analyze',
       'command_0',
     ],
     pkgsEnvironment: '',
@@ -171,7 +171,7 @@ dart:
 
 stages:
   - stage1:
-    - dartanalyzer
+    - analyze
   - stage2:
     - command: echo "testing 1 2 3"
   - stage3:
