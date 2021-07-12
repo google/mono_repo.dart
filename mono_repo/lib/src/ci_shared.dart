@@ -89,7 +89,7 @@ void validateRootConfig(RootConfig rootConfig) {
         .toSet()
         .where((v) => !sdkConstraint.allows(v))
         .toList()
-          ..sort();
+      ..sort();
 
     if (disallowedExplicitVersions.isNotEmpty) {
       final disallowedString =
