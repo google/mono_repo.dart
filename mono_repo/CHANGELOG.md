@@ -1,3 +1,8 @@
+## 5.0.1
+
+- Use latest [dart-lang/setup-dart](https://github.com/dart-lang/setup-dart)
+  v1.1.
+
 ## 5.0.0
 
 - *BREAKING* Drop support for Travis-CI.
