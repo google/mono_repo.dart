@@ -1,31 +1,31 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: prefer_expression_function_bodies
-
 part of 'package_config.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-CIJob _$CIJobFromJson(Map json) {
-  return $checkedNew('CIJob', json, () {
-    final val = CIJob(
-      $checkedConvert(json, 'os', (v) => v as String),
-      $checkedConvert(json, 'package', (v) => v as String),
-      $checkedConvert(json, 'sdk', (v) => v as String),
-      $checkedConvert(json, 'stageName', (v) => v as String),
-      $checkedConvert(
-          json,
-          'tasks',
-          (v) => (v as List<dynamic>)
-              .map((e) => Task.fromJson(Map<String, dynamic>.from(e as Map)))
-              .toList()),
-      description: $checkedConvert(json, 'description', (v) => v as String?),
+CIJob _$CIJobFromJson(Map json) => $checkedCreate(
+      'CIJob',
+      json,
+      ($checkedConvert) {
+        final val = CIJob(
+          $checkedConvert('os', (v) => v as String),
+          $checkedConvert('package', (v) => v as String),
+          $checkedConvert('sdk', (v) => v as String),
+          $checkedConvert('stageName', (v) => v as String),
+          $checkedConvert(
+              'tasks',
+              (v) => (v as List<dynamic>)
+                  .map(
+                      (e) => Task.fromJson(Map<String, dynamic>.from(e as Map)))
+                  .toList()),
+          description: $checkedConvert('description', (v) => v as String?),
+        );
+        return val;
+      },
     );
-    return val;
-  });
-}
 
 Map<String, dynamic> _$CIJobToJson(CIJob instance) {
   final val = <String, dynamic>{};
@@ -45,15 +45,17 @@ Map<String, dynamic> _$CIJobToJson(CIJob instance) {
   return val;
 }
 
-Task _$TaskFromJson(Map json) {
-  return $checkedNew('Task', json, () {
-    final val = Task(
-      $checkedConvert(json, 'name', (v) => v as String),
-      args: $checkedConvert(json, 'args', (v) => v as String?),
+Task _$TaskFromJson(Map json) => $checkedCreate(
+      'Task',
+      json,
+      ($checkedConvert) {
+        final val = Task(
+          $checkedConvert('name', (v) => v as String),
+          args: $checkedConvert('args', (v) => v as String?),
+        );
+        return val;
+      },
     );
-    return val;
-  });
-}
 
 Map<String, dynamic> _$TaskToJson(Task instance) {
   final val = <String, dynamic>{

@@ -2,7 +2,7 @@ name: mono_repo
 description: >-
   CLI tools to make it easier to manage a single source repository containing
   multiple Dart packages.
-version: 5.0.1
+version: 5.0.2-dev
 repository: https://github.com/google/mono_repo.dart
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
   collection: ^1.14.3
   graphs: ^2.0.0
   io: ^1.0.0
-  json_annotation: ^4.0.0
+  json_annotation: ^4.1.0
   meta: ^1.0.0
   path: ^1.4.1
   pub_semver: ^2.0.0
@@ -26,9 +26,7 @@ dev_dependencies:
   build_test: ^2.0.0
   build_verify: ^2.0.0
   build_version: ^2.0.0
-  json_serializable: ^4.0.0
-  # Because we use the ignore_for_file build.yaml option
-  source_gen: ^1.0.0
+  json_serializable: ^5.0.0
   term_glyph: ^1.0.0
   test: ^1.16.5
   test_descriptor: ^2.0.0
