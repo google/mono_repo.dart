@@ -1010,7 +1010,7 @@ jobs:
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.1
+      - uses: dart-lang/setup-dart@v1.2
         with:
           sdk: stable
       - id: checkout
@@ -1053,7 +1053,7 @@ jobs:
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.1
+      - uses: dart-lang/setup-dart@v1.2
         with:
           sdk: stable
       - id: checkout

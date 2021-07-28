@@ -1,3 +1,8 @@
+## 5.0.2
+
+- Use latest [dart-lang/setup-dart](https://github.com/dart-lang/setup-dart)
+  v1.2.
+
 ## 5.0.1
 
 - Use latest [dart-lang/setup-dart](https://github.com/dart-lang/setup-dart)
