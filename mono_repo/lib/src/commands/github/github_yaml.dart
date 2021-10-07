@@ -415,9 +415,12 @@ Map<String, dynamic> _cacheEntries(
     ]
   ];
 
+  String maxLength(String input) =>
+      input.length > 512 ? input.substring(0, 512) : input;
+
   final restoreKeys = [
-    for (var i = cacheKeyParts.length - 1; i > 0; i--)
-      cacheKeyParts.take(i).join(';')
+    for (var i = cacheKeyParts.length; i > 0; i--)
+      maxLength(cacheKeyParts.take(i).join(';'))
   ];
 
   // Just caching the `hosted` directory because caching git dependencies or
@@ -429,8 +432,8 @@ Map<String, dynamic> _cacheEntries(
     'uses': 'actions/cache@v2.1.6',
     'with': {
       'path': pubCacheHosted,
-      'key': cacheKeyParts.join(';'),
-      'restore-keys': restoreKeys.join('\n'),
+      'key': restoreKeys.first,
+      'restore-keys': restoreKeys.skip(1).join('\n'),
     }
   };
 }
