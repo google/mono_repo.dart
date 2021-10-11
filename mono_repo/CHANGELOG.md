@@ -1,6 +1,6 @@
 ## 5.0.3-dev
 
-- Strip cache keys to 512 characters.
+- Trim GitHub CI cache keys to 512 characters.
 
 ## 5.0.2
 

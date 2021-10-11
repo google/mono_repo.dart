@@ -389,7 +389,7 @@ name: pkg_a
       ]).create();
     }
 
-    testGenerateBothConfig(
+    testGenerateGitHubConfig(
       printMatcher: '''
 ${Iterable.generate(count, (i) => 'package:${pkgName(i)}').join('\n')}
 package:sub_pkg
