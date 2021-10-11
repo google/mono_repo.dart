@@ -1,6 +1,8 @@
-## 5.0.3-dev
+## 5.0.3
 
 - Trim GitHub CI cache keys to 512 characters.
+- Use latest [dart-lang/setup-dart](https://github.com/dart-lang/setup-dart)
+  v1.3.
 
 ## 5.0.2
 
