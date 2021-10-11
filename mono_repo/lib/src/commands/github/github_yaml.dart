@@ -416,8 +416,8 @@ Map<String, dynamic> _cacheEntries(
   ];
 
   final restoreKeys = [
-    for (var i = cacheKeyParts.length - 1; i > 0; i--)
-      cacheKeyParts.take(i).join(';')
+    for (var i = cacheKeyParts.length; i > 0; i--)
+      _maxLength(cacheKeyParts.take(i).join(';'))
   ];
 
   // Just caching the `hosted` directory because caching git dependencies or
@@ -429,10 +429,17 @@ Map<String, dynamic> _cacheEntries(
     'uses': 'actions/cache@v2.1.6',
     'with': {
       'path': pubCacheHosted,
-      'key': cacheKeyParts.join(';'),
-      'restore-keys': restoreKeys.join('\n'),
+      'key': restoreKeys.first,
+      'restore-keys': restoreKeys.skip(1).join('\n'),
     }
   };
+}
+
+String _maxLength(String input) {
+  if (input.length <= 512) return input;
+  final hash = ['-!!too_long!!', input.length, input.hashCode].join('-');
+
+  return input.substring(0, 512 - hash.length) + hash;
 }
 
 Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
