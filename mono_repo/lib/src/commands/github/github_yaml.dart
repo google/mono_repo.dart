@@ -415,12 +415,9 @@ Map<String, dynamic> _cacheEntries(
     ]
   ];
 
-  String maxLength(String input) =>
-      input.length > 512 ? input.substring(0, 512) : input;
-
   final restoreKeys = [
     for (var i = cacheKeyParts.length; i > 0; i--)
-      maxLength(cacheKeyParts.take(i).join(';'))
+      _maxLength(cacheKeyParts.take(i).join(';'))
   ];
 
   // Just caching the `hosted` directory because caching git dependencies or
@@ -437,6 +434,9 @@ Map<String, dynamic> _cacheEntries(
     }
   };
 }
+
+String _maxLength(String input) =>
+    input.length > 512 ? input.substring(0, 512) : input;
 
 Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
       selfValidateJobName,

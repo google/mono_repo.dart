@@ -362,6 +362,46 @@ $_writeScriptOutput''',
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
+  test('max cache key', () async {
+    final monoConfigContent = toYaml({
+      'merge_stages': ['format']
+    });
+    await populateConfig(monoConfigContent);
+
+    String pkgName(int i) => 'package_with_a_long_name_'
+        '${i.toString().padLeft(2, '0')}';
+
+    const count = 18;
+
+    for (var i = 0; i < count; i++) {
+      await d.dir(pkgName(i), [
+        d.file(monoPkgFileName, r'''
+dart:
+ - dev
+
+stages:
+  - format:
+    - format
+'''),
+        d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+      ]).create();
+    }
+
+    testGenerateBothConfig(
+      printMatcher: '''
+${Iterable.generate(count, (i) => 'package:${pkgName(i)}').join('\n')}
+package:sub_pkg
+$_writeScriptOutput''',
+    );
+
+    validateSandbox(
+      'max_cache_key.txt',
+      defaultGitHubWorkflowFilePath,
+    );
+  });
+
   test('two flavors of dartfmt', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''

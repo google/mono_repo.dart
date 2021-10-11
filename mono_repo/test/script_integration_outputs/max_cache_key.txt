@@ -1,0 +1,573 @@
+# Created with package:mono_repo v1.2.3
+name: Dart CI
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+defaults:
+  run:
+    shell: bash
+env:
+  PUB_ENVIRONMENT: bot.github
+
+jobs:
+  job_001:
+    name: "analyze; osx; Dart dev; PKG: sub_pkg; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
+    runs-on: macos-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:macos-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:analyze-format"
+          restore-keys: |
+            os:macos-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:macos-latest;pub-cache-hosted;dart:dev
+            os:macos-latest;pub-cache-hosted
+            os:macos-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: dev
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: sub_pkg; dart analyze
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart analyze
+      - name: "sub_pkg; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: "dart format --output=none --set-exit-if-changed ."
+  job_002:
+    name: "analyze; windows; Dart 1.23.0; PKG: sub_pkg; `dart analyze`"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: "1.23.0"
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: sub_pkg; dart analyze
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart analyze
+  job_003:
+    name: "unit_test; linux; Dart 1.23.0; PKG: sub_pkg; `dart test --preset travis`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:1.23.0;packages:sub_pkg;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:1.23.0;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:1.23.0
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: "1.23.0"
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --preset travis"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --preset travis
+    needs:
+      - job_001
+      - job_002
+  job_004:
+    name: "unit_test; linux; Dart 1.23.0; PKG: sub_pkg; chrome tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:1.23.0;packages:sub_pkg;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:1.23.0;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:1.23.0
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: "1.23.0"
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --platform chrome"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --platform chrome
+    needs:
+      - job_001
+      - job_002
+  job_005:
+    name: "unit_test; linux; Dart dev; PKG: sub_pkg; `dart test --preset travis`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: dev
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --preset travis"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --preset travis
+    needs:
+      - job_001
+      - job_002
+  job_006:
+    name: "unit_test; linux; Dart dev; PKG: sub_pkg; chrome tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: dev
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --platform chrome"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --platform chrome
+    needs:
+      - job_001
+      - job_002
+  job_007:
+    name: "unit_test; linux; Dart stable; PKG: sub_pkg; `dart test --preset travis`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:sub_pkg;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --preset travis"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --preset travis
+    needs:
+      - job_001
+      - job_002
+  job_008:
+    name: "unit_test; linux; Dart stable; PKG: sub_pkg; chrome tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:sub_pkg;commands:test_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --platform chrome"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --platform chrome
+    needs:
+      - job_001
+      - job_002
+  job_009:
+    name: "unit_test; windows; Dart 1.23.0; PKG: sub_pkg; `dart test --preset travis`"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: "1.23.0"
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --preset travis"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --preset travis
+    needs:
+      - job_001
+      - job_002
+  job_010:
+    name: "unit_test; windows; Dart 1.23.0; PKG: sub_pkg; chrome tests"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: "1.23.0"
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --platform chrome"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --platform chrome
+    needs:
+      - job_001
+      - job_002
+  job_011:
+    name: "unit_test; windows; Dart dev; PKG: sub_pkg; `dart test --preset travis`"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: dev
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --preset travis"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --preset travis
+    needs:
+      - job_001
+      - job_002
+  job_012:
+    name: "unit_test; windows; Dart dev; PKG: sub_pkg; chrome tests"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: dev
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --platform chrome"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --platform chrome
+    needs:
+      - job_001
+      - job_002
+  job_013:
+    name: "unit_test; windows; Dart stable; PKG: sub_pkg; `dart test --preset travis`"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --preset travis"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --preset travis
+    needs:
+      - job_001
+      - job_002
+  job_014:
+    name: "unit_test; windows; Dart stable; PKG: sub_pkg; chrome tests"
+    runs-on: windows-latest
+    steps:
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart pub upgrade
+      - name: "sub_pkg; dart test --platform chrome"
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+        run: dart test --platform chrome
+    needs:
+      - job_001
+      - job_002
+  job_015:
+    name: "format; linux; Dart dev; PKGS: package_with_a_long_name_00, package_with_a_long_name_01, package_with_a_long_name_02, package_with_a_long_name_03, package_with_a_long_name_04, package_with_a_long_name_05, package_with_a_long_name_06, package_with_a_long_name_07, package_with_a_long_name_08, package_with_a_long_name_09, package_with_a_long_name_10, package_with_a_long_name_11, package_with_a_long_name_12, package_with_a_long_name_13, package_with_a_long_name_14, package_with_a_long_name_15, package_with_a_long_name_16, package_with_a_long_name_17; `dart format --output=none --set-exit-if-changed .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:package_with_a_long_name_00-package_with_a_long_name_01-package_with_a_long_name_02-package_with_a_long_name_03-package_with_a_long_name_04-package_with_a_long_name_05-package_with_a_long_name_06-package_with_a_long_name_07-package_with_a_long_name_08-package_with_a_long_name_09-package_with_a_long_name_10-package_with_a_long_name_11-package_with_a_long_name_12-package_with_a_long_name_13-package_with_a_long_name_14-package_with_a_long_name_15-package_with"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:package_with_a_long_name_00-package_with_a_long_name_01-package_with_a_long_name_02-package_with_a_long_name_03-package_with_a_long_name_04-package_with_a_long_name_05-package_with_a_long_name_06-package_with_a_long_name_07-package_with_a_long_name_08-package_with_a_long_name_09-package_with_a_long_name_10-package_with_a_long_name_11-package_with_a_long_name_12-package_with_a_long_name_13-package_with_a_long_name_14-package_with_a_long_name_15-package_with
+            os:ubuntu-latest;pub-cache-hosted;dart:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.2
+        with:
+          sdk: dev
+      - id: checkout
+        uses: actions/checkout@v2.3.4
+      - id: package_with_a_long_name_00_pub_upgrade
+        name: package_with_a_long_name_00; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_00
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_00; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_00_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_00
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_01_pub_upgrade
+        name: package_with_a_long_name_01; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_01
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_01; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_01_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_01
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_02_pub_upgrade
+        name: package_with_a_long_name_02; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_02
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_02; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_02_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_02
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_03_pub_upgrade
+        name: package_with_a_long_name_03; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_03
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_03; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_03_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_03
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_04_pub_upgrade
+        name: package_with_a_long_name_04; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_04
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_04; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_04_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_04
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_05_pub_upgrade
+        name: package_with_a_long_name_05; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_05
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_05; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_05_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_05
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_06_pub_upgrade
+        name: package_with_a_long_name_06; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_06
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_06; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_06_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_06
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_07_pub_upgrade
+        name: package_with_a_long_name_07; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_07
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_07; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_07_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_07
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_08_pub_upgrade
+        name: package_with_a_long_name_08; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_08
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_08; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_08_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_08
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_09_pub_upgrade
+        name: package_with_a_long_name_09; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_09
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_09; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_09_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_09
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_10_pub_upgrade
+        name: package_with_a_long_name_10; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_10
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_10; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_10_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_10
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_11_pub_upgrade
+        name: package_with_a_long_name_11; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_11
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_11; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_11_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_11
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_12_pub_upgrade
+        name: package_with_a_long_name_12; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_12
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_12; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_12_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_12
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_13_pub_upgrade
+        name: package_with_a_long_name_13; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_13
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_13; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_13_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_13
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_14_pub_upgrade
+        name: package_with_a_long_name_14; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_14
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_14; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_14_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_14
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_15_pub_upgrade
+        name: package_with_a_long_name_15; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_15
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_15; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_15_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_15
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_16_pub_upgrade
+        name: package_with_a_long_name_16; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_16
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_16; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_16_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_16
+        run: "dart format --output=none --set-exit-if-changed ."
+      - id: package_with_a_long_name_17_pub_upgrade
+        name: package_with_a_long_name_17; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: package_with_a_long_name_17
+        run: dart pub upgrade
+      - name: "package_with_a_long_name_17; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.package_with_a_long_name_17_pub_upgrade.conclusion == 'success'"
+        working-directory: package_with_a_long_name_17
+        run: "dart format --output=none --set-exit-if-changed ."
+    needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+      - job_009
+      - job_010
+      - job_011
+      - job_012
+      - job_013
+      - job_014
