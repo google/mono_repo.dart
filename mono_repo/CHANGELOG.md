@@ -1,6 +1,6 @@
 ## 5.0.3-dev
 
-- Trip cache keys to 512 characters.
+- Strip cache keys to 512 characters.
 
 ## 5.0.2
 
