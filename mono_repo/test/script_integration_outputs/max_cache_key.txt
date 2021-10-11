@@ -27,7 +27,7 @@ jobs:
             os:macos-latest;pub-cache-hosted;dart:dev
             os:macos-latest;pub-cache-hosted
             os:macos-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: dev
       - id: checkout
@@ -49,7 +49,7 @@ jobs:
     name: "analyze; windows; Dart 1.23.0; PKG: sub_pkg; `dart analyze`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: "1.23.0"
       - id: checkout
@@ -77,7 +77,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:1.23.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: "1.23.0"
       - id: checkout
@@ -108,7 +108,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:1.23.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: "1.23.0"
       - id: checkout
@@ -139,7 +139,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: dev
       - id: checkout
@@ -170,7 +170,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: dev
       - id: checkout
@@ -201,7 +201,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: stable
       - id: checkout
@@ -232,7 +232,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: stable
       - id: checkout
@@ -253,7 +253,7 @@ jobs:
     name: "unit_test; windows; Dart 1.23.0; PKG: sub_pkg; `dart test --preset travis`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: "1.23.0"
       - id: checkout
@@ -274,7 +274,7 @@ jobs:
     name: "unit_test; windows; Dart 1.23.0; PKG: sub_pkg; chrome tests"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: "1.23.0"
       - id: checkout
@@ -295,7 +295,7 @@ jobs:
     name: "unit_test; windows; Dart dev; PKG: sub_pkg; `dart test --preset travis`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: dev
       - id: checkout
@@ -316,7 +316,7 @@ jobs:
     name: "unit_test; windows; Dart dev; PKG: sub_pkg; chrome tests"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: dev
       - id: checkout
@@ -337,7 +337,7 @@ jobs:
     name: "unit_test; windows; Dart stable; PKG: sub_pkg; `dart test --preset travis`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: stable
       - id: checkout
@@ -358,7 +358,7 @@ jobs:
     name: "unit_test; windows; Dart stable; PKG: sub_pkg; chrome tests"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: stable
       - id: checkout
@@ -389,7 +389,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.2
+      - uses: dart-lang/setup-dart@v1.3
         with:
           sdk: dev
       - id: checkout
