@@ -435,8 +435,12 @@ Map<String, dynamic> _cacheEntries(
   };
 }
 
-String _maxLength(String input) =>
-    input.length > 512 ? input.substring(0, 512) : input;
+String _maxLength(String input) {
+  if (input.length <= 512) return input;
+  final hash = ['-!!too_long!!', input.length, input.hashCode].join('-');
+
+  return input.substring(0, 512 - hash.length) + hash;
+}
 
 Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
       selfValidateJobName,
