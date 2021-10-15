@@ -10,17 +10,17 @@ stages:
     - analyze: --fatal-infos .
     dart: dev
   - analyze:
-    dart: 2.12.0
+    dart: 2.14.0
 - unit_test:
   - test: -x yaml -P presubmit --test-randomize-ordering-seed=random
     os:
     - linux
     - windows
-    dart: [2.12.0, dev]
+    dart: [2.14.0, dev]
   - test: -t yaml --test-randomize-ordering-seed=random
     os:
     - linux
-    dart: [2.12.0, dev]
+    dart: [2.14.0, dev]
 
 cache:
   directories:
