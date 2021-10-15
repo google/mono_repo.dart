@@ -1,3 +1,7 @@
+## 5.0.4-dev
+
+- Require Dart SDK >=2.14.0.
+
 ## 5.0.3
 
 - Trim GitHub CI cache keys to 512 characters.
