@@ -1,5 +1,6 @@
-## 5.0.4-dev
+## 5.0.4
 
+- Use latest `actions/checkout@v2.3.5`.
 - Require Dart SDK >=2.14.0.
 
 ## 5.0.3

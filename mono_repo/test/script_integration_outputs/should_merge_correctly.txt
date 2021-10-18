@@ -31,7 +31,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.5
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -76,7 +76,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.5
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -106,7 +106,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.5
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -136,7 +136,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.5
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -166,7 +166,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.5
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
