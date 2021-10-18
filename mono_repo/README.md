@@ -3,13 +3,13 @@ Manage multiple [Dart packages] within a single repository.
 ## Installation
 
 ```console
-> pub global activate mono_repo
+> dart pub global activate mono_repo
 ```
 
 ## Running
 
 ```console
-> pub global run mono_repo
+> dart pub global run mono_repo
 ```
 
 Or, once you've [setup your PATH]:
