@@ -33,7 +33,7 @@ jobs:
         with:
           sdk: "2.10.4"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -65,7 +65,7 @@ jobs:
         with:
           sdk: "2.12.0-259.0.dev"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -97,7 +97,7 @@ jobs:
         with:
           sdk: "2.12.0-29.10.beta"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -129,7 +129,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -157,7 +157,7 @@ jobs:
         with:
           sdk: beta
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -189,7 +189,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -217,7 +217,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -262,7 +262,7 @@ jobs:
         with:
           sdk: main
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -294,7 +294,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -326,7 +326,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -364,7 +364,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -402,7 +402,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -440,7 +440,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -478,7 +478,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -506,7 +506,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -534,7 +534,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
