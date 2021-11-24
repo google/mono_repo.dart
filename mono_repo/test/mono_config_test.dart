@@ -36,7 +36,7 @@ void main() {
   test('no stages - end up with one `unit_test` stage with one `test` task',
       () {
     final config = _parse({
-      'dart': ['stable']
+      'sdk': ['stable']
     });
 
     final oneJob = config.jobs.single;
@@ -95,7 +95,7 @@ stages:
   - group:
     - [dartfmt]
     - dartanalyzer: --fatal-infos --fatal-warnings .
-    dart: dev
+    sdk: dev
 ''') as Object,
         r'''
 line 4, column 7: Must be a map or a string.
@@ -106,33 +106,33 @@ line 4, column 7: Must be a map or a string.
       );
     });
 
-    test('dart value cannot be null', () {
+    test('sdk value cannot be null', () {
       _expectParseThrows(
-        {'dart': null},
+        {'sdk': null},
         r'''
-line 2, column 10: Unsupported value for "dart". The value for "dart" must be an array with at least one value.
+line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an array with at least one value.
   ╷
-2 │  "dart": null
-  │          ^^^^
+2 │  "sdk": null
+  │         ^^^^
   ╵''',
       );
     });
 
-    test('dart value cannot be empty', () {
+    test('sdk value cannot be empty', () {
       _expectParseThrows(
-        {'dart': []},
+        {'sdk': []},
         r'''
-line 2, column 10: Unsupported value for "dart". The value for "dart" must be an array with at least one value.
+line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an array with at least one value.
   ╷
-2 │  "dart": []
-  │          ^^
+2 │  "sdk": []
+  │         ^^
   ╵''',
       );
     });
 
     test('Stages named `test` are not allowed', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {
             'test': ['test']
@@ -154,7 +154,7 @@ line 7, column 12: Unsupported value for "test". Stages are not allowed to have 
 
     test('Stages tasks must be a list', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {'a': 42},
         ]
@@ -175,7 +175,7 @@ line 7, column 9: Unsupported value for "a". Stages must be a list of maps with 
 
     test('Stages tasks must be a list', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {'a': 42},
         ]
@@ -200,7 +200,7 @@ stages:
 - smoke_test:
   - description: 'bob'
     group: funky
-    dart: dev
+    sdk: dev
 ''') as Object;
 
       _expectParseThrows(
@@ -218,7 +218,7 @@ line 4, column 12: Unsupported value for "group". expected a list of tasks
         'Stages tasks must be a list with map with one key in the approved set',
         () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {
             'a': [
@@ -241,7 +241,7 @@ line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`.
 
     test('Stage tasks entries must have one key in the approved set', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {
             'a': [
@@ -264,7 +264,7 @@ line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`
 
     test('empty stage job', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {'a': []},
         ]
@@ -282,7 +282,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
 
     test('multiple keys under a stage', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {'a': null, 'b': null},
         ]
@@ -300,7 +300,7 @@ line 8, column 4: Stages must be a list of maps with exactly one key (the name o
 
     test('no keys under a stage', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [{}]
       };
       _expectParseThrows(
@@ -316,7 +316,7 @@ line 6, column 3: Stages must be a list of maps with exactly one key (the name o
 
     test('null stage job', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {'a': null},
         ]
@@ -337,7 +337,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
     test('unsupported keys', () {
       final monoYaml = {
         'extra': 'foo',
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {
             'a': ['test']
@@ -351,7 +351,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
       _expectParseThrows(
         monoYaml,
         r'''
-line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, dart, stages, cache]
+line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, sdk, stages, cache]
   ╷
 2 │  "extra": "foo",
   │  ^^^^^^^
@@ -361,7 +361,7 @@ line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, dart, s
 
     test('Duplicate stage names are not allowed', () {
       final monoYaml = {
-        'dart': ['stable'],
+        'sdk': ['stable'],
         'stages': [
           {
             'a': ['test']
@@ -385,7 +385,7 @@ line 12, column 4: Stages must be unique. "a" appears more than once.
 
     test('SDKs must be versions or in the allow-list', () {
       final monoYaml = {
-        'dart': ['latest'],
+        'sdk': ['latest'],
         'stages': [
           {
             'a': ['test']
@@ -394,10 +394,10 @@ line 12, column 4: Stages must be unique. "a" appears more than once.
       };
 
       _expectParseThrows(monoYaml, r'''
-line 2, column 10: Unsupported value for "dart". The value "latest" is neither a version string nor one of "main", "dev", "beta", "stable".
+line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a version string nor one of "main", "dev", "beta", "stable".
   ╷
-2 │    "dart": [
-  │ ┌──────────^
+2 │    "sdk": [
+  │ ┌─────────^
 3 │ │   "latest"
 4 │ │  ],
   │ └──^
@@ -407,7 +407,7 @@ line 2, column 10: Unsupported value for "dart". The value "latest" is neither a
 }
 
 const _testConfig1 = r'''
-dart:
+sdk:
   - dev
   - stable
   - 1.23.0
@@ -420,13 +420,13 @@ stages:
       group:
         - dartanalyzer: --fatal-infos --fatal-warnings .
         - dartfmt
-      dart:
+      sdk:
         - dev
       os:
         - windows
         - linux
     - dartanalyzer: --fatal-infos --fatal-warnings .
-      dart:
+      sdk:
         - 1.23.0
       os:
         - osx
@@ -445,9 +445,14 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'analyze_and_format',
         'tasks': [
-          {'name': 'analyze', 'args': '--fatal-infos --fatal-warnings .'},
-          {'name': 'format'}
-        ]
+          {
+            'flavor': 'dart',
+            'name': 'analyze',
+            'args': '--fatal-infos --fatal-warnings .'
+          },
+          {'flavor': 'dart', 'name': 'format'}
+        ],
+        'flavor': 'dart'
       },
       {
         'description': 'dartanalyzer && dartfmt',
@@ -456,9 +461,14 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'analyze_and_format',
         'tasks': [
-          {'name': 'analyze', 'args': '--fatal-infos --fatal-warnings .'},
-          {'name': 'format'}
-        ]
+          {
+            'flavor': 'dart',
+            'name': 'analyze',
+            'args': '--fatal-infos --fatal-warnings .'
+          },
+          {'flavor': 'dart', 'name': 'format'}
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'osx',
@@ -466,8 +476,13 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'analyze_and_format',
         'tasks': [
-          {'name': 'analyze', 'args': '--fatal-infos --fatal-warnings .'}
-        ]
+          {
+            'flavor': 'dart',
+            'name': 'analyze',
+            'args': '--fatal-infos --fatal-warnings .'
+          }
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -475,8 +490,9 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'unit_test',
         'tasks': [
-          {'name': 'test', 'args': '--platform chrome'}
-        ]
+          {'flavor': 'dart', 'name': 'test', 'args': '--platform chrome'}
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -484,8 +500,9 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'unit_test',
         'tasks': [
-          {'name': 'test', 'args': '--platform chrome'}
-        ]
+          {'flavor': 'dart', 'name': 'test', 'args': '--platform chrome'}
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -493,8 +510,9 @@ List get _testConfig1expectedOutput => [
         'sdk': 'stable',
         'stageName': 'unit_test',
         'tasks': [
-          {'name': 'test', 'args': '--platform chrome'}
-        ]
+          {'flavor': 'dart', 'name': 'test', 'args': '--platform chrome'}
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -503,10 +521,12 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {
+            'flavor': 'dart',
             'name': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 0'
           }
-        ]
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -515,10 +535,12 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {
+            'flavor': 'dart',
             'name': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 0'
           }
-        ]
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -527,10 +549,12 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {
+            'flavor': 'dart',
             'name': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 0'
           }
-        ]
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -539,10 +563,12 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {
+            'flavor': 'dart',
             'name': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 1'
           }
-        ]
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -551,10 +577,12 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {
+            'flavor': 'dart',
             'name': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 1'
           }
-        ]
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -563,10 +591,12 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {
+            'flavor': 'dart',
             'name': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 1'
           }
-        ]
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -574,8 +604,9 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'unit_test',
         'tasks': [
-          {'name': 'test'}
-        ]
+          {'flavor': 'dart', 'name': 'test'}
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -583,8 +614,9 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'unit_test',
         'tasks': [
-          {'name': 'test'}
-        ]
+          {'flavor': 'dart', 'name': 'test'}
+        ],
+        'flavor': 'dart'
       },
       {
         'os': 'linux',
@@ -592,7 +624,8 @@ List get _testConfig1expectedOutput => [
         'sdk': 'stable',
         'stageName': 'unit_test',
         'tasks': [
-          {'name': 'test'}
-        ]
+          {'flavor': 'dart', 'name': 'test'}
+        ],
+        'flavor': 'dart'
       }
     ];

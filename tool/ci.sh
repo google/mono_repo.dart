@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v5.0.5
+# Created with package:mono_repo v6.0.0-dev
 
 # Support built in commands on windows out of the box.
 # When it is a flutter repo (check the pubspec.yaml for "sdk: flutter")
@@ -92,6 +92,10 @@ for PKG in ${PKGS}; do
         dart test -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_2)
+        echo 'flutter test --test-randomize-ordering-seed=random'
+        flutter test --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        ;;
+      test_3)
         echo 'dart test --test-randomize-ordering-seed=random'
         dart test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;

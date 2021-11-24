@@ -21,10 +21,10 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_a-pkg_b;commands:analyze-format"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b;commands:analyze-format"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_a-pkg_b
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
@@ -66,10 +66,10 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_a;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_a
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
@@ -96,10 +96,10 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_b;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b;commands:test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_b
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
@@ -126,10 +126,10 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_a;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_a
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
@@ -156,10 +156,10 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_b;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:pkg_b
-            os:ubuntu-latest;pub-cache-hosted;dart:stable
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3

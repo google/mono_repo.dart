@@ -249,7 +249,7 @@ pkg_a
 }
 
 const pkgAConfig = '''
-dart:
+sdk:
   - dev
   - stable
 
@@ -262,7 +262,7 @@ stages:
 ''';
 
 const pkgBConfig = '''
-dart:
+sdk:
   - dev
   - stable
 

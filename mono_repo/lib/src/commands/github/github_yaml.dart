@@ -295,6 +295,7 @@ extension on CIJobEntry {
         includeStage: true,
       ),
       _githubJobOs,
+      job.flavor,
       job.sdk,
       commandEntries,
       additionalCacheKeys: {
@@ -326,7 +327,7 @@ extension on CIJobEntry {
 /// [runsOn] corresponds to the type of machine to run the job on.
 /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 ///
-/// [dartVersion] specifies which version of Dart to install.
+/// [sdkVersion] specifies which version of Dart/Flutter to install.
 ///
 /// [runCommands] specifies the steps to be run.
 /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
@@ -336,7 +337,8 @@ extension on CIJobEntry {
 Map<String, dynamic> _githubJobYaml(
   String jobName,
   String runsOn,
-  String dartVersion,
+  PackageFlavor packageFlavor,
+  String sdkVersion,
   List<_CommandEntry> runCommands, {
   Map<String, String>? additionalCacheKeys,
 }) =>
@@ -348,16 +350,11 @@ Map<String, dynamic> _githubJobYaml(
           _cacheEntries(
             runsOn,
             additionalCacheKeys: {
-              'dart': dartVersion,
+              'sdk': sdkVersion,
               if (additionalCacheKeys != null) ...additionalCacheKeys,
             },
           ),
-        {
-          'uses': 'dart-lang/setup-dart@v1.3',
-          'with': {
-            'sdk': dartVersion,
-          },
-        },
+        packageFlavor.configurationMap(sdkVersion),
         {
           'id': 'checkout',
           'uses': 'actions/checkout@v2.4.0',
@@ -445,6 +442,7 @@ String _maxLength(String input) {
 Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
       selfValidateJobName,
       'ubuntu-latest',
+      PackageFlavor.dart,
       'stable',
       [
         for (var command in selfValidateCommands)

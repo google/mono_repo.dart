@@ -102,7 +102,7 @@ Matcher throwsAParsedYamlException(Object matcher) => throwsA(
     );
 
 const testConfig2 = r'''
-dart:
+sdk:
  - dev
  - stable
  - 1.23.0
@@ -116,12 +116,12 @@ stages:
     - group:
         - analyze
         - format
-      dart:
+      sdk:
         - dev
       os:
         - osx
     - analyze:
-      dart:
+      sdk:
         - 1.23.0
       os:
         - windows

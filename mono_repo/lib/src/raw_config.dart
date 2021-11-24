@@ -2,8 +2,11 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:json_annotation/json_annotation.dart';
 
+import 'package_config.dart';
 import 'utilities.dart';
 
 part 'raw_config.g.dart';
@@ -13,20 +16,25 @@ class RawConfig {
   @JsonKey(name: 'os', defaultValue: ['linux'])
   final List<String> oses;
 
-  @JsonKey(name: 'dart')
+  @JsonKey(name: 'sdk')
   final List<String>? sdks;
 
   final List<RawStage> stages;
 
   final RawCache? cache;
 
-  RawConfig(this.oses, this.sdks, List<RawStage>? stages, this.cache)
-      : stages = stages ??
+  RawConfig({
+    required this.oses,
+    this.sdks,
+    List<RawStage>? stages,
+    this.cache,
+  }) : stages = stages ??
             [
               RawStage('unit_test', ['test'])
             ] {
     if (sdks != null) {
       sortNormalizeVerifySdksList(
+        Zone.current[_flavorKey] as PackageFlavor,
         sdks!,
         (m) => ArgumentError.value(sdks, 'sdks', m),
       );
@@ -34,8 +42,11 @@ class RawConfig {
     oses.sort();
   }
 
-  factory RawConfig.fromJson(Map json) {
-    final config = _$RawConfigFromJson(json);
+  factory RawConfig.fromYaml(PackageFlavor flavor, Map json) {
+    final config = runZoned(
+      () => _$RawConfigFromJson(json),
+      zoneValues: {_flavorKey: flavor},
+    );
 
     final stages = <String>{};
     for (var i = 0; i < config.stages.length; i++) {
@@ -51,6 +62,8 @@ class RawConfig {
 
     return config;
   }
+
+  static final _flavorKey = Object();
 }
 
 @JsonSerializable(createToJson: false)

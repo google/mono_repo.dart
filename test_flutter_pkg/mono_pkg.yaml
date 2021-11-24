@@ -1,6 +1,6 @@
 # See https://github.com/google/mono_repo.dart for details
 sdk:
-- dev
+- beta
 
 stages:
 - smoke_test:
@@ -9,12 +9,8 @@ stages:
     - analyze: --fatal-infos .
     sdk:
     - beta
-    - dev
-    - edge
     - stable
-    - 2.10.4
-    - 2.12.0-259.0.dev
-    - 2.12.0-29.10.beta
+    - master
 - unit_test:
   - test: --test-randomize-ordering-seed=random
     os:

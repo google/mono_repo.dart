@@ -18,6 +18,42 @@ part 'package_config.g.dart';
 
 const monoPkgFileName = 'mono_pkg.yaml';
 
+enum PackageFlavor {
+  dart,
+  flutter,
+}
+
+extension PackageFlavorExtension on PackageFlavor {
+  String get prettyName {
+    switch (this) {
+      case PackageFlavor.dart:
+        return 'Dart';
+      case PackageFlavor.flutter:
+        return 'Flutter';
+    }
+  }
+
+  Map<String, dynamic> configurationMap(String sdkVersion) {
+    switch (this) {
+      case PackageFlavor.dart:
+        return {
+          'uses': 'dart-lang/setup-dart@v1.3',
+          'with': {
+            'sdk': sdkVersion,
+          },
+        };
+
+      case PackageFlavor.flutter:
+        return {
+          'uses': 'subosito/flutter-action@v1.5.3',
+          'with': {
+            'channel': sdkVersion,
+          }
+        };
+    }
+  }
+}
+
 class PackageConfig {
   final String relativePath;
   final Pubspec pubspec;
@@ -42,7 +78,11 @@ class PackageConfig {
     this.osConfigUsed,
   ) : assert(() {
           if (sdks == null) return true;
-          sortNormalizeVerifySdksList(sdks, (m) => AssertionError(m));
+          sortNormalizeVerifySdksList(
+            pubspec.flavor,
+            sdks,
+            (m) => AssertionError(m),
+          );
           return true;
         }());
 
@@ -75,7 +115,10 @@ class PackageConfig {
         false,
       );
     }
-    final rawConfig = RawConfig.fromJson(monoPkgYaml);
+
+    final flavor = pubspec.flavor;
+
+    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml);
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <CIJob>[];
@@ -87,24 +130,26 @@ class PackageConfig {
       final stageYaml = stage.items;
       for (var job in stageYaml) {
         var jobSdks = rawConfig.sdks;
-        if (job is Map && job.containsKey('dart')) {
-          final jobValue = job['dart'];
+        if (job is Map && job.containsKey('sdk')) {
+          final jobValue = job['sdk'];
 
           jobSdks = (jobValue is List)
               ? jobSdks = List.from(jobValue)
               : [jobValue as String];
 
           sortNormalizeVerifySdksList(
+            flavor,
             jobSdks,
-            (m) => CheckedFromJsonException(job, 'dart', 'RawConfig', m),
+            (m) => CheckedFromJsonException(job, 'sdk', 'RawConfig', m),
           );
         } else if (jobSdks == null || jobSdks.isEmpty) {
-          if (monoPkgYaml.containsKey('dart')) {
+          if (monoPkgYaml.containsKey('sdk')) {
             throw CheckedFromJsonException(
               monoPkgYaml,
-              'dart',
+              'sdk',
               'RawConfig',
-              'The value for "dart" must be an array with at least one value.',
+              'The value for "sdk" must be an array with at least '
+                  'one value.',
             );
           }
 
@@ -115,8 +160,17 @@ class PackageConfig {
             );
           }
 
+          if (job.containsKey('dart')) {
+            throw CheckedFromJsonException(
+              job as YamlMap,
+              'dart',
+              'RawConfig',
+              '"dart" is no longer supported. Use "sdk" instead.',
+            );
+          }
+
           throw ParsedYamlException(
-            'A "dart" key is required.',
+            'An "sdk" key is required.',
             job as YamlMap,
           );
         } else {
@@ -138,7 +192,14 @@ class PackageConfig {
         for (var sdk in jobSdks) {
           for (var os in jobOses) {
             jobs.add(
-              CIJob.parse(os, relativePath, sdk, stage.name, job as Object),
+              CIJob.parse(
+                os,
+                relativePath,
+                sdk,
+                stage.name,
+                job as Object,
+                flavor: flavor,
+              ),
             );
           }
         }
@@ -156,16 +217,6 @@ class PackageConfig {
       rawConfig.cache?.directories ?? const [],
       sdkConfigUsed,
       osConfigUsed,
-    );
-  }
-
-  bool get hasFlutterDependency {
-    if (pubspec.environment!.containsKey('flutter')) {
-      return true;
-    }
-    return pubspec.dependencies.values.any(
-      (dependency) =>
-          dependency is SdkDependency && dependency.sdk == 'flutter',
     );
   }
 }
@@ -192,6 +243,8 @@ class CIJob implements HasStageName {
 
   final List<Task> tasks;
 
+  final PackageFlavor flavor;
+
   Iterable<String> get _taskCommandsTickQuoted =>
       tasks.map((t) => '`${t.command}`');
 
@@ -215,8 +268,9 @@ class CIJob implements HasStageName {
     this.stageName,
     this.tasks, {
     this.description,
+    required this.flavor,
   }) : assert(
-          errorForSdkConfig(sdk) == null,
+          errorForSdkConfig(flavor, sdk) == null,
           'Should have caught bad sdk value `$sdk` before here!',
         );
 
@@ -227,8 +281,9 @@ class CIJob implements HasStageName {
     String package,
     String sdk,
     String stageName,
-    Object yaml,
-  ) {
+    Object yaml, {
+    required PackageFlavor flavor,
+  }) {
     String? description;
     Object withoutDescription;
     if (yaml is Map && yaml.containsKey('description')) {
@@ -237,7 +292,7 @@ class CIJob implements HasStageName {
     } else {
       withoutDescription = yaml;
     }
-    final tasks = Task.parseTaskOrGroup(withoutDescription);
+    final tasks = Task.parseTaskOrGroup(flavor, withoutDescription);
     return CIJob(
       os,
       package,
@@ -245,6 +300,7 @@ class CIJob implements HasStageName {
       stageName,
       tasks,
       description: description,
+      flavor: flavor,
     );
   }
 
@@ -286,23 +342,26 @@ class Task {
 
   static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
 
+  final PackageFlavor flavor;
+
   final String name;
 
   final String? args;
 
   final String command;
 
-  Task(this.name, {this.args}) : command = _commandValue(name, args).join(' ');
+  Task(this.flavor, this.name, {this.args})
+      : command = _commandValue(flavor, name, args).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
-  static List<Task> parseTaskOrGroup(Object yamlValue) {
+  static List<Task> parseTaskOrGroup(PackageFlavor flavor, Object yamlValue) {
     if (yamlValue is Map) {
       final group = yamlValue['group'];
       if (group != null) {
         if (group is List) {
           return group
-              .map((taskYaml) => Task.parse(taskYaml as Object))
+              .map((taskYaml) => Task.parse(flavor, taskYaml as Object))
               .toList();
         } else {
           throw CheckedFromJsonException(
@@ -314,15 +373,15 @@ class Task {
         }
       }
     }
-    return [Task.parse(yamlValue)];
+    return [Task.parse(flavor, yamlValue)];
   }
 
-  factory Task.parse(Object yamlValue) {
+  factory Task.parse(PackageFlavor flavor, Object yamlValue) {
     if (yamlValue is String) {
       if (yamlValue == 'command') {
         throw ArgumentError.value(yamlValue, 'command', 'requires a value');
       }
-      return Task(_normalizeTaskName(yamlValue));
+      return Task(flavor, _normalizeTaskName(yamlValue));
     }
 
     if (yamlValue is Map) {
@@ -378,7 +437,7 @@ class Task {
       }
 
       final extraConfig = Set<String>.from(yamlValue.keys)
-        ..removeAll([taskNames.single, taskName, 'dart', 'os']);
+        ..removeAll([taskNames.single, taskName, 'os', 'sdk']);
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (extraConfig.isNotEmpty) {
@@ -390,7 +449,7 @@ class Task {
           badKey: true,
         );
       }
-      return Task(taskName, args: args);
+      return Task(flavor, taskName, args: args);
     }
 
     if (yamlValue is YamlNode) {
@@ -420,7 +479,8 @@ class Task {
     return taskName;
   }
 
-  static List<String> _commandValue(String name, String? args) {
+  static List<String> _commandValue(
+      PackageFlavor flavor, String name, String? args) {
     switch (name) {
       case 'format':
         return [
@@ -433,7 +493,7 @@ class Task {
         return ['dart analyze', if (args != null) args];
       case 'test':
         return [
-          'dart test',
+          flavor == PackageFlavor.dart ? 'dart test' : 'flutter test',
           if (args != null) args,
         ];
       case 'command':
