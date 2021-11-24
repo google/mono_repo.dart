@@ -96,7 +96,7 @@ package:sub_pkg
   test('fails with unsupported configuration', () async {
     await d.dir('sub_pkg', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
   - dev
 
 stages:
@@ -124,7 +124,7 @@ name: pkg_name
   test('fails with unsupported Dart version', () async {
     await d.dir('sub_pkg', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
   - not_a_dart
 
 stages:
@@ -141,7 +141,7 @@ name: pkg_name
       throwsAParsedYamlException(
         startsWith(
           'line 2, column 3 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-          'Unsupported value for "dart". The value "not_a_dart" is neither a '
+          'Unsupported value for "sdk". The value "not_a_dart" is neither a '
           'version string nor one of "main", "dev", "beta", "stable".',
         ),
       ),
@@ -160,7 +160,7 @@ name: pkg_name
             d.file(
                 monoPkgFileName,
                 jsonEncode({
-                  'dart': values,
+                  'sdk': values,
                   'stages': [
                     {
                       'unit_test': ['test']
@@ -176,8 +176,8 @@ name: pkg_name
             testGenerateBothConfig,
             throwsAParsedYamlException(
               startsWith(
-                'line 1, column 9 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-                'Unsupported value for "dart". "${values.first}" appears more '
+                'line 1, column 8 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
+                'Unsupported value for "sdk". "${values.first}" appears more '
                 'than once.',
               ),
             ),
@@ -194,7 +194,7 @@ name: pkg_name
                       'unit_test': [
                         {
                           'test': '',
-                          'dart': values,
+                          'sdk': values,
                         }
                       ]
                     }
@@ -209,8 +209,8 @@ name: pkg_name
             testGenerateBothConfig,
             throwsAParsedYamlException(
               startsWith(
-                'line 1, column 44 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-                'Unsupported value for "dart". "${values.first}" appears more '
+                'line 1, column 43 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
+                'Unsupported value for "sdk". "${values.first}" appears more '
                 'than once.',
               ),
             ),
@@ -241,7 +241,7 @@ name: pkg_name
   test('conflicting stage orders are not allowed', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - dev
 
 stages:
@@ -257,7 +257,7 @@ name: pkg_a
 
     await d.dir('pkg_b', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - dev
 
 stages:
@@ -376,7 +376,7 @@ $_writeScriptOutput''',
     for (var i = 0; i < count; i++) {
       await d.dir(pkgName(i), [
         d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - dev
 
 stages:
@@ -405,7 +405,7 @@ $_writeScriptOutput''',
   test('two flavors of dartfmt', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - stable
  - dev
 
@@ -425,7 +425,7 @@ name: pkg_a
 
     await d.dir('pkg_b', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - dev
 
 stages:
@@ -471,7 +471,7 @@ $_writeScriptOutput''',
   test('two flavors of dartfmt with different arguments', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - stable
  - dev
 
@@ -491,7 +491,7 @@ name: pkg_a
 
     await d.dir('pkg_b', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - dev
 
 stages:
@@ -553,7 +553,7 @@ name: pkg_a
     expect(
       testGenerateBothConfig,
       throwsAParsedYamlException('''
-line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: A "dart" key is required.
+line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: An "sdk" key is required.
   ╷
 3 │     - dartfmt:
   │       ^^^^^^^^
@@ -565,7 +565,7 @@ line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: A "dart" key is requi
       () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
 - stable
 os:
 - unneeded
@@ -575,22 +575,22 @@ stages:
     - group:
         - analyze
         - format
-      dart:
+      sdk:
         - dev
       os:
         - osx
     - analyze:
-      dart:
+      sdk:
         - 1.23.0
       os:
         - windows
   - unit_test:
     - description: "chrome tests"
       test: --platform chrome
-      dart: dev
+      sdk: dev
       os: macos
     - test: --preset travis
-      dart: stable
+      sdk: stable
       os: linux
 '''),
       d.file('pubspec.yaml', '''
@@ -619,7 +619,7 @@ $_writeScriptOutput''',
     () async {
       await d.dir('pkg_a', [
         d.file(monoPkgFileName, r'''
-dart:
+sdk:
 - dev
 
 stages:
@@ -646,7 +646,7 @@ line 6, column 14 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for 
   test('bad yaml', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
-dart:
+sdk:
 - dev
 
 stages:
@@ -678,7 +678,7 @@ line 6, column 18 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Mapping values are not
 name: pkg_a
 '''),
       d.file(monoPkgFileName, '''
-dart:
+sdk:
 - dev
 
 stages:
@@ -786,7 +786,7 @@ merge_stages: [analyze]
 
         await d.dir('pkg_a', [
           d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - stable
 
 stages:
@@ -805,7 +805,7 @@ name: pkg_a
         ]).create();
         await d.dir('pkg_b', [
           d.file(monoPkgFileName, r'''
-dart:
+sdk:
  - stable
 
 stages:
@@ -1046,7 +1046,7 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
@@ -1089,7 +1089,7 @@ jobs:
         uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:stable"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest

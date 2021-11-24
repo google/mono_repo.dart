@@ -56,7 +56,7 @@ class CIJobEntry {
     final sections = [
       if (includeStage) job.stageName,
       if (!includeOs) job.os,
-      if (!includeSdk) 'Dart ${job.sdk}',
+      if (!includeSdk) '${job.flavor.prettyName} ${job.sdk}',
       if (!includePackage) '$packageLabel: ${packages.join(', ')}',
       job.name,
     ];

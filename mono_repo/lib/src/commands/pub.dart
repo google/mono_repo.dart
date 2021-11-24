@@ -10,6 +10,7 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
 import '../root_config.dart';
+import '../utilities.dart';
 import 'mono_repo_command.dart';
 
 class PubCommand extends MonoRepoCommand {
@@ -49,7 +50,7 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
     final dir = config.relativePath;
     String executable;
 
-    if (config.hasFlutterDependency) {
+    if (config.pubspec.usesFlutter) {
       executable = _flutterPath;
     } else {
       executable = _dartPath;

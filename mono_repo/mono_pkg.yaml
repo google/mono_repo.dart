@@ -4,23 +4,23 @@ stages:
 - smoke_test:
   # https://github.com/google/mono_repo.dart/issues/199
   - command: cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate
-    dart: dev
+    sdk: dev
   - group:
     - format
     - analyze: --fatal-infos .
-    dart: dev
+    sdk: dev
   - analyze:
-    dart: 2.14.0
+    sdk: 2.14.0
 - unit_test:
   - test: -x yaml -P presubmit --test-randomize-ordering-seed=random
     os:
     - linux
     - windows
-    dart: [2.14.0, dev]
+    sdk: [2.14.0, dev]
   - test: -t yaml --test-randomize-ordering-seed=random
     os:
     - linux
-    dart: [2.14.0, dev]
+    sdk: [2.14.0, dev]
 
 cache:
   directories:

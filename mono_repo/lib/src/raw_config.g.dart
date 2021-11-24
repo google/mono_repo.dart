@@ -12,27 +12,27 @@ RawConfig _$RawConfigFromJson(Map json) => $checkedCreate(
       ($checkedConvert) {
         $checkKeys(
           json,
-          allowedKeys: const ['os', 'dart', 'stages', 'cache'],
+          allowedKeys: const ['os', 'sdk', 'stages', 'cache'],
         );
         final val = RawConfig(
-          $checkedConvert(
+          oses: $checkedConvert(
               'os',
               (v) =>
                   (v as List<dynamic>?)?.map((e) => e as String).toList() ??
                   ['linux']),
-          $checkedConvert('dart',
+          sdks: $checkedConvert('sdk',
               (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
-          $checkedConvert(
+          stages: $checkedConvert(
               'stages',
               (v) => (v as List<dynamic>?)
                   ?.map((e) => RawStage.fromJson(e as Map))
                   .toList()),
-          $checkedConvert(
+          cache: $checkedConvert(
               'cache', (v) => v == null ? null : RawCache.fromJson(v as Map)),
         );
         return val;
       },
-      fieldKeyMap: const {'oses': 'os', 'sdks': 'dart'},
+      fieldKeyMap: const {'oses': 'os', 'sdks': 'sdk'},
     );
 
 RawCache _$RawCacheFromJson(Map json) => $checkedCreate(

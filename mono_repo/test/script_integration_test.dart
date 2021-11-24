@@ -166,7 +166,7 @@ void _registerTest(
 }
 
 const _monoPkgContent = r'''
-dart:
+sdk:
  - stable
 
 stages:

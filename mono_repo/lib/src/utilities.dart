@@ -3,36 +3,51 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:pub_semver/pub_semver.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
+
+import 'package_config.dart';
 
 const travisEdgeSdk = 'be/raw/latest';
 
 /// Maps to `be/raw/latest` or "bleeding edge".
 const githubSetupMainSdk = 'main';
 
-String? errorForSdkConfig(String sdk) {
+String? errorForSdkConfig(PackageFlavor flavor, String sdk) {
   try {
     Version.parse(sdk);
     return null;
   } on FormatException {
-    if (!_supportedSdkLiterals.contains(sdk)) {
-      return 'The value "$sdk" is neither a version string nor one of '
-          '$_literalsPretty.';
+    switch (flavor) {
+      case PackageFlavor.dart:
+        if (!_supportedDartSdkLiterals.contains(sdk)) {
+          return 'The value "$sdk" is neither a version string nor one of '
+              '$_dartSdkLiteralsPretty.';
+        }
+        return null;
+      case PackageFlavor.flutter:
+        if (!_supportedFlutterSdkLiterals.contains(sdk)) {
+          return 'The value "$sdk" is neither a version string nor one of '
+              '$_flutterLiteralsPretty.';
+        }
+        return null;
+      default:
+        throw UnsupportedError('should never get a flavor of `$flavor`');
     }
-    return null;
   }
 }
 
 void sortNormalizeVerifySdksList(
+  PackageFlavor flavor,
   List<String> sdks,
   Object Function(String message) errorFactory,
 ) {
   sdks.sort();
   for (var i = 0; i < sdks.length; i++) {
     var value = sdks[i];
-    if (_allowedMainVersions.contains(value)) {
+    if (flavor == PackageFlavor.dart && _allowedMainVersions.contains(value)) {
       sdks[i] = value = githubSetupMainSdk;
     }
-    final error = errorForSdkConfig(value);
+    final error = errorForSdkConfig(flavor, value);
     if (error != null) {
       // ignore: only_throw_errors
       throw errorFactory(error);
@@ -45,7 +60,13 @@ void sortNormalizeVerifySdksList(
   }
 }
 
-const _supportedSdkLiterals = {
+const _supportedFlutterSdkLiterals = {
+  'master',
+  'beta',
+  'stable',
+};
+
+const _supportedDartSdkLiterals = {
   githubSetupMainSdk,
   'dev',
   'beta',
@@ -58,4 +79,26 @@ const _allowedMainVersions = {
   githubSetupMainSdk,
 };
 
-final _literalsPretty = _supportedSdkLiterals.map((e) => '"$e"').join(', ');
+final _dartSdkLiteralsPretty =
+    _supportedDartSdkLiterals.map((e) => '"$e"').join(', ');
+
+final _flutterLiteralsPretty =
+    _supportedFlutterSdkLiterals.map((e) => '"$e"').join(', ');
+
+extension PubspecExtension on Pubspec {
+  PackageFlavor get flavor =>
+      usesFlutter ? PackageFlavor.flutter : PackageFlavor.dart;
+
+  bool get usesFlutter =>
+      _dependsOnFlutterSdk || _dependsOnFlutterPackage || _hasFlutterKey;
+
+  bool get _dependsOnFlutterSdk => environment?.containsKey('flutter') ?? false;
+
+  bool get _dependsOnFlutterPackage => _dependsOnPackage('flutter');
+
+  bool get _hasFlutterKey => flutter != null;
+
+  bool _dependsOnPackage(String package) =>
+      (dependencies.containsKey(package)) ||
+      (devDependencies.containsKey(package));
+}

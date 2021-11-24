@@ -1,3 +1,15 @@
+## 6.0.0-dev
+
+- **BREAKING** Replaced the `dart` configuration key within `mono_pkg.yaml` with
+  `sdk`. It now covers the Dart _or_ Flutter version to be used for a given
+  package - depending on if the package is determined to be a Flutter package by
+  the contents of `pubspec.yaml`.
+- Added support for Flutter using
+  [Flutter action](https://github.com/marketplace/actions/flutter-action). The
+  `sdk` value from `mono_pkg.yaml` configures the `channel` setting. Supported
+  values are currently "master", "beta", and "stable". (Support for explicit
+  versions may be added later.)
+
 ## 5.0.5
 
 - Use latest `actions/cache@v2.1.7`.
