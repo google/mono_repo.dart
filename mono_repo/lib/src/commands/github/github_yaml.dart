@@ -360,7 +360,7 @@ Map<String, dynamic> _githubJobYaml(
         },
         {
           'id': 'checkout',
-          'uses': 'actions/checkout@v2.3.5',
+          'uses': 'actions/checkout@v2.4.0',
         },
         for (var command in runCommands) command.runContent,
       ],
@@ -426,7 +426,7 @@ Map<String, dynamic> _cacheEntries(
 
   return {
     'name': 'Cache Pub hosted dependencies',
-    'uses': 'actions/cache@v2.1.6',
+    'uses': 'actions/cache@v2.1.7',
     'with': {
       'path': pubCacheHosted,
       'key': restoreKeys.first,

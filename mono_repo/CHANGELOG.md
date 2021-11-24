@@ -1,3 +1,8 @@
+## 5.0.5
+
+- Use latest `actions/cache@v2.1.7`.
+- Use latest `actions/checkout@v2.4.0`.
+
 ## 5.0.4
 
 - Use latest `actions/checkout@v2.3.5`.

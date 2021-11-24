@@ -18,7 +18,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:macos-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:analyze-format"
@@ -31,7 +31,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -53,7 +53,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:1.23.0;packages:sub_pkg;commands:test_1"
@@ -81,7 +81,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:1.23.0;packages:sub_pkg;commands:test_0"
@@ -112,7 +112,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:test_1"
@@ -143,7 +143,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -161,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:sub_pkg;commands:test_0"
@@ -174,7 +174,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -192,7 +192,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:sub_pkg;commands:test_1"
@@ -205,7 +205,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -223,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:stable;packages:sub_pkg;commands:test_0"
@@ -236,7 +236,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -257,7 +257,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -278,7 +278,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -299,7 +299,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -320,7 +320,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -341,7 +341,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -362,7 +362,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -380,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:package_with_a_long_name_00-package_with_a_long_name_01-package_with_a_long_name_02-package_with_a_long_name_03-package_with_a_long_name_04-package_with_a_long_name_05-package_with_a_long_name_06-package_with_a_long_name_07-package_with_a_long_name_08-package_with_a_long_name_09-package_with_a_long_name_10-package_with_a_long_name_11-package_with_a_long_name_12-package_with_a_long_name_13-package_with_a_long_name_14-package_with_-!!too_long!!-571-481796576"
@@ -393,7 +393,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - id: package_with_a_long_name_00_pub_upgrade
         name: package_with_a_long_name_00; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
