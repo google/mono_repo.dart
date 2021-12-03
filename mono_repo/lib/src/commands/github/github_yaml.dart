@@ -238,7 +238,7 @@ extension on CIJobEntry {
   String get _githubJobOs {
     switch (job.os) {
       case 'linux':
-        return 'ubuntu-latest';
+        return _ubuntuLatest;
       case 'windows':
         return 'windows-latest';
       case 'osx':
@@ -441,7 +441,7 @@ String _maxLength(String input) {
 
 Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
       selfValidateJobName,
-      'ubuntu-latest',
+      _ubuntuLatest,
       PackageFlavor.dart,
       'stable',
       [
@@ -449,6 +449,8 @@ Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
           _CommandEntry(selfValidateJobName, command),
       ],
     );
+
+const _ubuntuLatest = 'ubuntu-latest';
 
 /// Used as a place-holder so we can treat all jobs the same in certain
 /// workflows.
