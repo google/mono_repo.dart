@@ -1,4 +1,4 @@
-## 6.0.0-dev
+## 6.0.0
 
 - **BREAKING** Replaced the `dart` configuration key within `mono_pkg.yaml` with
   `sdk`. It now covers the Dart _or_ Flutter version to be used for a given
