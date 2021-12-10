@@ -130,28 +130,6 @@ line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an ar
       );
     });
 
-    test('Stages named `test` are not allowed', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {
-            'test': ['test']
-          },
-        ]
-      };
-      _expectParseThrows(
-        monoYaml,
-        r'''
-line 7, column 12: Unsupported value for "test". Stages are not allowed to have the name "test" because it interacts poorly with the default stage by the same name.
-  ╷
-7 │      "test": [
-  │ ┌────────────^
-8 │ │     "test"
-9 │ └    ]
-  ╵''',
-      );
-    });
-
     test('Stages tasks must be a list', () {
       final monoYaml = {
         'sdk': ['stable'],
