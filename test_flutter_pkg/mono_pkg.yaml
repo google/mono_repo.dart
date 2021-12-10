@@ -11,7 +11,7 @@ stages:
     - beta
     - stable
     - master
-- unit_test:
+- test:
   - test: --test-randomize-ordering-seed=random
     os:
     - linux

@@ -84,16 +84,6 @@ class RawStage {
   final List items;
 
   RawStage(this.name, this.items) {
-    // NOTE: If ArgumentError is throw, intentionally using the value of `name`
-    // (and not "name", as you'd expect) because it corresponds to the
-    // `key` in the config map we'd like the error reported on
-    if (name == 'test') {
-      throw ArgumentError.value(
-          name,
-          name,
-          'Stages are not allowed to have the name "test" because it '
-          'interacts poorly with the default stage by the same name.');
-    }
     if (items.isEmpty) {
       throw ArgumentError.value(items, name,
           'Stages are required to have at least one job. "$name" is empty.');

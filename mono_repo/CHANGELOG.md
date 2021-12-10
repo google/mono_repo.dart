@@ -1,3 +1,8 @@
+## 6.1.0-dev
+
+- Drop restriction on stages named "test" – only applied to Travis-CI which is
+  no longer supported.
+
 ## 6.0.0
 
 - **BREAKING** Replaced the `dart` configuration key within `mono_pkg.yaml` with
