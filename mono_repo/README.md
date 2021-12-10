@@ -176,7 +176,6 @@ Running `mono_repo generate` in the root directory generates two or more files:
 
 Look at these repositories for examples of `mono_repo` usage:
 
-* https://github.com/dart-lang/angular_components
 * https://github.com/dart-lang/build
 * https://github.com/dart-lang/pub-dev
 * https://github.com/dart-lang/source_gen
