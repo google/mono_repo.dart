@@ -1,0 +1,9 @@
+# See https://github.com/google/mono_repo.dart for details
+sdk:
+- stable
+
+stages:
+- test:
+  - test: --test-randomize-ordering-seed=random
+    os:
+    - linux

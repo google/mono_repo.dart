@@ -601,6 +601,45 @@ jobs:
       - job_009
       - job_010
   job_017:
+    name: "test; linux; Flutter stable; PKG: test_flutter_pkg/example; `flutter test --test-randomize-ordering-seed=random`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v2.1.7
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg/example;commands:test_2"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg/example
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: subosito/flutter-action@v1.5.3
+        with:
+          channel: stable
+      - id: checkout
+        uses: actions/checkout@v2.4.0
+      - id: test_flutter_pkg_example_pub_upgrade
+        name: test_flutter_pkg/example; dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: test_flutter_pkg/example
+        run: dart pub upgrade
+      - name: "test_flutter_pkg/example; flutter test --test-randomize-ordering-seed=random"
+        if: "always() && steps.test_flutter_pkg_example_pub_upgrade.conclusion == 'success'"
+        working-directory: test_flutter_pkg/example
+        run: "flutter test --test-randomize-ordering-seed=random"
+    needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+      - job_009
+      - job_010
+  job_018:
     name: "test; windows; Dart 2.14.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
@@ -629,7 +668,7 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_018:
+  job_019:
     name: "test; windows; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
@@ -658,7 +697,7 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_019:
+  job_020:
     name: Notify failure
     runs-on: ubuntu-latest
     if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
@@ -688,3 +727,4 @@ jobs:
       - job_016
       - job_017
       - job_018
+      - job_019
