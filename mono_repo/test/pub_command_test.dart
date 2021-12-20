@@ -30,21 +30,4 @@ dependencies:
   meta: any
 ''')
   ]).create();
-
-  await d.dir('flutter', [
-    d.file('mono_pkg.yaml', ''),
-    // typical pubspec.yaml from flutter
-    d.file('pubspec.yaml', r'''
-name: flutter_app
-environment:
-  sdk: '>=2.12.0 <3.0.0'
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^0.1.0
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-''')
-  ]).create();
 }
