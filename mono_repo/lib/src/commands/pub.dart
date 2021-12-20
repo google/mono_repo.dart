@@ -104,8 +104,7 @@ final String _sdkDir = (() {
   return aboveExecutable;
 })();
 
-final String _dartPath =
-    p.join(_sdkDir, 'bin', Platform.isWindows ? 'dart.bat' : 'dart');
+final String _dartPath = p.join(_sdkDir, 'bin', 'dart');
 
 /// The "flutter[.bat]" command.
 final String _flutterPath = Platform.isWindows ? 'flutter.bat' : 'flutter';

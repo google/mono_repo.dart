@@ -2,6 +2,7 @@
 
 - Drop restriction on stages named "test" – only applied to Travis-CI which is
   no longer supported.
+- Fix the `pub` command on windows.
 
 ## 6.0.0
 
