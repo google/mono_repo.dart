@@ -13,7 +13,7 @@ void main() {
       expect(
           () => pub(RootConfig(rootDirectory: d.sandbox), ['get']),
           prints(
-              allOf(contains('Successes: 2'), isNot(contains('Failures:')))));
+              allOf(contains('Successes: 1'), isNot(contains('Failures:')))));
     });
   });
 }
