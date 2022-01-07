@@ -45,7 +45,7 @@ extension PackageFlavorExtension on PackageFlavor {
 
       case PackageFlavor.flutter:
         return {
-          'uses': 'subosito/flutter-action@v1.5.3',
+          'uses': 'subosito/flutter-action@v2.0.4',
           'with': {
             'channel': sdkVersion,
           }
