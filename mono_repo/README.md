@@ -184,4 +184,4 @@ Look at these repositories for examples of `mono_repo` usage:
 * https://github.com/google/json_serializable.dart
 
 [Dart packages]: https://dart.dev/guides/libraries/create-library-packages
-[setup your PATH]: (https://dart.dev/tools/pub/cmd/pub-global#running-a-script-from-your-path)
+[setup your PATH]: https://dart.dev/tools/pub/cmd/pub-global#running-a-script-from-your-path
