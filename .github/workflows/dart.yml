@@ -159,10 +159,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.4.0
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; dart pub upgrade
+        name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
@@ -172,10 +172,10 @@ jobs:
         working-directory: test_flutter_pkg
         run: dart analyze --fatal-infos .
       - id: test_pkg_pub_upgrade
-        name: test_pkg; dart pub upgrade
+        name: test_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -309,10 +309,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.4.0
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; dart pub upgrade
+        name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
@@ -341,10 +341,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.4.0
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; dart pub upgrade
+        name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
@@ -354,10 +354,10 @@ jobs:
         working-directory: test_flutter_pkg
         run: dart analyze --fatal-infos .
       - id: test_pkg_pub_upgrade
-        name: test_pkg; dart pub upgrade
+        name: test_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -464,10 +464,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.4.0
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; dart pub upgrade
+        name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; flutter test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
@@ -620,10 +620,10 @@ jobs:
       - id: checkout
         uses: actions/checkout@v2.4.0
       - id: test_flutter_pkg_example_pub_upgrade
-        name: test_flutter_pkg/example; dart pub upgrade
+        name: test_flutter_pkg/example; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg/example
-        run: dart pub upgrade
+        run: flutter pub pub upgrade
       - name: "test_flutter_pkg/example; flutter test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_flutter_pkg_example_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg/example

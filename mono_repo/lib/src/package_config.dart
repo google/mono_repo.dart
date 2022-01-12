@@ -24,6 +24,15 @@ enum PackageFlavor {
 }
 
 extension PackageFlavorExtension on PackageFlavor {
+  String get pubCommand {
+    switch (this) {
+      case PackageFlavor.flutter:
+        return 'flutter pub pub';
+      case PackageFlavor.dart:
+        return 'dart pub';
+    }
+  }
+
   String get prettyName {
     switch (this) {
       case PackageFlavor.dart:
