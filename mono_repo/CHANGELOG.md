@@ -2,7 +2,8 @@
 
 - Drop restriction on stages named "test" – only applied to Travis-CI which is
   no longer supported.
-- Fix the `pub` command on windows.
+- Fix the `pub` command on Windows.
+- Update to `subosito/flutter-action@v2.0.4`.
 
 ## 6.0.0
 

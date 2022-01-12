@@ -258,8 +258,8 @@ extension on CIJobEntry {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
     assert(packages.contains(job.package));
-    final pubCommand = 'dart pub '
-        '${rootConfig.monoConfig.pubAction}';
+    final pubCommand =
+        '${job.flavor.pubCommand} ${rootConfig.monoConfig.pubAction}';
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
