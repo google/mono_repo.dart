@@ -153,7 +153,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@v2.0.4
+      - uses: subosito/flutter-action@v2.2.0
         with:
           channel: beta
       - id: checkout
@@ -303,7 +303,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:master
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@v2.0.4
+      - uses: subosito/flutter-action@v2.2.0
         with:
           channel: master
       - id: checkout
@@ -335,7 +335,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@v2.0.4
+      - uses: subosito/flutter-action@v2.2.0
         with:
           channel: stable
       - id: checkout
@@ -458,7 +458,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@v2.0.4
+      - uses: subosito/flutter-action@v2.2.0
         with:
           channel: beta
       - id: checkout
@@ -614,7 +614,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@v2.0.4
+      - uses: subosito/flutter-action@v2.2.0
         with:
           channel: stable
       - id: checkout
