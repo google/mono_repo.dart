@@ -366,7 +366,6 @@ Map<String, dynamic> _githubJobYaml(
 class _CommandEntry {
   final String name;
   final String run;
-  final Map<String, String>? env;
   final String? id;
   final String? ifCondition;
   final String? workingDirectory;
@@ -374,7 +373,6 @@ class _CommandEntry {
   _CommandEntry(
     this.name,
     this.run, {
-    this.env,
     this.id,
     this.ifCondition,
     this.workingDirectory,
@@ -386,7 +384,6 @@ class _CommandEntry {
   Map<String, dynamic> get runContent => {
         if (id != null) 'id': id,
         'name': name,
-        if (env != null && env!.isNotEmpty) 'env': env,
         if (ifCondition != null) 'if': ifCondition,
         if (workingDirectory != null) 'working-directory': workingDirectory,
         'run': run,
