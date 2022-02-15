@@ -7,11 +7,9 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:test_process/test_process.dart';
 
-final pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
-
 void main() {
   test('pub get gets dependencies', () async {
-    final process = await TestProcess.start(pubBinary, ['run', 'mono_repo']);
+    final process = await TestProcess.start('dart', ['run', 'mono_repo']);
 
     final output = await process.stdoutStream().join('\n');
     expect(output, _helpOutput);
