@@ -1,4 +1,4 @@
-## 6.1.0-dev
+## 6.1.0
 
 - Drop restriction on stages named "test" – only applied to Travis-CI which is
   no longer supported.
