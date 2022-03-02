@@ -33,7 +33,7 @@ jobs:
         with:
           sdk: "2.10.4"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -65,7 +65,7 @@ jobs:
         with:
           sdk: "2.12.0-259.0.dev"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -97,7 +97,7 @@ jobs:
         with:
           sdk: "2.12.0-29.10.beta"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -129,7 +129,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -157,7 +157,7 @@ jobs:
         with:
           channel: beta
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -202,7 +202,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -230,7 +230,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -275,7 +275,7 @@ jobs:
         with:
           sdk: main
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -307,7 +307,7 @@ jobs:
         with:
           channel: master
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -339,7 +339,7 @@ jobs:
         with:
           channel: stable
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -384,7 +384,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -423,7 +423,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -462,7 +462,7 @@ jobs:
         with:
           channel: beta
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -501,7 +501,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -540,7 +540,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -579,7 +579,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -618,7 +618,7 @@ jobs:
         with:
           channel: stable
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: test_flutter_pkg_example_pub_upgrade
         name: test_flutter_pkg/example; flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -647,7 +647,7 @@ jobs:
         with:
           sdk: "2.14.0"
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -676,7 +676,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
