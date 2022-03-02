@@ -32,7 +32,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.0
       - name: mono_repo self validate
         run: dart pub global activate mono_repo 1.2.3
       - name: mono_repo self validate
@@ -55,7 +55,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -83,7 +83,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.0
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"

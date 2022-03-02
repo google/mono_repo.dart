@@ -4,6 +4,7 @@
   no longer supported.
 - Fix the `pub` command on Windows.
 - Update to `subosito/flutter-action@v2.0.4`.
+- Update to `actions/checkout@v3.0.0`.
 
 ## 6.0.0
 

@@ -357,7 +357,7 @@ Map<String, dynamic> _githubJobYaml(
         packageFlavor.configurationMap(sdkVersion),
         {
           'id': 'checkout',
-          'uses': 'actions/checkout@v2.4.0',
+          'uses': 'actions/checkout@v3.0.0',
         },
         for (var command in runCommands) command.runContent,
       ],
