@@ -10,6 +10,7 @@ import 'package:io/ansi.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
+import 'package:mono_repo/src/commands/pub.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
@@ -17,8 +18,6 @@ import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
-
-final _pubBinary = Platform.isWindows ? 'pub.bat' : 'pub';
 
 void main() {
   group('error reporting', () {
@@ -95,10 +94,10 @@ environment:
         ['+x', p.join('tool', 'ci.sh')],
         workingDirectory: repoPath,
       );
-      await Process.run(_pubBinary, ['get'], workingDirectory: pkgAPath);
+      await Process.run(dartPath, ['pub', 'get'], workingDirectory: pkgAPath);
       await Process.run(
-        _pubBinary,
-        ['global', 'activate', '-s', 'path', Directory.current.path],
+        dartPath,
+        ['pub', 'global', 'activate', '-s', 'path', Directory.current.path],
       );
     });
 
@@ -109,8 +108,8 @@ environment:
     test(
       'runs all tasks and packages',
       () async {
-        final result = await Process.run(_pubBinary,
-            ['global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
+        final result = await Process.run(dartPath,
+            ['pub', 'global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
             workingDirectory: repoPath);
         expect(result.exitCode, 0,
             reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
@@ -140,8 +139,9 @@ pkg_b
 
     test('can filter by package', () async {
       final result = await Process.run(
-          _pubBinary,
+          dartPath,
           [
+            'pub',
             'global',
             'run',
             'mono_repo',
@@ -167,8 +167,9 @@ pkg_b
 
     test('can filter by task', () async {
       final result = await Process.run(
-          _pubBinary,
+          dartPath,
           [
+            'pub',
             'global',
             'run',
             'mono_repo',
@@ -208,8 +209,9 @@ pkg_b
 
       test('cause an error and are reported', () async {
         final result = await Process.run(
-            _pubBinary,
+            dartPath,
             [
+              'pub',
               'global',
               'run',
               'mono_repo',
