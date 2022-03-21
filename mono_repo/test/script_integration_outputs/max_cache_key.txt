@@ -18,7 +18,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:macos-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:analyze-format"
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0;packages:sub_pkg;commands:test_1"
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0;packages:sub_pkg;commands:test_0"
@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test_1"
@@ -161,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test_0"
@@ -192,7 +192,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:sub_pkg;commands:test_1"
@@ -223,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:sub_pkg;commands:test_0"
@@ -380,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:package_with_a_long_name_00-package_with_a_long_name_01-package_with_a_long_name_02-package_with_a_long_name_03-package_with_a_long_name_04-package_with_a_long_name_05-package_with_a_long_name_06-package_with_a_long_name_07-package_with_a_long_name_08-package_with_a_long_name_09-package_with_a_long_name_10-package_with_a_long_name_11-package_with_a_long_name_12-package_with_a_long_name_13-package_with_a_long_name_14-package_with_a-!!too_long!!-570-127648710"
