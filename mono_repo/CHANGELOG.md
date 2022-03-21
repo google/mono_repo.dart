@@ -1,3 +1,7 @@
+## 6.2.0-dev
+
+- Update to `actions/cache@v3`.
+
 ## 6.1.0
 
 - Drop restriction on stages named "test" – only applied to Travis-CI which is

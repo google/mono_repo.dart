@@ -420,7 +420,7 @@ Map<String, dynamic> _cacheEntries(
 
   return {
     'name': 'Cache Pub hosted dependencies',
-    'uses': 'actions/cache@v2.1.7',
+    'uses': 'actions/cache@v3',
     'with': {
       'path': pubCacheHosted,
       'key': restoreKeys.first,
