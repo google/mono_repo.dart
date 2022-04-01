@@ -1,4 +1,4 @@
-## 6.2.0-dev
+## 6.2.0
 
 - Update to `actions/cache@v3`.
 
