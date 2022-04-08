@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.2.0
+# Created with package:mono_repo v6.2.1
 name: Dart CI
 on:
   push:
@@ -140,16 +140,16 @@ jobs:
         working-directory: mono_repo
         run: dart analyze
   job_005:
-    name: "smoke_test; linux; Flutter beta; PKGS: test_flutter_pkg, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "smoke_test; linux; Flutter beta; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg-test_pkg;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg;commands:format-analyze_2"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg-test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
@@ -167,15 +167,34 @@ jobs:
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_flutter_pkg; dart analyze --fatal-infos ."
+      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart analyze --fatal-infos .
+        run: flutter analyze --fatal-infos .
+  job_006:
+    name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v3
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_pkg;commands:format-analyze_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:beta
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: beta
+      - id: checkout
+        uses: actions/checkout@v3.0.0
       - id: test_pkg_pub_upgrade
-        name: test_pkg; flutter pub pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: flutter pub pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -184,7 +203,7 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
-  job_006:
+  job_007:
     name: "smoke_test; linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
     steps:
@@ -212,7 +231,7 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
         run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
-  job_007:
+  job_008:
     name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
@@ -257,7 +276,7 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
-  job_008:
+  job_009:
     name: "smoke_test; linux; Dart main; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
@@ -289,15 +308,15 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
-  job_009:
-    name: "smoke_test; linux; Flutter master; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+  job_010:
+    name: "smoke_test; linux; Flutter master; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:master;packages:test_flutter_pkg;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:master;packages:test_flutter_pkg;commands:format-analyze_2"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;sdk:master;packages:test_flutter_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:master
@@ -317,21 +336,21 @@ jobs:
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_flutter_pkg; dart analyze --fatal-infos ."
+      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart analyze --fatal-infos .
-  job_010:
-    name: "smoke_test; linux; Flutter stable; PKGS: test_flutter_pkg, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+        run: flutter analyze --fatal-infos .
+  job_011:
+    name: "smoke_test; linux; Flutter stable; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg-test_pkg;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg;commands:format-analyze_2"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg-test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
@@ -349,15 +368,34 @@ jobs:
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_flutter_pkg; dart analyze --fatal-infos ."
+      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: dart analyze --fatal-infos .
+        run: flutter analyze --fatal-infos .
+  job_012:
+    name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v3
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_pkg;commands:format-analyze_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: stable
+      - id: checkout
+        uses: actions/checkout@v3.0.0
       - id: test_pkg_pub_upgrade
-        name: test_pkg; flutter pub pub upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: flutter pub pub upgrade
+        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
@@ -366,7 +404,7 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
-  job_011:
+  job_013:
     name: "test; linux; Dart 2.14.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -405,7 +443,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_012:
+      - job_011
+      - job_012
+  job_014:
     name: "test; linux; Dart 2.14.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -444,7 +484,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_013:
+      - job_011
+      - job_012
+  job_015:
     name: "test; linux; Flutter beta; PKG: test_flutter_pkg; `flutter test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -483,7 +525,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_014:
+      - job_011
+      - job_012
+  job_016:
     name: "test; linux; Dart dev; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -522,7 +566,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_015:
+      - job_011
+      - job_012
+  job_017:
     name: "test; linux; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -561,7 +607,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_016:
+      - job_011
+      - job_012
+  job_018:
     name: "test; linux; Dart dev; PKG: test_pkg; `dart test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -600,7 +648,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_017:
+      - job_011
+      - job_012
+  job_019:
     name: "test; linux; Flutter stable; PKG: test_flutter_pkg/example; `flutter test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -639,7 +689,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_018:
+      - job_011
+      - job_012
+  job_020:
     name: "test; windows; Dart 2.14.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
@@ -668,7 +720,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_019:
+      - job_011
+      - job_012
+  job_021:
     name: "test; windows; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
@@ -697,7 +751,9 @@ jobs:
       - job_008
       - job_009
       - job_010
-  job_020:
+      - job_011
+      - job_012
+  job_022:
     name: Notify failure
     runs-on: ubuntu-latest
     if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
@@ -728,3 +784,5 @@ jobs:
       - job_017
       - job_018
       - job_019
+      - job_020
+      - job_021
