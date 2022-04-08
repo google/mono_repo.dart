@@ -1,3 +1,9 @@
+## 6.2.1
+
+- Use `flutter analyze` instead of `dart analyze` for flutter package analyze
+  actions. This fixes an issue where analyze jobs could get merged across dart
+  and flutter packages, which caused the flutter jobs to fail.
+
 ## 6.2.0
 
 - Update to `actions/cache@v3`.

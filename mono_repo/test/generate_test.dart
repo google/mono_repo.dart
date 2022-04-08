@@ -803,6 +803,7 @@ stages:
 name: pkg_a
 ''')
         ]).create();
+
         await d.dir('pkg_b', [
           d.file(monoPkgFileName, r'''
 sdk:
@@ -823,10 +824,30 @@ name: pkg_b
       ''')
         ]).create();
 
+        await d.dir('pkg_c', [
+          d.file(monoPkgFileName, r'''
+sdk:
+ - stable
+
+stages:
+  - analyze:
+    - group:
+        - analyze
+        - format
+'''),
+          d.file('pubspec.yaml', '''
+name: pkg_c
+dependencies:
+  flutter:
+    sdk: flutter
+      ''')
+        ]).create();
+
         testGenerateBothConfig(
           printMatcher: '''
 package:pkg_a
 package:pkg_b
+package:pkg_c
 $_writeScriptOutput''',
         );
 
@@ -835,7 +856,7 @@ $_writeScriptOutput''',
           defaultGitHubWorkflowFilePath,
         );
 
-        await d.file(ciScriptPath, ciShellOutput).validate();
+        await d.file(ciScriptPath, ciShellOutputMultiFlavor).validate();
       });
     });
 

@@ -21,7 +21,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b;commands:analyze-format"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b;commands:analyze_0-format"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
@@ -59,6 +59,38 @@ jobs:
         working-directory: pkg_b
         run: "dart format --output=none --set-exit-if-changed ."
   job_002:
+    name: "analyze; PKG: pkg_c; `flutter analyze`, `dart format --output=none --set-exit-if-changed .`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@v3
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_c;commands:analyze_1-format"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_c
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - uses: subosito/flutter-action@v2.3.0
+        with:
+          channel: stable
+      - id: checkout
+        uses: actions/checkout@v3.0.0
+      - id: pkg_c_pub_upgrade
+        name: pkg_c; flutter pub pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: pkg_c
+        run: flutter pub pub upgrade
+      - name: pkg_c; flutter analyze
+        if: "always() && steps.pkg_c_pub_upgrade.conclusion == 'success'"
+        working-directory: pkg_c
+        run: flutter analyze
+      - name: "pkg_c; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.pkg_c_pub_upgrade.conclusion == 'success'"
+        working-directory: pkg_c
+        run: "dart format --output=none --set-exit-if-changed ."
+  job_003:
     name: "unit_test; PKG: pkg_a; `dart test --preset travis`"
     runs-on: ubuntu-latest
     steps:
@@ -88,7 +120,8 @@ jobs:
         run: dart test --preset travis
     needs:
       - job_001
-  job_003:
+      - job_002
+  job_004:
     name: "unit_test; PKG: pkg_b; `dart test --preset travis`"
     runs-on: ubuntu-latest
     steps:
@@ -118,7 +151,8 @@ jobs:
         run: dart test --preset travis
     needs:
       - job_001
-  job_004:
+      - job_002
+  job_005:
     name: "unit_test; PKG: pkg_a; chrome tests"
     runs-on: ubuntu-latest
     steps:
@@ -148,7 +182,8 @@ jobs:
         run: dart test --platform chrome
     needs:
       - job_001
-  job_005:
+      - job_002
+  job_006:
     name: "unit_test; PKG: pkg_b; chrome tests"
     runs-on: ubuntu-latest
     steps:
@@ -178,3 +213,4 @@ jobs:
         run: dart test --platform chrome
     needs:
       - job_001
+      - job_002

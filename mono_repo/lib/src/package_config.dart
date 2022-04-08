@@ -499,7 +499,10 @@ class Task {
               : args,
         ];
       case 'analyze':
-        return ['dart analyze', if (args != null) args];
+        return [
+          flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
+          if (args != null) args
+        ];
       case 'test':
         return [
           flavor == PackageFlavor.dart ? 'dart test' : 'flutter test',
