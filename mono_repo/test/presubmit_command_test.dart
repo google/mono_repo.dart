@@ -209,20 +209,22 @@ pkg_b
 
       test('cause an error and are reported', () async {
         final result = await Process.run(
-            dartPath,
-            [
-              'pub',
-              'global',
-              'run',
-              'mono_repo',
-              'presubmit',
-              '--sdk=dev',
-              '-t',
-              'test',
-              '-p',
-              'pkg_a',
-            ],
-            workingDirectory: repoPath);
+          dartPath,
+          [
+            'pub',
+            'global',
+            'run',
+            'mono_repo',
+            'presubmit',
+            '--sdk=dev',
+            '-t',
+            'test',
+            '-p',
+            'pkg_a',
+          ],
+          workingDirectory: repoPath,
+          environment: {'GITHUB_ACTIONS': '0'},
+        );
         expect(result.exitCode, 1,
             reason: 'Any failing tasks should give a non-zero exit code');
         expect(
