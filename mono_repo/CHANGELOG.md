@@ -1,3 +1,7 @@
+## 6.2.2
+
+- Update to `actions/checkout@v3`.
+
 ## 6.2.1
 
 - Use `flutter analyze` instead of `dart analyze` for flutter package analyze
