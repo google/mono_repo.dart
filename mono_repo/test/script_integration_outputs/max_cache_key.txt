@@ -31,7 +31,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -53,7 +53,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -81,7 +81,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -112,7 +112,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -143,7 +143,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -174,7 +174,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -205,7 +205,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -236,7 +236,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -257,7 +257,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -278,7 +278,7 @@ jobs:
         with:
           sdk: "1.23.0"
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -299,7 +299,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -320,7 +320,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -341,7 +341,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -362,7 +362,7 @@ jobs:
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
@@ -393,7 +393,7 @@ jobs:
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3
       - id: package_with_a_long_name_00_pub_upgrade
         name: package_with_a_long_name_00; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
