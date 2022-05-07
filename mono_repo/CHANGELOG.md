@@ -1,3 +1,7 @@
+## 6.3.0-dev
+
+- Update to `subosito/flutter-action@v2.4.0`.
+
 ## 6.2.2
 
 - Update to `actions/checkout@v3`.
