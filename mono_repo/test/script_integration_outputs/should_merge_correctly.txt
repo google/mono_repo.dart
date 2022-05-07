@@ -72,7 +72,7 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@v2.3.0
+      - uses: subosito/flutter-action@v2.4.0
         with:
           channel: stable
       - id: checkout
