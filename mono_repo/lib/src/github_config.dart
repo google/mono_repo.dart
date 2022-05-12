@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 
 import 'commands/github/job.dart';
@@ -139,6 +141,142 @@ class GitHubWorkflow {
   }
 
   factory GitHubWorkflow.fromJson(Map json) => _$GitHubWorkflowFromJson(json);
+}
+
+/// Extra configuration for customizing the GitHub action context in which a
+/// task runs.
+class ActionConfig {
+  ActionConfig({
+    this.id,
+    this.uses,
+    this.condition,
+    this.inputs,
+    this.workingDirectory,
+    this.shell,
+  });
+
+  /// The step's identifier, which can be used to refer to the step and its
+  /// outputs in the [condition] property of this and other steps.
+  final String? id;
+
+  /// The GitHub action identifier, e.g. `actions/checkout@v3`.
+  final String? uses;
+
+  /// The inputs to the action.
+  ///
+  /// A map of key-value pairs which are passed to the action's `with`
+  /// parameter.
+  final Map<String, String>? inputs;
+
+  /// The condition on which to run this action.
+  final String? condition;
+
+  /// The directory in which to run this action.
+  final String? workingDirectory;
+
+  /// The shell override for this action.
+  final String? shell;
+
+  factory ActionConfig.fromJson(Map json) {
+    // Create a copy of unmodifiable `json`.
+    json = Map.of(json);
+
+    final Object? id = json.remove('id');
+    if (id is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'id',
+        'ActionConfig',
+        'Invalid `id` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsid',
+      );
+    }
+    final Object? uses = json.remove('uses');
+    if (uses is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'uses',
+        'ActionConfig',
+        'Invalid `uses` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses',
+      );
+    }
+    final Object? inputs = json.remove('with');
+    if (inputs is! Map?) {
+      throw CheckedFromJsonException(
+        json,
+        'with',
+        'ActionConfig',
+        'Invalid `with` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepswith',
+      );
+    }
+    // Transform <String, Object> -> <String, String> instead of throwing so
+    // that, for example, numerical values are properly converted.
+    final mappedInputs = inputs?.map(
+      (key, value) {
+        if (value is! String) {
+          value = jsonEncode(value);
+        }
+        return MapEntry(key as String, value);
+      },
+    );
+    final Object? condition = json.remove('if');
+    if (condition is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'if',
+        'ActionConfig',
+        'Invalid `if` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsif',
+      );
+    }
+    final Object? workingDirectory = json.remove('working-directory');
+    if (workingDirectory is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'working-directory',
+        'ActionConfig',
+        'Invalid `working-directory` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun',
+      );
+    }
+    final Object? shell = json.remove('shell');
+    if (shell is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'shell',
+        'ActionConfig',
+        'Invalid `shell` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell',
+      );
+    }
+    if (json.isNotEmpty) {
+      throw CheckedFromJsonException(
+        json,
+        json.keys.join(','),
+        'ActionConfig',
+        'Invalid keys',
+      );
+    }
+    return ActionConfig(
+      id: id,
+      uses: uses,
+      inputs: mappedInputs,
+      condition: condition,
+      workingDirectory: workingDirectory,
+      shell: shell,
+    );
+  }
+
+  Map<String, Object> toJson() => {
+        if (id != null) 'id': id!,
+        if (uses != null) 'uses': uses!,
+        if (inputs != null) 'with': inputs!,
+        if (condition != null) 'if': condition!,
+        if (workingDirectory != null) 'working-directory': workingDirectory!,
+        if (shell != null) 'shell': shell!,
+      };
 }
 
 Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {

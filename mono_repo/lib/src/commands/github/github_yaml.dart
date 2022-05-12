@@ -4,6 +4,8 @@
 
 import 'dart:collection';
 
+import 'package:path/path.dart';
+
 import '../../ci_shared.dart';
 import '../../github_config.dart';
 import '../../mono_config.dart';
@@ -308,15 +310,27 @@ extension on CIJobEntry {
         ),
       );
       for (var i = 0; i < commands.length; i++) {
+        final task = job.tasks[i];
+        var workingDirectory = task.action?.workingDirectory;
+        if (workingDirectory != null) {
+          workingDirectory = posix.normalize(
+            posix.join(package, workingDirectory),
+          );
+        }
         commandEntries.add(
           _CommandEntry(
-            '$package; ${job.tasks[i].command}',
-            _commandForOs(job.tasks[i].command),
-            type: job.tasks[i].type,
-            // Run this regardless of the success of other steps other than the
-            // pub step.
-            ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
-            workingDirectory: package,
+            '$package; ${task.command}',
+            _commandForOs(task.command),
+            type: task.type,
+            id: task.action?.id,
+            ifCondition: task.action?.condition ??
+                // Run this regardless of the success of other steps other than
+                // the pub step.
+                "always() && steps.$pubStepId.conclusion == 'success'",
+            workingDirectory: workingDirectory ?? package,
+            uses: task.action?.uses,
+            inputs: task.action?.inputs,
+            shell: task.action?.shell,
           ),
         );
       }
@@ -425,6 +439,10 @@ class _CommandEntry extends _CommandEntryBase {
   final String? id;
   final String? ifCondition;
   final String workingDirectory;
+  final String? uses;
+  final Map<String, String>? env;
+  final Map<String, Object>? inputs;
+  final String? shell;
 
   _CommandEntry(
     super.name,
@@ -433,17 +451,32 @@ class _CommandEntry extends _CommandEntryBase {
     this.type,
     this.id,
     this.ifCondition,
+    this.uses,
+    this.env,
+    this.inputs,
+    this.shell,
   });
 
   @override
   Iterable<Step> get runContent => [
-        Step.run(
-          id: id,
-          name: name,
-          ifContent: ifCondition,
-          workingDirectory: workingDirectory,
-          run: run,
-        ),
+        if (uses != null)
+          Step.uses(
+            id: id,
+            name: name,
+            uses: uses,
+            withContent: inputs,
+            ifContent: ifCondition,
+          )
+        else
+          Step.run(
+            id: id,
+            name: name,
+            ifContent: ifCondition,
+            workingDirectory: workingDirectory,
+            run: run,
+            env: env,
+            shell: shell,
+          ),
         ...?type?.afterEachSteps(workingDirectory),
       ];
 }

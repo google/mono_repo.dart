@@ -415,6 +415,14 @@ stages:
     - test: --preset travis --total-shards 5 --shard-index 0
     - test: --preset travis --total-shards 5 --shard-index 1
     - test #no args
+    - group:
+      - command: npm run build
+        action:
+          uses: actions/setup-node@v3
+          with:
+            node-version: 16
+          working-directory: ./src
+      - test: --platform node
 ''';
 
 List get _testConfig1expectedOutput => [
@@ -607,5 +615,77 @@ List get _testConfig1expectedOutput => [
           {'flavor': 'dart', 'type': 'test'}
         ],
         'flavor': 'dart'
-      }
+      },
+      {
+        'os': 'linux',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'unit_test',
+        'tasks': [
+          {
+            'flavor': 'dart',
+            'name': 'command',
+            'args': 'npm run build',
+            'action': {
+              'uses': 'actions/setup-node@v3',
+              'with': {'node-version': '16'},
+              'working-directory': './src',
+            },
+          },
+          {
+            'flavor': 'dart',
+            'name': 'test',
+            'args': '--platform node',
+          }
+        ],
+        'flavor': 'dart'
+      },
+      {
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'unit_test',
+        'tasks': [
+          {
+            'flavor': 'dart',
+            'name': 'command',
+            'args': 'npm run build',
+            'action': {
+              'uses': 'actions/setup-node@v3',
+              'with': {'node-version': '16'},
+              'working-directory': './src',
+            },
+          },
+          {
+            'flavor': 'dart',
+            'name': 'test',
+            'args': '--platform node',
+          }
+        ],
+        'flavor': 'dart'
+      },
+      {
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'stable',
+        'stageName': 'unit_test',
+        'tasks': [
+          {
+            'flavor': 'dart',
+            'name': 'command',
+            'args': 'npm run build',
+            'action': {
+              'uses': 'actions/setup-node@v3',
+              'with': {'node-version': '16'},
+              'working-directory': './src',
+            },
+          },
+          {
+            'flavor': 'dart',
+            'name': 'test',
+            'args': '--platform node',
+          }
+        ],
+        'flavor': 'dart'
+      },
     ];

@@ -29,6 +29,8 @@ class Step implements YamlLike {
   @JsonKey(name: 'with')
   final Map? withContent;
 
+  final String? shell;
+
   Step._({
     this.id,
     this.withContent,
@@ -38,6 +40,7 @@ class Step implements YamlLike {
     this.ifContent,
     this.workingDirectory,
     this.env,
+    this.shell,
   }) {
     if (run == null) {
       if (uses == null) {
@@ -71,6 +74,7 @@ class Step implements YamlLike {
     this.ifContent,
     this.workingDirectory,
     this.env,
+    this.shell,
   })  : uses = null,
         withContent = null;
 
@@ -82,7 +86,8 @@ class Step implements YamlLike {
     this.ifContent,
   })  : run = null,
         env = null,
-        workingDirectory = null;
+        workingDirectory = null,
+        shell = null;
 
   factory Step.fromJson(Map json) => _$StepFromJson(json);
 

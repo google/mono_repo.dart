@@ -9,6 +9,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
 
+import 'github_config.dart';
 import 'package_flavor.dart';
 import 'raw_config.dart';
 import 'task_type.dart';
@@ -307,7 +308,10 @@ class Task {
 
   final String command;
 
-  Task(this.flavor, this.type, {this.args})
+  /// The GitHub action context.
+  final ActionConfig? action;
+
+  Task(this.flavor, this.type, {this.args, this.action})
       : command = type.commandValue(flavor, args).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
@@ -395,8 +399,22 @@ class Task {
           args = yamlValue[taskName] as String?;
       }
 
+      final actionYaml = yamlValue['action'] as Object?;
+      if (actionYaml is! Map?) {
+        throw CheckedFromJsonException(
+          yamlValue,
+          'action',
+          'Task',
+          'Must be a map',
+        );
+      }
+      ActionConfig? action;
+      if (actionYaml != null) {
+        action = ActionConfig.fromJson(actionYaml);
+      }
+
       final extraConfig = Set<String>.from(yamlValue.keys)
-        ..removeAll([taskName, 'os', 'sdk']);
+        ..removeAll([taskName, 'os', 'sdk', 'action']);
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (extraConfig.isNotEmpty) {
@@ -409,7 +427,7 @@ class Task {
         );
       }
       try {
-        return Task(flavor, taskType, args: args);
+        return Task(flavor, taskType, args: args, action: action);
       } on InvalidTaskConfigException catch (e) {
         throw CheckedFromJsonException(
           yamlValue,

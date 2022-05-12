@@ -1227,6 +1227,114 @@ env:
       );
     });
   });
+
+  group('github actions config', () {
+    test('all parameters', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - command:
+          - ./script_a
+          - ./script_b
+          - ./script_c
+        action:
+          id: custom-scripts
+          uses: ./.github/actions/my-action
+          with:
+            my-key: my-var
+            my-num: 123
+            my-map: {'abc':123}
+          if: always()
+          working-directory: ./tool
+          shell: fish
+''')
+      ]).create();
+
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            contains('''
+      - id: custom-scripts
+        name: "pkg_a; ./script_a && ./script_b && ./script_c"
+        uses: "./.github/actions/my-action"
+        with:
+          my-key: my-var
+          my-num: "123"
+          my-map: "{\\"abc\\":123}"
+        if: always()
+        working-directory: pkg_a/tool
+        run: "./script_a && ./script_b && ./script_c"
+        shell: fish
+'''),
+          )
+          .validate();
+    });
+
+    test('merges `id`, `if`, `working-directory`', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - command: ./script
+        action:
+          id: custom-script
+          if: always()
+          working-directory: ./tool
+''')
+      ]).create();
+
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            stringContainsInOrder([
+              'id: custom-script',
+              'if: always()',
+              'working-directory: pkg_a/tool',
+            ]),
+          )
+          .validate();
+    });
+
+    test('throws for invalid keys', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - command: ./script
+        action:
+          some-key: some-value
+''')
+      ]).create();
+
+      expect(
+        testGenerateBothConfig,
+        throwsACheckedFromJsonException(contains('Invalid')),
+      );
+    });
+  });
 }
 
 String get _subPkgStandardOutput => '''
