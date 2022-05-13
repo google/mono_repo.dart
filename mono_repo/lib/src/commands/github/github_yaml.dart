@@ -441,7 +441,7 @@ class _CommandEntry extends _CommandEntryBase {
   final String workingDirectory;
   final String? uses;
   final Map<String, String>? env;
-  final Map<String, Object>? inputs;
+  final Map<String, String>? inputs;
   final String? shell;
 
   _CommandEntry(
