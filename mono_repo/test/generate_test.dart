@@ -1251,7 +1251,7 @@ stages:
             my-key: my-var
             my-num: 123
             my-map: {'abc':123}
-          if: always()
+          if: \${{ github.event_name == 'pull_request' }}
           working-directory: ./tool
           shell: fish
 ''')
@@ -1270,7 +1270,7 @@ stages:
           my-key: my-var
           my-num: "123"
           my-map: "{\\"abc\\":123}"
-        if: always()
+        if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a/tool
         run: "./script_a && ./script_b && ./script_c"
         shell: fish
@@ -1305,7 +1305,8 @@ stages:
             defaultGitHubWorkflowFilePath,
             stringContainsInOrder([
               'id: custom-script',
-              'if: always()',
+              'if: "always() && '
+                  r"steps.pkg_a_pub_upgrade.conclusion == 'success'",
               'working-directory: pkg_a/tool',
             ]),
           )

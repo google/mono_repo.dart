@@ -317,13 +317,17 @@ extension on CIJobEntry {
             posix.join(package, workingDirectory),
           );
         }
+        var condition = task.action?.condition;
+        if (condition != null) {
+          condition += " && steps.$pubStepId.conclusion == 'success'";
+        }
         commandEntries.add(
           _CommandEntry(
             '$package; ${task.command}',
             _commandForOs(task.command),
             type: task.type,
             id: task.action?.id,
-            ifCondition: task.action?.condition ??
+            ifCondition: condition ??
                 // Run this regardless of the success of other steps other than
                 // the pub step.
                 "always() && steps.$pubStepId.conclusion == 'success'",
