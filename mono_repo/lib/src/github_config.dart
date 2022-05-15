@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'commands/github/job.dart';
+import 'commands/github/overrides.dart';
 
 part 'github_config.g.dart';
 
@@ -143,43 +144,79 @@ class GitHubWorkflow {
   factory GitHubWorkflow.fromJson(Map json) => _$GitHubWorkflowFromJson(json);
 }
 
-/// Extra configuration for customizing the GitHub action context in which a
-/// task runs.
-class ActionConfig {
-  ActionConfig({
+/// Configuration for a single step in a GitHub Actions task.
+class GitHubActionConfig implements GitHubActionOverrides {
+  GitHubActionConfig({
     this.id,
+    this.name,
+    this.run,
     this.uses,
-    this.condition,
-    this.inputs,
+    this.ifContent,
+    this.withContent,
     this.workingDirectory,
     this.shell,
-  });
+    this.env,
+    this.continueOnError,
+    this.timeoutMinutes,
+    this.otherConfig,
+  }) : assert(
+          run != null || uses != null,
+          'Either `run` or `uses` must be specified',
+        );
 
-  /// The step's identifier, which can be used to refer to the step and its
-  /// outputs in the [condition] property of this and other steps.
+  @override
   final String? id;
 
-  /// The GitHub action identifier, e.g. `actions/checkout@v3`.
+  @override
+  final String? name;
+
+  @override
+  final String? run;
+
+  @override
   final String? uses;
 
-  /// The inputs to the action.
-  ///
-  /// A map of key-value pairs which are passed to the action's `with`
-  /// parameter.
-  final Map<String, String>? inputs;
+  /// The command identifier for this step, used in caching.
+  String get command => (run ?? uses)!;
 
-  /// The condition on which to run this action.
-  final String? condition;
+  @override
+  final Map<String, dynamic>? withContent;
 
-  /// The directory in which to run this action.
+  @override
+  final String? ifContent;
+
+  @override
   final String? workingDirectory;
 
-  /// The shell override for this action.
+  @override
   final String? shell;
 
-  factory ActionConfig.fromJson(Map json) {
+  @override
+  final Map<String, String>? env;
+
+  @override
+  final bool? continueOnError;
+
+  @override
+  final int? timeoutMinutes;
+
+  /// Configuration options not defined by one of the other keys.
+  final Map<String, dynamic>? otherConfig;
+
+  factory GitHubActionConfig.fromJson(Map json) {
     // Create a copy of unmodifiable `json`.
     json = Map.of(json);
+
+    // Transform <String, Object> -> <String, String> instead of throwing so
+    // that, for example, numerical values are properly converted.
+    Map<String, String>? toEnvMap(Map? map) => map?.map(
+          (key, value) {
+            if (value is! String) {
+              value = jsonEncode(value);
+            }
+            return MapEntry(key as String, value);
+          },
+        );
 
     final Object? id = json.remove('id');
     if (id is! String?) {
@@ -189,6 +226,26 @@ class ActionConfig {
         'ActionConfig',
         'Invalid `id` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsid',
+      );
+    }
+    final Object? name = json.remove('name');
+    if (name is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'name',
+        'ActionConfig',
+        'Invalid `name` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsname',
+      );
+    }
+    final Object? run = json.remove('run');
+    if (run is! String?) {
+      throw CheckedFromJsonException(
+        json,
+        'run',
+        'ActionConfig',
+        'Invalid `run` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun',
       );
     }
     final Object? uses = json.remove('uses');
@@ -201,8 +258,8 @@ class ActionConfig {
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses',
       );
     }
-    final Object? inputs = json.remove('with');
-    if (inputs is! Map?) {
+    final Object? withContent = json.remove('with');
+    if (withContent is! Map?) {
       throw CheckedFromJsonException(
         json,
         'with',
@@ -211,18 +268,8 @@ class ActionConfig {
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepswith',
       );
     }
-    // Transform <String, Object> -> <String, String> instead of throwing so
-    // that, for example, numerical values are properly converted.
-    final mappedInputs = inputs?.map(
-      (key, value) {
-        if (value is! String) {
-          value = jsonEncode(value);
-        }
-        return MapEntry(key as String, value);
-      },
-    );
-    final Object? condition = json.remove('if');
-    if (condition is! String?) {
+    final Object? ifContent = json.remove('if');
+    if (ifContent is! String?) {
       throw CheckedFromJsonException(
         json,
         'if',
@@ -251,32 +298,60 @@ class ActionConfig {
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell',
       );
     }
-    if (json.isNotEmpty) {
+    final Object? env = json.remove('env');
+    if (env is! Map?) {
       throw CheckedFromJsonException(
         json,
-        json.keys.join(','),
+        'env',
         'ActionConfig',
-        'Invalid keys',
+        'Invalid `env` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsenv',
       );
     }
-    return ActionConfig(
+    final Object? continueOnError = json.remove('continue-on-error');
+    if (continueOnError is! bool?) {
+      throw CheckedFromJsonException(
+        json,
+        'continue-on-error',
+        'ActionConfig',
+        'Invalid `continue-on-error` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepscontinue-on-error',
+      );
+    }
+    final Object? timeoutMinutes = json.remove('timeout-minutes');
+    if (timeoutMinutes is! num?) {
+      throw CheckedFromJsonException(
+        json,
+        'timeout-minutes',
+        'ActionConfig',
+        'Invalid `timeout-minutes` parameter. See GitHub docs for more info: '
+            'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepstimeout-minutes',
+      );
+    }
+
+    if (uses == null && run == null) {
+      throw CheckedFromJsonException(
+        json,
+        'run,uses',
+        'ActionConfig',
+        'Either `run` or `uses` must be specified',
+      );
+    }
+
+    return GitHubActionConfig(
       id: id,
       uses: uses,
-      inputs: mappedInputs,
-      condition: condition,
+      run: run,
+      withContent: withContent?.cast(),
+      ifContent: ifContent,
       workingDirectory: workingDirectory,
       shell: shell,
+      env: toEnvMap(env),
+      continueOnError: continueOnError,
+      timeoutMinutes: timeoutMinutes?.toInt(),
+      otherConfig: json.cast(),
     );
   }
-
-  Map<String, Object> toJson() => {
-        if (id != null) 'id': id!,
-        if (uses != null) 'uses': uses!,
-        if (inputs != null) 'with': inputs!,
-        if (condition != null) 'if': condition!,
-        if (workingDirectory != null) 'working-directory': workingDirectory!,
-        if (shell != null) 'shell': shell!,
-      };
 }
 
 Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {

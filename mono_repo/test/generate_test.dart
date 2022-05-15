@@ -1240,12 +1240,12 @@ sdk:
 
 stages:
   - custom_step:
-      - command:
-          - ./script_a
-          - ./script_b
-          - ./script_c
-        action:
+      - action:
           id: custom-scripts
+          run: | 
+            ./script_a
+            ./script_b
+            ./script_c
           uses: ./.github/actions/my-action
           with:
             my-key: my-var
@@ -1254,6 +1254,12 @@ stages:
           if: \${{ github.event_name == 'pull_request' }}
           working-directory: ./tool
           shell: fish
+          env:
+            my-key: my-var
+            my-num: 123
+            my-map: {'abc':123}
+          continue-on-error: false
+          timeout-minutes: 30
 ''')
       ]).create();
 
@@ -1264,7 +1270,6 @@ stages:
             defaultGitHubWorkflowFilePath,
             contains('''
       - id: custom-scripts
-        name: "pkg_a; ./script_a && ./script_b && ./script_c"
         uses: "./.github/actions/my-action"
         with:
           my-key: my-var
@@ -1272,8 +1277,17 @@ stages:
           my-map: "{\\"abc\\":123}"
         if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a/tool
-        run: "./script_a && ./script_b && ./script_c"
+        run: |
+          ./script_a
+          ./script_b
+          ./script_c
         shell: fish
+        env:
+          my-key: my-var
+          my-num: "123"
+          my-map: "{\\"abc\\":123}"
+        continue-on-error: false
+        timeout-minutes: 30
 '''),
           )
           .validate();
@@ -1290,10 +1304,10 @@ sdk:
 
 stages:
   - custom_step:
-      - command: ./script
-        action:
+      - action:
           id: custom-script
           if: always()
+          run: ./script
           working-directory: ./tool
 ''')
       ]).create();
@@ -1313,7 +1327,7 @@ stages:
           .validate();
     });
 
-    test('throws for invalid keys', () async {
+    test('allows unknown keys', () async {
       await d.dir('pkg_a', [
         d.file('pubspec.yaml', '''
 name: pkg_a
@@ -1324,16 +1338,23 @@ sdk:
 
 stages:
   - custom_step:
-      - command: ./script
-        action:
+      - action:
+          run: ./script
           some-key: some-value
 ''')
       ]).create();
 
-      expect(
-        testGenerateBothConfig,
-        throwsACheckedFromJsonException(contains('Invalid')),
-      );
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            stringContainsInOrder([
+              'run: ./script',
+              'some-key: some-value',
+            ]),
+          )
+          .validate();
     });
   });
 }

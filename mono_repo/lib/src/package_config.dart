@@ -308,10 +308,7 @@ class Task {
 
   final String command;
 
-  /// The GitHub action context.
-  final ActionConfig? action;
-
-  Task(this.flavor, this.type, {this.args, this.action})
+  Task(this.flavor, this.type, {this.args})
       : command = type.commandValue(flavor, args).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
@@ -374,6 +371,21 @@ class Task {
       }
 
       final taskName = taskNames.single;
+
+      if (taskName == 'github_action') {
+        final configYaml = yamlValue['github_action'] as Object?;
+        if (configYaml is! Map) {
+          throw CheckedFromJsonException(
+            yamlValue,
+            'github_action',
+            'GitHubActionConfig',
+            'Must be a map',
+          );
+        }
+        final config = GitHubActionConfig.fromJson(configYaml);
+        return Task(flavor, TaskType.githubAction(config));
+      }
+
       final taskType = _taskTypeForName(taskName);
 
       String? args;
@@ -399,20 +411,6 @@ class Task {
           args = yamlValue[taskName] as String?;
       }
 
-      final actionYaml = yamlValue['action'] as Object?;
-      if (actionYaml is! Map?) {
-        throw CheckedFromJsonException(
-          yamlValue,
-          'action',
-          'Task',
-          'Must be a map',
-        );
-      }
-      ActionConfig? action;
-      if (actionYaml != null) {
-        action = ActionConfig.fromJson(actionYaml);
-      }
-
       final extraConfig = Set<String>.from(yamlValue.keys)
         ..removeAll([taskName, 'os', 'sdk', 'action']);
 
@@ -427,7 +425,7 @@ class Task {
         );
       }
       try {
-        return Task(flavor, taskType, args: args, action: action);
+        return Task(flavor, taskType, args: args);
       } on InvalidTaskConfigException catch (e) {
         throw CheckedFromJsonException(
           yamlValue,

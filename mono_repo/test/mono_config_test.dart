@@ -211,7 +211,7 @@ line 4, column 12: Unsupported value for "group". expected a list of tasks
       _expectParseThrows(
         monoYaml,
         r'''
-line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
+line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`, `action`.
   ╷
 9 │      "weird": "thing"
   │      ^^^^^^^
@@ -234,7 +234,7 @@ line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `
       _expectParseThrows(
         monoYaml,
         r'''
-line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
+line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`, `action`.
    ╷
 10 │      "command": "other thing"
    │      ^^^^^^^^^
@@ -416,8 +416,8 @@ stages:
     - test: --preset travis --total-shards 5 --shard-index 1
     - test #no args
     - group:
-      - command: npm run build
-        action:
+      - action:
+          run: npm run build
           uses: actions/setup-node@v3
           with:
             node-version: 16
@@ -624,9 +624,9 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'command',
-            'args': 'npm run build',
+            'name': 'action',
             'action': {
+              'run': 'npm run build',
               'uses': 'actions/setup-node@v3',
               'with': {'node-version': '16'},
               'working-directory': './src',
@@ -648,9 +648,9 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'command',
-            'args': 'npm run build',
+            'name': 'action',
             'action': {
+              'run': 'npm run build',
               'uses': 'actions/setup-node@v3',
               'with': {'node-version': '16'},
               'working-directory': './src',
@@ -672,9 +672,9 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'command',
-            'args': 'npm run build',
+            'name': 'action',
             'action': {
+              'run': 'npm run build',
               'uses': 'actions/setup-node@v3',
               'with': {'node-version': '16'},
               'working-directory': './src',

@@ -3,11 +3,15 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'commands/github/action_info.dart';
+import 'commands/github/overrides.dart';
 import 'commands/github/step.dart';
+import 'github_config.dart';
 import 'package_flavor.dart';
 
 abstract class TaskType implements Comparable<TaskType> {
   static const command = _CommandTask();
+  const factory TaskType.githubAction(GitHubActionConfig config) =
+      GitHubActionTaskType;
 
   static const _values = <TaskType>[
     _FormatTask(),
@@ -37,6 +41,8 @@ abstract class TaskType implements Comparable<TaskType> {
 
   Iterable<Step> afterEachSteps(String packageDirectory) =>
       const Iterable.empty();
+
+  GitHubActionOverrides? get overrides => null;
 
   static Iterable<String> get allowedTaskNames sync* {
     for (var val in TaskType._values) {
@@ -152,5 +158,17 @@ class _TestWithCoverageTask extends TaskType {
         },
       ),
     ];
+  }
+}
+
+class GitHubActionTaskType extends TaskType {
+  const GitHubActionTaskType(this.overrides) : super._('github_action');
+
+  @override
+  final GitHubActionConfig overrides;
+
+  @override
+  List<String> commandValue(PackageFlavor flavor, String? args) {
+    throw UnimplementedError();
   }
 }

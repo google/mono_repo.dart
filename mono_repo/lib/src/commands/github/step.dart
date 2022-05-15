@@ -5,6 +5,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../yaml.dart';
+import 'overrides.dart';
 
 part 'step.g.dart';
 
@@ -13,23 +14,39 @@ part 'step.g.dart';
   includeIfNull: false,
   constructor: '_',
 )
-class Step implements YamlLike {
+class Step implements GitHubActionOverrides, YamlLike {
+  @override
   final String? id;
+  @override
   final String? name;
+  @override
   final String? run;
 
+  @override
   @JsonKey(name: 'if')
   final String? ifContent;
+
+  @override
   @JsonKey(name: 'working-directory')
   final String? workingDirectory;
 
-  final Map? env;
+  @override
+  final Map<String, String>? env;
 
+  @override
   final String? uses;
+  @override
   @JsonKey(name: 'with')
-  final Map? withContent;
+  final Map<String, dynamic>? withContent;
 
+  @override
   final String? shell;
+
+  @override
+  final bool? continueOnError;
+
+  @override
+  final int? timeoutMinutes;
 
   Step._({
     this.id,
@@ -41,7 +58,16 @@ class Step implements YamlLike {
     this.workingDirectory,
     this.env,
     this.shell,
+    this.continueOnError,
+    this.timeoutMinutes,
   }) {
+    if (name == null) {
+      throw ArgumentError.value(
+        name,
+        'name',
+        '`name` must be defined.',
+      );
+    }
     if (run == null) {
       if (uses == null) {
         throw ArgumentError.value(
@@ -67,6 +93,21 @@ class Step implements YamlLike {
     }
   }
 
+  Step.fromOverrides(GitHubActionOverrides overrides)
+      : this._(
+          id: overrides.id,
+          name: overrides.name,
+          uses: overrides.uses,
+          withContent: overrides.withContent,
+          workingDirectory: overrides.workingDirectory,
+          run: overrides.run,
+          env: overrides.env,
+          shell: overrides.shell,
+          ifContent: overrides.ifContent,
+          continueOnError: overrides.continueOnError,
+          timeoutMinutes: overrides.timeoutMinutes,
+        );
+
   Step.run({
     this.id,
     required String this.name,
@@ -75,6 +116,8 @@ class Step implements YamlLike {
     this.workingDirectory,
     this.env,
     this.shell,
+    this.continueOnError,
+    this.timeoutMinutes,
   })  : uses = null,
         withContent = null;
 
@@ -84,6 +127,8 @@ class Step implements YamlLike {
     required this.uses,
     this.withContent,
     this.ifContent,
+    this.continueOnError,
+    this.timeoutMinutes,
   })  : run = null,
         env = null,
         workingDirectory = null,
