@@ -12,9 +12,9 @@ stages:
     - dev
     - edge
     - stable
-    - 2.10.4
-    - 2.12.0-259.0.dev
-    - 2.12.0-29.10.beta
+    - 2.16.0
+    - 2.17.0-69.1.beta
+    - 2.18.0-106.0.dev
 - test:
   - test: --test-randomize-ordering-seed=random
     os:

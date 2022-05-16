@@ -90,7 +90,7 @@ class PackageConfig {
           sortNormalizeVerifySdksList(
             pubspec.flavor,
             sdks,
-            (m) => AssertionError(m),
+            AssertionError.new,
           );
           return true;
         }());
