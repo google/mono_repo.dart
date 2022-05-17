@@ -16,54 +16,50 @@ env:
 
 jobs:
   job_001:
-    name: "smoke_test; linux; Dart 2.10.4; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.16.0; PKG: mono_repo; `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.10.4;packages:test_pkg;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:mono_repo;commands:analyze_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.10.4;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.10.4
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.10.4"
+          sdk: "2.16.0"
       - id: checkout
         uses: actions/checkout@v3
-      - id: test_pkg_pub_upgrade
-        name: test_pkg; dart pub upgrade
+      - id: mono_repo_pub_upgrade
+        name: mono_repo; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: test_pkg
+        working-directory: mono_repo
         run: dart pub upgrade
-      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
-        run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
-        run: dart analyze --fatal-infos .
+      - name: mono_repo; dart analyze
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        working-directory: mono_repo
+        run: dart analyze
   job_002:
-    name: "smoke_test; linux; Dart 2.12.0-259.0.dev; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.16.0; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.12.0-259.0.dev;packages:test_pkg;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:test_pkg;commands:format-analyze_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.12.0-259.0.dev;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.12.0-259.0.dev
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.12.0-259.0.dev"
+          sdk: "2.16.0"
       - id: checkout
         uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
@@ -80,22 +76,22 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_003:
-    name: "smoke_test; linux; Dart 2.12.0-29.10.beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "smoke_test; linux; Dart 2.17.0-69.1.beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.12.0-29.10.beta;packages:test_pkg;commands:format-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0-69.1.beta;packages:test_pkg;commands:format-analyze_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.12.0-29.10.beta;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.12.0-29.10.beta
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0-69.1.beta;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0-69.1.beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.12.0-29.10.beta"
+          sdk: "2.17.0-69.1.beta"
       - id: checkout
         uses: actions/checkout@v3
       - id: test_pkg_pub_upgrade
@@ -112,33 +108,37 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_004:
-    name: "smoke_test; linux; Dart 2.14.0; PKG: mono_repo; `dart analyze`"
+    name: "smoke_test; linux; Dart 2.18.0-106.0.dev; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0;packages:mono_repo;commands:analyze_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.18.0-106.0.dev;packages:test_pkg;commands:format-analyze_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.18.0-106.0.dev;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.18.0-106.0.dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.14.0"
+          sdk: "2.18.0-106.0.dev"
       - id: checkout
         uses: actions/checkout@v3
-      - id: mono_repo_pub_upgrade
-        name: mono_repo; dart pub upgrade
+      - id: test_pkg_pub_upgrade
+        name: test_pkg; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: mono_repo
+        working-directory: test_pkg
         run: dart pub upgrade
-      - name: mono_repo; dart analyze
-        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
-        working-directory: mono_repo
-        run: dart analyze
+      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
+        run: "dart format --output=none --set-exit-if-changed ."
+      - name: "test_pkg; dart analyze --fatal-infos ."
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
+        run: dart analyze --fatal-infos .
   job_005:
     name: "smoke_test; linux; Flutter beta; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -405,22 +405,22 @@ jobs:
         working-directory: test_pkg
         run: dart analyze --fatal-infos .
   job_013:
-    name: "test; linux; Dart 2.14.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
+    name: "test; linux; Dart 2.16.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0;packages:mono_repo;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:mono_repo;commands:test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.14.0"
+          sdk: "2.16.0"
       - id: checkout
         uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
@@ -446,22 +446,22 @@ jobs:
       - job_011
       - job_012
   job_014:
-    name: "test; linux; Dart 2.14.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "test; linux; Dart 2.16.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v3
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0;packages:mono_repo;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:mono_repo;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.14.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.14.0"
+          sdk: "2.16.0"
       - id: checkout
         uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
@@ -692,12 +692,12 @@ jobs:
       - job_011
       - job_012
   job_020:
-    name: "test; windows; Dart 2.14.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "test; windows; Dart 2.16.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - uses: dart-lang/setup-dart@v1.3
         with:
-          sdk: "2.14.0"
+          sdk: "2.16.0"
       - id: checkout
         uses: actions/checkout@v3
       - id: mono_repo_pub_upgrade
