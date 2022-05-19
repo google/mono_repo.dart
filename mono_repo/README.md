@@ -34,6 +34,7 @@ Global options:
 Available commands:
   check       Check the state of the repository.
   generate    Generates the CI configuration for child packages.
+  list        List all packages configured for mono_repo.
   presubmit   Run the CI presubmits locally.
   pub         Runs the `pub` command with the provided arguments across all packages.
 
