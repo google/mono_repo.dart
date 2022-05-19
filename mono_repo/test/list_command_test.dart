@@ -12,12 +12,7 @@ void main() {
       listPackages(
         RootConfig(rootDirectory: d.sandbox),
         onlyPublished: false,
-        showItems: {
-          ShowItem.name,
-          ShowItem.path,
-          ShowItem.version,
-          ShowItem.publishTo
-        },
+        showItems: {Column.name, Column.path, Column.version, Column.publishTo},
       ),
       [
         'pkg1,pkg1_dir,,',
@@ -33,12 +28,7 @@ void main() {
       listPackages(
         RootConfig(rootDirectory: d.sandbox),
         onlyPublished: true,
-        showItems: {
-          ShowItem.name,
-          ShowItem.path,
-          ShowItem.version,
-          ShowItem.publishTo
-        },
+        showItems: {Column.name, Column.path, Column.version, Column.publishTo},
       ),
       [
         'pkg3,pkg3_dir,1.2.3,https://some.random.domain',
@@ -53,8 +43,8 @@ void main() {
         RootConfig(rootDirectory: d.sandbox),
         onlyPublished: false,
         showItems: {
-          ShowItem.path,
-          ShowItem.name,
+          Column.path,
+          Column.name,
         },
       ),
       [

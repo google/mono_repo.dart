@@ -22,11 +22,9 @@ class ListCommand extends MonoRepoCommand {
         abbr: 's',
         help:
             'The properties of the package to show in a comma-seperated list.',
-        allowed: ShowItem.values.map((e) => e.name),
-        allowedHelp: Map.fromEntries(
-          ShowItem.values.map((e) => MapEntry(e.name, e.help)),
-        ),
-        defaultsTo: ShowItem.values
+        allowed: Column.values.map((e) => e.name),
+        allowedHelp: {for (var item in Column.values) item.name: item.help},
+        defaultsTo: Column.values
             .where((element) => element.defaultsTo)
             .map((e) => e.name),
       );
@@ -46,14 +44,14 @@ class ListCommand extends MonoRepoCommand {
           showItems: (argResults!['show'] as List<String>)
               .map(
                 (e) =>
-                    ShowItem.values.singleWhere((element) => element.name == e),
+                    Column.values.singleWhere((element) => element.name == e),
               )
               .toSet(),
         ).join('\n'),
       );
 }
 
-enum ShowItem {
+enum Column {
   name(
     help: 'The name of the package as specified in the "name" field.',
     defaultsTo: true,
@@ -71,7 +69,7 @@ enum ShowItem {
     defaultsTo: false,
   );
 
-  const ShowItem({
+  const Column({
     required this.help,
     required this.defaultsTo,
   });
@@ -81,13 +79,13 @@ enum ShowItem {
 
   String valueFor(PackageConfig cfg) {
     switch (this) {
-      case ShowItem.name:
+      case Column.name:
         return cfg.pubspec.name;
-      case ShowItem.path:
+      case Column.path:
         return cfg.relativePath;
-      case ShowItem.version:
+      case Column.version:
         return cfg.pubspec.version?.toString() ?? '';
-      case ShowItem.publishTo:
+      case Column.publishTo:
         return cfg.pubspec.publishTo ?? '';
     }
   }
@@ -96,7 +94,7 @@ enum ShowItem {
 Iterable<String> listPackages(
   RootConfig rootConfig, {
   required bool onlyPublished,
-  required Set<ShowItem> showItems,
+  required Set<Column> showItems,
 }) sync* {
   for (var pkg in rootConfig) {
     if (onlyPublished && !_published(pkg.pubspec)) {
