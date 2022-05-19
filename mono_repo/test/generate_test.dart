@@ -158,15 +158,16 @@ name: pkg_name
         test('root of mono_pkg', () async {
           await d.dir('sub_pkg', [
             d.file(
-                monoPkgFileName,
-                jsonEncode({
-                  'sdk': values,
-                  'stages': [
-                    {
-                      'unit_test': ['test']
-                    }
-                  ]
-                })),
+              monoPkgFileName,
+              jsonEncode({
+                'sdk': values,
+                'stages': [
+                  {
+                    'unit_test': ['test']
+                  }
+                ]
+              }),
+            ),
             d.file('pubspec.yaml', '''
 name: pkg_name
       ''')
@@ -187,19 +188,20 @@ name: pkg_name
         test('within test', () async {
           await d.dir('sub_pkg', [
             d.file(
-                monoPkgFileName,
-                jsonEncode({
-                  'stages': [
-                    {
-                      'unit_test': [
-                        {
-                          'test': '',
-                          'sdk': values,
-                        }
-                      ]
-                    }
-                  ]
-                })),
+              monoPkgFileName,
+              jsonEncode({
+                'stages': [
+                  {
+                    'unit_test': [
+                      {
+                        'test': '',
+                        'sdk': values,
+                      }
+                    ]
+                  }
+                ]
+              }),
+            ),
             d.file('pubspec.yaml', '''
 name: pkg_name
       ''')
@@ -321,10 +323,12 @@ name: pkg_name
       );
 
       // Just check that this doesn't throw.
-      testGenerateBothConfig(printMatcher: '''
+      testGenerateBothConfig(
+        printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
-Wrote `${p.join(d.sandbox, ciScriptPath)}`.''');
+Wrote `${p.join(d.sandbox, ciScriptPath)}`.''',
+      );
     });
   });
 
@@ -454,7 +458,10 @@ $_writeScriptOutput''',
       defaultGitHubWorkflowFilePath,
     );
 
-    await d.file(ciScriptPath, contains(r'''
+    await d
+        .file(
+          ciScriptPath,
+          contains(r'''
       case ${TASK} in
       format)
         echo 'dart format --output=none --set-exit-if-changed .'
@@ -465,7 +472,9 @@ $_writeScriptOutput''',
         exit 64
         ;;
       esac
-''')).validate();
+'''),
+        )
+        .validate();
   });
 
   test('two flavors of dartfmt with different arguments', () async {
@@ -520,7 +529,10 @@ $_writeScriptOutput''',
       defaultGitHubWorkflowFilePath,
     );
 
-    await d.file(ciScriptPath, contains(r'''
+    await d
+        .file(
+          ciScriptPath,
+          contains(r'''
       case ${TASK} in
       format_0)
         echo 'dart format --output=none --set-exit-if-changed .'
@@ -535,7 +547,9 @@ $_writeScriptOutput''',
         exit 64
         ;;
       esac
-''')).validate();
+'''),
+        )
+        .validate();
   });
 
   test('missing `dart` key', () async {
@@ -668,10 +682,9 @@ line 6, column 18 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Mapping values are not
 
   test('double digit commands', () async {
     final lines = Iterable.generate(
-            11,
-            (i) =>
-                '    - test: --preset travis --total-shards 9 --shard-index $i')
-        .join('\n');
+      11,
+      (i) => '    - test: --preset travis --total-shards 9 --shard-index $i',
+    ).join('\n');
 
     await d.dir('pkg_a', [
       d.file('pubspec.yaml', '''
@@ -906,14 +919,19 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         );
 
         // TODO: validate GitHub case
-        await d.file(ciScriptPath, contains(r'''
+        await d
+            .file(
+              ciScriptPath,
+              contains(r'''
   dart pub get || EXIT_CODE=$?
 
   if [[ ${EXIT_CODE} -ne 0 ]]; then
     echo -e "\033[31mPKG: ${PKG}; 'dart pub get' - FAILED  (${EXIT_CODE})\033[0m"
     FAILURES+=("${PKG}; 'dart pub get'")
   else
-''')).validate();
+'''),
+            )
+            .validate();
       });
     });
 
@@ -1055,9 +1073,9 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
         // TODO: validate GitHub case
         await d
             .file(
-                defaultGitHubWorkflowFilePath,
-                stringContainsInOrder([
-                  r'''
+              defaultGitHubWorkflowFilePath,
+              stringContainsInOrder([
+                r'''
 jobs:
   job_001:
     name: mono_repo self validate
@@ -1082,7 +1100,8 @@ jobs:
         run: dart pub global run mono_repo generate --validate
   job_002:
 '''
-                ]))
+              ]),
+            )
             .validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
@@ -1099,9 +1118,9 @@ jobs:
         // TODO: validate GitHub case
         await d
             .file(
-                defaultGitHubWorkflowFilePath,
-                contains(
-                  r'''
+              defaultGitHubWorkflowFilePath,
+              contains(
+                r'''
   job_001:
     name: mono_repo self validate
     runs-on: ubuntu-latest
@@ -1124,22 +1143,26 @@ jobs:
       - name: mono_repo self validate
         run: dart pub global run mono_repo generate --validate
 ''',
-                ))
+              ),
+            )
             .validate();
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
 
     test('global env', () async {
-      await validConfig(r'''
+      await validConfig(
+        r'''
 github:
   env:
     FOO: BAR
-''', expectedGithubContent: contains('''
+''',
+        expectedGithubContent: contains('''
 env:
   PUB_ENVIRONMENT: bot.github
   FOO: BAR
-'''));
+'''),
+      );
     });
   });
 }

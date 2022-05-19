@@ -119,3 +119,4 @@ linter:
     - use_string_buffers
     - valid_regexps
     - void_checks
+    - require_trailing_commas

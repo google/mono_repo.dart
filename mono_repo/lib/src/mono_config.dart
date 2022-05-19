@@ -185,7 +185,8 @@ class MonoConfig {
 /// Parses the `stages` key from a CI config map, into a Map from stage name
 /// to [ConditionalStage] instance.
 Map<String, ConditionalStage> _readConditionalStages(
-    Map<dynamic, dynamic> ciJson) {
+  Map<dynamic, dynamic> ciJson,
+) {
   final conditionalStages = <String, ConditionalStage>{};
   final rawValue = ciJson['stages'];
   if (rawValue != null) {
