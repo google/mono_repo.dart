@@ -10,17 +10,17 @@ stages:
     - analyze: --fatal-infos .
     sdk: dev
   - analyze:
-    sdk: 2.16.0
+    sdk: 2.17.0
 - test:
   - test: -x yaml -P presubmit --test-randomize-ordering-seed=random
     os:
     - linux
     - windows
-    sdk: [2.16.0, dev]
+    sdk: [2.17.0, dev]
   - test: -t yaml --test-randomize-ordering-seed=random
     os:
     - linux
-    sdk: [2.16.0, dev]
+    sdk: [2.17.0, dev]
 
 cache:
   directories:
