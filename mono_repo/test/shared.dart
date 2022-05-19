@@ -73,9 +73,11 @@ void testGenerateConfig({
           forceGitHub: forceGitHub,
         );
       },
-      zoneSpec: ZoneSpecification(print: (z1, zd, z2, value) {
-        printOutput.add(value);
-      }),
+      zoneSpec: ZoneSpecification(
+        print: (z1, zd, z2, value) {
+          printOutput.add(value);
+        },
+      ),
     );
   } finally {
     addTearDown(() {
@@ -143,11 +145,13 @@ void validateSandbox(String expectFileName, String sandboxPath) {
 void validateOutput(String fileName, String output) {
   expect(output, isNotEmpty);
 
-  final expectedOutputFile = File(p.join(
-    'test',
-    'script_integration_outputs',
-    fileName,
-  ));
+  final expectedOutputFile = File(
+    p.join(
+      'test',
+      'script_integration_outputs',
+      fileName,
+    ),
+  );
 
   if (expectedOutputFile.existsSync()) {
     final expected =

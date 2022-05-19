@@ -27,8 +27,9 @@ Map<String, String> generateGitHubYml(
 
   final allJobStages = {for (var job in jobs) job.stageName};
   final orderedStages = calculateOrderedStages(
-      rootConfig, rootConfig.monoConfig.githubConditionalStages)
-    ..add(_onCompletionStage);
+    rootConfig,
+    rootConfig.monoConfig.githubConditionalStages,
+  )..add(_onCompletionStage);
 
   final output = <String, String>{};
 
@@ -201,24 +202,26 @@ Iterable<_MapEntryWithStage> _listJobs(
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList()..sort();
       yield jobEntry(
-          first.jobYaml(
+        first.jobYaml(
+          rootConfig,
+          packages: packages,
+          oneOs: differentOperatingSystems.length == 1,
+          oneSdk: differentSdks.length == 1,
+          onePackage: differentPackages.length == 1,
+        ),
+        first.job.stageName,
+      );
+    } else {
+      yield* entry.value.map(
+        (e) => jobEntry(
+          e.jobYaml(
             rootConfig,
-            packages: packages,
             oneOs: differentOperatingSystems.length == 1,
             oneSdk: differentSdks.length == 1,
             onePackage: differentPackages.length == 1,
           ),
-          first.job.stageName);
-    } else {
-      yield* entry.value.map(
-        (e) => jobEntry(
-            e.jobYaml(
-              rootConfig,
-              oneOs: differentOperatingSystems.length == 1,
-              oneSdk: differentSdks.length == 1,
-              onePackage: differentPackages.length == 1,
-            ),
-            e.job.stageName),
+          e.job.stageName,
+        ),
       );
     }
   }
@@ -227,9 +230,12 @@ Iterable<_MapEntryWithStage> _listJobs(
   // appropriate `needs` config to each.
   if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
     for (var jobConfig in onCompletionJobs) {
-      yield jobEntry({
-        ...jobConfig,
-      }, _onCompletionStage);
+      yield jobEntry(
+        {
+          ...jobConfig,
+        },
+        _onCompletionStage,
+      );
     }
   }
 }
@@ -265,24 +271,28 @@ extension on CIJobEntry {
     for (var package in packages) {
       final pubStepId = '${package.replaceAll('/', '_')}_'
           'pub_${rootConfig.monoConfig.pubAction}';
-      commandEntries.add(_CommandEntry(
-        '$package; $pubCommand',
-        pubCommand,
-        id: pubStepId,
-        // Run this regardless of the success of other steps other than the
-        // pub step.
-        ifCondition: "always() && steps.checkout.conclusion == 'success'",
-        workingDirectory: package,
-      ));
-      for (var i = 0; i < commands.length; i++) {
-        commandEntries.add(_CommandEntry(
-          '$package; ${job.tasks[i].command}',
-          _commandForOs(job.tasks[i].command),
+      commandEntries.add(
+        _CommandEntry(
+          '$package; $pubCommand',
+          pubCommand,
+          id: pubStepId,
           // Run this regardless of the success of other steps other than the
           // pub step.
-          ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
+          ifCondition: "always() && steps.checkout.conclusion == 'success'",
           workingDirectory: package,
-        ));
+        ),
+      );
+      for (var i = 0; i < commands.length; i++) {
+        commandEntries.add(
+          _CommandEntry(
+            '$package; ${job.tasks[i].command}',
+            _commandForOs(job.tasks[i].command),
+            // Run this regardless of the success of other steps other than the
+            // pub step.
+            ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
+            workingDirectory: package,
+          ),
+        );
       }
     }
 

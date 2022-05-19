@@ -25,21 +25,31 @@ class PresubmitCommand extends MonoRepoCommand {
 
   PresubmitCommand() {
     argParser
-      ..addMultiOption('package',
-          help: 'The package(s) to run on, defaults to all packages', abbr: 'p')
-      ..addMultiOption('task',
-          help: 'The task(s) to run, defaults to all tasks', abbr: 't')
-      ..addOption('sdk',
-          help: 'Which sdk to use for match tasks, defaults to current sdk',
-          defaultsTo: _currentSdk);
+      ..addMultiOption(
+        'package',
+        help: 'The package(s) to run on, defaults to all packages',
+        abbr: 'p',
+      )
+      ..addMultiOption(
+        'task',
+        help: 'The task(s) to run, defaults to all tasks',
+        abbr: 't',
+      )
+      ..addOption(
+        'sdk',
+        help: 'Which sdk to use for match tasks, defaults to current sdk',
+        defaultsTo: _currentSdk,
+      );
   }
 
   @override
   Future<void> run() async {
-    final passed = await presubmit(rootConfig(),
-        packages: argResults!['package'] as List<String>,
-        tasks: argResults!['task'] as List<String>,
-        sdkToRun: argResults!['sdk'] as String);
+    final passed = await presubmit(
+      rootConfig(),
+      packages: argResults!['package'] as List<String>,
+      tasks: argResults!['task'] as List<String>,
+      sdkToRun: argResults!['sdk'] as String,
+    );
 
     // Set a bad exit code if it failed.
     if (!passed) exitCode = 1;
@@ -100,12 +110,14 @@ Future<bool> presubmit(
   // Status of the presubmit.
   var passed = true;
   for (var package in packages) {
-    final config = rootConfig.singleWhere((pkg) => pkg.relativePath == package,
-        orElse: () {
-      throw UserException(
-          'Unrecognized package `$package`, known packages are:\n'
-          '${rootConfig.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
-    });
+    final config = rootConfig.singleWhere(
+      (pkg) => pkg.relativePath == package,
+      orElse: () {
+        throw UserException(
+            'Unrecognized package `$package`, known packages are:\n'
+            '${rootConfig.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
+      },
+    );
 
     print(styleBold.wrap(package));
     for (var job in config.jobs) {
@@ -122,8 +134,11 @@ Future<bool> presubmit(
           continue;
         }
 
-        final result = await Process.run(ciScriptPath, [taskKey],
-            environment: {'PKGS': package});
+        final result = await Process.run(
+          ciScriptPath,
+          [taskKey],
+          environment: {'PKGS': package},
+        );
         if (result.exitCode == 0) {
           print(green.wrap('    success'));
         } else {

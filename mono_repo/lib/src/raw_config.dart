@@ -54,9 +54,13 @@ class RawConfig {
       if (!stages.add(name)) {
         final map = (json['stages'] as List)[i] as Map;
 
-        throw CheckedFromJsonException(map, name, 'RawStage',
-            'Stages must be unique. "$name" appears more than once.',
-            badKey: true);
+        throw CheckedFromJsonException(
+          map,
+          name,
+          'RawStage',
+          'Stages must be unique. "$name" appears more than once.',
+          badKey: true,
+        );
       }
     }
 
@@ -85,8 +89,11 @@ class RawStage {
 
   RawStage(this.name, this.items) {
     if (items.isEmpty) {
-      throw ArgumentError.value(items, name,
-          'Stages are required to have at least one job. "$name" is empty.');
+      throw ArgumentError.value(
+        items,
+        name,
+        'Stages are required to have at least one job. "$name" is empty.',
+      );
     }
   }
 
@@ -114,12 +121,20 @@ class RawStage {
 
     final name = entry.key as String;
     if (entry.value == null) {
-      throw CheckedFromJsonException(json, name, 'RawStage',
-          'Stages are required to have at least one job. "$name" is null.');
+      throw CheckedFromJsonException(
+        json,
+        name,
+        'RawStage',
+        'Stages are required to have at least one job. "$name" is null.',
+      );
     }
     if (entry.value is! List) {
-      throw CheckedFromJsonException(json, name, 'RawStage',
-          '$_stageErrorPrefix the provided value `$json` is not valid.');
+      throw CheckedFromJsonException(
+        json,
+        name,
+        'RawStage',
+        '$_stageErrorPrefix the provided value `$json` is not valid.',
+      );
     }
 
     try {

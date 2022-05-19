@@ -489,7 +489,10 @@ class Task {
   }
 
   static List<String> _commandValue(
-      PackageFlavor flavor, String name, String? args) {
+    PackageFlavor flavor,
+    String name,
+    String? args,
+  ) {
     switch (name) {
       case 'format':
         return [
