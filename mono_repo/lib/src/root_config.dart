@@ -61,8 +61,6 @@ class RootConfig extends ListBase<PackageConfig> {
   final MonoConfig monoConfig;
   final List<PackageConfig> _configs;
 
-  RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
-
   factory RootConfig({String? rootDirectory, bool recursive = true}) {
     rootDirectory ??= p.current;
 
@@ -102,6 +100,8 @@ class RootConfig extends ListBase<PackageConfig> {
       configs,
     );
   }
+
+  RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
 
   @override
   int get length => _configs.length;
