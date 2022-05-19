@@ -6,7 +6,7 @@ version: 6.3.0-dev
 repository: https://github.com/google/mono_repo.dart
 
 environment:
-  sdk: '>=2.16.0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
   args: ^2.0.0

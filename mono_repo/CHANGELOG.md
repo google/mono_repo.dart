@@ -1,7 +1,8 @@
 ## 6.3.0-dev
 
 - Update to `subosito/flutter-action@v2.4.0`.
-- Require at least Dart >= 2.16.0
+- Require at least Dart >= 2.17.0
+- Add the `list` command.
 
 ## 6.2.2
 
