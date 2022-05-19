@@ -24,8 +24,10 @@ void main() {
     test('no $ciScriptPath', () async {
       await d.dir('pkg_a', [
         d.file('mono_pkg.yaml', ''),
-        d.file('pubspec.yaml',
-            '{"name":"_test", "environment": {"sdk": ">=2.7.0 <3.0.0"}}'),
+        d.file(
+          'pubspec.yaml',
+          '{"name":"_test", "environment": {"sdk": ">=2.7.0 <3.0.0"}}',
+        ),
       ]).create();
 
       expect(
@@ -108,11 +110,16 @@ environment:
     test(
       'runs all tasks and packages',
       () async {
-        final result = await Process.run(dartPath,
-            ['pub', 'global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
-            workingDirectory: repoPath);
-        expect(result.exitCode, 0,
-            reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
+        final result = await Process.run(
+          dartPath,
+          ['pub', 'global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
+          workingDirectory: repoPath,
+        );
+        expect(
+          result.exitCode,
+          0,
+          reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}',
+        );
         expect(result.stdout, '''
 pkg_a
   SDK: dev TASK: dart analyze
@@ -139,18 +146,19 @@ pkg_b
 
     test('can filter by package', () async {
       final result = await Process.run(
-          dartPath,
-          [
-            'pub',
-            'global',
-            'run',
-            'mono_repo',
-            'presubmit',
-            '--sdk=dev',
-            '-p',
-            'pkg_b'
-          ],
-          workingDirectory: repoPath);
+        dartPath,
+        [
+          'pub',
+          'global',
+          'run',
+          'mono_repo',
+          'presubmit',
+          '--sdk=dev',
+          '-p',
+          'pkg_b'
+        ],
+        workingDirectory: repoPath,
+      );
       expect(
         result.exitCode,
         0,
@@ -167,20 +175,24 @@ pkg_b
 
     test('can filter by task', () async {
       final result = await Process.run(
-          dartPath,
-          [
-            'pub',
-            'global',
-            'run',
-            'mono_repo',
-            'presubmit',
-            '--sdk=dev',
-            '-t',
-            'format'
-          ],
-          workingDirectory: repoPath);
-      expect(result.exitCode, 0,
-          reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}');
+        dartPath,
+        [
+          'pub',
+          'global',
+          'run',
+          'mono_repo',
+          'presubmit',
+          '--sdk=dev',
+          '-t',
+          'format'
+        ],
+        workingDirectory: repoPath,
+      );
+      expect(
+        result.exitCode,
+        0,
+        reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}',
+      );
       expect(result.stdout, '''
 pkg_a
   SDK: dev TASK: dart format --output=none --set-exit-if-changed .
@@ -225,8 +237,11 @@ pkg_b
           workingDirectory: repoPath,
           environment: {'GITHUB_ACTIONS': '0'},
         );
-        expect(result.exitCode, 1,
-            reason: 'Any failing tasks should give a non-zero exit code');
+        expect(
+          result.exitCode,
+          1,
+          reason: 'Any failing tasks should give a non-zero exit code',
+        );
         expect(
           result.stdout,
           startsWith('''

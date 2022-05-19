@@ -65,8 +65,12 @@ Future<void> pub(RootConfig rootConfig, List<String> args) async {
     );
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
-    final proc = await Process.start(executable, packageArgs,
-        mode: ProcessStartMode.inheritStdio, workingDirectory: workingDir);
+    final proc = await Process.start(
+      executable,
+      packageArgs,
+      mode: ProcessStartMode.inheritStdio,
+      workingDirectory: workingDir,
+    );
 
     final exit = await proc.exitCode;
 

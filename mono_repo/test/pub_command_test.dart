@@ -10,8 +10,10 @@ void main() {
     setUp(_setup);
 
     test('can run pub get', () async {
-      expect(() => pub(RootConfig(rootDirectory: d.sandbox), ['get']),
-          prints(allOf(contains('success!'), isNot(contains('Failures:')))));
+      expect(
+        () => pub(RootConfig(rootDirectory: d.sandbox), ['get']),
+        prints(allOf(contains('success!'), isNot(contains('Failures:')))),
+      );
     });
   });
 }

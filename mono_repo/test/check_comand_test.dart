@@ -29,8 +29,10 @@ void main() {
     test('check', () {
       final reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
-      expect(reports.keys,
-          ['bar', 'baz', p.join('baz', 'recursive'), 'flutter', 'foo']);
+      expect(
+        reports.keys,
+        ['bar', 'baz', p.join('baz', 'recursive'), 'flutter', 'foo'],
+      );
 
       final fooReport = reports['foo']!;
       expect(fooReport.packageName, 'foo');
@@ -38,10 +40,14 @@ void main() {
 
       final fooDeps = fooReport.pubspec.dependencies;
       expect(fooDeps, hasLength(2));
-      expect((fooDeps['build'] as HostedDependency).version,
-          VersionConstraint.any);
-      expect((fooDeps['implied_any'] as HostedDependency).version,
-          VersionConstraint.any);
+      expect(
+        (fooDeps['build'] as HostedDependency).version,
+        VersionConstraint.any,
+      );
+      expect(
+        (fooDeps['implied_any'] as HostedDependency).version,
+        VersionConstraint.any,
+      );
 
       final barReport = reports['bar']!;
       expect(barReport.packageName, 'bar');
@@ -84,7 +90,8 @@ void main() {
 
     test('check no recursive', () {
       final reports = getPackageReports(
-          RootConfig(rootDirectory: d.sandbox, recursive: false));
+        RootConfig(rootDirectory: d.sandbox, recursive: false),
+      );
 
       expect(reports.keys, ['bar', 'baz', 'flutter', 'foo']);
     });

@@ -39,14 +39,18 @@ class ListCommand extends MonoRepoCommand {
   String get description => 'List all packages configured for mono_repo.';
 
   @override
-  void run() => print(listPackages(
-        rootConfig(),
-        onlyPublished: argResults!['only-published'] as bool,
-        showItems: (argResults!['show'] as List<String>)
-            .map((e) =>
-                ShowItem.values.singleWhere((element) => element.name == e))
-            .toSet(),
-      ).join('\n'));
+  void run() => print(
+        listPackages(
+          rootConfig(),
+          onlyPublished: argResults!['only-published'] as bool,
+          showItems: (argResults!['show'] as List<String>)
+              .map(
+                (e) =>
+                    ShowItem.values.singleWhere((element) => element.name == e),
+              )
+              .toSet(),
+        ).join('\n'),
+      );
 }
 
 enum ShowItem {

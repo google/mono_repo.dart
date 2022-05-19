@@ -35,15 +35,6 @@ class MonoConfig {
   final String? selfValidateStage;
   final GitHubConfig github;
 
-  MonoConfig._({
-    required this.githubConditionalStages,
-    required this.mergeStages,
-    required this.prettyAnsi,
-    required this.pubAction,
-    required this.selfValidateStage,
-    required this.github,
-  });
-
   factory MonoConfig({
     required Set<String> mergeStages,
     required bool prettyAnsi,
@@ -62,6 +53,15 @@ class MonoConfig {
       github: GitHubConfig.fromJson(github),
     );
   }
+
+  MonoConfig._({
+    required this.githubConditionalStages,
+    required this.mergeStages,
+    required this.prettyAnsi,
+    required this.pubAction,
+    required this.selfValidateStage,
+    required this.github,
+  });
 
   factory MonoConfig.fromJson(Map json) {
     final unsupportedKeys =
@@ -185,7 +185,8 @@ class MonoConfig {
 /// Parses the `stages` key from a CI config map, into a Map from stage name
 /// to [ConditionalStage] instance.
 Map<String, ConditionalStage> _readConditionalStages(
-    Map<dynamic, dynamic> ciJson) {
+  Map<dynamic, dynamic> ciJson,
+) {
   final conditionalStages = <String, ConditionalStage>{};
   final rawValue = ciJson['stages'];
   if (rawValue != null) {

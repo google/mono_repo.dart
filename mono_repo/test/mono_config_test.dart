@@ -19,13 +19,14 @@ String _encodeJson(Object? input) =>
     const JsonEncoder.withIndent(' ').convert(input);
 
 PackageConfig _parse(map) => PackageConfig.parse(
-    'a',
-    _dummyPubspec,
-    map is YamlMap
-        ? map
-        : loadYamlChecked(
-            _encodeJson(map),
-          ) as Map);
+      'a',
+      _dummyPubspec,
+      map is YamlMap
+          ? map
+          : loadYamlChecked(
+              _encodeJson(map),
+            ) as Map,
+    );
 
 void _expectParseThrows(Object content, String expectedError) =>
     expect(() => _parse(content), throwsAParsedYamlException(expectedError));

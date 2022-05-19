@@ -25,42 +25,46 @@ void main() {
     expect(readmeContent, contains(_yamlWrap(_repoYaml)));
   });
 
-  test('validate readme example output', () async {
-    await d.file('mono_repo.yaml', _repoYaml).create();
-    await d.dir('sub_pkg', [
-      d.file(monoPkgFileName, _pkgYaml),
-      d.file('pubspec.yaml', '''
+  test(
+    'validate readme example output',
+    () async {
+      await d.file('mono_repo.yaml', _repoYaml).create();
+      await d.dir('sub_pkg', [
+        d.file(monoPkgFileName, _pkgYaml),
+        d.file('pubspec.yaml', '''
 name: sub_pkg
 ''')
-    ]).create();
+      ]).create();
 
-    testGenerateConfig(
-      forceGitHub: false,
-      printMatcher: stringContainsInOrder(
-        [
-          'package:sub_pkg\n',
-          'Make sure to mark `tool/ci.sh` as executable.\n',
-          '  chmod +x tool/ci.sh\n',
-        ],
-      ),
-    );
-
-    void validateFile(
-      String fileToVerify,
-      String expectedOutputFileName,
-    ) {
-      final inputFile = File(p.join(d.sandbox, fileToVerify));
-      final sourceContent = inputFile.readAsStringSync();
-      validateOutput(
-        'readme_$expectedOutputFileName.txt',
-        sourceContent,
+      testGenerateConfig(
+        forceGitHub: false,
+        printMatcher: stringContainsInOrder(
+          [
+            'package:sub_pkg\n',
+            'Make sure to mark `tool/ci.sh` as executable.\n',
+            '  chmod +x tool/ci.sh\n',
+          ],
+        ),
       );
-    }
 
-    validateFile(ciScriptPath, 'ci');
-    validateFile(githubWorkflowFilePath('lint'), 'github_lints');
-    validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
-  }, onPlatform: const {'windows': Skip('Many platform-specific differences')});
+      void validateFile(
+        String fileToVerify,
+        String expectedOutputFileName,
+      ) {
+        final inputFile = File(p.join(d.sandbox, fileToVerify));
+        final sourceContent = inputFile.readAsStringSync();
+        validateOutput(
+          'readme_$expectedOutputFileName.txt',
+          sourceContent,
+        );
+      }
+
+      validateFile(ciScriptPath, 'ci');
+      validateFile(githubWorkflowFilePath('lint'), 'github_lints');
+      validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
+    },
+    onPlatform: const {'windows': Skip('Many platform-specific differences')},
+  );
 }
 
 String _yamlWrap(String content) => '```yaml\n$content```';
