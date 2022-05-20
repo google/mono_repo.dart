@@ -37,6 +37,7 @@ Available commands:
   list        List all packages configured for mono_repo.
   presubmit   Run the CI presubmits locally.
   pub         Runs the `pub` command with the provided arguments across all packages.
+  readme      Generate a markdown table of all packages configured for mono_repo.
 
 Run "mono_repo help <command>" for more information about a command.
 ```
