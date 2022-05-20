@@ -1,12 +1,12 @@
-import 'dart:async';
-
 import 'package:mono_repo/src/commands/list_command.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
+import 'shared.dart';
+
 void main() {
-  setUp(_setup);
+  setUp(listReadmeSetup);
   test('show everything', () async {
     expect(
       listPackages(
@@ -55,59 +55,4 @@ void main() {
       ],
     );
   });
-}
-
-Future _setup() async {
-  await d.dir('pkg1_dir', [
-    d.file('mono_pkg.yaml', ''),
-    d.file('pubspec.yaml', r'''
-name: pkg1
-environment:
-  sdk: '>=2.12.0 <3.0.0'
-
-dependencies:
-  meta: any
-''')
-  ]).create();
-
-  await d.dir('pkg2_dir', [
-    d.file('mono_pkg.yaml', ''),
-    d.file('pubspec.yaml', r'''
-name: pkg2
-publish_to: none
-version: 1.2.3
-environment:
-  sdk: '>=2.12.0 <3.0.0'
-
-dependencies:
-  meta: any
-''')
-  ]).create();
-
-  await d.dir('pkg3_dir', [
-    d.file('mono_pkg.yaml', ''),
-    d.file('pubspec.yaml', r'''
-name: pkg3
-publish_to: https://some.random.domain
-version: 1.2.3
-environment:
-  sdk: '>=2.12.0 <3.0.0'
-
-dependencies:
-  meta: any
-''')
-  ]).create();
-
-  await d.dir('pkg4_dir', [
-    d.file('mono_pkg.yaml', ''),
-    d.file('pubspec.yaml', r'''
-name: pkg4
-version: 1.2.3
-environment:
-  sdk: '>=2.12.0 <3.0.0'
-
-dependencies:
-  meta: any
-''')
-  ]).create();
 }

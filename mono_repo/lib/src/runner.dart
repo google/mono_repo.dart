@@ -13,6 +13,7 @@ import 'commands/list_command.dart';
 import 'commands/mono_repo_command.dart';
 import 'commands/presubmit.dart';
 import 'commands/pub.dart';
+import 'commands/readme_command.dart';
 import 'version.dart';
 
 final commands = List<Command<void>>.unmodifiable(
@@ -22,6 +23,7 @@ final commands = List<Command<void>>.unmodifiable(
     ListCommand(),
     PresubmitCommand(),
     PubCommand(),
+    ReadmeCommand(),
   ],
 );
 

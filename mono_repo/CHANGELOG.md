@@ -2,7 +2,7 @@
 
 - Update to `subosito/flutter-action@v2.4.0`.
 - Require at least Dart >= 2.17.0
-- Add the `list` command.
+- Add the `list` and `readme` commands.
 
 ## 6.2.2
 

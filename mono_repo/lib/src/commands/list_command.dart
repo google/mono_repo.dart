@@ -96,13 +96,21 @@ Iterable<String> listPackages(
   required bool onlyPublished,
   required Set<Column> showItems,
 }) sync* {
-  for (var pkg in rootConfig) {
-    if (onlyPublished && !_published(pkg.pubspec)) {
-      continue;
-    }
+  for (var pkg in enumeratePackages(rootConfig, onlyPublished: onlyPublished)) {
     yield showItems.map((e) => e.valueFor(pkg)).join(',');
   }
 }
 
-bool _published(Pubspec pubspec) =>
-    pubspec.version != null && pubspec.publishTo != 'none';
+Iterable<PackageConfig> enumeratePackages(
+  RootConfig rootConfig, {
+  required bool onlyPublished,
+}) =>
+    rootConfig.where((element) => !onlyPublished || element.pubspec._published);
+
+extension PubspecExtension on Pubspec {
+  bool get _published => version != null && publishTo != 'none';
+
+  String get pubBadge => _published
+      ? '[![pub package](https://img.shields.io/pub/v/$name.svg)](https://pub.dev/packages/$name)'
+      : '';
+}
