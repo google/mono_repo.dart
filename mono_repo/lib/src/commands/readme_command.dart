@@ -46,15 +46,13 @@ String readme(
 }) {
   final rows = [
     ['Package source', 'Description', 'Published Version'],
+    for (var pkg in enumeratePackages(rootConfig, onlyPublished: onlyPublished))
+      [
+        '[${pkg.pubspec.name}](${pkg.relativePath}/)',
+        pkg.pubspec.description ?? '',
+        pkg.pubspec.pubBadge,
+      ]
   ];
-
-  for (var pkg in enumeratePackages(rootConfig, onlyPublished: onlyPublished)) {
-    rows.add([
-      '[${pkg.pubspec.name}](${pkg.relativePath}/)',
-      pkg.pubspec.description ?? '',
-      pkg.pubspec.pubBadge,
-    ]);
-  }
 
   final widths = [3, 3, 3];
   if (pad) {
@@ -65,11 +63,10 @@ String readme(
         }
       }
     }
-  }
-
-  for (var row in rows) {
-    for (var i = 0; i < 3; i++) {
-      row[i] = row[i].padRight(widths[i]);
+    for (var row in rows) {
+      for (var i = 0; i < 3; i++) {
+        row[i] = row[i].padRight(widths[i]);
+      }
     }
   }
 
