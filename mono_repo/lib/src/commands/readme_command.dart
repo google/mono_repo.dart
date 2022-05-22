@@ -74,7 +74,7 @@ String readme(
 
   rows.insert(1, widths.map((e) => '-' * e).toList());
 
-  return rows.map((e) => e.join(' | ')).join('\n');
+  return rows.map((e) => '| ${e.join(' | ')} |').join('\n');
 }
 
 extension on Pubspec {
