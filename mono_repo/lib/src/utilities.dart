@@ -92,6 +92,12 @@ extension PubspecExtension on Pubspec {
   bool get usesFlutter =>
       _dependsOnFlutterSdk || _dependsOnFlutterPackage || _hasFlutterKey;
 
+  bool get published => version != null && publishTo != 'none';
+
+  String get pubBadge => published
+      ? '[![pub package](https://img.shields.io/pub/v/$name.svg)](https://pub.dev/packages/$name)'
+      : '';
+
   bool get _dependsOnFlutterSdk => environment?.containsKey('flutter') ?? false;
 
   bool get _dependsOnFlutterPackage => _dependsOnPackage('flutter');
