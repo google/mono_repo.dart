@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'package:pubspec_parse/pubspec_parse.dart';
+
 import '../root_config.dart';
 import 'list_command.dart';
 import 'mono_repo_command.dart';
@@ -73,4 +75,10 @@ String readme(
   rows.insert(1, widths.map((e) => '-' * e).toList());
 
   return rows.map((e) => e.join(' | ')).join('\n');
+}
+
+extension on Pubspec {
+  String get pubBadge => published(this)
+      ? '[![pub package](https://img.shields.io/pub/v/$name.svg)](https://pub.dev/packages/$name)'
+      : '';
 }

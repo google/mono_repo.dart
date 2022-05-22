@@ -105,12 +105,7 @@ Iterable<PackageConfig> enumeratePackages(
   RootConfig rootConfig, {
   required bool onlyPublished,
 }) =>
-    rootConfig.where((element) => !onlyPublished || element.pubspec._published);
+    rootConfig.where((element) => !onlyPublished || published(element.pubspec));
 
-extension PubspecExtension on Pubspec {
-  bool get _published => version != null && publishTo != 'none';
-
-  String get pubBadge => _published
-      ? '[![pub package](https://img.shields.io/pub/v/$name.svg)](https://pub.dev/packages/$name)'
-      : '';
-}
+bool published(Pubspec pubspec) =>
+    pubspec.version != null && pubspec.publishTo != 'none';
