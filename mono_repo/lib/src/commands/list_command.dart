@@ -2,10 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:pubspec_parse/pubspec_parse.dart';
-
 import '../package_config.dart';
 import '../root_config.dart';
+import '../utilities.dart';
 import 'mono_repo_command.dart';
 
 class ListCommand extends MonoRepoCommand {
@@ -96,13 +95,13 @@ Iterable<String> listPackages(
   required bool onlyPublished,
   required Set<Column> showItems,
 }) sync* {
-  for (var pkg in rootConfig) {
-    if (onlyPublished && !_published(pkg.pubspec)) {
-      continue;
-    }
+  for (var pkg in enumeratePackages(rootConfig, onlyPublished: onlyPublished)) {
     yield showItems.map((e) => e.valueFor(pkg)).join(',');
   }
 }
 
-bool _published(Pubspec pubspec) =>
-    pubspec.version != null && pubspec.publishTo != 'none';
+Iterable<PackageConfig> enumeratePackages(
+  RootConfig rootConfig, {
+  required bool onlyPublished,
+}) =>
+    rootConfig.where((element) => !onlyPublished || element.pubspec.published);
