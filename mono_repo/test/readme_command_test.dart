@@ -16,7 +16,7 @@ void main() {
         ),
         '''
 | Package source | Description | Published Version |
-| --- | --- | --- |
+|---|---|---|
 | [pkg1](pkg1_dir/) |  |  |
 | [pkg2](pkg2_dir/) |  |  |
 | [pkg3](pkg3_dir/) |  | [![pub package](https://img.shields.io/pub/v/pkg3.svg)](https://pub.dev/packages/pkg3) |
@@ -32,7 +32,7 @@ void main() {
       ),
       '''
 | Package source    | Description | Published Version                                                                      |
-| ----------------- | ----------- | -------------------------------------------------------------------------------------- |
+|-------------------|-------------|----------------------------------------------------------------------------------------|
 | [pkg1](pkg1_dir/) |             |                                                                                        |
 | [pkg2](pkg2_dir/) |             |                                                                                        |
 | [pkg3](pkg3_dir/) |             | [![pub package](https://img.shields.io/pub/v/pkg3.svg)](https://pub.dev/packages/pkg3) |
@@ -49,7 +49,7 @@ void main() {
       ),
       '''
 | Package source | Description | Published Version |
-| --- | --- | --- |
+|---|---|---|
 | [pkg3](pkg3_dir/) |  | [![pub package](https://img.shields.io/pub/v/pkg3.svg)](https://pub.dev/packages/pkg3) |
 | [pkg4](pkg4_dir/) |  | [![pub package](https://img.shields.io/pub/v/pkg4.svg)](https://pub.dev/packages/pkg4) |''',
     );

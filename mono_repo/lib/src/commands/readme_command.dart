@@ -55,7 +55,7 @@ String readme(
       ]
   ];
 
-  final widths = [3, 3, 3];
+  final widths = [1, 1, 1];
   if (pad) {
     for (var row in rows) {
       for (var i = 0; i < 3; i++) {
@@ -71,7 +71,8 @@ String readme(
     }
   }
 
-  rows.insert(1, widths.map((e) => '-' * e).toList());
+  final lines = rows.map((e) => '| ${e.join(' | ')} |').toList()
+    ..insert(1, '|${widths.map((e) => '-' * (e + 2)).join('|')}|');
 
-  return rows.map((e) => '| ${e.join(' | ')} |').join('\n');
+  return lines.join('\n');
 }
