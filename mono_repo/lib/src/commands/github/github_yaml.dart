@@ -478,3 +478,25 @@ class _MapEntryWithStage implements MapEntry<String, Map<String, dynamic>> {
 
   _MapEntryWithStage(this.key, this.value, this.stageName);
 }
+
+extension on PackageFlavor {
+  Map<String, dynamic> configurationMap(String sdkVersion) {
+    switch (this) {
+      case PackageFlavor.dart:
+        return {
+          'uses': 'dart-lang/setup-dart@v1.3',
+          'with': {
+            'sdk': sdkVersion,
+          },
+        };
+
+      case PackageFlavor.flutter:
+        return {
+          'uses': 'subosito/flutter-action@v2.4.0',
+          'with': {
+            'channel': sdkVersion,
+          }
+        };
+    }
+  }
+}

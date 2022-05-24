@@ -19,48 +19,13 @@ part 'package_config.g.dart';
 const monoPkgFileName = 'mono_pkg.yaml';
 
 enum PackageFlavor {
-  dart,
-  flutter,
-}
+  dart(pubCommand: 'dart pub', prettyName: 'Dart'),
+  flutter(pubCommand: 'flutter pub pub', prettyName: 'Flutter');
 
-extension PackageFlavorExtension on PackageFlavor {
-  String get pubCommand {
-    switch (this) {
-      case PackageFlavor.flutter:
-        return 'flutter pub pub';
-      case PackageFlavor.dart:
-        return 'dart pub';
-    }
-  }
+  const PackageFlavor({required this.pubCommand, required this.prettyName});
 
-  String get prettyName {
-    switch (this) {
-      case PackageFlavor.dart:
-        return 'Dart';
-      case PackageFlavor.flutter:
-        return 'Flutter';
-    }
-  }
-
-  Map<String, dynamic> configurationMap(String sdkVersion) {
-    switch (this) {
-      case PackageFlavor.dart:
-        return {
-          'uses': 'dart-lang/setup-dart@v1.3',
-          'with': {
-            'sdk': sdkVersion,
-          },
-        };
-
-      case PackageFlavor.flutter:
-        return {
-          'uses': 'subosito/flutter-action@v2.4.0',
-          'with': {
-            'channel': sdkVersion,
-          }
-        };
-    }
-  }
+  final String pubCommand;
+  final String prettyName;
 }
 
 class PackageConfig {
