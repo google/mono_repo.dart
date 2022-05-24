@@ -83,9 +83,7 @@ name: pkg_name
     expect(
       () => testGenerateBothConfig(
         printMatcher: '''
-package:sub_pkg
-  `dart` values () are not used and can be removed.
-  `os` values () are not used and can be removed.''',
+package:sub_pkg''',
       ),
       throwsUserExceptionWith(
         'No entries created. Check your nested `$monoPkgFileName` files.',
