@@ -174,15 +174,16 @@ Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
 void logPackages(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {
     print(styleBold.wrap('package:${pkg.relativePath}'));
-    if (pkg.sdks != null && !pkg.dartSdkConfigUsed) {
+    final sdks = pkg.sdks;
+    if (sdks != null && sdks.isNotEmpty && !pkg.dartSdkConfigUsed) {
       print(
         yellow.wrap(
-          '  `dart` values (${pkg.sdks!.join(', ')}) are not used '
+          '  `dart` values (${sdks.join(', ')}) are not used '
           'and can be removed.',
         ),
       );
     }
-    if (!pkg.osConfigUsed) {
+    if (!pkg.osConfigUsed && pkg.oses.isNotEmpty) {
       print(
         yellow.wrap(
           '  `os` values (${pkg.oses.join(', ')}) are not used '
