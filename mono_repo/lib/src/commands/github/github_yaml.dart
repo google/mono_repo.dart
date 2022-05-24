@@ -9,6 +9,7 @@ import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
+import 'action_info.dart';
 
 const _onCompletionStage = '_on_completion';
 
@@ -367,7 +368,7 @@ Map<String, dynamic> _githubJobYaml(
         packageFlavor.configurationMap(sdkVersion),
         {
           'id': 'checkout',
-          'uses': 'actions/checkout@v3',
+          'uses': ActionInfo.checkout.usesValue,
         },
         for (var command in runCommands) command.runContent,
       ],
@@ -430,7 +431,7 @@ Map<String, dynamic> _cacheEntries(
 
   return {
     'name': 'Cache Pub hosted dependencies',
-    'uses': 'actions/cache@v3',
+    'uses': ActionInfo.cache.usesValue,
     'with': {
       'path': pubCacheHosted,
       'key': restoreKeys.first,
@@ -484,7 +485,7 @@ extension on PackageFlavor {
     switch (this) {
       case PackageFlavor.dart:
         return {
-          'uses': 'dart-lang/setup-dart@v1.3',
+          'uses': ActionInfo.setupDart.usesValue,
           'with': {
             'sdk': sdkVersion,
           },
@@ -492,7 +493,7 @@ extension on PackageFlavor {
 
       case PackageFlavor.flutter:
         return {
-          'uses': 'subosito/flutter-action@v2.4.0',
+          'uses': ActionInfo.setupFlutter.usesValue,
           'with': {
             'channel': sdkVersion,
           }
