@@ -46,11 +46,11 @@ String readme(
   required bool pad,
 }) {
   final rows = [
-    ['Package source', 'Description', 'Published Version'],
+    ['Package', 'Description', 'Version'],
     for (var pkg in enumeratePackages(rootConfig, onlyPublished: onlyPublished))
       [
         '[${pkg.pubspec.name}](${pkg.relativePath}/)',
-        pkg.pubspec.description ?? '',
+        pkg.pubspec.description?.trim() ?? '',
         pkg.pubspec.pubBadge,
       ]
   ];
