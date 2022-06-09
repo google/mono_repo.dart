@@ -3,6 +3,8 @@
 - Update to `subosito/flutter-action@v2.4.0`.
 - Require at least Dart >= 2.17.0
 - Add the `list` and `readme` commands.
+- Update github actions to use hashes instead of version numbers
+- Add read-only permissions to actions by default
 
 ## 6.2.2
 
