@@ -1240,7 +1240,7 @@ sdk:
 
 stages:
   - custom_step:
-      - action:
+      - github_action:
           id: custom-scripts
           run: | 
             ./script_a
@@ -1304,7 +1304,7 @@ sdk:
 
 stages:
   - custom_step:
-      - action:
+      - github_action:
           id: custom-script
           if: always()
           run: ./script
@@ -1338,7 +1338,7 @@ sdk:
 
 stages:
   - custom_step:
-      - action:
+      - github_action:
           run: ./script
           some-key: some-value
 ''')
