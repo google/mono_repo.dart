@@ -1,4 +1,4 @@
-## 6.3.0-dev
+## 6.3.0
 
 - Update to `subosito/flutter-action@v2.4.0`.
 - Require at least Dart >= 2.17.0
@@ -73,8 +73,8 @@
 - _BREAKING_ Drop support for Travis-CI.
 - Change calls from `pub` to `dart pub` within generated scripts.
 - Support and encourage up-to-date task names:
-  - `analyze` instead of `dartanalyzer`
-  - `format` instead of `dartfmt`.
+    - `analyze` instead of `dartanalyzer`
+    - `format` instead of `dartfmt`.
 
 ## 4.1.0
 
@@ -82,10 +82,10 @@
 - Use latest `actions/cache@v2.1.6`.
 - Migrate to new command pattern supported in Dart 2.10
 - `pub` command
-  - Now allows any `pub` command and argument combination to be provided.
-  - Dropped `--no-precompile` since it is now the default.
-  - Now prints a summary of execution progress. Useful for repositories with
-    many packages.
+    - Now allows any `pub` command and argument combination to be provided.
+    - Dropped `--no-precompile` since it is now the default.
+    - Now prints a summary of execution progress. Useful for repositories with
+      many packages.
 
 ## 4.0.0
 
@@ -115,7 +115,7 @@
 
 - Move to use [dart-lang/setup-dart](https://github.com/dart-lang/setup-dart) to
   setup the Dart SDK.
-  - Remove explicit `dart --version` call. This is handled in the new action.
+    - Remove explicit `dart --version` call. This is handled in the new action.
 
 ## 3.4.4
 
@@ -148,8 +148,8 @@
 ## 3.4.0
 
 - Configuring the target Dart SDK:
-  - Allow specifying specific `dev` releases.
-  - Allow specifying just `beta`.
+    - Allow specifying specific `dev` releases.
+    - Allow specifying just `beta`.
 - Shorten the generated names for a job if a given component of the name is
   identical for all tasks. Makes it easier to read the names in the GitHub
   Action UI.
@@ -180,68 +180,68 @@
 - Added support for [GitHub Actions](https://docs.github.com/actions). See
   `README.md` for details.
 - Added the `generate` command, since we know support more than one CI provider.
-  - **Deprecated** the `travis` command.
+    - **Deprecated** the `travis` command.
 - Small improvement to how some strings are emitted in Yaml.
 
 ## 3.0.0
 
 - `mono_repo.yaml`:
-  - **NEW!** Added support for `pub_action` value. Can be one of `get` or
-    `upgrade` (default) to change the package request behavior in each action.
-  - **NEW!** Added support for `pretty_ansi` value. The default is `true`. Set
-    to `false` to have the generated shell script skip any ANSI formatting.
-  - **UPDATED** `self_validate` can now be _either_ `true` or a String value
-    that maps to the desired stage where validation should run.
+    - **NEW!** Added support for `pub_action` value. Can be one of `get` or
+      `upgrade` (default) to change the package request behavior in each action.
+    - **NEW!** Added support for `pretty_ansi` value. The default is `true`. Set
+      to `false` to have the generated shell script skip any ANSI formatting.
+    - **UPDATED** `self_validate` can now be _either_ `true` or a String value
+      that maps to the desired stage where validation should run.
 - `travis` command:
-  - Many improvements to the generated `tool/travis.sh` file
-    - Clearly denote when terminating a job due to incorrect usage or
-      configuration.
-    - Clearly mark the end of each task and if it succeeded or failed.
-    - Print a summary at the end of the tasks for each package to make it easier
-      to find and fix failures.
-  - **BREAKING** Removed `--use-get` command-line flag. Use `pub_action` setting
-    in `mono_repo.yaml` instead.
-  - **BREAKING** Removed `--pretty-ansi` command-line flag. Use `pretty_ansi`
-    setting in `mono_repo.yaml` instead.
-  - Simplified generated configuration for `self_validate`.
-    'tool/mono_repo_self_validate.sh' is no longer created or used. When
-    upgrading from `v2.5.0`, you can delete this file.
+    - Many improvements to the generated `tool/travis.sh` file
+        - Clearly denote when terminating a job due to incorrect usage or
+          configuration.
+        - Clearly mark the end of each task and if it succeeded or failed.
+        - Print a summary at the end of the tasks for each package to make it
+          easier to find and fix failures.
+    - **BREAKING** Removed `--use-get` command-line flag. Use `pub_action`
+      setting in `mono_repo.yaml` instead.
+    - **BREAKING** Removed `--pretty-ansi` command-line flag. Use `pretty_ansi`
+      setting in `mono_repo.yaml` instead.
+    - Simplified generated configuration for `self_validate`.
+      'tool/mono_repo_self_validate.sh' is no longer created or used. When
+      upgrading from `v2.5.0`, you can delete this file.
 
 ## 2.5.0
 
 - Provide a better error when parsing a poorly formatted Yaml file.
 - `mono_repo.yaml`:
-  - **NEW!** Added support for `self_validate` boolean value. If `true`, creates
-    a shell script and associated task to install the same version of
-    `mono_repo` during CI and run `mono_repo travis --validate` to ensure all
-    files are up-to-date.
-  - Respect the ordering of `stages`, if configured.
-  - Allow `stages` values to be just a string – allows defining an explicit
-    ordering of stages.
+    - **NEW!** Added support for `self_validate` boolean value. If `true`,
+      creates a shell script and associated task to install the same version of
+      `mono_repo` during CI and run `mono_repo travis --validate` to ensure all
+      files are up-to-date.
+    - Respect the ordering of `stages`, if configured.
+    - Allow `stages` values to be just a string – allows defining an explicit
+      ordering of stages.
 - `mono_pkg.yaml`:
-  - Task `command` entry: correctly handle a `List` containing strings.
+    - Task `command` entry: correctly handle a `List` containing strings.
 
 ## 2.4.0
 
 - Adds a `--validate` option to the `travis` command.
 
-  - You can configure this to run from any of your `mono_pkg.yaml` files using a
-    command job like this:
+    - You can configure this to run from any of your `mono_pkg.yaml` files using
+      a command job like this:
 
-    `command: "cd ../ && pub global run mono_repo travis --validate"`.
+      `command: "cd ../ && pub global run mono_repo travis --validate"`.
 
-  - We may make this easier to configure in the future.
+    - We may make this easier to configure in the future.
 
 - Require Dart SDK `>=2.7.0 <3.0.0`.
 
 ## 2.3.0
 
 - Add support for `os` configuration.
-  - This generally works in the same way as the `dart` sdk option, except that
-    it is not required.
-  - The default is to only run on `linux`.
-  - Supports a top-level `os` list in `mono_pkg.yaml` files.
-  - Supports overriding the `os` per task.
+    - This generally works in the same way as the `dart` sdk option, except that
+      it is not required.
+    - The default is to only run on `linux`.
+    - Supports a top-level `os` list in `mono_pkg.yaml` files.
+    - Supports overriding the `os` per task.
 
 ## 2.2.0
 
@@ -250,8 +250,8 @@
 - Use `flutter packages` for `pub` command on packages that depend on Flutter.
 - Any arguments given to `dartfmt` Travis tasks are used instead of the default
   `-n --set-exit-if-changed .`.
-  - To maintain previous behavior, `dartfmt: sdk` is a special case and still
-    triggers the default arguments.
+    - To maintain previous behavior, `dartfmt: sdk` is a special case and still
+      triggers the default arguments.
 - Add `--use-get` optional flag for the `travis` command to use `pub get`
   instead of `pub upgrade` in the generated script.
 
@@ -328,9 +328,9 @@
 
 ```yaml
 stages:
-  - unit_test:
-      - description: "chrome"
-        test: -p chrome
+- unit_test:
+  - description: "chrome"
+    test: -p chrome
 ```
 
 ## 0.3.2+1
@@ -357,10 +357,10 @@ stages:
 
 ```yaml
 stages:
-  - analyze_and_format:
-      - group:
-          - analyze
-          - format
+- analyze_and_format:
+  - group:
+    - analyze
+    - format
 ```
 
 ## 0.3.0
@@ -374,48 +374,48 @@ stages:
 ```yaml
 # List of the sdk versions you support
 dart:
-  - dev
-  - stable
+- dev
+- stable
 
 # Ordered list of all stages you want to run.
 stages:
-  # A single stage, called `analyze_and_format` which runs the analyzer and
-  # the formatter only.
-  - analyze_and_format:
-      - dartanalyzer: --hints-as-warnings .
-      - dartfmt: sdk
-        dart:
-          - dev # Overrides the top level sdk default
-  # Assuming everything analyzed correctly, runs a build.
-  - build:
-      - command: "pub run build_runner build"
-  # And finally run tests, these are custom build_runner tests but the regular
-  # `test` task is also supported.
-  - unit_test:
-      - command: "pub run build_runner test"
-      - command: "pub run build_runner test -- -p chrome"
+# A single stage, called `analyze_and_format` which runs the analyzer and
+# the formatter only.
+- analyze_and_format:
+  - dartanalyzer: --hints-as-warnings .
+  - dartfmt: sdk
+    dart:
+    - dev # Overrides the top level sdk default
+# Assuming everything analyzed correctly, runs a build.
+- build:
+  - command: "pub run build_runner build"
+# And finally run tests, these are custom build_runner tests but the regular
+# `test` task is also supported.
+- unit_test:
+  - command: "pub run build_runner test"
+  - command: "pub run build_runner test -- -p chrome"
 ```
 
 ## 0.2.2
 
 - `travis` command
 
-  - Make numbering more consistent and clean when there is more than one task
-    with a given name.
+    - Make numbering more consistent and clean when there is more than one task
+      with a given name.
 
-  - Print out the full command that executed as part of a task.
+    - Print out the full command that executed as part of a task.
 
-  - Support a `List` value for `before_script`.
+    - Support a `List` value for `before_script`.
 
 ## 0.2.1
 
 - `travis` command
 
-  - Write ANSI escape sequences in `tool/travis.sh` as pre-escaped ASCII
-    literals.
+    - Write ANSI escape sequences in `tool/travis.sh` as pre-escaped ASCII
+      literals.
 
-  - Added `--[no-]pretty-ansi` flag to allow ANSI sequences to be optionally
-    omitted.
+    - Added `--[no-]pretty-ansi` flag to allow ANSI sequences to be optionally
+      omitted.
 
 ## 0.2.0
 
