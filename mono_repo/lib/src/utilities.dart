@@ -89,8 +89,7 @@ extension PubspecExtension on Pubspec {
   PackageFlavor get flavor =>
       usesFlutter ? PackageFlavor.flutter : PackageFlavor.dart;
 
-  bool get usesFlutter =>
-      _dependsOnFlutterSdk || _dependsOnFlutterPackage || _hasFlutterKey;
+  bool get usesFlutter => _dependsOnFlutterSdk || _dependsOnFlutterPackage;
 
   bool get published => version != null && publishTo != 'none';
 
@@ -101,8 +100,6 @@ extension PubspecExtension on Pubspec {
   bool get _dependsOnFlutterSdk => environment?.containsKey('flutter') ?? false;
 
   bool get _dependsOnFlutterPackage => _dependsOnPackage('flutter');
-
-  bool get _hasFlutterKey => flutter != null;
 
   bool _dependsOnPackage(String package) =>
       (dependencies.containsKey(package)) ||
