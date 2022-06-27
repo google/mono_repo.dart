@@ -45,6 +45,11 @@ class MonoRepoRunner extends CommandRunner<void> {
         help:
             'Whether to recursively walk sub-directories looking for packages.',
         defaultsTo: true,
+      )
+      ..addFlag(
+        'verbose',
+        negatable: false,
+        help: 'Show full stack trace on error. (Useful for debugging.)',
       );
   }
 
@@ -54,6 +59,15 @@ class MonoRepoRunner extends CommandRunner<void> {
       print(packageVersion);
       return;
     }
-    await super.runCommand(topLevelResults);
+    final verbose = topLevelResults['verbose'] as bool;
+    try {
+      await super.runCommand(topLevelResults);
+    } catch (e, stack) {
+      if (verbose) {
+        print(e);
+        print(stack);
+      }
+      rethrow;
+    }
   }
 }

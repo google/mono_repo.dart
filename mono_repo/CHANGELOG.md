@@ -1,3 +1,7 @@
+## 6.4.0-dev
+
+- Added `--verbose` flag. Helps when debugging failures.
+
 ## 6.3.0
 
 - Update to `subosito/flutter-action@v2.4.0`.
