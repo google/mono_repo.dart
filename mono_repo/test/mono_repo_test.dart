@@ -37,6 +37,7 @@ Global options:
     --version           Prints the version of mono_repo.
     --[no-]recursive    Whether to recursively walk sub-directories looking for packages.
                         (defaults to on)
+    --verbose           Show full stack trace on error. (Useful for debugging.)
 
 Available commands:
   check       Check the state of the repository.
