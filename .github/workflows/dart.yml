@@ -85,23 +85,23 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_003:
-    name: "smoke_test; linux; Dart 2.17.0; PKG: mono_repo; `dart analyze`"
+    name: "smoke_test; linux; Dart 2.17.5; PKG: mono_repo; `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:mono_repo;commands:analyze_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:mono_repo;commands:analyze_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
-          sdk: "2.17.0"
+          sdk: "2.17.5"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -430,66 +430,23 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_013:
-    name: "test; linux; Dart 2.17.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
+    name: "test; linux; Dart 2.17.5; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:mono_repo;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:mono_repo;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.5
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
-          sdk: "2.17.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
-      - id: mono_repo_pub_upgrade
-        name: mono_repo; dart pub upgrade
-        run: dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: mono_repo
-      - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
-        run: "dart test -t yaml --test-randomize-ordering-seed=random"
-        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
-        working-directory: mono_repo
-    needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
-      - job_007
-      - job_008
-      - job_009
-      - job_010
-      - job_011
-      - job_012
-  job_014:
-    name: "test; linux; Dart 2.17.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:mono_repo;commands:test_0"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: "2.17.0"
+          sdk: "2.17.5"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -515,7 +472,7 @@ jobs:
       - job_010
       - job_011
       - job_012
-  job_015:
+  job_014:
     name: "test; linux; Flutter beta; PKG: test_flutter_pkg; `flutter test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -558,7 +515,111 @@ jobs:
       - job_010
       - job_011
       - job_012
+  job_015:
+    name: "test; linux; Dart dev; PKG: mono_repo; `dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo;commands:test_with_coverage_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+        with:
+          sdk: dev
+      - name: "Activate package:coverage"
+        run: dart pub global activate coverage
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+      - id: mono_repo_pub_upgrade
+        name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: mono_repo
+      - name: "mono_repo; dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random"
+        run: "dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        working-directory: mono_repo
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          path-to-lcov: mono_repo/coverage/lcov.info
+          flag-name: coverage_00
+          parallel: true
+    needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+      - job_009
+      - job_010
+      - job_011
+      - job_012
   job_016:
+    name: "test; linux; Dart dev; PKG: mono_repo; `dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo;commands:test_with_coverage_0"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:dev
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+        with:
+          sdk: dev
+      - name: "Activate package:coverage"
+        run: dart pub global activate coverage
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+      - id: mono_repo_pub_upgrade
+        name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: mono_repo
+      - name: "mono_repo; dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        working-directory: mono_repo
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          path-to-lcov: mono_repo/coverage/lcov.info
+          flag-name: coverage_01
+          parallel: true
+    needs:
+      - job_001
+      - job_002
+      - job_003
+      - job_004
+      - job_005
+      - job_006
+      - job_007
+      - job_008
+      - job_009
+      - job_010
+      - job_011
+      - job_012
+  job_017:
     name: "test; linux; Dart dev; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
@@ -586,49 +647,6 @@ jobs:
         working-directory: mono_repo
       - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
         run: "dart test -t yaml --test-randomize-ordering-seed=random"
-        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
-        working-directory: mono_repo
-    needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
-      - job_007
-      - job_008
-      - job_009
-      - job_010
-      - job_011
-      - job_012
-  job_017:
-    name: "test; linux; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo;commands:test_0"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
-      - id: mono_repo_pub_upgrade
-        name: mono_repo; dart pub upgrade
-        run: dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: mono_repo
-      - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
-        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
     needs:
@@ -731,13 +749,13 @@ jobs:
       - job_011
       - job_012
   job_020:
-    name: "test; windows; Dart 2.17.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "test; windows; Dart 2.17.5; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
-          sdk: "2.17.0"
+          sdk: "2.17.5"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -829,3 +847,15 @@ jobs:
       - job_019
       - job_020
       - job_021
+  job_23:
+    name: Mark Coveralls job finished
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark Coveralls job finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          parallel-finished: true
+    needs:
+      - job_015
+      - job_016

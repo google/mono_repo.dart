@@ -89,6 +89,9 @@ Map<String, String> generateGitHubYml(
     final allPrevStageJobs = <String>{};
     String? currStageName;
 
+    // TaskType : {jobs names}
+    final completionMap = SplayTreeMap<ActionInfo, Set<String>>();
+
     for (var job in allJobs) {
       if (job.stageName != currStageName) {
         currStageName = job.stageName;
@@ -99,10 +102,26 @@ Map<String, String> generateGitHubYml(
       if (allPrevStageJobs.isNotEmpty) {
         job.value.needs = allPrevStageJobs.toList();
       }
+
+      // process post-run logic
+      for (var step in job.value.steps) {
+        if (step.hasCompletionJob) {
+          completionMap
+              .putIfAbsent(step.actionInfo!, SplayTreeSet<String>.new)
+              .add(job.id);
+        }
+      }
     }
 
     final jobList =
         Map.fromEntries(allJobs.map((e) => MapEntry(e.id, e.value)));
+
+    for (var completion in completionMap.entries) {
+      final job = completion.key.completionJobFactory!()
+        ..needs = completion.value.toList();
+
+      jobList['job_${jobList.length + 1}'] = job;
+    }
 
     output[fileName] = '''
 $createdWith

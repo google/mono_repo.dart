@@ -1,5 +1,9 @@
+
 ## 6.4.0-dev
 
+- Added support for `test_with_coverage`.
+  Uses `package:coverage` and [Coveralls](https://coveralls.io) to track test
+  code coverage.
 - Added `--verbose` flag. Helps when debugging failures.
 
 ## 6.3.0

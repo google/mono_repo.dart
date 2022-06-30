@@ -2,3 +2,6 @@
 .packages
 .dart_tool/
 pubspec.lock
+
+# default directory for pkg:coverage
+coverage/

@@ -96,6 +96,96 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Canno
   );
 
   test(
+    '"on_completion" needs steps',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'on_completion': [{}]
+        }
+      },
+      r'''
+line 3, column 7 of mono_repo.yaml: Required keys are missing: steps.
+  ╷
+3 │     - {}
+  │       ^^
+  ╵''',
+    ),
+  );
+
+  test(
+    '"on_completion" needs one of `run` or `uses`',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'on_completion': [
+            {
+              'steps': [{}]
+            }
+          ]
+        }
+      },
+      r'''
+line 4, column 11 of mono_repo.yaml: Missing key "uses". Either `run` or `uses` must be defined.
+  ╷
+4 │         - {}
+  │           ^^
+  ╵''',
+    ),
+  );
+
+  test(
+    '"on_completion" cannot have run and uses',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'on_completion': [
+            {
+              'steps': [
+                {
+                  'run': 'bob',
+                  'uses': 'bob',
+                }
+              ]
+            }
+          ]
+        }
+      },
+      r'''
+line 5, column 17 of mono_repo.yaml: Unsupported value for "uses". `uses` and `run` cannot both be defined.
+  ╷
+5 │           uses: bob
+  │                 ^^^
+  ╵''',
+    ),
+  );
+
+  test(
+    '"on_completion" cannot have with without uses',
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'on_completion': [
+            {
+              'steps': [
+                {
+                  'run': 'bob',
+                  'with': {},
+                }
+              ]
+            }
+          ]
+        }
+      },
+      r'''
+line 5, column 17 of mono_repo.yaml: Unsupported value for "with". `withContent` cannot be defined unless `uses` is defined.`
+  ╷
+5 │           with: {}
+  │                 ^^
+  ╵''',
+    ),
+  );
+
+  test(
     'stages config only accepts a list',
     () => _testBadConfigWithYamlException(
       {

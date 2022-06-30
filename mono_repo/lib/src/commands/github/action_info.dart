@@ -1,3 +1,4 @@
+import 'job.dart';
 import 'step.dart';
 
 enum ActionInfo implements Comparable<ActionInfo> {
@@ -16,23 +17,30 @@ enum ActionInfo implements Comparable<ActionInfo> {
   setupFlutter(
     repo: 'subosito/flutter-action',
     version: '2fb73e25c9488eb544b9b14b2ce00c4c2baf789e', // v2.4.0
+  ),
+  coveralls(
+    repo: 'coverallsapp/github-action',
+    version: 'master',
+    completionJobFactory: _coverageCompletionJob,
   );
 
   const ActionInfo({
     required this.repo,
     required this.version,
+    this.completionJobFactory,
   });
 
   final String repo;
   final String version;
+  final Job Function()? completionJobFactory;
 
   Step usage({
     required String name,
     String? id,
     Map<String, dynamic>? withContent,
   }) =>
-      Step.uses(
-        uses: '$repo@$version',
+      _ActionStep(
+        info: this,
         id: id,
         name: name,
         withContent: withContent,
@@ -40,4 +48,38 @@ enum ActionInfo implements Comparable<ActionInfo> {
 
   @override
   int compareTo(ActionInfo other) => index.compareTo(other.index);
+}
+
+Job _coverageCompletionJob() => Job(
+      name: 'Mark Coveralls job finished',
+      runsOn: 'ubuntu-latest',
+      steps: [
+        ActionInfo.coveralls.usage(
+          name: 'Mark Coveralls job finished',
+          withContent: {
+            'github-token': '\${{ secrets.GITHUB_TOKEN }}',
+            'parallel-finished': true
+          },
+        )
+      ],
+    );
+
+class _ActionStep extends Step {
+  final ActionInfo info;
+
+  _ActionStep({
+    required this.info,
+    required super.name,
+    super.id,
+    super.withContent,
+  }) : super.uses(
+          uses: '${info.repo}@${info.version}',
+        );
+}
+
+extension StepExtension on Step {
+  bool get hasCompletionJob => actionInfo?.completionJobFactory != null;
+
+  ActionInfo? get actionInfo =>
+      (this is _ActionStep) ? (this as _ActionStep).info : null;
 }
