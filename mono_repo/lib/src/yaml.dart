@@ -14,6 +14,10 @@ import 'user_exception.dart';
 
 final _yamlMapExpando = Expando<y.YamlMap>('yamlMap');
 
+abstract class YamlLike {
+  Object? toJson();
+}
+
 /// Returns a new [Map] with the contents of [source], storing the original
 /// [source] in an [Expando] allowing it be retrieved later in error handling
 /// code to create more helpful errors.
@@ -238,6 +242,8 @@ void _writeYaml(
         }
       }
     }
+  } else if (source is YamlLike) {
+    _writeYaml(buffer, source.toJson(), indent, parentType);
   } else {
     throw UnsupportedError('We do not like ${source.runtimeType}');
   }

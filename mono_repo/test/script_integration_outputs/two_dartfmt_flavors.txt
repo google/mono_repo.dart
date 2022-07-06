@@ -28,20 +28,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart pub upgrade
       - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
+        run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a
-        run: "dart format --output=none --set-exit-if-changed ."
   job_002:
     name: "format; Dart dev; PKG: pkg_b; `dart format --output=none --set-exit-if-changed .`"
     runs-on: ubuntu-latest
@@ -56,20 +58,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_b
-        run: dart pub upgrade
       - name: "pkg_b; dart format --output=none --set-exit-if-changed ."
+        run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.pkg_b_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_b
-        run: "dart format --output=none --set-exit-if-changed ."
   job_003:
     name: "format; Dart stable; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
     runs-on: ubuntu-latest
@@ -84,17 +88,19 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart pub upgrade
       - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
+        run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a
-        run: "dart format --output=none --set-exit-if-changed ."

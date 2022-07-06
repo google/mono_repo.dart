@@ -94,7 +94,9 @@ Future<bool> presubmit(
   final allKnownTasks = rootConfig.fold(
     <String>{},
     (Set<String> existing, PackageConfig config) => existing
-      ..addAll(config.jobs.expand((job) => job.tasks.map((task) => task.name))),
+      ..addAll(
+        config.jobs.expand((job) => job.tasks.map((task) => task.type.name)),
+      ),
   );
   if (tasks.isEmpty) tasks = allKnownTasks;
   final unrecognizedTasks =
@@ -125,7 +127,7 @@ Future<bool> presubmit(
       for (var task in job.tasks) {
         final taskKey = commandsToKeys[task.command]!;
         // Skip tasks that weren't specified
-        if (!tasks.contains(task.name)) continue;
+        if (!tasks.contains(task.type.name)) continue;
 
         print('  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
             'TASK: ${styleBold.wrap(white.wrap(task.command))}');

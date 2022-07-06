@@ -30,24 +30,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:2.16.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.16.0"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_002:
     name: "smoke_test; linux; Dart 2.17.0-69.1.beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -62,24 +64,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0-69.1.beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.17.0-69.1.beta"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_003:
     name: "smoke_test; linux; Dart 2.17.0; PKG: mono_repo; `dart analyze`"
     runs-on: ubuntu-latest
@@ -94,20 +98,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.17.0"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: mono_repo; dart analyze
+        run: dart analyze
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart analyze
   job_004:
     name: "smoke_test; linux; Dart 2.18.0-106.0.dev; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -122,24 +128,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:2.18.0-106.0.dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.18.0-106.0.dev"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_005:
     name: "smoke_test; linux; Flutter beta; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -154,24 +162,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
         with:
           channel: beta
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
+        run: flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_flutter_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
+      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         run: flutter analyze --fatal-infos .
+        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_flutter_pkg
   job_006:
     name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -186,24 +196,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: beta
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_007:
     name: "smoke_test; linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
@@ -218,20 +230,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
+        run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
   job_008:
     name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -246,37 +260,39 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
-        working-directory: mono_repo
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "mono_repo; dart analyze --fatal-infos ."
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
+      - name: "mono_repo; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
+        working-directory: mono_repo
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_009:
     name: "smoke_test; linux; Dart main; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -291,24 +307,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:main
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: main
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_010:
     name: "smoke_test; linux; Flutter master; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -323,24 +341,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:master
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
         with:
           channel: master
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
+        run: flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_flutter_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
+      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         run: flutter analyze --fatal-infos .
+        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_flutter_pkg
   job_011:
     name: "smoke_test; linux; Flutter stable; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -355,24 +375,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
         with:
           channel: stable
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
+        run: flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_flutter_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
+      - name: "test_flutter_pkg; flutter analyze --fatal-infos ."
         run: flutter analyze --fatal-infos .
+        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_flutter_pkg
   job_012:
     name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
@@ -387,24 +409,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: test_pkg
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "test_pkg; dart analyze --fatal-infos ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+      - name: "test_pkg; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: test_pkg
   job_013:
     name: "test; linux; Dart 2.17.0; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
@@ -419,20 +443,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.17.0"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
+        run: "dart test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "dart test -t yaml --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -460,20 +486,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.17.0"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -501,20 +529,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
         with:
           channel: beta
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub pub upgrade
+        run: flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: flutter pub pub upgrade
       - name: "test_flutter_pkg; flutter test --test-randomize-ordering-seed=random"
+        run: "flutter test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
-        run: "flutter test --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -542,20 +572,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart test -t yaml --test-randomize-ordering-seed=random"
+        run: "dart test -t yaml --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "dart test -t yaml --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -583,20 +615,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -624,20 +658,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_pkg
-        run: dart pub upgrade
       - name: "test_pkg; dart test --test-randomize-ordering-seed=random"
+        run: "dart test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-        run: "dart test --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -665,20 +701,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@2fb73e25c9488eb544b9b14b2ce00c4c2baf789e
         with:
           channel: stable
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_example_pub_upgrade
         name: test_flutter_pkg/example; flutter pub pub upgrade
+        run: flutter pub pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg/example
-        run: flutter pub pub upgrade
       - name: "test_flutter_pkg/example; flutter test --test-randomize-ordering-seed=random"
+        run: "flutter test --test-randomize-ordering-seed=random"
         if: "always() && steps.test_flutter_pkg_example_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg/example
-        run: "flutter test --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -696,20 +734,22 @@ jobs:
     name: "test; windows; Dart 2.17.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "2.17.0"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002
@@ -727,20 +767,22 @@ jobs:
     name: "test; windows; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: mono_repo
-        run: dart pub upgrade
       - name: "mono_repo; dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
+        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-        run: "dart test -x yaml -P presubmit --test-randomize-ordering-seed=random"
     needs:
       - job_001
       - job_002

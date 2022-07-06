@@ -79,7 +79,8 @@ line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' i
         'github': {
           'on_completion': [
             {
-              'needs': ['foo']
+              'steps': [],
+              'needs': ['foo'],
             }
           ]
         }
@@ -87,8 +88,9 @@ line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' i
       r'''
 line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Cannot define a `needs` key for `on_completion` jobs, this is filled in for you to depend on all jobs.
   ╷
-3 │ ┌     - needs:
-4 │ └         - foo
+3 │ ┌     - steps: []
+4 │ │       needs:
+5 │ └         - foo
   ╵''',
     ),
   );

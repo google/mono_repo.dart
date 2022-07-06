@@ -5,7 +5,7 @@
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
-import 'package_config.dart';
+import 'package_flavor.dart';
 
 const travisEdgeSdk = 'be/raw/latest';
 

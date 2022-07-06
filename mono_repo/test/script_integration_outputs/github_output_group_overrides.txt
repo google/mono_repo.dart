@@ -28,42 +28,46 @@ jobs:
             os:macos-latest;pub-cache-hosted;sdk:dev
             os:macos-latest;pub-cache-hosted
             os:macos-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart pub upgrade
       - name: pkg_a; dart analyze
-        if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
-        working-directory: pkg_a
         run: dart analyze
-      - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a
+      - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
         run: "dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
+        working-directory: pkg_a
   job_002:
     name: "analyze; windows; Dart 1.23.0; `dart analyze`"
     runs-on: windows-latest
     steps:
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: "1.23.0"
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart pub upgrade
       - name: pkg_a; dart analyze
+        run: dart analyze
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart analyze
   job_003:
     name: "unit_test; linux; Dart stable; `dart test --preset travis`"
     runs-on: ubuntu-latest
@@ -78,20 +82,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart pub upgrade
       - name: "pkg_a; dart test --preset travis"
+        run: dart test --preset travis
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart test --preset travis
     needs:
       - job_001
       - job_002
@@ -109,20 +115,22 @@ jobs:
             os:macos-latest;pub-cache-hosted;sdk:dev
             os:macos-latest;pub-cache-hosted
             os:macos-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart pub upgrade
       - name: "pkg_a; dart test --platform chrome"
+        run: dart test --platform chrome
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: pkg_a
-        run: dart test --platform chrome
     needs:
       - job_001
       - job_002

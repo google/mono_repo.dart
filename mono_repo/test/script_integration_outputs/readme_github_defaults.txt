@@ -31,23 +31,26 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dart pub upgrade
       - name: sub_pkg; dart test
+        run: dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dart test
   job_002:
     name: "cron; linux; `dart test`"
     runs-on: ubuntu-latest
+    if: "github.event_name == 'schedule'"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
@@ -59,42 +62,45 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dart pub upgrade
       - name: sub_pkg; dart test
+        run: dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dart test
-    if: "github.event_name == 'schedule'"
     needs:
       - job_001
   job_003:
     name: "cron; windows; `dart test`"
     runs-on: windows-latest
+    if: "github.event_name == 'schedule'"
     steps:
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
+        name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dart pub upgrade
       - name: sub_pkg; dart test
+        run: dart test
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-        run: dart test
-    if: "github.event_name == 'schedule'"
     needs:
       - job_001
   job_004:

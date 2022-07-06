@@ -2,14 +2,20 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:collection';
+
 import '../../ci_shared.dart';
 import '../../github_config.dart';
 import '../../mono_config.dart';
 import '../../package_config.dart';
+import '../../package_flavor.dart';
 import '../../root_config.dart';
+import '../../task_type.dart';
 import '../../user_exception.dart';
 import '../../yaml.dart';
 import 'action_info.dart';
+import 'job.dart';
+import 'step.dart';
 
 const _onCompletionStage = '_on_completion';
 
@@ -82,19 +88,21 @@ Map<String, String> generateGitHubYml(
     var currStageJobs = <String>{};
     final allPrevStageJobs = <String>{};
     String? currStageName;
+
     for (var job in allJobs) {
       if (job.stageName != currStageName) {
         currStageName = job.stageName;
         allPrevStageJobs.addAll(currStageJobs);
         currStageJobs = {};
       }
-      currStageJobs.add(job.key);
+      currStageJobs.add(job.id);
       if (allPrevStageJobs.isNotEmpty) {
-        job.value['needs'] = allPrevStageJobs.toList();
+        job.value.needs = allPrevStageJobs.toList();
       }
     }
 
-    final jobList = Map.fromEntries(allJobs);
+    final jobList =
+        Map.fromEntries(allJobs.map((e) => MapEntry(e.id, e.value)));
 
     output[fileName] = '''
 $createdWith
@@ -150,7 +158,7 @@ Iterable<_MapEntryWithStage> _listJobs(
   List<HasStageName> jobs,
   Map<String, String> commandsToKeys,
   Set<String> mergeStages,
-  List<Map<String, dynamic>>? onCompletionJobs,
+  List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
 ) sync* {
   final jobEntries = <CIJobEntry>[];
@@ -159,15 +167,16 @@ Iterable<_MapEntryWithStage> _listJobs(
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
-  _MapEntryWithStage jobEntry(
-    Map<String, dynamic> content,
-    String stage,
-  ) {
+  _MapEntryWithStage jobEntry(Job content, String stage) {
     final conditional = conditionalStages[stage];
     if (conditional != null) {
-      content['if'] = conditional.ifCondition;
+      content.ifContent = conditional.ifCondition;
     }
-    return _MapEntryWithStage(jobName(++count), content, stage);
+    return _MapEntryWithStage(
+      jobName(++count),
+      content,
+      stage,
+    );
   }
 
   for (var job in jobs) {
@@ -202,27 +211,25 @@ Iterable<_MapEntryWithStage> _listJobs(
 
     if (mergeStages.contains(first.job.stageName)) {
       final packages = entry.value.map((t) => t.job.package).toList()..sort();
-      yield jobEntry(
-        first.jobYaml(
-          rootConfig,
-          packages: packages,
-          oneOs: differentOperatingSystems.length == 1,
-          oneSdk: differentSdks.length == 1,
-          onePackage: differentPackages.length == 1,
-        ),
-        first.job.stageName,
+      final yaml = first._createJob(
+        rootConfig,
+        packages: packages,
+        oneOs: differentOperatingSystems.length == 1,
+        oneSdk: differentSdks.length == 1,
+        onePackage: differentPackages.length == 1,
       );
+      yield jobEntry(yaml, first.job.stageName);
     } else {
       yield* entry.value.map(
-        (e) => jobEntry(
-          e.jobYaml(
+        (e) {
+          final yaml = e._createJob(
             rootConfig,
             oneOs: differentOperatingSystems.length == 1,
             oneSdk: differentSdks.length == 1,
             onePackage: differentPackages.length == 1,
-          ),
-          e.job.stageName,
-        ),
+          );
+          return jobEntry(yaml, e.job.stageName);
+        },
       );
     }
   }
@@ -232,9 +239,7 @@ Iterable<_MapEntryWithStage> _listJobs(
   if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
     for (var jobConfig in onCompletionJobs) {
       yield jobEntry(
-        {
-          ...jobConfig,
-        },
+        jobConfig,
         _onCompletionStage,
       );
     }
@@ -255,7 +260,7 @@ extension on CIJobEntry {
     throw UnsupportedError('Not sure how to map `${job.os}` to GitHub!');
   }
 
-  Map<String, dynamic> jobYaml(
+  Job _createJob(
     RootConfig rootConfig, {
     List<String>? packages,
     required bool oneOs,
@@ -288,6 +293,7 @@ extension on CIJobEntry {
           _CommandEntry(
             '$package; ${job.tasks[i].command}',
             _commandForOs(job.tasks[i].command),
+            type: job.tasks[i].type,
             // Run this regardless of the success of other steps other than the
             // pub step.
             ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
@@ -345,18 +351,18 @@ extension on CIJobEntry {
 ///
 /// [additionalCacheKeys] is used to create a unique key used to store and
 /// retrieve the cache.
-Map<String, dynamic> _githubJobYaml(
+Job _githubJobYaml(
   String jobName,
   String runsOn,
   PackageFlavor packageFlavor,
   String sdkVersion,
-  List<_CommandEntry> runCommands, {
+  List<_CommandEntryBase> runCommands, {
   Map<String, String>? additionalCacheKeys,
 }) =>
-    {
-      'name': jobName,
-      'runs-on': runsOn,
-      'steps': [
+    Job(
+      name: jobName,
+      runsOn: runsOn,
+      steps: [
         if (!runsOn.startsWith('windows'))
           _cacheEntries(
             runsOn,
@@ -366,39 +372,64 @@ Map<String, dynamic> _githubJobYaml(
             },
           ),
         packageFlavor.configurationMap(sdkVersion),
-        {
-          'id': 'checkout',
-          'uses': ActionInfo.checkout.usesValue,
-        },
-        for (var command in runCommands) command.runContent,
+        ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
+        ActionInfo.checkout.usage(
+          name: 'Checkout repository',
+          id: 'checkout',
+        ),
+        for (var command in runCommands) ...command.runContent,
       ],
-    };
+    );
 
-class _CommandEntry {
+Set<TaskType> _orderedTypes(Iterable<_CommandEntry> commands) =>
+    SplayTreeSet.of(commands.map((e) => e.type).whereType<TaskType>());
+
+Iterable<Step> _beforeSteps(
+  Iterable<_CommandEntry> commands,
+) sync* {
+  for (var type in _orderedTypes(commands)) {
+    yield* type.beforeAllSteps;
+  }
+}
+
+class _CommandEntryBase {
   final String name;
   final String run;
-  final String? id;
-  final String? ifCondition;
-  final String? workingDirectory;
 
-  _CommandEntry(
-    this.name,
-    this.run, {
-    this.id,
-    this.ifCondition,
-    this.workingDirectory,
-  });
+  _CommandEntryBase(this.name, this.run);
 
   /// The entry in the GitHub Action stage representing this object.
   ///
   /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
-  Map<String, dynamic> get runContent => {
-        if (id != null) 'id': id,
-        'name': name,
-        if (ifCondition != null) 'if': ifCondition,
-        if (workingDirectory != null) 'working-directory': workingDirectory,
-        'run': run,
-      };
+  Iterable<Step> get runContent => [Step.run(name: name, run: run)];
+}
+
+class _CommandEntry extends _CommandEntryBase {
+  final TaskType? type;
+  final String? id;
+  final String? ifCondition;
+  final String workingDirectory;
+
+  _CommandEntry(
+    super.name,
+    super.run, {
+    required this.workingDirectory,
+    this.type,
+    this.id,
+    this.ifCondition,
+  });
+
+  @override
+  Iterable<Step> get runContent => [
+        Step.run(
+          id: id,
+          name: name,
+          ifContent: ifCondition,
+          workingDirectory: workingDirectory,
+          run: run,
+        ),
+        ...?type?.afterEachSteps(workingDirectory),
+      ];
 }
 
 /// Creates a "step" for enabling caching for the containing job.
@@ -407,7 +438,7 @@ class _CommandEntry {
 ///
 /// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
 /// store and retrieve the cache.
-Map<String, dynamic> _cacheEntries(
+Step _cacheEntries(
   String runsOn, {
   Map<String, String>? additionalCacheKeys,
 }) {
@@ -429,15 +460,14 @@ Map<String, dynamic> _cacheEntries(
   // activated packages can cause problems.
   const pubCacheHosted = '~/.pub-cache/hosted';
 
-  return {
-    'name': 'Cache Pub hosted dependencies',
-    'uses': ActionInfo.cache.usesValue,
-    'with': {
+  return ActionInfo.cache.usage(
+    name: 'Cache Pub hosted dependencies',
+    withContent: {
       'path': pubCacheHosted,
       'key': restoreKeys.first,
       'restore-keys': restoreKeys.skip(1).join('\n'),
-    }
-  };
+    },
+  );
 }
 
 String _maxLength(String input) {
@@ -447,14 +477,14 @@ String _maxLength(String input) {
   return input.substring(0, 512 - hash.length) + hash;
 }
 
-Map<String, dynamic> _selfValidateTaskConfig() => _githubJobYaml(
+Job _selfValidateTaskConfig() => _githubJobYaml(
       selfValidateJobName,
       _ubuntuLatest,
       PackageFlavor.dart,
       'stable',
       [
         for (var command in selfValidateCommands)
-          _CommandEntry(selfValidateJobName, command),
+          _CommandEntryBase(selfValidateJobName, command),
       ],
     );
 
@@ -469,35 +499,33 @@ class _SelfValidateJob implements HasStageName {
   _SelfValidateJob(this.stageName);
 }
 
-class _MapEntryWithStage implements MapEntry<String, Map<String, dynamic>> {
-  @override
-  final String key;
-  @override
-  final Map<String, dynamic> value;
+class _MapEntryWithStage {
+  final String id;
+  final Job value;
 
   final String stageName;
 
-  _MapEntryWithStage(this.key, this.value, this.stageName);
+  _MapEntryWithStage(
+    this.id,
+    this.value,
+    this.stageName,
+  );
 }
 
 extension on PackageFlavor {
-  Map<String, dynamic> configurationMap(String sdkVersion) {
+  Step configurationMap(String sdkVersion) {
     switch (this) {
       case PackageFlavor.dart:
-        return {
-          'uses': ActionInfo.setupDart.usesValue,
-          'with': {
-            'sdk': sdkVersion,
-          },
-        };
+        return ActionInfo.setupDart.usage(
+          name: 'Setup Dart SDK',
+          withContent: {'sdk': sdkVersion},
+        );
 
       case PackageFlavor.flutter:
-        return {
-          'uses': ActionInfo.setupFlutter.usesValue,
-          'with': {
-            'channel': sdkVersion,
-          }
-        };
+        return ActionInfo.setupFlutter.usage(
+          name: 'Setup Flutter SDK',
+          withContent: {'channel': sdkVersion},
+        );
     }
   }
 }

@@ -37,7 +37,8 @@ GitHubConfig _$GitHubConfigFromJson(Map json) => $checkedCreate(
           $checkedConvert(
               'on_completion',
               (v) => (v as List<dynamic>?)
-                  ?.map((e) => Map<String, dynamic>.from(e as Map))
+                  ?.map(
+                      (e) => Job.fromJson(Map<String, dynamic>.from(e as Map)))
                   .toList()),
           $checkedConvert('cron', (v) => v as String?),
           $checkedConvert('stages', (v) => v as List<dynamic>?),

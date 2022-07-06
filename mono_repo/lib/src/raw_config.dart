@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:json_annotation/json_annotation.dart';
 
-import 'package_config.dart';
+import 'package_flavor.dart';
 import 'utilities.dart';
 
 part 'raw_config.g.dart';
