@@ -8,29 +8,6 @@ part of 'package_config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CIJob _$CIJobFromJson(Map json) => $checkedCreate(
-      'CIJob',
-      json,
-      ($checkedConvert) {
-        final val = CIJob(
-          $checkedConvert('os', (v) => v as String),
-          $checkedConvert('package', (v) => v as String),
-          $checkedConvert('sdk', (v) => v as String),
-          $checkedConvert('stageName', (v) => v as String),
-          $checkedConvert(
-              'tasks',
-              (v) => (v as List<dynamic>)
-                  .map(
-                      (e) => Task.fromJson(Map<String, dynamic>.from(e as Map)))
-                  .toList()),
-          description: $checkedConvert('description', (v) => v as String?),
-          flavor: $checkedConvert(
-              'flavor', (v) => $enumDecode(_$PackageFlavorEnumMap, v)),
-        );
-        return val;
-      },
-    );
-
 Map<String, dynamic> _$CIJobToJson(CIJob instance) {
   final val = <String, dynamic>{};
 
@@ -54,20 +31,6 @@ const _$PackageFlavorEnumMap = {
   PackageFlavor.dart: 'dart',
   PackageFlavor.flutter: 'flutter',
 };
-
-Task _$TaskFromJson(Map json) => $checkedCreate(
-      'Task',
-      json,
-      ($checkedConvert) {
-        final val = Task(
-          $checkedConvert(
-              'flavor', (v) => $enumDecode(_$PackageFlavorEnumMap, v)),
-          $checkedConvert('type', (v) => TaskType.fromJson(v as String)),
-          args: $checkedConvert('args', (v) => v as String?),
-        );
-        return val;
-      },
-    );
 
 Map<String, dynamic> _$TaskToJson(Task instance) {
   final val = <String, dynamic>{

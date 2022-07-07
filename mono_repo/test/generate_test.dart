@@ -626,6 +626,35 @@ $_writeScriptOutput''',
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
+  test('test_with_coverage', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+stages:
+  - test:
+    - description: "chrome tests"
+      test: --platform chrome
+      sdk: dev
+      os: macos
+    - test_with_coverage: --preset travis
+      sdk: stable
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+    ]).create();
+
+    testGenerateBothConfig(
+      printMatcher: '''
+package:pkg_a
+$_writeScriptOutput''',
+    );
+
+    validateSandbox(
+      'github_output_test_with_coverage.txt',
+      defaultGitHubWorkflowFilePath,
+    );
+  });
+
   test(
     'command values must be either a String or a List containing strings',
     () async {

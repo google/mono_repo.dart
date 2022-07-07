@@ -191,24 +191,34 @@ abstract class HasStageName {
   String get stageName;
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(
+  explicitToJson: true,
+  createFactory: false,
+  ignoreUnannotated: true,
+)
 class CIJob implements HasStageName {
   @JsonKey(includeIfNull: false)
   final String? description;
 
+  @JsonKey()
   final String os;
 
   /// Relative path to the directory containing the source package from the root
   /// of the repository.
+  @JsonKey()
   final String package;
 
+  @JsonKey()
   final String sdk;
 
   @override
+  @JsonKey()
   final String stageName;
 
+  @JsonKey()
   final List<Task> tasks;
 
+  @JsonKey()
   final PackageFlavor flavor;
 
   Iterable<String> get _taskCommandsTickQuoted =>
@@ -240,8 +250,6 @@ class CIJob implements HasStageName {
           'Should have caught bad sdk value `$sdk` before here!',
         );
 
-  factory CIJob.fromJson(Map<String, dynamic> json) => _$CIJobFromJson(json);
-
   factory CIJob.parse(
     String os,
     String package,
@@ -271,6 +279,7 @@ class CIJob implements HasStageName {
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
+  @JsonKey(ignore: true)
   Version? get explicitSdkVersion {
     try {
       return Version.parse(sdk);
@@ -294,12 +303,19 @@ class CIJob implements HasStageName {
   List get _items => [description, package, sdk, stageName, tasks];
 }
 
-@JsonSerializable(includeIfNull: false)
+@JsonSerializable(
+  createFactory: false,
+  ignoreUnannotated: true,
+  includeIfNull: false,
+)
 class Task {
+  @JsonKey()
   final PackageFlavor flavor;
 
+  @JsonKey()
   final TaskType type;
 
+  @JsonKey()
   final String? args;
 
   final String command;
@@ -414,8 +430,6 @@ class Task {
 
     throw ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
   }
-
-  factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 

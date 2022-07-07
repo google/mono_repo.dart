@@ -233,7 +233,10 @@ String? _selfValidateFromValue(Object? value) {
   throw ArgumentError.value(value, 'value', 'Must be a `String` or `bool`.');
 }
 
-@JsonSerializable(disallowUnrecognizedKeys: true)
+@JsonSerializable(
+  createToJson: false,
+  disallowUnrecognizedKeys: true,
+)
 class ConditionalStage {
   @JsonKey(required: true, disallowNullValue: true)
   final String name;
@@ -248,13 +251,6 @@ class ConditionalStage {
       return ConditionalStage(json);
     }
     return _$ConditionalStageFromJson(json as Map);
-  }
-
-  Object toJson() {
-    if (ifCondition == null) {
-      return name;
-    }
-    return _$ConditionalStageToJson(this);
   }
 }
 

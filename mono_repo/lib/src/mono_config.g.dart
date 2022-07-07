@@ -26,18 +26,3 @@ ConditionalStage _$ConditionalStageFromJson(Map json) => $checkedCreate(
       },
       fieldKeyMap: const {'ifCondition': 'if'},
     );
-
-Map<String, dynamic> _$ConditionalStageToJson(ConditionalStage instance) {
-  final val = <String, dynamic>{
-    'name': instance.name,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('if', instance.ifCondition);
-  return val;
-}
