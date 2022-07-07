@@ -16,6 +16,6 @@ stages:
     - 2.17.0-69.1.beta
     - 2.18.0-106.0.dev
 - test:
-  - test: --test-randomize-ordering-seed=random
+  - test_with_coverage: --test-randomize-ordering-seed=random
     os:
     - linux
