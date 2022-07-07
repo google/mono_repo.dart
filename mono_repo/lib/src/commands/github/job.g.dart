@@ -12,14 +12,17 @@ Job _$JobFromJson(Map json) => $checkedCreate(
       'Job',
       json,
       ($checkedConvert) {
+        $checkKeys(
+          json,
+          requiredKeys: const ['steps'],
+        );
         final val = Job(
           name: $checkedConvert('name', (v) => v as String?),
           runsOn: $checkedConvert('runs-on', (v) => v as String?),
           steps: $checkedConvert(
               'steps',
               (v) => (v as List<dynamic>)
-                  .map(
-                      (e) => Step.fromJson(Map<String, dynamic>.from(e as Map)))
+                  .map((e) => Step.fromJson(e as Map))
                   .toList()),
         );
         $checkedConvert('if', (v) => val.ifContent = v as String?);

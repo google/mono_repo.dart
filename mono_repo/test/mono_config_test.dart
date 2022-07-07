@@ -211,7 +211,7 @@ line 4, column 12: Unsupported value for "group". expected a list of tasks
       _expectParseThrows(
         monoYaml,
         r'''
-line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`.
+line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
   ╷
 9 │      "weird": "thing"
   │      ^^^^^^^
@@ -234,7 +234,7 @@ line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`.
       _expectParseThrows(
         monoYaml,
         r'''
-line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`.
+line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
    ╷
 10 │      "command": "other thing"
    │      ^^^^^^^^^

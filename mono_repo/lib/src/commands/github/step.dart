@@ -23,11 +23,11 @@ class Step implements YamlLike {
   @JsonKey(name: 'working-directory')
   final String? workingDirectory;
 
-  final Map<String, String>? env;
+  final Map? env;
 
   final String? uses;
   @JsonKey(name: 'with')
-  final Map<String, dynamic>? withContent;
+  final Map? withContent;
 
   Step._({
     this.id,
@@ -84,7 +84,7 @@ class Step implements YamlLike {
         env = null,
         workingDirectory = null;
 
-  factory Step.fromJson(Map<String, dynamic> json) => _$StepFromJson(json);
+  factory Step.fromJson(Map json) => _$StepFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$StepToJson(this);

@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'commands/github/action_info.dart';
 import 'commands/github/step.dart';
 import 'package_flavor.dart';
 
@@ -13,6 +14,7 @@ abstract class TaskType implements Comparable<TaskType> {
     _AnalyzeTask(),
     _TestTask(),
     command,
+    _TestWithCoverageTask(),
   ];
 
   final String name;
@@ -98,4 +100,52 @@ class _CommandTask extends TaskType {
 
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) => [args!];
+}
+
+class _TestWithCoverageTask extends TaskType {
+  const _TestWithCoverageTask() : super._('test_with_coverage');
+
+  static int _count = 0;
+
+  @override
+  List<String> commandValue(PackageFlavor flavor, String? args) {
+    if (flavor == PackageFlavor.flutter) {
+      throw ArgumentError(
+        'Code coverage tests are not supported with Flutter.',
+      );
+    }
+    return [
+      'dart',
+      'pub',
+      'global',
+      'run',
+      'coverage:test_with_coverage',
+      if (args != null) ...['--', args],
+    ];
+  }
+
+  @override
+  Iterable<Step> get beforeAllSteps => [
+        Step.run(
+          name: 'Activate package:coverage',
+          run: 'dart pub global activate coverage',
+        ),
+      ];
+
+  @override
+  Iterable<Step> afterEachSteps(String packageDirectory) {
+    final countString = (_count++).toString().padLeft(2, '0');
+    return [
+      ActionInfo.coveralls.usage(
+        name: 'Upload coverage to Coveralls',
+        withContent: {
+          // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+          'github-token': r'${{ secrets.GITHUB_TOKEN }}',
+          'path-to-lcov': '$packageDirectory/coverage/lcov.info',
+          'flag-name': 'coverage_$countString',
+          'parallel': true,
+        },
+      ),
+    ];
+  }
 }

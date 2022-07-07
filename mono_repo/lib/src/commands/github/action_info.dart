@@ -1,3 +1,4 @@
+import 'job.dart';
 import 'step.dart';
 
 enum ActionInfo implements Comparable<ActionInfo> {
@@ -16,28 +17,65 @@ enum ActionInfo implements Comparable<ActionInfo> {
   setupFlutter(
     repo: 'subosito/flutter-action',
     version: '2fb73e25c9488eb544b9b14b2ce00c4c2baf789e', // v2.4.0
+  ),
+
+  /// See https://github.com/marketplace/actions/coveralls-github-action
+  coveralls(
+    repo: 'coverallsapp/github-action',
+    version: 'master',
+    completionJobFactory: _coverageCompletionJob,
   );
 
   const ActionInfo({
     required this.repo,
     required this.version,
+    this.completionJobFactory,
   });
 
   final String repo;
   final String version;
+  final Job Function()? completionJobFactory;
 
   Step usage({
     required String name,
     String? id,
     Map<String, dynamic>? withContent,
-  }) =>
-      Step.uses(
-        uses: '$repo@$version',
-        id: id,
-        name: name,
-        withContent: withContent,
-      );
+  }) {
+    final step = Step.uses(
+      uses: '$repo@$version',
+      id: id,
+      name: name,
+      withContent: withContent,
+    );
+    // store away the action info for later use.
+    _actionInfoExpando[step] = this;
+    return step;
+  }
 
   @override
   int compareTo(ActionInfo other) => index.compareTo(other.index);
+}
+
+Job _coverageCompletionJob() => Job(
+      name: 'Mark Coveralls job finished',
+      runsOn: 'ubuntu-latest',
+      steps: [
+        ActionInfo.coveralls.usage(
+          name: 'Mark Coveralls job finished',
+          withContent: {
+            // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+            'github-token': r'${{ secrets.GITHUB_TOKEN }}',
+            'parallel-finished': true
+          },
+        )
+      ],
+    );
+
+/// Allows finding [ActionInfo] for a corresponding [Step].
+final _actionInfoExpando = Expando<ActionInfo>();
+
+extension StepExtension on Step {
+  bool get hasCompletionJob => actionInfo?.completionJobFactory != null;
+
+  ActionInfo? get actionInfo => _actionInfoExpando[this];
 }

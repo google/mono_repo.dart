@@ -20,6 +20,7 @@ class Job implements YamlLike {
   final String? runsOn;
   @JsonKey(name: 'if')
   String? ifContent;
+  @JsonKey(required: true)
   final List<Step> steps;
   List<String>? needs;
 
@@ -29,7 +30,7 @@ class Job implements YamlLike {
     required this.steps,
   });
 
-  factory Job.fromJson(Map<String, dynamic> json) => _$JobFromJson(json);
+  factory Job.fromJson(Map json) => _$JobFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$JobToJson(this);

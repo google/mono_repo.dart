@@ -14,22 +14,14 @@ Step _$StepFromJson(Map json) => $checkedCreate(
       ($checkedConvert) {
         final val = Step._(
           id: $checkedConvert('id', (v) => v as String?),
-          withContent: $checkedConvert(
-              'with',
-              (v) => (v as Map?)?.map(
-                    (k, e) => MapEntry(k as String, e),
-                  )),
+          withContent: $checkedConvert('with', (v) => v as Map?),
           name: $checkedConvert('name', (v) => v as String?),
           uses: $checkedConvert('uses', (v) => v as String?),
           run: $checkedConvert('run', (v) => v as String?),
           ifContent: $checkedConvert('if', (v) => v as String?),
           workingDirectory:
               $checkedConvert('working-directory', (v) => v as String?),
-          env: $checkedConvert(
-              'env',
-              (v) => (v as Map?)?.map(
-                    (k, e) => MapEntry(k as String, e as String),
-                  )),
+          env: $checkedConvert('env', (v) => v as Map?),
         );
         return val;
       },

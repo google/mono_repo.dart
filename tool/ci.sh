@@ -99,9 +99,17 @@ for PKG in ${PKGS}; do
         echo 'flutter test --test-randomize-ordering-seed=random'
         flutter test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
-      test_3)
-        echo 'dart test --test-randomize-ordering-seed=random'
-        dart test --test-randomize-ordering-seed=random || EXIT_CODE=$?
+      test_with_coverage_0)
+        echo 'dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random'
+        dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        ;;
+      test_with_coverage_1)
+        echo 'dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random'
+        dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        ;;
+      test_with_coverage_2)
+        echo 'dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random'
+        dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
