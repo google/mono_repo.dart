@@ -421,7 +421,16 @@ class Task {
           badKey: true,
         );
       }
-      return Task(flavor, taskType, args: args);
+      try {
+        return Task(flavor, taskType, args: args);
+      } on InvalidTaskConfigException catch (e) {
+        throw CheckedFromJsonException(
+          yamlValue,
+          taskName,
+          'Task',
+          e.message,
+        );
+      }
     }
 
     if (yamlValue is YamlNode) {

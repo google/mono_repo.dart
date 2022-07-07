@@ -655,6 +655,37 @@ $_writeScriptOutput''',
     );
   });
 
+  test('test_with_coverage not supported with flutter', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+stages:
+  - test:
+    - test_with_coverage:
+      sdk: stable
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+      ''')
+    ]).create();
+
+    expect(
+      testGenerateGitHubConfig,
+      throwsAParsedYamlException(r'''
+line 3, column 25 of pkg_a/mono_pkg.yaml: Unsupported value for "test_with_coverage". Code coverage tests are not supported with Flutter.
+  ╷
+3 │     - test_with_coverage:
+  │                         ^
+  ╵'''),
+    );
+  });
+
   test(
     'command values must be either a String or a List containing strings',
     () async {
