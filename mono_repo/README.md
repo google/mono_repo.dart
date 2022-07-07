@@ -1,5 +1,10 @@
 Manage multiple [Dart packages] within a single repository.
 
+[![pub package](https://img.shields.io/pub/v/mono_repo.svg)](https://pub.dev/packages/mono_repo)
+[![package publisher](https://img.shields.io/pub/publisher/mono_repo.svg)](https://pub.dev/packages/mono_repo/publisher)
+[![Dart CI](https://github.com/google/mono_repo.dart/actions/workflows/dart.yml/badge.svg)](https://github.com/google/mono_repo.dart/actions/workflows/dart.yml)
+[![Coverage Status](https://coveralls.io/repos/github/google/mono_repo.dart/badge.svg?branch=master)](https://coveralls.io/github/google/mono_repo.dart?branch=master)
+
 ## Installation
 
 ```console
