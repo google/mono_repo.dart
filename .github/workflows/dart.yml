@@ -170,8 +170,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; flutter pub pub upgrade
-        run: flutter pub pub upgrade
+        name: test_flutter_pkg; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
@@ -349,8 +349,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; flutter pub pub upgrade
-        run: flutter pub pub upgrade
+        name: test_flutter_pkg; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
@@ -383,8 +383,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; flutter pub pub upgrade
-        run: flutter pub pub upgrade
+        name: test_flutter_pkg; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
       - name: "test_flutter_pkg; dart format --output=none --set-exit-if-changed ."
@@ -537,8 +537,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_pub_upgrade
-        name: test_flutter_pkg; flutter pub pub upgrade
-        run: flutter pub pub upgrade
+        name: test_flutter_pkg; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg
       - name: "test_flutter_pkg; flutter test --test-randomize-ordering-seed=random"
@@ -709,8 +709,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: test_flutter_pkg_example_pub_upgrade
-        name: test_flutter_pkg/example; flutter pub pub upgrade
-        run: flutter pub pub upgrade
+        name: test_flutter_pkg/example; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: test_flutter_pkg/example
       - name: "test_flutter_pkg/example; flutter test --test-randomize-ordering-seed=random"

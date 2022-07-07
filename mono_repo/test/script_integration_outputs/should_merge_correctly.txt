@@ -83,8 +83,8 @@ jobs:
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
       - id: pkg_c_pub_upgrade
-        name: pkg_c; flutter pub pub upgrade
-        run: flutter pub pub upgrade
+        name: pkg_c; flutter pub upgrade
+        run: flutter pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: pkg_c
       - name: pkg_c; flutter analyze

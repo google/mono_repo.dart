@@ -181,7 +181,7 @@ Iterable<_MapEntryWithStage> _listJobs(
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield jobEntry(_selfValidateTaskConfig(), job.stageName);
+      yield jobEntry(_selfValidateJob(), job.stageName);
       continue;
     }
 
@@ -303,7 +303,7 @@ extension on CIJobEntry {
       }
     }
 
-    return _githubJobYaml(
+    return _githubJob(
       jobName(
         packages,
         includeOs: oneOs,
@@ -351,7 +351,7 @@ extension on CIJobEntry {
 ///
 /// [additionalCacheKeys] is used to create a unique key used to store and
 /// retrieve the cache.
-Job _githubJobYaml(
+Job _githubJob(
   String jobName,
   String runsOn,
   PackageFlavor packageFlavor,
@@ -371,7 +371,7 @@ Job _githubJobYaml(
               if (additionalCacheKeys != null) ...additionalCacheKeys,
             },
           ),
-        packageFlavor.configurationMap(sdkVersion),
+        packageFlavor.setupStep(sdkVersion),
         ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
         ActionInfo.checkout.usage(
           name: 'Checkout repository',
@@ -398,9 +398,6 @@ class _CommandEntryBase {
 
   _CommandEntryBase(this.name, this.run);
 
-  /// The entry in the GitHub Action stage representing this object.
-  ///
-  /// See https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#jobsjob_idsteps
   Iterable<Step> get runContent => [Step.run(name: name, run: run)];
 }
 
@@ -477,7 +474,7 @@ String _maxLength(String input) {
   return input.substring(0, 512 - hash.length) + hash;
 }
 
-Job _selfValidateTaskConfig() => _githubJobYaml(
+Job _selfValidateJob() => _githubJob(
       selfValidateJobName,
       _ubuntuLatest,
       PackageFlavor.dart,
@@ -513,7 +510,7 @@ class _MapEntryWithStage {
 }
 
 extension on PackageFlavor {
-  Step configurationMap(String sdkVersion) {
+  Step setupStep(String sdkVersion) {
     switch (this) {
       case PackageFlavor.dart:
         return ActionInfo.setupDart.usage(

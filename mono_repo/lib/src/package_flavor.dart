@@ -4,7 +4,7 @@
 
 enum PackageFlavor {
   dart(pubCommand: 'dart pub', prettyName: 'Dart'),
-  flutter(pubCommand: 'flutter pub pub', prettyName: 'Flutter');
+  flutter(pubCommand: 'flutter pub', prettyName: 'Flutter');
 
   const PackageFlavor({required this.pubCommand, required this.prettyName});
 
