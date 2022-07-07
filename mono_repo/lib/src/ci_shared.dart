@@ -144,16 +144,16 @@ Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
   final commandsToKeys = <String, String>{};
 
   final tasksToConfigure = _travisTasks(configs);
-  final taskNames = tasksToConfigure.map((task) => task.name).toSet();
+  final taskNames = tasksToConfigure.map((task) => task.type).toSet();
 
   for (var taskName in taskNames) {
     final commands = tasksToConfigure
-        .where((task) => task.name == taskName)
+        .where((task) => task.type == taskName)
         .map((task) => task.command)
         .toSet();
 
     if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskName;
+      commandsToKeys[commands.single] = taskName.name;
       continue;
     }
 

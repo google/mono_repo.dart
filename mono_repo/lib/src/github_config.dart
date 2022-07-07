@@ -4,6 +4,8 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'commands/github/job.dart';
+
 part 'github_config.g.dart';
 
 const defaultGitHubWorkflowFileName = 'dart';
@@ -16,7 +18,7 @@ class GitHubConfig {
   final Map<String, dynamic>? on;
 
   @JsonKey(name: 'on_completion')
-  final List<Map<String, dynamic>>? onCompletion;
+  final List<Job>? onCompletion;
 
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
@@ -92,7 +94,7 @@ class GitHubConfig {
   void _noOnCompletionNeedsConfig() {
     if (onCompletion == null) return;
     for (var jobConfig in onCompletion!) {
-      if (jobConfig.containsKey('needs')) {
+      if (jobConfig.needs != null) {
         throw ArgumentError.value(
             jobConfig,
             'on_completion',

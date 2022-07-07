@@ -10,23 +10,15 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
 
+import 'package_flavor.dart';
 import 'raw_config.dart';
+import 'task_type.dart';
 import 'utilities.dart';
 import 'yaml.dart';
 
 part 'package_config.g.dart';
 
 const monoPkgFileName = 'mono_pkg.yaml';
-
-enum PackageFlavor {
-  dart(pubCommand: 'dart pub', prettyName: 'Dart'),
-  flutter(pubCommand: 'flutter pub pub', prettyName: 'Flutter');
-
-  const PackageFlavor({required this.pubCommand, required this.prettyName});
-
-  final String pubCommand;
-  final String prettyName;
-}
 
 class PackageConfig {
   final String relativePath;
@@ -304,28 +296,16 @@ class CIJob implements HasStageName {
 
 @JsonSerializable(includeIfNull: false)
 class Task {
-  static const _oldToNewTaskNames = {
-    'dartfmt': 'format',
-    'dartanalyzer': 'analyze',
-  };
-  static const _tasks = {'format', 'analyze', 'test', 'command'};
-  static final _allowedTaskNames = UnmodifiableSetView({
-    ..._oldToNewTaskNames.keys,
-    ..._tasks,
-  });
-
-  static final _prettyTaskList = _tasks.map((t) => '`$t`').join(', ');
-
   final PackageFlavor flavor;
 
-  final String name;
+  final TaskType type;
 
   final String? args;
 
   final String command;
 
-  Task(this.flavor, this.name, {this.args})
-      : command = _commandValue(flavor, name, args).join(' ');
+  Task(this.flavor, this.type, {this.args})
+      : command = type.commandValue(flavor, args).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
@@ -352,15 +332,15 @@ class Task {
 
   factory Task.parse(PackageFlavor flavor, Object yamlValue) {
     if (yamlValue is String) {
-      if (yamlValue == 'command') {
+      if (yamlValue == TaskType.command.name) {
         throw ArgumentError.value(yamlValue, 'command', 'requires a value');
       }
-      return Task(flavor, _normalizeTaskName(yamlValue));
+      return Task(flavor, _taskTypeForName(yamlValue));
     }
 
     if (yamlValue is Map) {
       final taskNames = yamlValue.keys
-          .where(_allowedTaskNames.contains)
+          .where(TaskType.allowedTaskNames.contains)
           .cast<String>()
           .toList();
       if (taskNames.isEmpty) {
@@ -372,7 +352,7 @@ class Task {
           yamlValue,
           key,
           'Task',
-          'Must have one key of $_prettyTaskList.',
+          'Must have one key of ${TaskType.prettyTaskList}.',
           badKey: true,
         );
       }
@@ -381,16 +361,18 @@ class Task {
           yamlValue,
           taskNames.skip(1).first,
           'Task',
-          'Must have one and only one key of $_prettyTaskList.',
+          'Must have one and only one key of ${TaskType.prettyTaskList}.',
           badKey: true,
         );
       }
-      final taskName = _normalizeTaskName(taskNames.single);
+
+      final taskName = taskNames.single;
+      final taskType = _taskTypeForName(taskName);
 
       String? args;
-      switch (taskName) {
-        case 'command':
-          final taskValue = yamlValue[taskName];
+      switch (taskType) {
+        case TaskType.command:
+          final taskValue = yamlValue[taskType.name];
           if (taskValue is String) {
             args = taskValue;
           } else if (taskValue is List &&
@@ -399,19 +381,19 @@ class Task {
           } else {
             throw CheckedFromJsonException(
               yamlValue,
-              taskName,
-              'command',
+              taskType.name,
+              'TaskType',
               'Only supports a string or array of strings',
             );
           }
           break;
         default:
           // NOTE: using `taskName.single` in case it's a deprecated name
-          args = yamlValue[taskNames.single] as String?;
+          args = yamlValue[taskName] as String?;
       }
 
       final extraConfig = Set<String>.from(yamlValue.keys)
-        ..removeAll([taskNames.single, taskName, 'os', 'sdk']);
+        ..removeAll([taskName, 'os', 'sdk']);
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (extraConfig.isNotEmpty) {
@@ -423,7 +405,7 @@ class Task {
           badKey: true,
         );
       }
-      return Task(flavor, taskName, args: args);
+      return Task(flavor, taskType, args: args);
     }
 
     if (yamlValue is YamlNode) {
@@ -438,11 +420,11 @@ class Task {
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 
   /// Stores the job names we've already warned about. Only warn once!
-  static final _warnedNames = <String>{};
+  static final _warnedNames = <TaskType>{};
 
-  static String _normalizeTaskName(String input) {
-    final taskName = _oldToNewTaskNames[input] ?? input;
-    if (taskName != input && _warnedNames.add(taskName)) {
+  static TaskType _taskTypeForName(String input) {
+    final taskName = TaskType.taskFromName(input);
+    if (taskName.name != input && _warnedNames.add(taskName)) {
       print(
         yellow.wrap(
           '"$input" is deprecated. Use "$taskName" instead to define tasks in '
@@ -453,36 +435,6 @@ class Task {
     return taskName;
   }
 
-  static List<String> _commandValue(
-    PackageFlavor flavor,
-    String name,
-    String? args,
-  ) {
-    switch (name) {
-      case 'format':
-        return [
-          'dart format',
-          (args == null || args == 'sdk')
-              ? '--output=none --set-exit-if-changed .'
-              : args,
-        ];
-      case 'analyze':
-        return [
-          flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
-          if (args != null) args
-        ];
-      case 'test':
-        return [
-          flavor == PackageFlavor.dart ? 'dart test' : 'flutter test',
-          if (args != null) args,
-        ];
-      case 'command':
-        return [args!];
-      default:
-        throw UnsupportedError('Cannot generate the command for `$name`.');
-    }
-  }
-
   @override
   bool operator ==(Object other) =>
       other is Task && _equality.equals(_items, other._items);
@@ -490,7 +442,7 @@ class Task {
   @override
   int get hashCode => _equality.hash(_items);
 
-  List get _items => [name, args];
+  List get _items => [type, args];
 }
 
 const _equality = DeepCollectionEquality();

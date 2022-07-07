@@ -62,7 +62,7 @@ Task _$TaskFromJson(Map json) => $checkedCreate(
         final val = Task(
           $checkedConvert(
               'flavor', (v) => $enumDecode(_$PackageFlavorEnumMap, v)),
-          $checkedConvert('name', (v) => v as String),
+          $checkedConvert('type', (v) => TaskType.fromJson(v as String)),
           args: $checkedConvert('args', (v) => v as String?),
         );
         return val;
@@ -72,7 +72,7 @@ Task _$TaskFromJson(Map json) => $checkedCreate(
 Map<String, dynamic> _$TaskToJson(Task instance) {
   final val = <String, dynamic>{
     'flavor': _$PackageFlavorEnumMap[instance.flavor],
-    'name': instance.name,
+    'type': instance.type,
   };
 
   void writeNotNull(String key, dynamic value) {

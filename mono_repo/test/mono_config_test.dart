@@ -42,7 +42,7 @@ void main() {
 
     final oneJob = config.jobs.single;
     expect(oneJob.sdk, 'stable');
-    expect(oneJob.tasks.first.name, 'test');
+    expect(oneJob.tasks.first.type.name, 'test');
     expect(oneJob.tasks.first.args, isNull);
     expect(oneJob.stageName, 'unit_test');
   });
@@ -54,7 +54,8 @@ void main() {
 
     expect(config.sdks, ['1.23.0', 'dev', 'stable']);
 
-    final jobs = config.jobs.map((tj) => tj.toJson()).toList();
+    final jobs =
+        jsonDecode(jsonEncode(config.jobs.map((tj) => tj.toJson()).toList()));
 
     expect(jobs, _testConfig1expectedOutput);
   });
@@ -426,10 +427,10 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'analyze',
+            'type': 'analyze',
             'args': '--fatal-infos --fatal-warnings .'
           },
-          {'flavor': 'dart', 'name': 'format'}
+          {'flavor': 'dart', 'type': 'format'}
         ],
         'flavor': 'dart'
       },
@@ -442,10 +443,10 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'analyze',
+            'type': 'analyze',
             'args': '--fatal-infos --fatal-warnings .'
           },
-          {'flavor': 'dart', 'name': 'format'}
+          {'flavor': 'dart', 'type': 'format'}
         ],
         'flavor': 'dart'
       },
@@ -457,7 +458,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'analyze',
+            'type': 'analyze',
             'args': '--fatal-infos --fatal-warnings .'
           }
         ],
@@ -469,7 +470,7 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'unit_test',
         'tasks': [
-          {'flavor': 'dart', 'name': 'test', 'args': '--platform chrome'}
+          {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'}
         ],
         'flavor': 'dart'
       },
@@ -479,7 +480,7 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'unit_test',
         'tasks': [
-          {'flavor': 'dart', 'name': 'test', 'args': '--platform chrome'}
+          {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'}
         ],
         'flavor': 'dart'
       },
@@ -489,7 +490,7 @@ List get _testConfig1expectedOutput => [
         'sdk': 'stable',
         'stageName': 'unit_test',
         'tasks': [
-          {'flavor': 'dart', 'name': 'test', 'args': '--platform chrome'}
+          {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'}
         ],
         'flavor': 'dart'
       },
@@ -501,7 +502,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 0'
           }
         ],
@@ -515,7 +516,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 0'
           }
         ],
@@ -529,7 +530,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 0'
           }
         ],
@@ -543,7 +544,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 1'
           }
         ],
@@ -557,7 +558,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 1'
           }
         ],
@@ -571,7 +572,7 @@ List get _testConfig1expectedOutput => [
         'tasks': [
           {
             'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--preset travis --total-shards 5 --shard-index 1'
           }
         ],
@@ -583,7 +584,7 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'unit_test',
         'tasks': [
-          {'flavor': 'dart', 'name': 'test'}
+          {'flavor': 'dart', 'type': 'test'}
         ],
         'flavor': 'dart'
       },
@@ -593,7 +594,7 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'unit_test',
         'tasks': [
-          {'flavor': 'dart', 'name': 'test'}
+          {'flavor': 'dart', 'type': 'test'}
         ],
         'flavor': 'dart'
       },
@@ -603,7 +604,7 @@ List get _testConfig1expectedOutput => [
         'sdk': 'stable',
         'stageName': 'unit_test',
         'tasks': [
-          {'flavor': 'dart', 'name': 'test'}
+          {'flavor': 'dart', 'type': 'test'}
         ],
         'flavor': 'dart'
       }
