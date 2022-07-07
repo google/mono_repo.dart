@@ -46,7 +46,7 @@ Map<String, dynamic> _$CIJobToJson(CIJob instance) {
   val['sdk'] = instance.sdk;
   val['stageName'] = instance.stageName;
   val['tasks'] = instance.tasks.map((e) => e.toJson()).toList();
-  val['flavor'] = _$PackageFlavorEnumMap[instance.flavor];
+  val['flavor'] = _$PackageFlavorEnumMap[instance.flavor]!;
   return val;
 }
 
@@ -71,7 +71,7 @@ Task _$TaskFromJson(Map json) => $checkedCreate(
 
 Map<String, dynamic> _$TaskToJson(Task instance) {
   final val = <String, dynamic>{
-    'flavor': _$PackageFlavorEnumMap[instance.flavor],
+    'flavor': _$PackageFlavorEnumMap[instance.flavor]!,
     'type': instance.type,
   };
 
