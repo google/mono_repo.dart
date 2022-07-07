@@ -677,8 +677,8 @@ dependencies:
 
     expect(
       testGenerateGitHubConfig,
-      throwsAParsedYamlException(r'''
-line 3, column 25 of pkg_a/mono_pkg.yaml: Unsupported value for "test_with_coverage". Code coverage tests are not supported with Flutter.
+      throwsAParsedYamlException('''
+line 3, column 25 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "test_with_coverage". Code coverage tests are not supported with Flutter.
   ╷
 3 │     - test_with_coverage:
   │                         ^
