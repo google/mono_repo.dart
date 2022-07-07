@@ -135,14 +135,14 @@ class _TestWithCoverageTask extends TaskType {
   @override
   Iterable<Step> afterEachSteps(String packageDirectory) {
     final countString = (_count++).toString().padLeft(2, '0');
-    final stepId = 'coverage_$countString';
     return [
       ActionInfo.coveralls.usage(
         name: 'Upload coverage to Coveralls',
         withContent: {
-          'github-token': '\${{ secrets.GITHUB_TOKEN }}',
+          // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+          'github-token': r'${{ secrets.GITHUB_TOKEN }}',
           'path-to-lcov': '$packageDirectory/coverage/lcov.info',
-          'flag-name': stepId,
+          'flag-name': 'coverage_$countString',
           'parallel': true,
         },
       ),

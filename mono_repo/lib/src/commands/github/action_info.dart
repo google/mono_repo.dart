@@ -18,6 +18,8 @@ enum ActionInfo implements Comparable<ActionInfo> {
     repo: 'subosito/flutter-action',
     version: '2fb73e25c9488eb544b9b14b2ce00c4c2baf789e', // v2.4.0
   ),
+
+  /// See https://github.com/marketplace/actions/coveralls-github-action
   coveralls(
     repo: 'coverallsapp/github-action',
     version: 'master',
@@ -38,13 +40,17 @@ enum ActionInfo implements Comparable<ActionInfo> {
     required String name,
     String? id,
     Map<String, dynamic>? withContent,
-  }) =>
-      _ActionStep(
-        info: this,
-        id: id,
-        name: name,
-        withContent: withContent,
-      );
+  }) {
+    final step = Step.uses(
+      uses: '$repo@$version',
+      id: id,
+      name: name,
+      withContent: withContent,
+    );
+    // store away the action info for later use.
+    _actionInfoExpando[step] = this;
+    return step;
+  }
 
   @override
   int compareTo(ActionInfo other) => index.compareTo(other.index);
@@ -57,29 +63,19 @@ Job _coverageCompletionJob() => Job(
         ActionInfo.coveralls.usage(
           name: 'Mark Coveralls job finished',
           withContent: {
-            'github-token': '\${{ secrets.GITHUB_TOKEN }}',
+            // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+            'github-token': r'${{ secrets.GITHUB_TOKEN }}',
             'parallel-finished': true
           },
         )
       ],
     );
 
-class _ActionStep extends Step {
-  final ActionInfo info;
-
-  _ActionStep({
-    required this.info,
-    required super.name,
-    super.id,
-    super.withContent,
-  }) : super.uses(
-          uses: '${info.repo}@${info.version}',
-        );
-}
+/// Allows finding [ActionInfo] for a corresponding [Step].
+final _actionInfoExpando = Expando<ActionInfo>();
 
 extension StepExtension on Step {
   bool get hasCompletionJob => actionInfo?.completionJobFactory != null;
 
-  ActionInfo? get actionInfo =>
-      (this is _ActionStep) ? (this as _ActionStep).info : null;
+  ActionInfo? get actionInfo => _actionInfoExpando[this];
 }
