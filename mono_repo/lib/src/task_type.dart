@@ -23,9 +23,6 @@ abstract class TaskType implements Comparable<TaskType> {
 
   const TaskType._(this.name);
 
-  factory TaskType.fromJson(String name) =>
-      _values.singleWhere((element) => element.name == name);
-
   List<String> commandValue(PackageFlavor flavor, String? args);
 
   String toJson() => name;
@@ -55,6 +52,14 @@ abstract class TaskType implements Comparable<TaskType> {
         (element) =>
             element.name == input || element.alternates.contains(input),
       );
+}
+
+/// Special [Exception] type used to convey error state that can be caught and
+/// re-thrown with more context.
+class InvalidTaskConfigException implements Exception {
+  final String message;
+
+  const InvalidTaskConfigException(this.message);
 }
 
 class _FormatTask extends TaskType {
@@ -110,7 +115,7 @@ class _TestWithCoverageTask extends TaskType {
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) {
     if (flavor == PackageFlavor.flutter) {
-      throw ArgumentError(
+      throw const InvalidTaskConfigException(
         'Code coverage tests are not supported with Flutter.',
       );
     }

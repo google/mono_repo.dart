@@ -626,6 +626,66 @@ $_writeScriptOutput''',
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
 
+  test('test_with_coverage', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+stages:
+  - test:
+    - description: "chrome tests"
+      test: --platform chrome
+      sdk: dev
+      os: macos
+    - test_with_coverage: --preset travis
+      sdk: stable
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+      ''')
+    ]).create();
+
+    testGenerateBothConfig(
+      printMatcher: '''
+package:pkg_a
+$_writeScriptOutput''',
+    );
+
+    validateSandbox(
+      'github_output_test_with_coverage.txt',
+      defaultGitHubWorkflowFilePath,
+    );
+  });
+
+  test('test_with_coverage not supported with flutter', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
+stages:
+  - test:
+    - test_with_coverage:
+      sdk: stable
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_a
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+      ''')
+    ]).create();
+
+    expect(
+      testGenerateGitHubConfig,
+      throwsAParsedYamlException('''
+line 3, column 25 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "test_with_coverage". Code coverage tests are not supported with Flutter.
+  ╷
+3 │     - test_with_coverage:
+  │                         ^
+  ╵'''),
+    );
+  });
+
   test(
     'command values must be either a String or a List containing strings',
     () async {

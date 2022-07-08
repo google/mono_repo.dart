@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:checked_yaml/checked_yaml.dart';
-import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -191,24 +190,34 @@ abstract class HasStageName {
   String get stageName;
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(
+  explicitToJson: true,
+  createFactory: false,
+  ignoreUnannotated: true,
+)
 class CIJob implements HasStageName {
   @JsonKey(includeIfNull: false)
   final String? description;
 
+  @JsonKey()
   final String os;
 
   /// Relative path to the directory containing the source package from the root
   /// of the repository.
+  @JsonKey()
   final String package;
 
+  @JsonKey()
   final String sdk;
 
   @override
+  @JsonKey()
   final String stageName;
 
+  @JsonKey()
   final List<Task> tasks;
 
+  @JsonKey()
   final PackageFlavor flavor;
 
   Iterable<String> get _taskCommandsTickQuoted =>
@@ -240,8 +249,6 @@ class CIJob implements HasStageName {
           'Should have caught bad sdk value `$sdk` before here!',
         );
 
-  factory CIJob.fromJson(Map<String, dynamic> json) => _$CIJobFromJson(json);
-
   factory CIJob.parse(
     String os,
     String package,
@@ -271,6 +278,7 @@ class CIJob implements HasStageName {
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
+  @JsonKey(ignore: true)
   Version? get explicitSdkVersion {
     try {
       return Version.parse(sdk);
@@ -280,26 +288,21 @@ class CIJob implements HasStageName {
   }
 
   Map<String, dynamic> toJson() => _$CIJobToJson(this);
-
-  @override
-  String toString() => 'CIJob: ${toJson()}';
-
-  @override
-  bool operator ==(Object other) =>
-      other is CIJob && _equality.equals(_items, other._items);
-
-  @override
-  int get hashCode => _equality.hash(_items);
-
-  List get _items => [description, package, sdk, stageName, tasks];
 }
 
-@JsonSerializable(includeIfNull: false)
+@JsonSerializable(
+  createFactory: false,
+  ignoreUnannotated: true,
+  includeIfNull: false,
+)
 class Task {
+  @JsonKey()
   final PackageFlavor flavor;
 
+  @JsonKey()
   final TaskType type;
 
+  @JsonKey()
   final String? args;
 
   final String command;
@@ -405,7 +408,16 @@ class Task {
           badKey: true,
         );
       }
-      return Task(flavor, taskType, args: args);
+      try {
+        return Task(flavor, taskType, args: args);
+      } on InvalidTaskConfigException catch (e) {
+        throw CheckedFromJsonException(
+          yamlValue,
+          taskName,
+          'Task',
+          e.message,
+        );
+      }
     }
 
     if (yamlValue is YamlNode) {
@@ -414,8 +426,6 @@ class Task {
 
     throw ArgumentError('huh? $yamlValue ${yamlValue.runtimeType}');
   }
-
-  factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
   Map<String, dynamic> toJson() => _$TaskToJson(this);
 
@@ -434,15 +444,4 @@ class Task {
     }
     return taskName;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      other is Task && _equality.equals(_items, other._items);
-
-  @override
-  int get hashCode => _equality.hash(_items);
-
-  List get _items => [type, args];
 }
-
-const _equality = DeepCollectionEquality();
