@@ -3,7 +3,6 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:checked_yaml/checked_yaml.dart';
-import 'package:collection/collection.dart';
 import 'package:io/ansi.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pub_semver/pub_semver.dart';
@@ -289,18 +288,6 @@ class CIJob implements HasStageName {
   }
 
   Map<String, dynamic> toJson() => _$CIJobToJson(this);
-
-  @override
-  String toString() => 'CIJob: ${toJson()}';
-
-  @override
-  bool operator ==(Object other) =>
-      other is CIJob && _equality.equals(_items, other._items);
-
-  @override
-  int get hashCode => _equality.hash(_items);
-
-  List get _items => [description, package, sdk, stageName, tasks];
 }
 
 @JsonSerializable(
@@ -457,15 +444,4 @@ class Task {
     }
     return taskName;
   }
-
-  @override
-  bool operator ==(Object other) =>
-      other is Task && _equality.equals(_items, other._items);
-
-  @override
-  int get hashCode => _equality.hash(_items);
-
-  List get _items => [type, args];
 }
-
-const _equality = DeepCollectionEquality();
