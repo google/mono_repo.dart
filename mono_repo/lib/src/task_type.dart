@@ -133,7 +133,9 @@ class _TestWithCoverageTask extends TaskType {
   Iterable<Step> get beforeAllSteps => [
         Step.run(
           name: 'Activate package:coverage',
-          run: 'dart pub global activate coverage',
+          // Requiring the latest version of pkg:coverage as the when this
+          // feature was added.
+          run: "dart pub global activate coverage '>=1.5.0'",
         ),
       ];
 
