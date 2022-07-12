@@ -534,7 +534,7 @@ jobs:
         with:
           sdk: dev
       - name: "Activate package:coverage"
-        run: dart pub global activate coverage
+        run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -586,7 +586,7 @@ jobs:
         with:
           sdk: dev
       - name: "Activate package:coverage"
-        run: dart pub global activate coverage
+        run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -681,7 +681,7 @@ jobs:
         with:
           sdk: dev
       - name: "Activate package:coverage"
-        run: dart pub global activate coverage
+        run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
