@@ -29,6 +29,13 @@ enum ActionInfo implements Comparable<ActionInfo> {
     repo: 'coverallsapp/github-action',
     version: 'master',
     completionJobFactory: _coverageCompletionJob,
+  ),
+
+  /// See https://github.com/marketplace/actions/codecov
+  codecov(
+    name: 'Upload coverage to codecov.io',
+    repo: 'codecov/codecov-action',
+    version: 'master',
   );
 
   const ActionInfo({

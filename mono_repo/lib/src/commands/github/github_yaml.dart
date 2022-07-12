@@ -4,6 +4,7 @@
 
 import 'dart:collection';
 
+import '../../basic_config.dart';
 import '../../ci_shared.dart';
 import '../../github_config.dart';
 import '../../mono_config.dart';
@@ -195,7 +196,7 @@ Iterable<_MapEntryWithStage> _listJobs(
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield jobEntry(_selfValidateJob(), job.stageName);
+      yield jobEntry(_selfValidateJob(rootConfig.monoConfig), job.stageName);
       continue;
     }
 
@@ -331,6 +332,7 @@ extension on CIJobEntry {
       job.flavor,
       job.sdk,
       commandEntries,
+      config: rootConfig.monoConfig,
       additionalCacheKeys: {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
@@ -373,6 +375,7 @@ Job _githubJob(
   PackageFlavor packageFlavor,
   String sdkVersion,
   List<_CommandEntryBase> runCommands, {
+  required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
 }) =>
     Job(
@@ -392,7 +395,7 @@ Job _githubJob(
         ActionInfo.checkout.usage(
           id: 'checkout',
         ),
-        for (var command in runCommands) ...command.runContent,
+        for (var command in runCommands) ...command.runContent(config),
       ],
     );
 
@@ -413,7 +416,8 @@ class _CommandEntryBase {
 
   _CommandEntryBase(this.name, this.run);
 
-  Iterable<Step> get runContent => [Step.run(name: name, run: run)];
+  Iterable<Step> runContent(BasicConfiguration config) =>
+      [Step.run(name: name, run: run)];
 }
 
 class _CommandEntry extends _CommandEntryBase {
@@ -432,7 +436,7 @@ class _CommandEntry extends _CommandEntryBase {
   });
 
   @override
-  Iterable<Step> get runContent => [
+  Iterable<Step> runContent(BasicConfiguration config) => [
         Step.run(
           id: id,
           name: name,
@@ -440,7 +444,7 @@ class _CommandEntry extends _CommandEntryBase {
           workingDirectory: workingDirectory,
           run: run,
         ),
-        ...?type?.afterEachSteps(workingDirectory),
+        ...?type?.afterEachSteps(workingDirectory, config),
       ];
 }
 
@@ -488,7 +492,7 @@ String _maxLength(String input) {
   return input.substring(0, 512 - hash.length) + hash;
 }
 
-Job _selfValidateJob() => _githubJob(
+Job _selfValidateJob(BasicConfiguration config) => _githubJob(
       selfValidateJobName,
       _ubuntuLatest,
       PackageFlavor.dart,
@@ -497,6 +501,7 @@ Job _selfValidateJob() => _githubJob(
         for (var command in selfValidateCommands)
           _CommandEntryBase(selfValidateJobName, command),
       ],
+      config: config,
     );
 
 const _ubuntuLatest = 'ubuntu-latest';

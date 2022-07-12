@@ -5,6 +5,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
 
+import 'basic_config.dart';
+import 'coverage_processor.dart';
 import 'github_config.dart';
 import 'yaml.dart';
 
@@ -18,6 +20,7 @@ const _allowedMonoConfigKeys = {
   'pretty_ansi',
   'pub_action',
   'self_validate',
+  'coverage_service',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -27,41 +30,25 @@ const _allowedPubActions = {
   _defaultPubAction,
 };
 
-class MonoConfig {
+class MonoConfig implements BasicConfiguration {
   final Map<String, ConditionalStage> githubConditionalStages;
   final Set<String> mergeStages;
   final bool prettyAnsi;
   final String pubAction;
   final String? selfValidateStage;
   final GitHubConfig github;
-
-  factory MonoConfig({
-    required Set<String> mergeStages,
-    required bool prettyAnsi,
-    required String pubAction,
-    required String? selfValidateStage,
-    required Map github,
-  }) {
-    final githubConditionalStages = _readConditionalStages(github);
-
-    return MonoConfig._(
-      githubConditionalStages: githubConditionalStages,
-      mergeStages: mergeStages,
-      prettyAnsi: prettyAnsi,
-      pubAction: pubAction,
-      selfValidateStage: selfValidateStage,
-      github: GitHubConfig.fromJson(github),
-    );
-  }
+  @override
+  final Set<CoverageProcessor> coverageProcessors;
 
   MonoConfig._({
-    required this.githubConditionalStages,
     required this.mergeStages,
     required this.prettyAnsi,
     required this.pubAction,
     required this.selfValidateStage,
-    required this.github,
-  });
+    required Map github,
+    required this.coverageProcessors,
+  })  : githubConditionalStages = _readConditionalStages(github),
+        github = GitHubConfig.fromJson(github);
 
   factory MonoConfig.fromJson(Map json) {
     final unsupportedKeys =
@@ -135,33 +122,20 @@ class MonoConfig {
       );
     }
 
-    final mergeStages = json['merge_stages'] ?? [];
+    final mergeStages = _asList(json, 'merge_stages');
 
-    if (mergeStages is List) {
-      if (mergeStages.any((v) => v is! String)) {
-        throw CheckedFromJsonException(
-          json,
-          'merge_stages',
-          'MonoConfig',
-          'All values must be strings.',
-        );
-      }
+    final coverageServices = _asList(json, 'coverage_service');
 
-      return MonoConfig(
-        mergeStages: Set.from(mergeStages),
-        prettyAnsi: prettyAnsi,
-        pubAction: pubAction,
-        selfValidateStage: _selfValidateFromValue(selfValidate),
-        github: github,
-      );
-    } else {
-      throw CheckedFromJsonException(
-        json,
-        'merge_stages',
-        'MonoConfig',
-        '`merge_stages` must be an array.',
-      );
-    }
+    return MonoConfig._(
+      mergeStages: Set.from(mergeStages),
+      prettyAnsi: prettyAnsi,
+      pubAction: pubAction,
+      selfValidateStage: _selfValidateFromValue(selfValidate),
+      github: github,
+      coverageProcessors: coverageServices
+          .map((e) => CoverageProcessor.values.byName(e))
+          .toSet(),
+    );
   }
 
   factory MonoConfig.fromRepo({String? rootDirectory}) {
@@ -169,17 +143,40 @@ class MonoConfig {
 
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
-      return MonoConfig(
+      return MonoConfig._(
         mergeStages: <String>{},
         pubAction: _defaultPubAction,
         prettyAnsi: true,
         selfValidateStage: null,
         github: {},
+        coverageProcessors: {CoverageProcessor.coveralls},
       );
     }
 
     return createWithCheck(() => MonoConfig.fromJson(yaml));
   }
+}
+
+List<String> _asList(Map json, String key) {
+  final value = json[key] ?? <String>[];
+
+  if (value is List) {
+    if (value.any((v) => v is! String)) {
+      throw CheckedFromJsonException(
+        json,
+        key,
+        'MonoConfig',
+        'All values must be strings.',
+      );
+    }
+    return List.from(value);
+  }
+  throw CheckedFromJsonException(
+    json,
+    key,
+    'MonoConfig',
+    '`$key` must be an array.',
+  );
 }
 
 /// Parses the `stages` key from a CI config map, into a Map from stage name
