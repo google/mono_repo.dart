@@ -393,7 +393,6 @@ Job _githubJob(
         packageFlavor.setupStep(sdkVersion),
         ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
         ActionInfo.checkout.usage(
-          name: 'Checkout repository',
           id: 'checkout',
         ),
         for (var command in runCommands) ...command.runContent,
@@ -477,7 +476,6 @@ Step _cacheEntries(
   const pubCacheHosted = '~/.pub-cache/hosted';
 
   return ActionInfo.cache.usage(
-    name: 'Cache Pub hosted dependencies',
     withContent: {
       'path': pubCacheHosted,
       'key': restoreKeys.first,
@@ -533,13 +531,11 @@ extension on PackageFlavor {
     switch (this) {
       case PackageFlavor.dart:
         return ActionInfo.setupDart.usage(
-          name: 'Setup Dart SDK',
           withContent: {'sdk': sdkVersion},
         );
 
       case PackageFlavor.flutter:
         return ActionInfo.setupFlutter.usage(
-          name: 'Setup Flutter SDK',
           withContent: {'channel': sdkVersion},
         );
     }

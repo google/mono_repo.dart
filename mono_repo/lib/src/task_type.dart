@@ -144,7 +144,6 @@ class _TestWithCoverageTask extends TaskType {
     final countString = (_count++).toString().padLeft(2, '0');
     return [
       ActionInfo.coveralls.usage(
-        name: 'Upload coverage to Coveralls',
         withContent: {
           // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
           'github-token': r'${{ secrets.GITHUB_TOKEN }}',
