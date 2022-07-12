@@ -19,10 +19,7 @@ import 'step.dart';
 
 const _onCompletionStage = '_on_completion';
 
-Map<String, String> generateGitHubYml(
-  RootConfig rootConfig,
-  Map<String, String> commandsToKeys,
-) {
+Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   final jobs = <HasStageName>[
     ...rootConfig.expand((config) => config.jobs),
   ];
@@ -79,7 +76,6 @@ Map<String, String> generateGitHubYml(
     final allJobs = _listJobs(
       rootConfig,
       sortedJobs,
-      commandsToKeys,
       rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
@@ -175,7 +171,6 @@ ${toYaml({'jobs': jobList})}
 Iterable<_MapEntryWithStage> _listJobs(
   RootConfig rootConfig,
   List<HasStageName> jobs,
-  Map<String, String> commandsToKeys,
   Set<String> mergeStages,
   List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
@@ -205,6 +200,8 @@ Iterable<_MapEntryWithStage> _listJobs(
     }
 
     final ciJob = job as CIJob;
+
+    final commandsToKeys = extractCommands(rootConfig);
 
     final commands =
         ciJob.tasks.map((task) => commandsToKeys[task.command]!).toList();
