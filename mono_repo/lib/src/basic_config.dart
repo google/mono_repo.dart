@@ -4,6 +4,10 @@
 
 import 'coverage_processor.dart';
 
+/// Represents top-level configuration values that are needed by specific
+/// jobs or actions.
+///
+/// Meant to be minimal and expanded on an as-needed basis.
 abstract class BasicConfiguration {
   Set<CoverageProcessor> get coverageProcessors;
 }
