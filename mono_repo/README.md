@@ -137,6 +137,17 @@ self_validate: analyze
 # Use this key to merge stages across packages to create fewer jobs
 merge_stages:
 - analyze
+
+# When using `test_with_coverage`, this setting configures the service that
+# results are uploaded to.
+# Note: you can configure both options, but this would be unusual.
+# Note: you can configure this key with no values, to just generate the files
+#   locally. This may be to enable other, custom processing.
+coverage_service:
+# https://coveralls.io/ - the default
+- coveralls
+# https://codecov.io/ – the other option
+- codecov
 ```
 
 ### Adding a package config

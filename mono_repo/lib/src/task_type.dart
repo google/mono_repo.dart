@@ -2,8 +2,10 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'basic_config.dart';
 import 'commands/github/action_info.dart';
 import 'commands/github/step.dart';
+import 'coverage_processor.dart';
 import 'package_flavor.dart';
 
 abstract class TaskType implements Comparable<TaskType> {
@@ -35,7 +37,10 @@ abstract class TaskType implements Comparable<TaskType> {
 
   Iterable<Step> get beforeAllSteps => const Iterable.empty();
 
-  Iterable<Step> afterEachSteps(String packageDirectory) =>
+  Iterable<Step> afterEachSteps(
+    String packageDirectory,
+    BasicConfiguration config,
+  ) =>
       const Iterable.empty();
 
   static Iterable<String> get allowedTaskNames sync* {
@@ -108,9 +113,9 @@ class _CommandTask extends TaskType {
 }
 
 class _TestWithCoverageTask extends TaskType {
-  const _TestWithCoverageTask() : super._('test_with_coverage');
-
   static int _count = 0;
+
+  const _TestWithCoverageTask() : super._('test_with_coverage');
 
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) {
@@ -140,18 +145,31 @@ class _TestWithCoverageTask extends TaskType {
       ];
 
   @override
-  Iterable<Step> afterEachSteps(String packageDirectory) {
+  Iterable<Step> afterEachSteps(
+    String packageDirectory,
+    BasicConfiguration config,
+  ) {
     final countString = (_count++).toString().padLeft(2, '0');
     return [
-      ActionInfo.coveralls.usage(
-        withContent: {
-          // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
-          'github-token': r'${{ secrets.GITHUB_TOKEN }}',
-          'path-to-lcov': '$packageDirectory/coverage/lcov.info',
-          'flag-name': 'coverage_$countString',
-          'parallel': true,
-        },
-      ),
+      if (config.coverageProcessors.contains(CoverageProcessor.coveralls))
+        ActionInfo.coveralls.usage(
+          name: 'Upload coverage to Coveralls',
+          withContent: {
+            // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+            'github-token': r'${{ secrets.GITHUB_TOKEN }}',
+            'path-to-lcov': '$packageDirectory/coverage/lcov.info',
+            'flag-name': 'coverage_$countString',
+            'parallel': true,
+          },
+        ),
+      if (config.coverageProcessors.contains(CoverageProcessor.codecov))
+        ActionInfo.codecov.usage(
+          withContent: {
+            'files': '$packageDirectory/coverage/lcov.info',
+            'fail_ci_if_error': true,
+            'name': 'coverage_$countString',
+          },
+        ),
     ];
   }
 }
