@@ -1229,7 +1229,50 @@ env:
   });
 
   group('github actions config', () {
-    test('all parameters', () async {
+    test('custom uses', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - github_action:
+          id: custom-scripts
+          uses: ./.github/actions/my-action
+          with:
+            my-key: my-var
+            my-num: 123
+            my-map: {'abc':123}
+          if: \${{ github.event_name == 'pull_request' }}
+          continue-on-error: false
+          timeout-minutes: 30
+''')
+      ]).create();
+
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            contains('''
+        if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
+        uses: "./.github/actions/my-action"
+        with:
+          my-key: my-var
+          my-num: "123"
+          my-map: "{\\"abc\\":123}"
+        continue-on-error: false
+        timeout-minutes: 30
+'''),
+          )
+          .validate();
+    });
+
+    test('custom run', () async {
       await d.dir('pkg_a', [
         d.file('pubspec.yaml', '''
 name: pkg_a
@@ -1246,11 +1289,6 @@ stages:
             ./script_a
             ./script_b
             ./script_c
-          uses: ./.github/actions/my-action
-          with:
-            my-key: my-var
-            my-num: 123
-            my-map: {'abc':123}
           if: \${{ github.event_name == 'pull_request' }}
           working-directory: ./tool
           shell: fish
@@ -1269,23 +1307,17 @@ stages:
           .file(
             defaultGitHubWorkflowFilePath,
             contains('''
-      - id: custom-scripts
-        uses: "./.github/actions/my-action"
-        with:
-          my-key: my-var
-          my-num: "123"
-          my-map: "{\\"abc\\":123}"
-        if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
-        working-directory: pkg_a/tool
         run: |
           ./script_a
           ./script_b
           ./script_c
-        shell: fish
+        if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
+        working-directory: pkg_a/tool
         env:
           my-key: my-var
           my-num: "123"
           my-map: "{\\"abc\\":123}"
+        shell: fish
         continue-on-error: false
         timeout-minutes: 30
 '''),
@@ -1327,7 +1359,7 @@ stages:
           .validate();
     });
 
-    test('allows unknown keys', () async {
+    test('disallows unknown keys', () async {
       await d.dir('pkg_a', [
         d.file('pubspec.yaml', '''
 name: pkg_a
@@ -1344,17 +1376,10 @@ stages:
 ''')
       ]).create();
 
-      testGenerateBothConfig(printMatcher: anything);
-
-      await d
-          .file(
-            defaultGitHubWorkflowFilePath,
-            stringContainsInOrder([
-              'run: ./script',
-              'some-key: some-value',
-            ]),
-          )
-          .validate();
+      expect(
+        testGenerateBothConfig,
+        throwsACheckedFromJsonException('Invalid keys'),
+      );
     });
   });
 }

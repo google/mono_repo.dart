@@ -37,15 +37,17 @@ class Step implements GitHubActionOverrides, YamlLike {
   final String? uses;
   @override
   @JsonKey(name: 'with')
-  final Map<String, dynamic>? withContent;
+  final Map<String, String>? withContent;
 
   @override
   final String? shell;
 
   @override
+  @JsonKey(name: 'continue-on-error')
   final bool? continueOnError;
 
   @override
+  @JsonKey(name: 'timeout-minutes')
   final int? timeoutMinutes;
 
   Step._({
@@ -61,13 +63,6 @@ class Step implements GitHubActionOverrides, YamlLike {
     this.continueOnError,
     this.timeoutMinutes,
   }) {
-    if (name == null) {
-      throw ArgumentError.value(
-        name,
-        'name',
-        '`name` must be defined.',
-      );
-    }
     if (run == null) {
       if (uses == null) {
         throw ArgumentError.value(
@@ -93,25 +88,35 @@ class Step implements GitHubActionOverrides, YamlLike {
     }
   }
 
-  Step.fromOverrides(GitHubActionOverrides overrides)
-      : this._(
-          id: overrides.id,
-          name: overrides.name,
-          uses: overrides.uses,
-          withContent: overrides.withContent,
-          workingDirectory: overrides.workingDirectory,
-          run: overrides.run,
-          env: overrides.env,
-          shell: overrides.shell,
-          ifContent: overrides.ifContent,
-          continueOnError: overrides.continueOnError,
-          timeoutMinutes: overrides.timeoutMinutes,
-        );
+  factory Step.fromOverrides(GitHubActionOverrides overrides) {
+    if (overrides.uses != null) {
+      return Step._(
+        id: overrides.id,
+        name: overrides.name,
+        uses: overrides.uses,
+        withContent: overrides.withContent,
+        ifContent: overrides.ifContent,
+        continueOnError: overrides.continueOnError,
+        timeoutMinutes: overrides.timeoutMinutes,
+      );
+    }
+    return Step._(
+      id: overrides.id,
+      name: overrides.name,
+      run: overrides.run,
+      workingDirectory: overrides.workingDirectory,
+      env: overrides.env,
+      shell: overrides.shell,
+      ifContent: overrides.ifContent,
+      continueOnError: overrides.continueOnError,
+      timeoutMinutes: overrides.timeoutMinutes,
+    );
+  }
 
   Step.run({
     this.id,
     required String this.name,
-    required this.run,
+    required String this.run,
     this.ifContent,
     this.workingDirectory,
     this.env,
@@ -124,7 +129,7 @@ class Step implements GitHubActionOverrides, YamlLike {
   Step.uses({
     this.id,
     required String this.name,
-    required this.uses,
+    required String this.uses,
     this.withContent,
     this.ifContent,
     this.continueOnError,

@@ -622,19 +622,10 @@ List get _testConfig1expectedOutput => [
         'sdk': '1.23.0',
         'stageName': 'unit_test',
         'tasks': [
+          {'flavor': 'dart', 'type': 'github_action'},
           {
             'flavor': 'dart',
-            'name': 'github_action',
-            'githubAction': {
-              'run': 'npm run build',
-              'uses': 'actions/setup-node@v3',
-              'with': {'node-version': '16'},
-              'working-directory': './src',
-            },
-          },
-          {
-            'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--platform node',
           }
         ],
@@ -646,19 +637,10 @@ List get _testConfig1expectedOutput => [
         'sdk': 'dev',
         'stageName': 'unit_test',
         'tasks': [
+          {'flavor': 'dart', 'type': 'github_action'},
           {
             'flavor': 'dart',
-            'name': 'github_action',
-            'githubAction': {
-              'run': 'npm run build',
-              'uses': 'actions/setup-node@v3',
-              'with': {'node-version': '16'},
-              'working-directory': './src',
-            },
-          },
-          {
-            'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--platform node',
           }
         ],
@@ -670,19 +652,10 @@ List get _testConfig1expectedOutput => [
         'sdk': 'stable',
         'stageName': 'unit_test',
         'tasks': [
+          {'flavor': 'dart', 'type': 'github_action'},
           {
             'flavor': 'dart',
-            'name': 'github_action',
-            'githubAction': {
-              'run': 'npm run build',
-              'uses': 'actions/setup-node@v3',
-              'with': {'node-version': '16'},
-              'working-directory': './src',
-            },
-          },
-          {
-            'flavor': 'dart',
-            'name': 'test',
+            'type': 'test',
             'args': '--platform node',
           }
         ],

@@ -39,7 +39,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   Step usage({
     required String name,
     String? id,
-    Map<String, dynamic>? withContent,
+    Map<String, String>? withContent,
   }) {
     final step = Step.uses(
       uses: '$repo@$version',
@@ -65,7 +65,7 @@ Job _coverageCompletionJob() => Job(
           withContent: {
             // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
             'github-token': r'${{ secrets.GITHUB_TOKEN }}',
-            'parallel-finished': true
+            'parallel-finished': 'true'
           },
         )
       ],

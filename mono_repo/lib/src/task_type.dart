@@ -11,7 +11,7 @@ import 'package_flavor.dart';
 abstract class TaskType implements Comparable<TaskType> {
   static const command = _CommandTask();
   const factory TaskType.githubAction(GitHubActionConfig config) =
-      GitHubActionTaskType;
+      _GitHubActionTaskType;
 
   static const _values = <TaskType>[
     _FormatTask(),
@@ -49,10 +49,13 @@ abstract class TaskType implements Comparable<TaskType> {
       yield val.name;
       yield* val.alternates;
     }
+    yield _GitHubActionTaskType._name;
   }
 
-  static final prettyTaskList =
-      TaskType._values.map((t) => '`${t.name}`').join(', ');
+  static final prettyTaskList = [
+    ...TaskType._values.map((t) => '`${t.name}`'),
+    '`${_GitHubActionTaskType._name}`',
+  ].join(', ');
 
   static TaskType taskFromName(String input) => TaskType._values.singleWhere(
         (element) =>
@@ -154,21 +157,23 @@ class _TestWithCoverageTask extends TaskType {
           'github-token': r'${{ secrets.GITHUB_TOKEN }}',
           'path-to-lcov': '$packageDirectory/coverage/lcov.info',
           'flag-name': 'coverage_$countString',
-          'parallel': true,
+          'parallel': 'true',
         },
       ),
     ];
   }
 }
 
-class GitHubActionTaskType extends TaskType {
-  const GitHubActionTaskType(this.overrides) : super._('github_action');
+class _GitHubActionTaskType extends TaskType {
+  const _GitHubActionTaskType(this.overrides) : super._(_name);
+
+  static const _name = 'github_action';
 
   @override
   final GitHubActionConfig overrides;
 
   @override
-  List<String> commandValue(PackageFlavor flavor, String? args) {
-    throw UnimplementedError();
-  }
+  List<String> commandValue(PackageFlavor flavor, String? args) => [
+        if (overrides.run != null) overrides.run!,
+      ];
 }

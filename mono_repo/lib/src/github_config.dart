@@ -158,7 +158,6 @@ class GitHubActionConfig implements GitHubActionOverrides {
     this.env,
     this.continueOnError,
     this.timeoutMinutes,
-    this.otherConfig,
   }) : assert(
           run != null || uses != null,
           'Either `run` or `uses` must be specified',
@@ -176,11 +175,8 @@ class GitHubActionConfig implements GitHubActionOverrides {
   @override
   final String? uses;
 
-  /// The command identifier for this step, used in caching.
-  String get command => (run ?? uses)!;
-
   @override
-  final Map<String, dynamic>? withContent;
+  final Map<String, String>? withContent;
 
   @override
   final String? ifContent;
@@ -199,9 +195,6 @@ class GitHubActionConfig implements GitHubActionOverrides {
 
   @override
   final int? timeoutMinutes;
-
-  /// Configuration options not defined by one of the other keys.
-  final Map<String, dynamic>? otherConfig;
 
   factory GitHubActionConfig.fromJson(Map json) {
     // Create a copy of unmodifiable `json`.
@@ -223,7 +216,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'id',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `id` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsid',
       );
@@ -233,7 +226,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'name',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `name` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsname',
       );
@@ -243,7 +236,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'run',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `run` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun',
       );
@@ -253,7 +246,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'uses',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `uses` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsuses',
       );
@@ -263,7 +256,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'with',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `with` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepswith',
       );
@@ -273,7 +266,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'if',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `if` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsif',
       );
@@ -283,7 +276,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'working-directory',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `working-directory` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun',
       );
@@ -293,7 +286,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'shell',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `shell` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell',
       );
@@ -303,7 +296,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'env',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `env` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsenv',
       );
@@ -313,7 +306,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'continue-on-error',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `continue-on-error` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepscontinue-on-error',
       );
@@ -323,7 +316,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'timeout-minutes',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Invalid `timeout-minutes` parameter. See GitHub docs for more info: '
             'https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepstimeout-minutes',
       );
@@ -333,8 +326,16 @@ class GitHubActionConfig implements GitHubActionOverrides {
       throw CheckedFromJsonException(
         json,
         'run,uses',
-        'ActionConfig',
+        'GitHubActionConfig',
         'Either `run` or `uses` must be specified',
+      );
+    }
+    if (json.isNotEmpty) {
+      throw CheckedFromJsonException(
+        json,
+        json.keys.join(','),
+        'GitHubActionConfig',
+        'Invalid keys',
       );
     }
 
@@ -342,14 +343,13 @@ class GitHubActionConfig implements GitHubActionOverrides {
       id: id,
       uses: uses,
       run: run,
-      withContent: withContent?.cast(),
+      withContent: toEnvMap(withContent),
       ifContent: ifContent,
       workingDirectory: workingDirectory,
       shell: shell,
       env: toEnvMap(env),
       continueOnError: continueOnError,
       timeoutMinutes: timeoutMinutes?.toInt(),
-      otherConfig: json.cast(),
     );
   }
 }

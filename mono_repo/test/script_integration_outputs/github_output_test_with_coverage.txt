@@ -52,7 +52,7 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: pkg_a/coverage/lcov.info
           flag-name: coverage_00
-          parallel: true
+          parallel: "true"
   job_002:
     name: test; macos; Dart dev; chrome tests
     runs-on: macos-latest
@@ -91,6 +91,6 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          parallel-finished: true
+          parallel-finished: "true"
     needs:
       - job_001

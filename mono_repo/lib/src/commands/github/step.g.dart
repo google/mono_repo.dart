@@ -17,7 +17,7 @@ Step _$StepFromJson(Map json) => $checkedCreate(
           withContent: $checkedConvert(
               'with',
               (v) => (v as Map?)?.map(
-                    (k, e) => MapEntry(k as String, e),
+                    (k, e) => MapEntry(k as String, e as String),
                   )),
           name: $checkedConvert('name', (v) => v as String?),
           uses: $checkedConvert('uses', (v) => v as String?),
@@ -32,15 +32,17 @@ Step _$StepFromJson(Map json) => $checkedCreate(
                   )),
           shell: $checkedConvert('shell', (v) => v as String?),
           continueOnError:
-              $checkedConvert('continueOnError', (v) => v as bool?),
-          timeoutMinutes: $checkedConvert('timeoutMinutes', (v) => v as int?),
+              $checkedConvert('continue-on-error', (v) => v as bool?),
+          timeoutMinutes: $checkedConvert('timeout-minutes', (v) => v as int?),
         );
         return val;
       },
       fieldKeyMap: const {
         'withContent': 'with',
         'ifContent': 'if',
-        'workingDirectory': 'working-directory'
+        'workingDirectory': 'working-directory',
+        'continueOnError': 'continue-on-error',
+        'timeoutMinutes': 'timeout-minutes'
       },
     );
 
@@ -62,7 +64,7 @@ Map<String, dynamic> _$StepToJson(Step instance) {
   writeNotNull('uses', instance.uses);
   writeNotNull('with', instance.withContent);
   writeNotNull('shell', instance.shell);
-  writeNotNull('continueOnError', instance.continueOnError);
-  writeNotNull('timeoutMinutes', instance.timeoutMinutes);
+  writeNotNull('continue-on-error', instance.continueOnError);
+  writeNotNull('timeout-minutes', instance.timeoutMinutes);
   return val;
 }
