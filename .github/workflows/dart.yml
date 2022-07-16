@@ -534,7 +534,7 @@ jobs:
         with:
           sdk: dev
       - name: "Activate package:coverage"
-        run: dart pub global activate coverage
+        run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -554,6 +554,12 @@ jobs:
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_00
           parallel: true
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@master
+        with:
+          files: mono_repo/coverage/lcov.info
+          fail_ci_if_error: true
+          name: coverage_00
     needs:
       - job_001
       - job_002
@@ -586,7 +592,7 @@ jobs:
         with:
           sdk: dev
       - name: "Activate package:coverage"
-        run: dart pub global activate coverage
+        run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -606,6 +612,12 @@ jobs:
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_01
           parallel: true
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@master
+        with:
+          files: mono_repo/coverage/lcov.info
+          fail_ci_if_error: true
+          name: coverage_01
     needs:
       - job_001
       - job_002
@@ -681,7 +693,7 @@ jobs:
         with:
           sdk: dev
       - name: "Activate package:coverage"
-        run: dart pub global activate coverage
+        run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
@@ -701,6 +713,12 @@ jobs:
           path-to-lcov: test_pkg/coverage/lcov.info
           flag-name: coverage_02
           parallel: true
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@master
+        with:
+          files: test_pkg/coverage/lcov.info
+          fail_ci_if_error: true
+          name: coverage_02
     needs:
       - job_001
       - job_002

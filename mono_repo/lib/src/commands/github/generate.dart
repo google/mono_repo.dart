@@ -52,10 +52,7 @@ class _GeneratedGitHubConfig {
   _GeneratedGitHubConfig._(this.workflowFiles);
 
   factory _GeneratedGitHubConfig.generate(RootConfig rootConfig) {
-    final commandsToKeys = extractCommands(rootConfig);
-
-    final result = generateGitHubYml(rootConfig, commandsToKeys);
-
+    final result = generateGitHubYml(rootConfig);
     return _GeneratedGitHubConfig._(result);
   }
 }

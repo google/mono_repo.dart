@@ -797,14 +797,17 @@ $lines
 
     test(
       'disallows unsupported keys',
-      () => _testBadConfig({
-        'other': {'stages': 5}
-      }, r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate` keys are supported.
+      () => _testBadConfig(
+        {
+          'other': {'stages': 5}
+        },
+        r'''
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
-  ╵'''),
+  ╵''',
+      ),
     );
 
     group('merge_stages', () {

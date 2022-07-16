@@ -6,6 +6,7 @@ import 'dart:collection';
 
 import 'package:path/path.dart';
 
+import '../../basic_config.dart';
 import '../../ci_shared.dart';
 import '../../github_config.dart';
 import '../../mono_config.dart';
@@ -22,10 +23,7 @@ import 'step.dart';
 
 const _onCompletionStage = '_on_completion';
 
-Map<String, String> generateGitHubYml(
-  RootConfig rootConfig,
-  Map<String, String> commandsToKeys,
-) {
+Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   final jobs = <HasStageName>[
     ...rootConfig.expand((config) => config.jobs),
   ];
@@ -82,7 +80,6 @@ Map<String, String> generateGitHubYml(
     final allJobs = _listJobs(
       rootConfig,
       sortedJobs,
-      commandsToKeys,
       rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
@@ -178,7 +175,6 @@ ${toYaml({'jobs': jobList})}
 Iterable<_MapEntryWithStage> _listJobs(
   RootConfig rootConfig,
   List<HasStageName> jobs,
-  Map<String, String> commandsToKeys,
   Set<String> mergeStages,
   List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
@@ -203,11 +199,13 @@ Iterable<_MapEntryWithStage> _listJobs(
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield jobEntry(_selfValidateJob(), job.stageName);
+      yield jobEntry(_selfValidateJob(rootConfig.monoConfig), job.stageName);
       continue;
     }
 
     final ciJob = job as CIJob;
+
+    final commandsToKeys = extractCommands(rootConfig);
 
     final commands =
         ciJob.tasks.map((task) => commandsToKeys[task.command]!).toList();
@@ -357,6 +355,7 @@ extension on CIJobEntry {
       job.flavor,
       job.sdk,
       commandEntries,
+      config: rootConfig.monoConfig,
       additionalCacheKeys: {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
@@ -399,6 +398,7 @@ Job _githubJob(
   PackageFlavor packageFlavor,
   String sdkVersion,
   List<_CommandEntryBase> runCommands, {
+  required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
 }) =>
     Job(
@@ -416,10 +416,9 @@ Job _githubJob(
         packageFlavor.setupStep(sdkVersion),
         ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
         ActionInfo.checkout.usage(
-          name: 'Checkout repository',
           id: 'checkout',
         ),
-        for (var command in runCommands) ...command.runContent,
+        for (var command in runCommands) ...command.runContent(config),
       ],
     );
 
@@ -440,7 +439,8 @@ class _CommandEntryBase {
 
   _CommandEntryBase(this.name, this.run);
 
-  Iterable<Step> get runContent => [Step.run(name: name, run: run)];
+  Iterable<Step> runContent(BasicConfiguration config) =>
+      [Step.run(name: name, run: run)];
 }
 
 class _CommandEntry extends _CommandEntryBase implements GitHubActionOverrides {
@@ -489,9 +489,9 @@ class _CommandEntry extends _CommandEntryBase implements GitHubActionOverrides {
   });
 
   @override
-  Iterable<Step> get runContent => [
+  Iterable<Step> runContent(BasicConfiguration config) => [
         Step.fromOverrides(this),
-        ...?type?.afterEachSteps(workingDirectory),
+        ...?type?.afterEachSteps(workingDirectory, config),
       ];
 }
 
@@ -524,7 +524,6 @@ Step _cacheEntries(
   const pubCacheHosted = '~/.pub-cache/hosted';
 
   return ActionInfo.cache.usage(
-    name: 'Cache Pub hosted dependencies',
     withContent: {
       'path': pubCacheHosted,
       'key': restoreKeys.first,
@@ -540,7 +539,7 @@ String _maxLength(String input) {
   return input.substring(0, 512 - hash.length) + hash;
 }
 
-Job _selfValidateJob() => _githubJob(
+Job _selfValidateJob(BasicConfiguration config) => _githubJob(
       selfValidateJobName,
       _ubuntuLatest,
       PackageFlavor.dart,
@@ -549,6 +548,7 @@ Job _selfValidateJob() => _githubJob(
         for (var command in selfValidateCommands)
           _CommandEntryBase(selfValidateJobName, command),
       ],
+      config: config,
     );
 
 const _ubuntuLatest = 'ubuntu-latest';
@@ -580,13 +580,11 @@ extension on PackageFlavor {
     switch (this) {
       case PackageFlavor.dart:
         return ActionInfo.setupDart.usage(
-          name: 'Setup Dart SDK',
           withContent: {'sdk': sdkVersion},
         );
 
       case PackageFlavor.flutter:
         return ActionInfo.setupFlutter.usage(
-          name: 'Setup Flutter SDK',
           withContent: {'channel': sdkVersion},
         );
     }
