@@ -412,7 +412,7 @@ class Task {
       }
 
       final extraConfig = Set<String>.from(yamlValue.keys)
-        ..removeAll([taskName, 'os', 'sdk', 'action']);
+        ..removeAll([taskName, 'os', 'sdk']);
 
       // TODO(kevmoo): at some point, support custom configuration here
       if (extraConfig.isNotEmpty) {

@@ -417,11 +417,10 @@ stages:
     - test #no args
     - group:
       - github_action:
-          run: npm run build
           uses: actions/setup-node@v3
           with:
             node-version: 16
-          working-directory: ./src
+      - command: npm run build
       - test: --platform node
 ''';
 
@@ -623,6 +622,7 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {'flavor': 'dart', 'type': 'github_action'},
+          {'flavor': 'dart', 'type': 'command', 'args': 'npm run build'},
           {
             'flavor': 'dart',
             'type': 'test',
@@ -638,6 +638,7 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {'flavor': 'dart', 'type': 'github_action'},
+          {'flavor': 'dart', 'type': 'command', 'args': 'npm run build'},
           {
             'flavor': 'dart',
             'type': 'test',
@@ -653,6 +654,7 @@ List get _testConfig1expectedOutput => [
         'stageName': 'unit_test',
         'tasks': [
           {'flavor': 'dart', 'type': 'github_action'},
+          {'flavor': 'dart', 'type': 'command', 'args': 'npm run build'},
           {
             'flavor': 'dart',
             'type': 'test',
