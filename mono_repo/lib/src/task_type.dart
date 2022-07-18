@@ -12,6 +12,7 @@ import 'package_flavor.dart';
 
 abstract class TaskType implements Comparable<TaskType> {
   static const command = _CommandTask();
+
   const factory TaskType.githubAction(GitHubActionConfig config) =
       _GitHubActionTaskType;
 
@@ -168,14 +169,14 @@ class _TestWithCoverageTask extends TaskType {
             'github-token': r'${{ secrets.GITHUB_TOKEN }}',
             'path-to-lcov': '$packageDirectory/coverage/lcov.info',
             'flag-name': 'coverage_$countString',
-            'parallel': 'true',
+            'parallel': true,
           },
         ),
       if (config.coverageProcessors.contains(CoverageProcessor.codecov))
         ActionInfo.codecov.usage(
           withContent: {
             'files': '$packageDirectory/coverage/lcov.info',
-            'fail_ci_if_error': 'true',
+            'fail_ci_if_error': true,
             'name': 'coverage_$countString',
           },
         ),

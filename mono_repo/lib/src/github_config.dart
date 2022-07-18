@@ -176,7 +176,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
   final String? uses;
 
   @override
-  final Map<String, String>? withContent;
+  final Map<String, dynamic>? withContent;
 
   @override
   final String? ifContent;

@@ -17,7 +17,7 @@ Step _$StepFromJson(Map json) => $checkedCreate(
           withContent: $checkedConvert(
               'with',
               (v) => (v as Map?)?.map(
-                    (k, e) => MapEntry(k as String, e as String),
+                    (k, e) => MapEntry(k as String, e),
                   )),
           name: $checkedConvert('name', (v) => v as String?),
           uses: $checkedConvert('uses', (v) => v as String?),

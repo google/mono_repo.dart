@@ -37,7 +37,7 @@ class Step implements GitHubActionOverrides, YamlLike {
   final String? uses;
   @override
   @JsonKey(name: 'with')
-  final Map<String, String>? withContent;
+  final Map<String, dynamic>? withContent;
 
   @override
   final String? shell;

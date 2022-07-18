@@ -462,7 +462,7 @@ class _CommandEntry extends _CommandEntryBase implements GitHubActionOverrides {
   final Map<String, String>? env;
 
   @override
-  final Map<String, String>? withContent;
+  final Map<String, dynamic>? withContent;
 
   @override
   final String? shell;

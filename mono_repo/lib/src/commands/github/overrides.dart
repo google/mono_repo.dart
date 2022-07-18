@@ -20,7 +20,7 @@ abstract class GitHubActionOverrides {
   ///
   /// A map of key-value pairs which are passed to the action's `with`
   /// parameter.
-  Map<String, String>? get withContent;
+  Map<String, dynamic>? get withContent;
 
   /// The condition on which to run this action.
   String? get ifContent;

@@ -553,12 +553,12 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_00
-          parallel: "true"
+          parallel: true
       - name: Upload coverage to codecov.io
         uses: codecov/codecov-action@master
         with:
           files: mono_repo/coverage/lcov.info
-          fail_ci_if_error: "true"
+          fail_ci_if_error: true
           name: coverage_00
     needs:
       - job_001
@@ -611,12 +611,12 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_01
-          parallel: "true"
+          parallel: true
       - name: Upload coverage to codecov.io
         uses: codecov/codecov-action@master
         with:
           files: mono_repo/coverage/lcov.info
-          fail_ci_if_error: "true"
+          fail_ci_if_error: true
           name: coverage_01
     needs:
       - job_001
@@ -712,12 +712,12 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: test_pkg/coverage/lcov.info
           flag-name: coverage_02
-          parallel: "true"
+          parallel: true
       - name: Upload coverage to codecov.io
         uses: codecov/codecov-action@master
         with:
           files: test_pkg/coverage/lcov.info
-          fail_ci_if_error: "true"
+          fail_ci_if_error: true
           name: coverage_02
     needs:
       - job_001
@@ -882,7 +882,7 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-          parallel-finished: "true"
+          parallel-finished: true
     needs:
       - job_015
       - job_016
