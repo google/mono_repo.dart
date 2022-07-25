@@ -1245,6 +1245,7 @@ stages:
   - custom_step:
       - github_action:
           id: custom-scripts
+          name: 'My Custom Scripts'
           uses: ./.github/actions/my-action
           with:
             my-key: my-var
@@ -1262,6 +1263,7 @@ stages:
           .file(
             defaultGitHubWorkflowFilePath,
             contains('''
+        name: My Custom Scripts
         if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         uses: "./.github/actions/my-action"
         with:

@@ -341,6 +341,7 @@ class GitHubActionConfig implements GitHubActionOverrides {
 
     return GitHubActionConfig(
       id: id,
+      name: name,
       uses: uses,
       run: run,
       withContent: toEnvMap(withContent),

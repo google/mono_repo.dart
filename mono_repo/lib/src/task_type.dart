@@ -194,6 +194,7 @@ class _GitHubActionTaskType extends TaskType {
 
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) => [
+        if (overrides.uses != null) overrides.uses!,
         if (overrides.run != null) overrides.run!,
       ];
 }

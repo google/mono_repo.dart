@@ -323,7 +323,7 @@ extension on CIJobEntry {
         }
         commandEntries.add(
           _CommandEntry(
-            '$package; ${task.command}',
+            overrides?.name ?? '$package; ${task.command}',
             _commandForOs(task.command),
             type: task.type,
             id: overrides?.id,
