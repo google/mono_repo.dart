@@ -170,6 +170,9 @@ details on how you'd like tests to be run.
 # an array. Alternatively, you can specify the SDK version(s) within each job.
 sdk:
  - dev
+ # Specific `pubspec` to test the lower-bound SDK defined in pubspec.yaml
+ # This is only supported for Dart packages (not Flutter).
+ - pubspec
 
 stages:
   # Register two jobs to run under the `analyze` stage.

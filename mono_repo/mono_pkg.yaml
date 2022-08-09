@@ -10,13 +10,13 @@ stages:
     - analyze: --fatal-infos .
     sdk: dev
   - analyze:
-    sdk: 2.17.5
+    sdk: pubspec
 - test:
   - test: -x yaml -P presubmit --test-randomize-ordering-seed=random
     os:
     - linux
     - windows
-    sdk: [2.17.5]
+    sdk: [pubspec]
   - test_with_coverage: -x yaml -P presubmit --test-randomize-ordering-seed=random
     os:
     - linux
