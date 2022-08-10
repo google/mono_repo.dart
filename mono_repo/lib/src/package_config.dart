@@ -9,6 +9,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
 
+import 'github_config.dart';
 import 'package_flavor.dart';
 import 'raw_config.dart';
 import 'task_type.dart';
@@ -370,6 +371,21 @@ class Task {
       }
 
       final taskName = taskNames.single;
+
+      if (taskName == 'github_action') {
+        final configYaml = yamlValue['github_action'] as Object?;
+        if (configYaml is! Map) {
+          throw CheckedFromJsonException(
+            yamlValue,
+            'github_action',
+            'GitHubActionConfig',
+            'Must be a map',
+          );
+        }
+        final config = GitHubActionConfig.fromJson(configYaml);
+        return Task(flavor, TaskType.githubAction(config));
+      }
+
       final taskType = _taskTypeForName(taskName);
 
       String? args;

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:checked_yaml/checked_yaml.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/generate.dart';
@@ -101,6 +102,11 @@ Matcher throwsAParsedYamlException(Object matcher) => throwsA(
         'formattedMessage',
         matcher,
       ),
+    );
+
+Matcher throwsACheckedFromJsonException(Object message) => throwsA(
+      isA<CheckedFromJsonException>()
+          .having((e) => e.message, 'message', message),
     );
 
 const testConfig2 = r'''

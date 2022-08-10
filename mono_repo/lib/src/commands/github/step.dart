@@ -5,6 +5,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../yaml.dart';
+import 'overrides.dart';
 
 part 'step.g.dart';
 
@@ -13,21 +14,41 @@ part 'step.g.dart';
   includeIfNull: false,
   constructor: '_',
 )
-class Step implements YamlLike {
+class Step implements GitHubActionOverrides, YamlLike {
+  @override
   final String? id;
+  @override
   final String? name;
+  @override
   final String? run;
 
+  @override
   @JsonKey(name: 'if')
   final String? ifContent;
+
+  @override
   @JsonKey(name: 'working-directory')
   final String? workingDirectory;
 
-  final Map? env;
+  @override
+  final Map<String, String>? env;
 
+  @override
   final String? uses;
+  @override
   @JsonKey(name: 'with')
-  final Map? withContent;
+  final Map<String, dynamic>? withContent;
+
+  @override
+  final String? shell;
+
+  @override
+  @JsonKey(name: 'continue-on-error')
+  final bool? continueOnError;
+
+  @override
+  @JsonKey(name: 'timeout-minutes')
+  final int? timeoutMinutes;
 
   Step._({
     this.id,
@@ -38,6 +59,9 @@ class Step implements YamlLike {
     this.ifContent,
     this.workingDirectory,
     this.env,
+    this.shell,
+    this.continueOnError,
+    this.timeoutMinutes,
   }) {
     if (run == null) {
       if (uses == null) {
@@ -64,25 +88,56 @@ class Step implements YamlLike {
     }
   }
 
+  factory Step.fromOverrides(GitHubActionOverrides overrides) {
+    if (overrides.uses != null) {
+      return Step._(
+        id: overrides.id,
+        name: overrides.name,
+        uses: overrides.uses,
+        withContent: overrides.withContent,
+        ifContent: overrides.ifContent,
+        continueOnError: overrides.continueOnError,
+        timeoutMinutes: overrides.timeoutMinutes,
+      );
+    }
+    return Step._(
+      id: overrides.id,
+      name: overrides.name,
+      run: overrides.run,
+      workingDirectory: overrides.workingDirectory,
+      env: overrides.env,
+      shell: overrides.shell,
+      ifContent: overrides.ifContent,
+      continueOnError: overrides.continueOnError,
+      timeoutMinutes: overrides.timeoutMinutes,
+    );
+  }
+
   Step.run({
     this.id,
     required String this.name,
-    required this.run,
+    required String this.run,
     this.ifContent,
     this.workingDirectory,
     this.env,
+    this.shell,
+    this.continueOnError,
+    this.timeoutMinutes,
   })  : uses = null,
         withContent = null;
 
   Step.uses({
     this.id,
     required String this.name,
-    required this.uses,
+    required String this.uses,
     this.withContent,
     this.ifContent,
+    this.continueOnError,
+    this.timeoutMinutes,
   })  : run = null,
         env = null,
-        workingDirectory = null;
+        workingDirectory = null,
+        shell = null;
 
   factory Step.fromJson(Map json) => _$StepFromJson(json);
 

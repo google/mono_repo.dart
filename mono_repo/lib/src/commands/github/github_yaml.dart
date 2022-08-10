@@ -4,6 +4,8 @@
 
 import 'dart:collection';
 
+import 'package:path/path.dart';
+
 import '../../basic_config.dart';
 import '../../ci_shared.dart';
 import '../../github_config.dart';
@@ -16,6 +18,7 @@ import '../../user_exception.dart';
 import '../../yaml.dart';
 import 'action_info.dart';
 import 'job.dart';
+import 'overrides.dart';
 import 'step.dart';
 
 const _onCompletionStage = '_on_completion';
@@ -301,20 +304,40 @@ extension on CIJobEntry {
           id: pubStepId,
           // Run this regardless of the success of other steps other than the
           // pub step.
-          ifCondition: "always() && steps.checkout.conclusion == 'success'",
+          ifContent: "always() && steps.checkout.conclusion == 'success'",
           workingDirectory: package,
         ),
       );
       for (var i = 0; i < commands.length; i++) {
+        final task = job.tasks[i];
+        final overrides = task.type.overrides;
+        var workingDirectory = overrides?.workingDirectory;
+        if (workingDirectory != null) {
+          workingDirectory = posix.normalize(
+            posix.join(package, workingDirectory),
+          );
+        }
+        var ifCondition = overrides?.ifContent;
+        if (ifCondition != null) {
+          ifCondition += " && steps.$pubStepId.conclusion == 'success'";
+        }
         commandEntries.add(
           _CommandEntry(
-            '$package; ${job.tasks[i].command}',
-            _commandForOs(job.tasks[i].command),
-            type: job.tasks[i].type,
-            // Run this regardless of the success of other steps other than the
-            // pub step.
-            ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
-            workingDirectory: package,
+            overrides?.name ?? '$package; ${task.command}',
+            _commandForOs(task.command),
+            type: task.type,
+            id: overrides?.id,
+            ifContent: ifCondition ??
+                // Run this regardless of the success of other steps other than
+                // the pub step.
+                "always() && steps.$pubStepId.conclusion == 'success'",
+            workingDirectory: workingDirectory ?? package,
+            uses: overrides?.uses,
+            withContent: overrides?.withContent,
+            shell: overrides?.shell,
+            env: overrides?.env,
+            timeoutMinutes: overrides?.timeoutMinutes,
+            continueOnError: overrides?.continueOnError,
           ),
         );
       }
@@ -420,11 +443,35 @@ class _CommandEntryBase {
       [Step.run(name: name, run: run)];
 }
 
-class _CommandEntry extends _CommandEntryBase {
+class _CommandEntry extends _CommandEntryBase implements GitHubActionOverrides {
   final TaskType? type;
+
+  @override
   final String? id;
-  final String? ifCondition;
+
+  @override
+  final String? ifContent;
+
+  @override
   final String workingDirectory;
+
+  @override
+  final String? uses;
+
+  @override
+  final Map<String, String>? env;
+
+  @override
+  final Map<String, dynamic>? withContent;
+
+  @override
+  final String? shell;
+
+  @override
+  final bool? continueOnError;
+
+  @override
+  final int? timeoutMinutes;
 
   _CommandEntry(
     super.name,
@@ -432,18 +479,18 @@ class _CommandEntry extends _CommandEntryBase {
     required this.workingDirectory,
     this.type,
     this.id,
-    this.ifCondition,
+    this.ifContent,
+    this.uses,
+    this.env,
+    this.withContent,
+    this.shell,
+    this.continueOnError,
+    this.timeoutMinutes,
   });
 
   @override
   Iterable<Step> runContent(BasicConfiguration config) => [
-        Step.run(
-          id: id,
-          name: name,
-          ifContent: ifCondition,
-          workingDirectory: workingDirectory,
-          run: run,
-        ),
+        Step.fromOverrides(this),
         ...?type?.afterEachSteps(workingDirectory, config),
       ];
 }

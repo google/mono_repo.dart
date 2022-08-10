@@ -211,7 +211,7 @@ line 4, column 12: Unsupported value for "group". expected a list of tasks
       _expectParseThrows(
         monoYaml,
         r'''
-line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
+line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`, `github_action`.
   ╷
 9 │      "weird": "thing"
   │      ^^^^^^^
@@ -234,7 +234,7 @@ line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `
       _expectParseThrows(
         monoYaml,
         r'''
-line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
+line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`, `github_action`.
    ╷
 10 │      "command": "other thing"
    │      ^^^^^^^^^
@@ -415,6 +415,13 @@ stages:
     - test: --preset travis --total-shards 5 --shard-index 0
     - test: --preset travis --total-shards 5 --shard-index 1
     - test #no args
+    - group:
+      - github_action:
+          uses: actions/setup-node@v3
+          with:
+            node-version: 16
+      - command: npm run build
+      - test: --platform node
 ''';
 
 List get _testConfig1expectedOutput => [
@@ -607,5 +614,53 @@ List get _testConfig1expectedOutput => [
           {'flavor': 'dart', 'type': 'test'}
         ],
         'flavor': 'dart'
-      }
+      },
+      {
+        'os': 'linux',
+        'package': 'a',
+        'sdk': '1.23.0',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'flavor': 'dart', 'type': 'github_action'},
+          {'flavor': 'dart', 'type': 'command', 'args': 'npm run build'},
+          {
+            'flavor': 'dart',
+            'type': 'test',
+            'args': '--platform node',
+          }
+        ],
+        'flavor': 'dart'
+      },
+      {
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'dev',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'flavor': 'dart', 'type': 'github_action'},
+          {'flavor': 'dart', 'type': 'command', 'args': 'npm run build'},
+          {
+            'flavor': 'dart',
+            'type': 'test',
+            'args': '--platform node',
+          }
+        ],
+        'flavor': 'dart'
+      },
+      {
+        'os': 'linux',
+        'package': 'a',
+        'sdk': 'stable',
+        'stageName': 'unit_test',
+        'tasks': [
+          {'flavor': 'dart', 'type': 'github_action'},
+          {'flavor': 'dart', 'type': 'command', 'args': 'npm run build'},
+          {
+            'flavor': 'dart',
+            'type': 'test',
+            'args': '--platform node',
+          }
+        ],
+        'flavor': 'dart'
+      },
     ];

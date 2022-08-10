@@ -1230,6 +1230,163 @@ env:
       );
     });
   });
+
+  group('github actions config', () {
+    test('custom uses', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - github_action:
+          id: custom-scripts
+          name: 'My Custom Scripts'
+          uses: ./.github/actions/my-action
+          with:
+            my-key: my-var
+            my-num: 123
+            my-map: {'abc':123}
+          if: \${{ github.event_name == 'pull_request' }}
+          continue-on-error: false
+          timeout-minutes: 30
+''')
+      ]).create();
+
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            contains('''
+        name: My Custom Scripts
+        if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
+        uses: "./.github/actions/my-action"
+        with:
+          my-key: my-var
+          my-num: "123"
+          my-map: "{\\"abc\\":123}"
+        continue-on-error: false
+        timeout-minutes: 30
+'''),
+          )
+          .validate();
+    });
+
+    test('custom run', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - github_action:
+          id: custom-scripts
+          run: | 
+            ./script_a
+            ./script_b
+            ./script_c
+          if: \${{ github.event_name == 'pull_request' }}
+          working-directory: ./tool
+          shell: fish
+          env:
+            my-key: my-var
+            my-num: 123
+            my-map: {'abc':123}
+          continue-on-error: false
+          timeout-minutes: 30
+''')
+      ]).create();
+
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            contains('''
+        run: |
+          ./script_a
+          ./script_b
+          ./script_c
+        if: "\${{ github.event_name == 'pull_request' }} && steps.pkg_a_pub_upgrade.conclusion == 'success'"
+        working-directory: pkg_a/tool
+        env:
+          my-key: my-var
+          my-num: "123"
+          my-map: "{\\"abc\\":123}"
+        shell: fish
+        continue-on-error: false
+        timeout-minutes: 30
+'''),
+          )
+          .validate();
+    });
+
+    test('merges `id`, `if`, `working-directory`', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - github_action:
+          id: custom-script
+          if: always()
+          run: ./script
+          working-directory: ./tool
+''')
+      ]).create();
+
+      testGenerateBothConfig(printMatcher: anything);
+
+      await d
+          .file(
+            defaultGitHubWorkflowFilePath,
+            stringContainsInOrder([
+              'id: custom-script',
+              'if: "always() && '
+                  r"steps.pkg_a_pub_upgrade.conclusion == 'success'",
+              'working-directory: pkg_a/tool',
+            ]),
+          )
+          .validate();
+    });
+
+    test('disallows unknown keys', () async {
+      await d.dir('pkg_a', [
+        d.file('pubspec.yaml', '''
+name: pkg_a
+'''),
+        d.file(monoPkgFileName, '''
+sdk:
+- dev
+
+stages:
+  - custom_step:
+      - github_action:
+          run: ./script
+          some-key: some-value
+''')
+      ]).create();
+
+      expect(
+        testGenerateBothConfig,
+        throwsACheckedFromJsonException('Invalid keys'),
+      );
+    });
+  });
 }
 
 String get _subPkgStandardOutput => '''

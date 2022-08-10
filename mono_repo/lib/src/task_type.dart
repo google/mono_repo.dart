@@ -4,12 +4,17 @@
 
 import 'basic_config.dart';
 import 'commands/github/action_info.dart';
+import 'commands/github/overrides.dart';
 import 'commands/github/step.dart';
 import 'coverage_processor.dart';
+import 'github_config.dart';
 import 'package_flavor.dart';
 
 abstract class TaskType implements Comparable<TaskType> {
   static const command = _CommandTask();
+
+  const factory TaskType.githubAction(GitHubActionConfig config) =
+      _GitHubActionTaskType;
 
   static const _values = <TaskType>[
     _FormatTask(),
@@ -43,15 +48,20 @@ abstract class TaskType implements Comparable<TaskType> {
   ) =>
       const Iterable.empty();
 
+  GitHubActionOverrides? get overrides => null;
+
   static Iterable<String> get allowedTaskNames sync* {
     for (var val in TaskType._values) {
       yield val.name;
       yield* val.alternates;
     }
+    yield _GitHubActionTaskType._name;
   }
 
-  static final prettyTaskList =
-      TaskType._values.map((t) => '`${t.name}`').join(', ');
+  static final prettyTaskList = [
+    ...TaskType._values.map((t) => '`${t.name}`'),
+    '`${_GitHubActionTaskType._name}`',
+  ].join(', ');
 
   static TaskType taskFromName(String input) => TaskType._values.singleWhere(
         (element) =>
@@ -172,4 +182,19 @@ class _TestWithCoverageTask extends TaskType {
         ),
     ];
   }
+}
+
+class _GitHubActionTaskType extends TaskType {
+  const _GitHubActionTaskType(this.overrides) : super._(_name);
+
+  static const _name = 'github_action';
+
+  @override
+  final GitHubActionConfig overrides;
+
+  @override
+  List<String> commandValue(PackageFlavor flavor, String? args) => [
+        if (overrides.uses != null) overrides.uses!,
+        if (overrides.run != null) overrides.run!,
+      ];
 }
