@@ -440,7 +440,7 @@ line 4, column 13 of mono_repo.yaml: Unsupported value for "name". Cannot be the
       await populateConfig(monoConfigContent);
 
       expect(
-        () => testGenerateGitHubConfig(printMatcher: 'package:sub_pkg'),
+        () => testGenerateConfig(printMatcher: 'package:sub_pkg'),
         throwsUserExceptionWith(
           'No jobs are defined for the stage "oops" '
           'defined in GitHub workflow "bob".',
@@ -518,7 +518,7 @@ Future<void> _testBadConfigWithYamlException(
   final monoConfigContent = toYaml(monoRepoYaml);
   await populateConfig(monoConfigContent);
   expect(
-    testGenerateGitHubConfig,
+    testGenerateConfig,
     throwsAParsedYamlException(expectedParsedYaml),
   );
 }
@@ -532,7 +532,7 @@ Future<void> _testBadConfigWithUserException(
   final monoConfigContent = toYaml(monoRepoYaml);
   await populateConfig(monoConfigContent);
   expect(
-    () => testGenerateGitHubConfig(printMatcher: printMatcher),
+    () => testGenerateConfig(printMatcher: printMatcher),
     throwsUserExceptionWith(expectedMessage, details: expectedDetails),
   );
 }

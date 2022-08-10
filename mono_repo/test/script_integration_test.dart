@@ -54,7 +54,7 @@ environment:
       d.file('some_dart_file.dart', 'void main() => print("hello");'),
     ]).create();
 
-    testGenerateTravisConfig(
+    testGenerateConfig(
       printMatcher: '''
 package:pkg_a
 package:pkg_b
