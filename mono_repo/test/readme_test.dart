@@ -37,7 +37,6 @@ name: sub_pkg
       ]).create();
 
       testGenerateConfig(
-        forceGitHub: false,
         printMatcher: stringContainsInOrder(
           [
             'package:sub_pkg\n',

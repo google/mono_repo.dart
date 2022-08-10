@@ -37,7 +37,6 @@ void main() {
         ].join('\n');
 
         testGenerateConfig(
-          forceGitHub: false,
           printMatcher: expected,
         );
       });
@@ -48,7 +47,7 @@ void main() {
     await d.dir('sub_pkg').create();
 
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsUserExceptionWith(
         'No packages found.',
         details: 'Each target package directory must contain a '
@@ -67,7 +66,7 @@ name: pkg_name
 
     final path = p.join('sub_pkg', 'mono_pkg.yaml');
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsUserExceptionWith('The contents of `$path` must be a Map.'),
     );
   });
@@ -81,7 +80,7 @@ name: pkg_name
     ]).create();
 
     expect(
-      () => testGenerateBothConfig(
+      () => testGenerateConfig(
         printMatcher: '''
 package:sub_pkg''',
       ),
@@ -109,7 +108,7 @@ name: pkg_name
     ]).create();
 
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsAParsedYamlException(
         startsWith(
           'line 8, column 7 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
@@ -135,7 +134,7 @@ name: pkg_name
     ]).create();
 
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsAParsedYamlException(
         startsWith(
           'line 2, column 3 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
@@ -172,7 +171,7 @@ name: pkg_name
           ]).create();
 
           expect(
-            testGenerateBothConfig,
+            testGenerateConfig,
             throwsAParsedYamlException(
               startsWith(
                 'line 1, column 8 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
@@ -206,7 +205,7 @@ name: pkg_name
           ]).create();
 
           expect(
-            testGenerateBothConfig,
+            testGenerateConfig,
             throwsAParsedYamlException(
               startsWith(
                 'line 1, column 43 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
@@ -229,7 +228,7 @@ name: pkg_name
     ]).create();
 
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsUserExceptionWith(
         'Found legacy package configuration file '
         '(".mono_repo.yml") in `sub_pkg`.',
@@ -272,7 +271,7 @@ name: pkg_b
     ]).create();
 
     expect(
-      () => testGenerateBothConfig(
+      () => testGenerateConfig(
         printMatcher: '''
 package:pkg_a
 package:pkg_b''',
@@ -296,7 +295,7 @@ name: pkg_name
 
     test('throws if there is no generated config', () async {
       expect(
-        () => testGenerateBothConfig(
+        () => testGenerateConfig(
           validateOnly: true,
           printMatcher: 'package:sub_pkg',
         ),
@@ -307,7 +306,7 @@ name: pkg_name
     test("throws if the previous config doesn't match", () async {
       await d.file(defaultGitHubWorkflowFileName, '').create();
       expect(
-        () => testGenerateBothConfig(
+        () => testGenerateConfig(
           validateOnly: true,
           printMatcher: 'package:sub_pkg',
         ),
@@ -316,12 +315,12 @@ name: pkg_name
     });
 
     test("doesn't throw if the previous config is up to date", () async {
-      testGenerateBothConfig(
+      testGenerateConfig(
         printMatcher: _subPkgStandardOutput,
       );
 
       // Just check that this doesn't throw.
-      testGenerateBothConfig(
+      testGenerateConfig(
         printMatcher: '''
 package:sub_pkg
 Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
@@ -338,7 +337,7 @@ name: pkg_name
       ''')
     ]).create();
 
-    testGenerateBothConfig(
+    testGenerateConfig(
       printMatcher: _subPkgStandardOutput,
     );
     await d.file(ciScriptPath, ciShellOutput).validate();
@@ -354,7 +353,7 @@ environment:
 ''')
     ]).create();
 
-    testGenerateBothConfig(
+    testGenerateConfig(
       printMatcher: '''
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
@@ -391,7 +390,7 @@ name: pkg_a
       ]).create();
     }
 
-    testGenerateGitHubConfig(
+    testGenerateConfig(
       printMatcher: '''
 ${Iterable.generate(count, (i) => 'package:${pkgName(i)}').join('\n')}
 package:sub_pkg
@@ -444,7 +443,7 @@ name: pkg_b
       ''')
     ]).create();
 
-    testGenerateBothConfig(
+    testGenerateConfig(
       printMatcher: '''
 package:pkg_a
 package:pkg_b
@@ -515,7 +514,7 @@ name: pkg_b
       ''')
     ]).create();
 
-    testGenerateBothConfig(
+    testGenerateConfig(
       printMatcher: '''
 package:pkg_a
 package:pkg_b
@@ -563,7 +562,7 @@ name: pkg_a
     ]).create();
 
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsAParsedYamlException('''
 line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: An "sdk" key is required.
   ╷
@@ -610,7 +609,7 @@ name: pkg_a
       ''')
     ]).create();
 
-    testGenerateBothConfig(
+    testGenerateConfig(
       printMatcher: '''
 package:pkg_a
   `dart` values (stable) are not used and can be removed.
@@ -643,7 +642,7 @@ name: pkg_a
       ''')
     ]).create();
 
-    testGenerateBothConfig(
+    testGenerateConfig(
       printMatcher: '''
 package:pkg_a
 $_writeScriptOutput''',
@@ -676,7 +675,7 @@ dependencies:
     ]).create();
 
     expect(
-      testGenerateGitHubConfig,
+      testGenerateConfig,
       throwsAParsedYamlException('''
 line 3, column 25 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "test_with_coverage". Code coverage tests are not supported with Flutter.
   ╷
@@ -704,7 +703,7 @@ name: pkg_a
       ]).create();
 
       expect(
-        testGenerateBothConfig,
+        testGenerateConfig,
         throwsAParsedYamlException('''
 line 6, column 14 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "command". Only supports a string or array of strings
   ╷
@@ -728,7 +727,7 @@ stages:
     ]).create();
 
     expect(
-      testGenerateBothConfig,
+      testGenerateConfig,
       throwsAParsedYamlException('''
 line 6, column 18 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Mapping values are not allowed here. Did you miss a colon earlier?
   ╷
@@ -758,7 +757,7 @@ $lines
 ''')
     ]).create();
 
-    testGenerateBothConfig(printMatcher: isNotEmpty);
+    testGenerateConfig(printMatcher: isNotEmpty);
 
     await d
         .file(
@@ -783,7 +782,7 @@ $lines
       }
       await d.nothing(ciScriptPath).validate();
 
-      testGenerateBothConfig(
+      testGenerateConfig(
         printMatcher: _subPkgStandardOutput,
       );
 
@@ -843,7 +842,7 @@ line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`
         });
         await populateConfig(monoConfigContent);
         expect(
-          () => testGenerateBothConfig(printMatcher: 'package:sub_pkg'),
+          () => testGenerateConfig(printMatcher: 'package:sub_pkg'),
           throwsUserExceptionWith(
             'Error parsing mono_repo.yaml',
             details:
@@ -917,7 +916,7 @@ dependencies:
       ''')
         ]).create();
 
-        testGenerateBothConfig(
+        testGenerateConfig(
           printMatcher: '''
 package:pkg_a
 package:pkg_b
@@ -962,7 +961,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
 
         await populateConfig(monoConfigContent);
 
-        testGenerateBothConfig(
+        testGenerateConfig(
           printMatcher: _subPkgStandardOutput,
         );
 
@@ -975,7 +974,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
 
         await populateConfig(monoConfigContent);
 
-        testGenerateBothConfig(
+        testGenerateConfig(
           printMatcher: _subPkgStandardOutput,
         );
 
@@ -1010,7 +1009,7 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
       test('set to false', () async {
         await populateConfig(toYaml({'pretty_ansi': false}));
 
-        testGenerateBothConfig(
+        testGenerateConfig(
           printMatcher: _subPkgStandardOutput,
         );
 
@@ -1127,7 +1126,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
 
         await populateConfig(monoConfigContent);
 
-        testGenerateBothConfig(
+        testGenerateConfig(
           printMatcher: _subPkgStandardOutput,
         );
 
@@ -1174,7 +1173,7 @@ jobs:
 
         await populateConfig(monoConfigContent);
 
-        testGenerateBothConfig(
+        testGenerateConfig(
           printMatcher: _subPkgStandardOutput,
         );
 
@@ -1247,7 +1246,7 @@ Future<void> _testBadConfig(
   final monoConfigContent = toYaml(monoRepoYaml);
   await populateConfig(monoConfigContent);
   expect(
-    testGenerateBothConfig,
+    testGenerateConfig,
     throwsAParsedYamlException(expectedParsedYaml),
   );
 }

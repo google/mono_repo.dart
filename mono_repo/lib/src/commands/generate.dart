@@ -29,11 +29,7 @@ class GenerateCommand extends MonoRepoCommand {
   void run() => generate(rootConfig(), argResults!['validate'] as bool);
 }
 
-void generate(
-  RootConfig config,
-  bool validateOnly, {
-  bool forceGitHub = false,
-}) {
+void generate(RootConfig config, bool validateOnly) {
   logPackages(config);
   validateRootConfig(config);
   generateGitHubActions(config, validateOnly: validateOnly);

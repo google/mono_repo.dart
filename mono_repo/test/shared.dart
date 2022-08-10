@@ -26,38 +26,7 @@ name: pkg_name
   ]).create();
 }
 
-void testGenerateTravisConfig({
-  bool validateOnly = false,
-  Object? printMatcher,
-}) =>
-    testGenerateConfig(
-      forceGitHub: false,
-      validateOnly: validateOnly,
-      printMatcher: printMatcher,
-    );
-
-void testGenerateGitHubConfig({
-  bool validateOnly = false,
-  Object? printMatcher,
-}) =>
-    testGenerateConfig(
-      forceGitHub: true,
-      validateOnly: validateOnly,
-      printMatcher: printMatcher,
-    );
-
-void testGenerateBothConfig({
-  bool validateOnly = false,
-  Object? printMatcher,
-}) =>
-    testGenerateConfig(
-      forceGitHub: true,
-      validateOnly: validateOnly,
-      printMatcher: printMatcher,
-    );
-
 void testGenerateConfig({
-  required bool forceGitHub,
   bool validateOnly = false,
   Object? printMatcher,
 }) {
@@ -70,7 +39,6 @@ void testGenerateConfig({
         generate(
           config,
           validateOnly,
-          forceGitHub: forceGitHub,
         );
       },
       zoneSpec: ZoneSpecification(
