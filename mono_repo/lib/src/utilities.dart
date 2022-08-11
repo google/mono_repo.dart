@@ -14,7 +14,7 @@ const githubSetupMainSdk = 'main';
 
 /// SDK version key to tell the generator to align with what's defined in
 /// the pubspec.
-const pubspecSdkKey = 'pubspec';
+const _pubspecSdkKey = 'pubspec';
 
 String? errorForSdkConfig(PackageFlavor flavor, String sdk) {
   try {
@@ -40,7 +40,7 @@ String? errorForSdkConfig(PackageFlavor flavor, String sdk) {
   }
 }
 
-/// Replaces instances of [pubspecSdkKey] in [sdks] with the lower-bound
+/// Replaces instances of [_pubspecSdkKey] in [sdks] with the lower-bound
 /// SDK constraint from [pubspec].
 void handlePubspecInSdkList(
   PackageFlavor flavor,
@@ -61,11 +61,11 @@ void handlePubspecInSdkList(
 
   for (var i = 0; i < sdks.length; i++) {
     final startValue = sdks[i];
-    if (startValue == pubspecSdkKey) {
+    if (startValue == _pubspecSdkKey) {
       if (flavor != PackageFlavor.dart) {
         // ignore: only_throw_errors
         throw errorFactory(
-          '`$pubspecSdkKey` is only valid for Dart packages (not Flutter).',
+          '`$_pubspecSdkKey` is only valid for Dart packages (not Flutter).',
         );
       }
 
@@ -76,7 +76,7 @@ void handlePubspecInSdkList(
         //   the supported types
         // ignore: only_throw_errors
         throw errorFactory(
-          '`$pubspecSdkKey` is only valid for packages that have an '
+          '`$_pubspecSdkKey` is only valid for packages that have an '
           'environment->sdk value defined in `pubspec.yaml`.',
         );
       }
@@ -116,7 +116,7 @@ const _supportedFlutterSdkLiterals = {
 
 const _supportedDartSdkLiterals = {
   githubSetupMainSdk,
-  pubspecSdkKey,
+  _pubspecSdkKey,
   'dev',
   'beta',
   'stable',
