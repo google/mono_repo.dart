@@ -7,10 +7,8 @@ import 'package:pubspec_parse/pubspec_parse.dart';
 
 import 'package_flavor.dart';
 
-const travisEdgeSdk = 'be/raw/latest';
-
 /// Maps to `be/raw/latest` or "bleeding edge".
-const githubSetupMainSdk = 'main';
+const _githubSetupMainSdk = 'main';
 
 /// SDK version key to tell the generator to align with what's defined in
 /// the pubspec.
@@ -93,7 +91,7 @@ void sortNormalizeVerifySdksList(
   for (var i = 0; i < sdks.length; i++) {
     var value = sdks[i];
     if (flavor == PackageFlavor.dart && _allowedMainVersions.contains(value)) {
-      sdks[i] = value = githubSetupMainSdk;
+      sdks[i] = value = _githubSetupMainSdk;
     }
     final error = errorForSdkConfig(flavor, value);
     if (error != null) {
@@ -115,7 +113,7 @@ const _supportedFlutterSdkLiterals = {
 };
 
 const _supportedDartSdkLiterals = {
-  githubSetupMainSdk,
+  _githubSetupMainSdk,
   _pubspecSdkKey,
   'dev',
   'beta',
@@ -124,8 +122,8 @@ const _supportedDartSdkLiterals = {
 
 const _allowedMainVersions = {
   'edge', // supported for historical reasons
-  travisEdgeSdk,
-  githubSetupMainSdk,
+  'be/raw/latest', // also related to Travis, potentially...
+  _githubSetupMainSdk,
 };
 
 final _dartSdkLiteralsPretty =
