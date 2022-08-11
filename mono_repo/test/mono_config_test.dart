@@ -374,7 +374,7 @@ line 12, column 4: Stages must be unique. "a" appears more than once.
       };
 
       _expectParseThrows(monoYaml, r'''
-line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a version string nor one of "main", "dev", "beta", "stable".
+line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a version string nor one of "main", "pubspec", "dev", "beta", "stable".
   ╷
 2 │    "sdk": [
   │ ┌─────────^

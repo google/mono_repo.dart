@@ -83,7 +83,7 @@ class PackageConfig {
 
     final flavor = pubspec.flavor;
 
-    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml);
+    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml, pubspec);
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <CIJob>[];
@@ -102,6 +102,12 @@ class PackageConfig {
               ? jobSdks = List.from(jobValue)
               : [jobValue as String];
 
+          handlePubspecInSdkList(
+            flavor,
+            jobSdks,
+            pubspec,
+            (m) => CheckedFromJsonException(job, 'sdk', 'RawConfig', m),
+          );
           sortNormalizeVerifySdksList(
             flavor,
             jobSdks,

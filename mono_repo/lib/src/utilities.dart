@@ -12,6 +12,10 @@ const travisEdgeSdk = 'be/raw/latest';
 /// Maps to `be/raw/latest` or "bleeding edge".
 const githubSetupMainSdk = 'main';
 
+/// SDK version key to tell the generator to align with what's defined in
+/// the pubspec.
+const _pubspecSdkKey = 'pubspec';
+
 String? errorForSdkConfig(PackageFlavor flavor, String sdk) {
   try {
     Version.parse(sdk);
@@ -32,6 +36,50 @@ String? errorForSdkConfig(PackageFlavor flavor, String sdk) {
         return null;
       default:
         throw UnsupportedError('should never get a flavor of `$flavor`');
+    }
+  }
+}
+
+/// Replaces instances of [_pubspecSdkKey] in [sdks] with the lower-bound
+/// SDK constraint from [pubspec].
+void handlePubspecInSdkList(
+  PackageFlavor flavor,
+  List<String>? sdks,
+  Pubspec pubspec,
+  Object Function(String message) errorFactory,
+) {
+  if (sdks == null) {
+    return;
+  }
+
+  final sdkConstraint = pubspec.environment?['sdk'];
+
+  Version? lowerVersion;
+  if (sdkConstraint is VersionRange && sdkConstraint.includeMin) {
+    lowerVersion = sdkConstraint.min;
+  }
+
+  for (var i = 0; i < sdks.length; i++) {
+    final startValue = sdks[i];
+    if (startValue == _pubspecSdkKey) {
+      if (flavor != PackageFlavor.dart) {
+        // ignore: only_throw_errors
+        throw errorFactory(
+          '`$_pubspecSdkKey` is only valid for Dart packages (not Flutter).',
+        );
+      }
+
+      if (lowerVersion != null) {
+        sdks[i] = lowerVersion.toString();
+      } else {
+        // TODO: throw a more specific error when the SDK constraint is not of
+        //   the supported types
+        // ignore: only_throw_errors
+        throw errorFactory(
+          '`$_pubspecSdkKey` is only valid for packages that have an '
+          'environment->sdk value defined in `pubspec.yaml`.',
+        );
+      }
     }
   }
 }
@@ -68,6 +116,7 @@ const _supportedFlutterSdkLiterals = {
 
 const _supportedDartSdkLiterals = {
   githubSetupMainSdk,
+  _pubspecSdkKey,
   'dev',
   'beta',
   'stable',

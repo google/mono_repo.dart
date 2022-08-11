@@ -1,9 +1,10 @@
-
 ## 6.4.0-dev
 
 - Added support for `test_with_coverage`.
   Uses `package:coverage` and supports [Coveralls](https://coveralls.io)
   (the default) and [Codecov](https://codecov.com/) to track test code coverage.
+- Added support for `pubspec` as an CI target for Dart packages. When used,
+  the lower-bound of the support SDK range is used.
 - Added `--verbose` flag. Helps when debugging failures.
 
 ## 6.3.0

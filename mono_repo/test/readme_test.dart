@@ -33,6 +33,8 @@ void main() {
         d.file(monoPkgFileName, _pkgYaml),
         d.file('pubspec.yaml', '''
 name: sub_pkg
+environment:
+  sdk: '>=2.17.0 <3.0.0'
 ''')
       ]).create();
 
@@ -161,6 +163,9 @@ const _pkgYaml = r'''
 # an array. Alternatively, you can specify the SDK version(s) within each job.
 sdk:
  - dev
+ # Specific `pubspec` to test the lower-bound SDK defined in pubspec.yaml
+ # This is only supported for Dart packages (not Flutter).
+ - pubspec
 
 stages:
   # Register two jobs to run under the `analyze` stage.

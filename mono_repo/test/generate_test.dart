@@ -139,7 +139,8 @@ name: pkg_name
         startsWith(
           'line 2, column 3 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
           'Unsupported value for "sdk". The value "not_a_dart" is neither a '
-          'version string nor one of "main", "dev", "beta", "stable".',
+          'version string nor one of "main", "pubspec", "dev", "beta", '
+          '"stable".',
         ),
       ),
     );
@@ -1226,6 +1227,147 @@ env:
   PUB_ENVIRONMENT: bot.github
   FOO: BAR
 '''),
+      );
+    });
+  });
+
+  group('pubspec version', () {
+    test('valid', () async {
+      await d.dir('pkg_a', [
+        d.file(
+          monoPkgFileName,
+          r'''
+sdk:
+- pubspec
+- dev
+
+stages:
+- analyze_and_format:
+  - analyze: --fatal-infos .
+    sdk:
+    - dev
+  - analyze:
+    sdk:
+    - pubspec
+  - format:
+    sdk:
+    - dev
+- unit_test:
+  - test: --test-randomize-ordering-seed=random
+  - test: --test-randomize-ordering-seed=random -p chrome
+    os:
+    - linux
+    - windows
+''',
+        ),
+        d.file('pubspec.yaml', '''
+name: pkg_a
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+''')
+      ]).create();
+
+      testGenerateConfig(
+        printMatcher: '''
+package:pkg_a
+$_writeScriptOutput''',
+      );
+
+      validateSandbox(
+        'valid_pubspec_version.txt',
+        defaultGitHubWorkflowFilePath,
+      );
+    });
+
+    test('no SDK constraint - with top-level `pubspec` usage', () async {
+      await d.dir('pkg_a', [
+        d.file(
+          monoPkgFileName,
+          r'''
+sdk:
+- pubspec
+- dev
+
+stages:
+- analyze_and_format:
+  - analyze: --fatal-infos .
+''',
+        ),
+        d.file('pubspec.yaml', '''
+name: pkg_a
+''')
+      ]).create();
+
+      expect(
+        testGenerateConfig,
+        throwsAParsedYamlException('''
+line 2, column 1 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "sdk". `pubspec` is only valid for packages that have an environment->sdk value defined in `pubspec.yaml`.
+  ╷
+2 │ ┌ - pubspec
+3 │ │ - dev
+4 │ └ 
+  ╵'''),
+      );
+    });
+
+    test('no SDK constraint - with job `pubspec` usage', () async {
+      await d.dir('pkg_a', [
+        d.file(
+          monoPkgFileName,
+          r'''
+stages:
+- analyze_and_format:
+  - analyze: --fatal-infos .
+    sdk: pubspec
+''',
+        ),
+        d.file('pubspec.yaml', '''
+name: pkg_a
+''')
+      ]).create();
+
+      expect(
+        testGenerateConfig,
+        throwsAParsedYamlException('''
+line 4, column 10 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "sdk". `pubspec` is only valid for packages that have an environment->sdk value defined in `pubspec.yaml`.
+  ╷
+4 │     sdk: pubspec
+  │          ^^^^^^^
+  ╵'''),
+      );
+    });
+
+    test('not supported with flutter', () async {
+      await d.dir('pkg_a', [
+        d.file(
+          monoPkgFileName,
+          r'''
+stages:
+- analyze_and_format:
+  - analyze: --fatal-infos .
+    sdk: pubspec
+''',
+        ),
+        d.file('pubspec.yaml', '''
+name: pkg_a
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+''')
+      ]).create();
+
+      expect(
+        testGenerateConfig,
+        throwsAParsedYamlException('''
+line 4, column 10 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "sdk". `pubspec` is only valid for Dart packages (not Flutter).
+  ╷
+4 │     sdk: pubspec
+  │          ^^^^^^^
+  ╵'''),
       );
     });
   });
