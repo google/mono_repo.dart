@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@f4278025ab0f432ce369118909e46deec636f50c
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:sub_pkg;commands:test"
@@ -37,7 +37,7 @@ jobs:
           sdk: "2.17.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@f4278025ab0f432ce369118909e46deec636f50c
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test"
@@ -67,7 +67,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -83,7 +83,7 @@ jobs:
     if: "github.event_name == 'schedule'"
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@f4278025ab0f432ce369118909e46deec636f50c
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:sub_pkg;commands:test"
@@ -98,7 +98,7 @@ jobs:
           sdk: "2.17.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -117,7 +117,7 @@ jobs:
     if: "github.event_name == 'schedule'"
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@f4278025ab0f432ce369118909e46deec636f50c
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test"
@@ -132,7 +132,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -156,7 +156,7 @@ jobs:
           sdk: "2.17.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -180,7 +180,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade

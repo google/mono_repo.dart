@@ -1131,41 +1131,11 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
           printMatcher: _subPkgStandardOutput,
         );
 
-        // TODO: validate GitHub case
-        await d
-            .file(
-              defaultGitHubWorkflowFilePath,
-              stringContainsInOrder([
-                r'''
-jobs:
-  job_001:
-    name: mono_repo self validate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: stable
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
-      - name: mono_repo self validate
-        run: dart pub global activate mono_repo 1.2.3
-      - name: mono_repo self validate
-        run: dart pub global run mono_repo generate --validate
-  job_002:
-'''
-              ]),
-            )
-            .validate();
+        validateSandbox(
+          'self_validate_set_to_true.txt',
+          defaultGitHubWorkflowFilePath,
+        );
+
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
 
@@ -1178,39 +1148,11 @@ jobs:
           printMatcher: _subPkgStandardOutput,
         );
 
-        // TODO: validate GitHub case
-        await d
-            .file(
-              defaultGitHubWorkflowFilePath,
-              contains(
-                r'''
-  job_001:
-    name: mono_repo self validate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        with:
-          sdk: stable
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
-      - name: mono_repo self validate
-        run: dart pub global activate mono_repo 1.2.3
-      - name: mono_repo self validate
-        run: dart pub global run mono_repo generate --validate
-''',
-              ),
-            )
-            .validate();
+        validateSandbox(
+          'self_validate_set_to_a_stage_name.txt',
+          defaultGitHubWorkflowFilePath,
+        );
+
         await d.file(ciScriptPath, ciShellOutput).validate();
       });
     });
