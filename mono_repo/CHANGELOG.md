@@ -6,6 +6,8 @@
 - Added support for `pubspec` as an CI target for Dart packages. When used,
   the lower-bound of the support SDK range is used.
 - Added `--verbose` flag. Helps when debugging failures.
+- Updated `actions/checkout`, `actions/cache`, and `subosito/flutter-action` to
+  latest versions.
 
 ## 6.3.0
 
