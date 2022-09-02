@@ -1,4 +1,4 @@
-## 6.4.0-dev
+## 6.4.0
 
 - Added support for `test_with_coverage`.
   Uses `package:coverage` and supports [Coveralls](https://coveralls.io)
