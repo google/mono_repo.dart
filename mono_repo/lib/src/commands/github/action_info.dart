@@ -10,7 +10,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   cache(
     name: 'Cache Pub hosted dependencies',
     repo: 'actions/cache',
-    version: 'fd5de65bc895cf536527842281bea11763fefd77', // v3.0.8
+    version: 'ac8075791e805656e71b4ba23325ace9e3421120', // v3.0.9
   ),
   setupDart(
     name: 'Setup Dart SDK',
@@ -20,7 +20,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   setupFlutter(
     name: 'Setup Flutter SDK',
     repo: 'subosito/flutter-action',
-    version: '9d48f4efd5460d7013af812069d08b23f37aed20', // v2.6.2
+    version: '1e6ee87cb840500837bcd50a667fb28815d8e310', // v2.7.1
   ),
 
   /// See https://github.com/marketplace/actions/coveralls-github-action
@@ -35,7 +35,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   codecov(
     name: 'Upload coverage to codecov.io',
     repo: 'codecov/codecov-action',
-    version: 'master',
+    version: 'main',
   );
 
   const ActionInfo({
