@@ -1,4 +1,4 @@
-## 6.4.1-dev
+## 6.4.1
 
 - Updated `actions/cache`, `subosito/flutter-action`, and 
   `coverallsapp/github-action` to latest versions.
