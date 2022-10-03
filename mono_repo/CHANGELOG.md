@@ -1,3 +1,8 @@
+## 6.4.1-dev
+
+- Updated `actions/cache`, `subosito/flutter-action`, and 
+  `coverallsapp/github-action` to latest versions.
+
 ## 6.4.0
 
 - Added support for `test_with_coverage`.
