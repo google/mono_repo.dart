@@ -152,7 +152,7 @@ merge_stages:
 coverage_service:
 # https://coveralls.io/ - the default
 - coveralls
-# https://codecov.io/ - the other option
+# https://codecov.io/ – the other option
 - codecov
 ''';
 
