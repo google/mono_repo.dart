@@ -66,7 +66,7 @@ class PackageConfig {
     Map monoPkgYaml,
   ) {
     if (monoPkgYaml.isEmpty) {
-      // It's valid to have an empty `mono_pkg.yaml` file - it just results in
+      // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
       return PackageConfig(
         relativePath,

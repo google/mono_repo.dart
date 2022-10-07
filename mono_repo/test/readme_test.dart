@@ -157,7 +157,7 @@ coverage_service:
 ''';
 
 const _pkgYaml = r'''
-# Every entry must be associated with at least one SDK version - corresponding
+# Every entry must be associated with at least one SDK version – corresponding
 # to the Dart SDK version or the Flutter framework version, depending on the
 # type of package. It can be specified at the top-lever as a single value or
 # an array. Alternatively, you can specify the SDK version(s) within each job.

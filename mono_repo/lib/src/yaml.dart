@@ -156,7 +156,7 @@ void _writeYaml(
 
       final lines = LineSplitter.split(source);
       if (lines.length > 1 &&
-          // No line can be just empty - or only whitespace
+          // No line can be just empty – or only whitespace
           lines.every((element) => element.trim().isNotEmpty) &&
           // No lines can have trailing whitespace
           // The first line cannot have any leading whitespace, either
@@ -215,7 +215,7 @@ void _writeYaml(
     }
   } else if (source is Iterable) {
     if (parentType == _ParentType.list && source.isNotEmpty) {
-      throw UnsupportedError('We cannot encode lists within lists - yet!');
+      throw UnsupportedError('We cannot encode lists within lists – yet!');
     }
     if (source.isEmpty) {
       if (parentType == _ParentType.map) {

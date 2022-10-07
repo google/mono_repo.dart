@@ -146,7 +146,7 @@ merge_stages:
 coverage_service:
 # https://coveralls.io/ - the default
 - coveralls
-# https://codecov.io/ - the other option
+# https://codecov.io/ – the other option
 - codecov
 ```
 
@@ -164,7 +164,7 @@ details on how you'd like tests to be run.
 #### `mono_pkg.yaml` example
 
 ```yaml
-# Every entry must be associated with at least one SDK version - corresponding
+# Every entry must be associated with at least one SDK version – corresponding
 # to the Dart SDK version or the Flutter framework version, depending on the
 # type of package. It can be specified at the top-lever as a single value or
 # an array. Alternatively, you can specify the SDK version(s) within each job.

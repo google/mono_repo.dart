@@ -45,7 +45,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   ) {
     if (output.containsKey(fileName)) {
       throw UnsupportedError(
-        'Should not get here - duplicate workflow "$fileName".',
+        'Should not get here – duplicate workflow "$fileName".',
       );
     }
 
