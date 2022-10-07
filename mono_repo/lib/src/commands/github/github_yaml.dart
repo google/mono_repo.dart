@@ -45,7 +45,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   ) {
     if (output.containsKey(fileName)) {
       throw UnsupportedError(
-        'Should not get here – duplicate workflow "$fileName".',
+        'Should not get here - duplicate workflow "$fileName".',
       );
     }
 
@@ -114,7 +114,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
         Map.fromEntries(allJobs.map((e) => MapEntry(e.id, e.value)));
 
     for (var completion in completionMap.entries) {
-      final job = completion.key.completionJobFactory!()
+      final job = completion.key.completionJobFactory!(rootConfig)
         ..needs = completion.value.toList();
 
       jobList['job_${jobList.length + 1}'] = job;
@@ -196,7 +196,10 @@ Iterable<_MapEntryWithStage> _listJobs(
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
-      yield jobEntry(_selfValidateJob(rootConfig.monoConfig), job.stageName);
+      yield jobEntry(
+        _selfValidateJob(rootConfig.monoConfig, rootConfig),
+        job.stageName,
+      );
       continue;
     }
 
@@ -332,6 +335,7 @@ extension on CIJobEntry {
       job.flavor,
       job.sdk,
       commandEntries,
+      rootConfig,
       config: rootConfig.monoConfig,
       additionalCacheKeys: {
         'packages': packages.join('-'),
@@ -374,7 +378,8 @@ Job _githubJob(
   String runsOn,
   PackageFlavor packageFlavor,
   String sdkVersion,
-  List<_CommandEntryBase> runCommands, {
+  List<_CommandEntryBase> runCommands,
+  RootConfig rootConfig, {
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
 }) =>
@@ -385,17 +390,20 @@ Job _githubJob(
         if (!runsOn.startsWith('windows'))
           _cacheEntries(
             runsOn,
+            rootConfig: rootConfig,
             additionalCacheKeys: {
               'sdk': sdkVersion,
               if (additionalCacheKeys != null) ...additionalCacheKeys,
             },
           ),
-        packageFlavor.setupStep(sdkVersion),
+        packageFlavor.setupStep(sdkVersion, rootConfig),
         ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
         ActionInfo.checkout.usage(
           id: 'checkout',
+          versionOverrides: rootConfig.existingActionVersions,
         ),
-        for (var command in runCommands) ...command.runContent(config),
+        for (var command in runCommands)
+          ...command.runContent(config, rootConfig),
       ],
     );
 
@@ -416,7 +424,7 @@ class _CommandEntryBase {
 
   _CommandEntryBase(this.name, this.run);
 
-  Iterable<Step> runContent(BasicConfiguration config) =>
+  Iterable<Step> runContent(BasicConfiguration config, RootConfig rootConfig) =>
       [Step.run(name: name, run: run)];
 }
 
@@ -436,7 +444,8 @@ class _CommandEntry extends _CommandEntryBase {
   });
 
   @override
-  Iterable<Step> runContent(BasicConfiguration config) => [
+  Iterable<Step> runContent(BasicConfiguration config, RootConfig rootConfig) =>
+      [
         Step.run(
           id: id,
           name: name,
@@ -444,7 +453,7 @@ class _CommandEntry extends _CommandEntryBase {
           workingDirectory: workingDirectory,
           run: run,
         ),
-        ...?type?.afterEachSteps(workingDirectory, config),
+        ...?type?.afterEachSteps(workingDirectory, config, rootConfig),
       ];
 }
 
@@ -456,6 +465,7 @@ class _CommandEntry extends _CommandEntryBase {
 /// store and retrieve the cache.
 Step _cacheEntries(
   String runsOn, {
+  required RootConfig rootConfig,
   Map<String, String>? additionalCacheKeys,
 }) {
   final cacheKeyParts = [
@@ -482,6 +492,7 @@ Step _cacheEntries(
       'key': restoreKeys.first,
       'restore-keys': restoreKeys.skip(1).join('\n'),
     },
+    versionOverrides: rootConfig.existingActionVersions,
   );
 }
 
@@ -492,7 +503,8 @@ String _maxLength(String input) {
   return input.substring(0, 512 - hash.length) + hash;
 }
 
-Job _selfValidateJob(BasicConfiguration config) => _githubJob(
+Job _selfValidateJob(BasicConfiguration config, RootConfig rootConfig) =>
+    _githubJob(
       selfValidateJobName,
       _ubuntuLatest,
       PackageFlavor.dart,
@@ -501,6 +513,7 @@ Job _selfValidateJob(BasicConfiguration config) => _githubJob(
         for (var command in selfValidateCommands)
           _CommandEntryBase(selfValidateJobName, command),
       ],
+      rootConfig,
       config: config,
     );
 
@@ -529,16 +542,18 @@ class _MapEntryWithStage {
 }
 
 extension on PackageFlavor {
-  Step setupStep(String sdkVersion) {
+  Step setupStep(String sdkVersion, RootConfig rootConfig) {
     switch (this) {
       case PackageFlavor.dart:
         return ActionInfo.setupDart.usage(
           withContent: {'sdk': sdkVersion},
+          versionOverrides: rootConfig.existingActionVersions,
         );
 
       case PackageFlavor.flutter:
         return ActionInfo.setupFlutter.usage(
           withContent: {'channel': sdkVersion},
+          versionOverrides: rootConfig.existingActionVersions,
         );
     }
   }

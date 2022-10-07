@@ -83,7 +83,7 @@ class PackageReport {
 
   factory PackageReport.create(Pubspec pubspec, Set<Pubspec> siblings) {
     // TODO(kevmoo): check: if any dependency has a path dependency, it'd better
-    // be a sibling – right?
+    // be a sibling - right?
 
     final sibs = <String, SiblingReference>{};
     for (var sib in siblings) {

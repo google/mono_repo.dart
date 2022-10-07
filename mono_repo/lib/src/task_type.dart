@@ -7,6 +7,7 @@ import 'commands/github/action_info.dart';
 import 'commands/github/step.dart';
 import 'coverage_processor.dart';
 import 'package_flavor.dart';
+import 'root_config.dart';
 
 abstract class TaskType implements Comparable<TaskType> {
   static const command = _CommandTask();
@@ -40,6 +41,7 @@ abstract class TaskType implements Comparable<TaskType> {
   Iterable<Step> afterEachSteps(
     String packageDirectory,
     BasicConfiguration config,
+    RootConfig rootConfig,
   ) =>
       const Iterable.empty();
 
@@ -148,6 +150,7 @@ class _TestWithCoverageTask extends TaskType {
   Iterable<Step> afterEachSteps(
     String packageDirectory,
     BasicConfiguration config,
+    RootConfig rootConfig,
   ) {
     final countString = (_count++).toString().padLeft(2, '0');
     return [
@@ -161,6 +164,7 @@ class _TestWithCoverageTask extends TaskType {
             'flag-name': 'coverage_$countString',
             'parallel': true,
           },
+          versionOverrides: rootConfig.existingActionVersions,
         ),
       if (config.coverageProcessors.contains(CoverageProcessor.codecov))
         ActionInfo.codecov.usage(
@@ -169,6 +173,7 @@ class _TestWithCoverageTask extends TaskType {
             'fail_ci_if_error': true,
             'name': 'coverage_$countString',
           },
+          versionOverrides: rootConfig.existingActionVersions,
         ),
     ];
   }

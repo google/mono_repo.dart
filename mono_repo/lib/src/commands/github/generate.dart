@@ -20,6 +20,8 @@ final defaultGitHubWorkflowFilePath =
 String githubWorkflowFilePath(String filename) =>
     '$githubWorkflowDirectory/$filename.yml';
 
+const dependabotFileName = '.github/dependabot.yaml';
+
 void generateGitHubActions(
   RootConfig rootConfig, {
   bool validateOnly = false,

@@ -555,7 +555,7 @@ jobs:
           flag-name: coverage_00
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
+        uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70
         with:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
@@ -613,7 +613,7 @@ jobs:
           flag-name: coverage_01
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
+        uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70
         with:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
@@ -714,7 +714,7 @@ jobs:
           flag-name: coverage_02
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
+        uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70
         with:
           files: test_pkg/coverage/lcov.info
           fail_ci_if_error: true

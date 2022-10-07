@@ -1,3 +1,4 @@
+import '../../root_config.dart';
 import 'job.dart';
 import 'step.dart';
 
@@ -35,7 +36,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   codecov(
     name: 'Upload coverage to codecov.io',
     repo: 'codecov/codecov-action',
-    version: 'main',
+    version: 'd9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70',
   );
 
   const ActionInfo({
@@ -48,16 +49,19 @@ enum ActionInfo implements Comparable<ActionInfo> {
   final String repo;
   final String version;
   final String name;
-  final Job Function()? completionJobFactory;
+  final Job Function(RootConfig rootConfig)? completionJobFactory;
 
   Step usage({
     String? name,
     String? id,
     Map<String, dynamic>? withContent,
+    Map<String, String>? versionOverrides,
   }) {
     name ??= this.name;
+    final useVersion =
+        (versionOverrides == null ? null : versionOverrides[repo]) ?? version;
     final step = Step.uses(
-      uses: '$repo@$version',
+      uses: '$repo@$useVersion',
       id: id,
       name: name,
       withContent: withContent,
@@ -71,7 +75,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   int compareTo(ActionInfo other) => index.compareTo(other.index);
 }
 
-Job _coverageCompletionJob() => Job(
+Job _coverageCompletionJob(RootConfig rootConfig) => Job(
       name: 'Mark Coveralls job finished',
       runsOn: 'ubuntu-latest',
       steps: [
@@ -82,6 +86,7 @@ Job _coverageCompletionJob() => Job(
             'github-token': r'${{ secrets.GITHUB_TOKEN }}',
             'parallel-finished': true
           },
+          versionOverrides: rootConfig.existingActionVersions,
         )
       ],
     );
