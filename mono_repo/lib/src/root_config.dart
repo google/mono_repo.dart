@@ -103,9 +103,8 @@ class RootConfig extends ListBase<PackageConfig> {
     Map<String, String>? existingActionVersions;
     if (File(dependabotFileName).existsSync() &&
         File(defaultGitHubWorkflowFilePath).existsSync()) {
-      // TODO(devoncarew): test this
       existingActionVersions =
-          _parseExistingActionVersions(File(defaultGitHubWorkflowFilePath));
+          parseActionVersions(File(defaultGitHubWorkflowFilePath));
     }
 
     return RootConfig._(
@@ -136,38 +135,42 @@ class RootConfig extends ListBase<PackageConfig> {
   @override
   void operator []=(int index, PackageConfig pkg) =>
       throw UnsupportedError('This List is read-only.');
-}
 
-// "dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d"
-final RegExp _usageRegex = RegExp(r'([\w-]+)\/([\w-]+)@([\w\.]+)');
+  /// Parse any github action versions from a workflow file.
+  ///
+  /// This returns a map of <action name> to <action version>.
+  static Map<String, String> parseActionVersions(File workflowFile) {
+    // "dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d"
+    final usageRegex = RegExp(r'([\w-]+)\/([\w-]+)@([\w\.]+)');
 
-Map<String, String> _parseExistingActionVersions(File file) {
-  final yaml = loadYaml(file.readAsStringSync());
-  final result = <String, String>{};
+    final yaml = loadYaml(workflowFile.readAsStringSync());
+    final result = <String, String>{};
 
-  void collect(dynamic yaml) {
-    if (yaml is List) {
-      for (var item in yaml) {
-        collect(item);
-      }
-    } else if (yaml is Map) {
-      const usesKey = 'uses';
+    void collect(dynamic yaml) {
+      if (yaml is List) {
+        for (var item in yaml) {
+          collect(item);
+        }
+      } else if (yaml is Map) {
+        const usesKey = 'uses';
 
-      if (yaml.containsKey(usesKey)) {
-        // dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-        final usage = yaml[usesKey] as String;
-        final match = _usageRegex.firstMatch(usage);
-        if (match != null) {
-          result['${match.group(1)}/${match.group(2)}'] = match.group(3)!;
+        if (yaml.containsKey(usesKey)) {
+          // dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+          final usage = yaml[usesKey] as String;
+          final match = usageRegex.firstMatch(usage);
+          if (match != null) {
+            result['${match.group(1)}/${match.group(2)}'] = match.group(3)!;
+          }
+        }
+
+        for (var item in yaml.entries) {
+          collect(item.value);
         }
       }
-
-      for (var item in yaml.entries) {
-        collect(item.value);
-      }
     }
-  }
 
-  collect(yaml);
-  return result;
+    collect(yaml);
+
+    return result;
+  }
 }

@@ -206,5 +206,20 @@ Look at these repositories for examples of `mono_repo` usage:
 * https://github.com/dart-lang/webdev
 * https://github.com/google/json_serializable.dart
 
+## Mono_repo and Dependabot
+
+Historically, package:mono_repo and Dependabot couldn't be used together -
+they both wanted to maintain your GitHub workflow file. We've adopted mono_repo
+so that you can now use both it and Dependabot on your repo.
+
+When generating your workflow configuration (`mono_repo generate`) mono_repo
+will write out its current default action versions into the workflow file. If
+however it sees that the repo has a Dependabot configuration - has a file named
+`.github/dependabot.yaml` in the repo - mono_repo will instead parse that file,
+read out the current action versions, and use those versions when generating
+the workflow file. This lets mono_repo manage the overall structure of the
+file, while allowing Dependabot to independently move various action versions
+forward as necessary.
+
 [Dart packages]: https://dart.dev/guides/libraries/create-library-packages
 [setup your PATH]: https://dart.dev/tools/pub/cmd/pub-global#running-a-script-from-your-path
