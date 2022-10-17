@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b;commands:analyze_0-format"
@@ -34,7 +34,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_c;commands:analyze_1-format"
@@ -76,12 +76,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@1e6ee87cb840500837bcd50a667fb28815d8e310
+        uses: subosito/flutter-action@dbf1fa04f4d2e52c33185153d06cdb5443aa189d
         with:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: pkg_c_pub_upgrade
         name: pkg_c; flutter pub upgrade
         run: flutter pub upgrade
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_1"
@@ -115,7 +115,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -133,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b;commands:test_1"
@@ -148,7 +148,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         run: dart pub upgrade
@@ -166,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_0"
@@ -181,7 +181,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -199,7 +199,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b;commands:test_0"
@@ -214,7 +214,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         run: dart pub upgrade
