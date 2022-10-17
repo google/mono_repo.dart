@@ -1,6 +1,11 @@
+## 6.4.2
+
+- Updated `actions/cache`, `subosito/flutter-action`, and
+  `actions/checkout` to latest versions.
+
 ## 6.4.1
 
-- Updated `actions/cache`, `subosito/flutter-action`, and 
+- Updated `actions/cache`, `subosito/flutter-action`, and
   `coverallsapp/github-action` to latest versions.
 
 ## 6.4.0
