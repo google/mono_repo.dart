@@ -5,12 +5,12 @@ enum ActionInfo implements Comparable<ActionInfo> {
   checkout(
     name: 'Checkout repository',
     repo: 'actions/checkout',
-    version: '93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8', // v3.1.0
+    version: '755da8c3cf115ac066823e79a1e1788f8940201b', // v3.2.0
   ),
   cache(
     name: 'Cache Pub hosted dependencies',
     repo: 'actions/cache',
-    version: '9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7', // v3.0.11
+    version: '4723a57e26efda3a62cbde1812113b730952852d', // v3.2.2
   ),
   setupDart(
     name: 'Setup Dart SDK',

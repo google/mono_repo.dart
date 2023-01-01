@@ -1,3 +1,7 @@
+## 6.4.3
+
+- Updated `actions/cache` and `actions/checkout` to latest versions.
+
 ## 6.4.2
 
 - Updated `actions/cache`, `subosito/flutter-action`, and
