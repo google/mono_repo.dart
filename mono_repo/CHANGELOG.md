@@ -1,3 +1,8 @@
+## 6.4.3
+
+- Updated `actions/cache` and `actions/checkout` to latest versions.
+- Require at least Dart >= 2.18.0
+
 ## 6.4.2
 
 - Updated `actions/cache`, `subosito/flutter-action`, and
