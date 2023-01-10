@@ -8,8 +8,6 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
-import '../../github_config.dart';
-import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import 'github_yaml.dart';

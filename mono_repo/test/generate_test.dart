@@ -6,11 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:mono_repo/mono_repo.dart';
-import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/ci_test_script.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
-import 'package:mono_repo/src/commands/github/generate.dart'
-    show defaultGitHubWorkflowFilePath;
 import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/github_config.dart';
 import 'package:mono_repo/src/package_config.dart';
