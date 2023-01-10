@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart';
+import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';

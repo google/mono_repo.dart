@@ -6,10 +6,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:mono_repo/mono_repo.dart';
+import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/ci_test_script.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/generate.dart'
     show defaultGitHubWorkflowFilePath;
+import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/github_config.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
@@ -35,7 +37,6 @@ void main() {
           'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
           ciScriptPathMessage,
         ].join('\n');
-
         testGenerateConfig(
           printMatcher: expected,
         );
@@ -1311,6 +1312,89 @@ line 4, column 10 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for 
   │          ^^^^^^^
   ╵'''),
       );
+    });
+  });
+
+  group('dependabot', () {
+    test('Simple', () async {
+      await populateConfig(
+        r'''
+github:
+  dependabot: {}
+''',
+      );
+      testGenerateConfig(
+        printMatcher: 'package:sub_pkg\n'
+            'Wrote `${d.sandbox}/.github/workflows/dart.yml`.\n'
+            'Wrote `${d.sandbox}/.github/dependabot.yml`.\n'
+            'Make sure to mark `tool/ci.sh` as executable.\n'
+            '  chmod +x tool/ci.sh\n'
+            'Wrote `${d.sandbox}/tool/ci.sh`.',
+      );
+      await d.dir('.github', [
+        d.file('dependabot.yml', '''
+# Created with package:mono_repo v1.2.3
+{
+  "version": 2,
+  "updates": [
+    {
+      "package-ecosystem": "pub",
+      "directory": "sub_pkg",
+      "schedule": {
+        "interval": "weekly"
+      }
+    }
+  ]
+}
+''')
+      ]).validate();
+    });
+
+    test('global configuration', () async {
+      await populateConfig(
+        r'''
+github:
+  dependabot:
+    version: 3
+    updates:
+      - package-ecosystem: "github-actions"
+        directory: "/"
+        schedule:
+          interval: "monthly"
+''',
+      );
+      testGenerateConfig(
+        printMatcher: 'package:sub_pkg\n'
+            'Wrote `${d.sandbox}/.github/workflows/dart.yml`.\n'
+            'Wrote `${d.sandbox}/.github/dependabot.yml`.\n'
+            'Make sure to mark `tool/ci.sh` as executable.\n'
+            '  chmod +x tool/ci.sh\n'
+            'Wrote `${d.sandbox}/tool/ci.sh`.',
+      );
+      await d.dir('.github', [
+        d.file('dependabot.yml', '''
+# Created with package:mono_repo v1.2.3
+{
+  "version": 3,
+  "updates": [
+    {
+      "package-ecosystem": "github-actions",
+      "directory": "/",
+      "schedule": {
+        "interval": "monthly"
+      }
+    },
+    {
+      "package-ecosystem": "pub",
+      "directory": "sub_pkg",
+      "schedule": {
+        "interval": "weekly"
+      }
+    }
+  ]
+}
+''')
+      ]).validate();
     });
   });
 }
