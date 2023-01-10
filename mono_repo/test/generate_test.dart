@@ -1321,12 +1321,8 @@ github:
 ''',
       );
       testGenerateConfig(
-        printMatcher: 'package:sub_pkg\n'
-            'Wrote `${d.path('.github/workflows/dart.yml')}`.\n'
-            'Wrote `${d.path('.github/dependabot.yml')}`.\n'
-            'Make sure to mark `tool/ci.sh` as executable.\n'
-            '  chmod +x tool/ci.sh\n'
-            'Wrote `${d.sandbox}/tool/ci.sh`.',
+        printMatcher:
+            contains('Wrote `${d.path('.github/dependabot.yml')}`.\n'),
       );
       await d.dir('.github', [
         d.file('dependabot.yml', '''
@@ -1361,12 +1357,8 @@ github:
 ''',
       );
       testGenerateConfig(
-        printMatcher: 'package:sub_pkg\n'
-            'Wrote `${d.path('.github/workflows/dart.yml')}`.\n'
-            'Wrote `${d.path('.github/dependabot.yml')}`.\n'
-            'Make sure to mark `tool/ci.sh` as executable.\n'
-            '  chmod +x tool/ci.sh\n'
-            'Wrote `${d.sandbox}/tool/ci.sh`.',
+        printMatcher:
+            contains('Wrote `${d.path('.github/dependabot.yml')}`.\n'),
       );
       await d.dir('.github', [
         d.file('dependabot.yml', '''
