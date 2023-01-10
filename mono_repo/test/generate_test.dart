@@ -1362,8 +1362,8 @@ github:
       );
       testGenerateConfig(
         printMatcher: 'package:sub_pkg\n'
-            'Wrote `${d.sandbox}/.github/workflows/dart.yml`.\n'
-            'Wrote `${d.sandbox}/.github/dependabot.yml`.\n'
+            'Wrote `${d.path('.github/workflows/dart.yml')}`.\n'
+            'Wrote `${d.path('.github/dependabot.yml')}`.\n'
             'Make sure to mark `tool/ci.sh` as executable.\n'
             '  chmod +x tool/ci.sh\n'
             'Wrote `${d.sandbox}/tool/ci.sh`.',
