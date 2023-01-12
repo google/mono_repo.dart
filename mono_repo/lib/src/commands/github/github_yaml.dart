@@ -20,6 +20,14 @@ import 'step.dart';
 
 const _onCompletionStage = '_on_completion';
 
+const githubWorkflowDirectory = '.github/workflows';
+
+final defaultGitHubWorkflowFilePath =
+    githubWorkflowFilePath(defaultGitHubWorkflowFileName);
+
+String githubWorkflowFilePath(String filename) =>
+    '$githubWorkflowDirectory/$filename.yml';
+
 Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   final jobs = <HasStageName>[
     ...rootConfig.expand((config) => config.jobs),
@@ -120,7 +128,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       jobList['job_${jobList.length + 1}'] = job;
     }
 
-    output[fileName] = '''
+    output[githubWorkflowFilePath(fileName)] = '''
 $createdWith
 ${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
 

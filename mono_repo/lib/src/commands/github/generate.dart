@@ -2,23 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
-import '../../github_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 import 'github_yaml.dart';
-
-const githubWorkflowDirectory = '.github/workflows';
-
-final defaultGitHubWorkflowFilePath =
-    githubWorkflowFilePath(defaultGitHubWorkflowFileName);
-
-String githubWorkflowFilePath(String filename) =>
-    '$githubWorkflowDirectory/$filename.yml';
 
 void generateGitHubActions(
   RootConfig rootConfig, {
@@ -27,21 +19,64 @@ void generateGitHubActions(
   final githubConfig = _GeneratedGitHubConfig.generate(
     rootConfig,
   );
-  for (var entry in githubConfig.workflowFiles.entries) {
+  final dependabotConfig = _GeneratedDependabotConfig.generate(
+    rootConfig,
+  );
+  for (var entry in [
+    ...githubConfig.workflowFiles.entries,
+    ...dependabotConfig.workflowFiles.entries,
+  ]) {
     if (validateOnly) {
       _validateFile(
         rootConfig.rootDirectory,
         entry.value,
-        githubWorkflowFilePath(entry.key),
+        entry.key,
       );
     } else {
       writeFile(
         rootConfig.rootDirectory,
-        githubWorkflowFilePath(entry.key),
+        entry.key,
         entry.value,
         isScript: false,
       );
     }
+  }
+}
+
+/// The generated configuration for dependabot.
+class _GeneratedDependabotConfig {
+  final Map<String, String> workflowFiles;
+
+  _GeneratedDependabotConfig._(this.workflowFiles);
+
+  factory _GeneratedDependabotConfig.generate(RootConfig rootConfig) {
+    final result = <String, String>{};
+    final dependabotConfig = rootConfig.monoConfig.github.dependabot;
+    if (dependabotConfig != null) {
+      final config = {
+        'version': 2,
+        ...dependabotConfig,
+      };
+      final packageUpdates = rootConfig.map(
+        (packageConfig) => {
+          'package-ecosystem': 'pub',
+          'directory': packageConfig.relativePath,
+          'schedule': {'interval': 'weekly'},
+          // TODO(sigurdm): package customizability?
+        },
+      );
+
+      config['updates'] = [
+        ...config['updates'] as List? ?? <dynamic>[],
+        ...packageUpdates
+      ];
+      result['.github/dependabot.yml'] = '''
+$createdWith
+${const JsonEncoder.withIndent('  ').convert(config)}
+''';
+    }
+
+    return _GeneratedDependabotConfig._(result);
   }
 }
 
