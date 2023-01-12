@@ -1,3 +1,7 @@
+## 6.5.0-dev
+
+- Support for generating dependabot configurations.
+
 ## 6.4.3
 
 - Updated `actions/cache` and `actions/checkout` to latest versions.
