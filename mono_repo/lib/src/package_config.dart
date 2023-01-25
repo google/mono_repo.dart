@@ -284,7 +284,7 @@ class CIJob implements HasStageName {
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
-  @JsonKey(ignore: true)
+  @JsonKey(includeToJson: false, includeFromJson: false)
   Version? get explicitSdkVersion {
     try {
       return Version.parse(sdk);
