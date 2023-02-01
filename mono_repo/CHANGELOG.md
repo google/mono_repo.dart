@@ -1,6 +1,8 @@
-## 6.5.0-dev
+## 6.5.0
 
 - Support for generating dependabot configurations.
+- Updated `actions/cache`, `actions/checkout`, and `dart-lang/setup-dart` to
+  the latest versions.
 
 ## 6.4.3
 
