@@ -1,3 +1,7 @@
+## 6.5.1
+
+- Updated `actions/cache` to latest version.
+
 ## 6.5.0
 
 - Support for generating dependabot configurations.
