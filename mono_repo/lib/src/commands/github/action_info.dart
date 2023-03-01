@@ -10,7 +10,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   cache(
     name: 'Cache Pub hosted dependencies',
     repo: 'actions/cache',
-    version: '627f0f41f6904a5b1efbaed9f96d9eb58e92e920', // v3.2.4
+    version: '69d9d449aced6a2ede0bc19182fadc3a0a42d2b0', // v3.2.6
   ),
   setupDart(
     name: 'Setup Dart SDK',
