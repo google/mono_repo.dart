@@ -230,8 +230,3 @@ Look at these repositories for examples of `mono_repo` usage:
 
 [Dart packages]: https://dart.dev/guides/libraries/create-library-packages
 [setup your PATH]: https://dart.dev/tools/pub/cmd/pub-global#running-a-script-from-your-path
-
-## Publishing automation
-
-For information about our publishing automation and release process, see
-https://github.com/dart-lang/ecosystem/wiki/Publishing-automation.
