@@ -3,7 +3,7 @@ import 'step.dart';
 
 enum ActionInfo implements Comparable<ActionInfo> {
   cache(
-    name: 'Cache dependencies',
+    name: 'Cache Pub hosted dependencies',
     repo: 'actions/cache',
     version: '88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8', // v3.3.1
   ),
