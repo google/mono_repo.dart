@@ -2,20 +2,20 @@ import 'job.dart';
 import 'step.dart';
 
 enum ActionInfo implements Comparable<ActionInfo> {
+  cache(
+    name: 'Cache dependencies',
+    repo: 'actions/cache',
+    version: '88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8', // v3.3.1
+  ),
   checkout(
     name: 'Checkout repository',
     repo: 'actions/checkout',
-    version: 'ac593985615ec2ede58e132d2e21d2b1cbd6127c', // v3.3.0
-  ),
-  cache(
-    name: 'Cache Pub hosted dependencies',
-    repo: 'actions/cache',
-    version: '69d9d449aced6a2ede0bc19182fadc3a0a42d2b0', // v3.2.6
+    version: '24cb9080177205b6e8c946b17badbe402adc938f', // v3.4.0
   ),
   setupDart(
     name: 'Setup Dart SDK',
     repo: 'dart-lang/setup-dart',
-    version: 'a57a6c04cf7d4840e88432aad6281d1e125f0d46', // v1.4
+    version: 'd6a63dab3335f427404425de0fbfed4686d93c4f', // v1.5.0
   ),
   setupFlutter(
     name: 'Setup Flutter SDK',
