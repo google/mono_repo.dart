@@ -1,5 +1,9 @@
-## 6.5.1
+## 6.5.2
 
+- Updated `actions/cache`, `actions/checkout`, and `dart-lang/setup-dart` to
+  the latest versions.
+
+## 6.5.1
 - Updated `actions/cache` to latest version.
 
 ## 6.5.0
