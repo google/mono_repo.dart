@@ -10,7 +10,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   checkout(
     name: 'Checkout repository',
     repo: 'actions/checkout',
-    version: '24cb9080177205b6e8c946b17badbe402adc938f', // v3.4.0
+    version: '8f4b7f84864484a7bf31766abe9204da3cbe65b3', // v3.5.0
   ),
   setupDart(
     name: 'Setup Dart SDK',
@@ -20,7 +20,7 @@ enum ActionInfo implements Comparable<ActionInfo> {
   setupFlutter(
     name: 'Setup Flutter SDK',
     repo: 'subosito/flutter-action',
-    version: 'dbf1fa04f4d2e52c33185153d06cdb5443aa189d', // v2.8.0
+    version: '48cafc24713cca54bbe03cdc3a423187d413aafa', // v2.10.0
   ),
 
   /// See https://github.com/marketplace/actions/coveralls-github-action

@@ -1,3 +1,7 @@
+## 6.5.3
+
+- Updated `actions/cache` and `subosito/flutter-action` to the latest versions.
+
 ## 6.5.2
 
 - Updated `actions/cache`, `actions/checkout`, and `dart-lang/setup-dart` to
