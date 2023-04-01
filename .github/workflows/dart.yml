@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.5.2
+# Created with package:mono_repo v6.5.3
 name: Dart CI
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           sdk: "2.16.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -70,7 +70,7 @@ jobs:
           sdk: "2.17.0-69.1.beta"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -104,7 +104,7 @@ jobs:
           sdk: "2.18.0-106.0.dev"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -138,7 +138,7 @@ jobs:
           sdk: "2.18.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -163,12 +163,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@dbf1fa04f4d2e52c33185153d06cdb5443aa189d
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa
         with:
           channel: beta
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -202,7 +202,7 @@ jobs:
           sdk: beta
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -236,7 +236,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -266,7 +266,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -313,7 +313,7 @@ jobs:
           sdk: main
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -342,12 +342,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@dbf1fa04f4d2e52c33185153d06cdb5443aa189d
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa
         with:
           channel: master
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -376,12 +376,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@dbf1fa04f4d2e52c33185153d06cdb5443aa189d
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa
         with:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -415,7 +415,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -449,7 +449,7 @@ jobs:
           sdk: "2.18.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -487,12 +487,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@dbf1fa04f4d2e52c33185153d06cdb5443aa189d
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa
         with:
           channel: beta
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -537,7 +537,7 @@ jobs:
         run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -595,7 +595,7 @@ jobs:
         run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -651,7 +651,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -696,7 +696,7 @@ jobs:
         run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -747,12 +747,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@dbf1fa04f4d2e52c33185153d06cdb5443aa189d
+        uses: subosito/flutter-action@48cafc24713cca54bbe03cdc3a423187d413aafa
         with:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: test_flutter_pkg_example_pub_upgrade
         name: test_flutter_pkg/example; flutter pub upgrade
         run: flutter pub upgrade
@@ -785,7 +785,7 @@ jobs:
           sdk: "2.18.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -818,7 +818,7 @@ jobs:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
