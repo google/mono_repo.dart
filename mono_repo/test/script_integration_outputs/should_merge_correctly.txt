@@ -34,7 +34,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -81,7 +81,7 @@ jobs:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
       - id: pkg_c_pub_upgrade
         name: pkg_c; flutter pub upgrade
         run: flutter pub upgrade
@@ -115,7 +115,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -148,7 +148,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         run: dart pub upgrade
@@ -181,7 +181,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -214,7 +214,7 @@ jobs:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         run: dart pub upgrade
