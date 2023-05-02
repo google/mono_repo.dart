@@ -1,3 +1,7 @@
+## 6.5.5
+
+- Add the pub package topics `tool` and `repository-management`.
+
 ## 6.5.4
 
 - Updated `actions/checkout` to the latest version.
