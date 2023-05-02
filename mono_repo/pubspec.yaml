@@ -4,6 +4,9 @@ description: >-
   multiple Dart packages.
 version: 6.5.4
 repository: https://github.com/google/mono_repo.dart
+topics:
+ - tool
+ - repository-management
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
