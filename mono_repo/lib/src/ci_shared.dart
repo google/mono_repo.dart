@@ -246,21 +246,31 @@ List<String> calculateOrderedStages(
     );
   }
 
-  // Running strongly connected components lets us detect cycles (which aren't
-  // allowed), and gives us the reverse order of what we ultimately want.
-  final components = stronglyConnectedComponents(edges.keys, (n) => edges[n]!);
-  for (var component in components) {
-    if (component.length > 1) {
-      final items = component.map((e) => '`$e`').join(', ');
-      throw UserException(
-        'Not all packages agree on `stages` ordering, found '
-        'a cycle between the following stages: $items.',
-      );
-    }
+  final List<String> components;
+  try {
+    // Build up a map of the keys to their index in `edges.keys`, which we use
+    // as a secondary sort. This is an intuitive secondary sort order as it
+    // follows the order given in configuration files.
+    final keys = edges.keys.toList();
+    final edgeIndexes = {
+      for (var i = 0; i < keys.length; i++) keys[i]: i,
+    };
+
+    // Orders by dependencies first, and detect cycles (which aren't allowed).
+    components = topologicalSort(
+      keys,
+      (n) => edges[n]!,
+      secondarySort: (a, b) => edgeIndexes[b]!.compareTo(edgeIndexes[a]!),
+    );
+  } on CycleException<String> catch (e) {
+    final items = e.cycle.map((e) => '`$e`').join(', ');
+    throw UserException(
+      'Not all packages agree on `stages` ordering, found '
+      'a cycle between the following stages: $items.',
+    );
   }
 
-  final orderedStages =
-      components.map((c) => c.first).toList().reversed.toList();
+  final orderedStages = components;
 
   if (rootConfig.monoConfig.selfValidateStage != null &&
       !orderedStages.contains(rootConfig.monoConfig.selfValidateStage)) {
