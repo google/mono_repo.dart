@@ -1,3 +1,8 @@
+## 6.5.6
+
+- Restore the previous ordering behavior for jobs by using a secondary sort
+  based on the insertion order (this matches the listed configuration order).
+
 ## 6.5.5
 
 - Add the pub package topics `tool` and `repository-management`.
