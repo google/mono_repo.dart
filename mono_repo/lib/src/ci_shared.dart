@@ -257,6 +257,8 @@ List<String> calculateOrderedStages(
     };
 
     // Orders by dependencies first, and detect cycles (which aren't allowed).
+    // Our edges here are actually reverse edges already, so a topological sort
+    // gives us the right thing.
     components = topologicalSort(
       keys,
       (n) => edges[n]!,
@@ -270,14 +272,12 @@ List<String> calculateOrderedStages(
     );
   }
 
-  final orderedStages = components;
-
   if (rootConfig.monoConfig.selfValidateStage != null &&
-      !orderedStages.contains(rootConfig.monoConfig.selfValidateStage)) {
-    orderedStages.insert(0, rootConfig.monoConfig.selfValidateStage!);
+      !components.contains(rootConfig.monoConfig.selfValidateStage)) {
+    components.insert(0, rootConfig.monoConfig.selfValidateStage!);
   }
 
-  return orderedStages;
+  return components;
 }
 
 List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
