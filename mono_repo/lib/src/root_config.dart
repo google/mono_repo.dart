@@ -102,13 +102,12 @@ class RootConfig extends ListBase<PackageConfig> {
     // the generated workflow file are maintained by dependabot; parse and use
     // those versions.
     Map<String, String>? existingActionVersions;
-    if (File(defaultGitHubWorkflowFilePath).existsSync()) {
-      for (var dependabotFile in dependabotFileNames.map(File.new)) {
-        if (dependabotFile.existsSync()) {
-          existingActionVersions =
-              parseActionVersions(File(defaultGitHubWorkflowFilePath));
-        }
-      }
+    final hasDependabot =
+        dependabotFileNames.map(File.new).any((file) => file.existsSync());
+    if (hasDependabot && File(defaultGitHubWorkflowFilePath).existsSync()) {
+      existingActionVersions = parseActionVersions(
+        File(defaultGitHubWorkflowFilePath).readAsStringSync(),
+      );
     }
 
     return RootConfig._(
@@ -143,11 +142,11 @@ class RootConfig extends ListBase<PackageConfig> {
   /// Parse any github action versions from a workflow file.
   ///
   /// This returns a map of <action name> to <action version>.
-  static Map<String, String> parseActionVersions(File workflowFile) {
+  static Map<String, String> parseActionVersions(String yamlText) {
     // "dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d"
-    final usageRegex = RegExp(r'([\w-]+)\/([\w-]+)@([\w\.]+)');
+    final usageRegex = RegExp(r'([\w\.-]+)\/([\w\.-]+)@([\w\.]+)');
 
-    final yaml = loadYaml(workflowFile.readAsStringSync());
+    final yaml = loadYaml(yamlText);
     final result = <String, String>{};
 
     void collect(dynamic yaml) {
