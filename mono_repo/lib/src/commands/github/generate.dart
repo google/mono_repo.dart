@@ -12,15 +12,10 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import 'github_yaml.dart';
 
-const githubWorkflowDirectory = '.github/workflows';
-
-final defaultGitHubWorkflowFilePath =
-    githubWorkflowFilePath(defaultGitHubWorkflowFileName);
-
-String githubWorkflowFilePath(String filename) =>
-    '$githubWorkflowDirectory/$filename.yml';
-
-const dependabotFileName = '.github/dependabot.yaml';
+const dependabotFileNames = [
+  '.github/dependabot.yaml',
+  '.github/dependabot.yml',
+];
 
 void generateGitHubActions(
   RootConfig rootConfig, {

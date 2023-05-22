@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:mono_repo/src/commands/github/generate.dart';
+import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as path;
 import 'package:test/test.dart';

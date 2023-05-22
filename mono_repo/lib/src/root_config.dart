@@ -10,6 +10,7 @@ import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
 
 import 'commands/github/generate.dart';
+import 'commands/github/github_yaml.dart';
 import 'mono_config.dart';
 import 'package_config.dart';
 import 'user_exception.dart';
@@ -101,10 +102,13 @@ class RootConfig extends ListBase<PackageConfig> {
     // the generated workflow file are maintained by dependabot; parse and use
     // those versions.
     Map<String, String>? existingActionVersions;
-    if (File(dependabotFileName).existsSync() &&
-        File(defaultGitHubWorkflowFilePath).existsSync()) {
-      existingActionVersions =
-          parseActionVersions(File(defaultGitHubWorkflowFilePath));
+    if (File(defaultGitHubWorkflowFilePath).existsSync()) {
+      for (var dependabotFile in dependabotFileNames.map(File.new)) {
+        if (dependabotFile.existsSync()) {
+          existingActionVersions =
+              parseActionVersions(File(defaultGitHubWorkflowFilePath));
+        }
+      }
     }
 
     return RootConfig._(
