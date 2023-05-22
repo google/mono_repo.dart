@@ -3,25 +3,25 @@ import 'job.dart';
 import 'step.dart';
 
 enum ActionInfo implements Comparable<ActionInfo> {
-  checkout(
-    name: 'Checkout repository',
-    repo: 'actions/checkout',
-    version: '2541b1294d2704b0964813337f33b291d3f8596b', // v3.0.2
-  ),
   cache(
     name: 'Cache Pub hosted dependencies',
     repo: 'actions/cache',
-    version: 'ac8075791e805656e71b4ba23325ace9e3421120', // v3.0.9
+    version: '88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8', // v3.3.1
+  ),
+  checkout(
+    name: 'Checkout repository',
+    repo: 'actions/checkout',
+    version: '8e5e7e5ab8b370d6c329ec480221332ada57f0ab', // v3.5.2
   ),
   setupDart(
     name: 'Setup Dart SDK',
     repo: 'dart-lang/setup-dart',
-    version: '6a218f2413a3e78e9087f638a238f6b40893203d', // v1.3
+    version: 'd6a63dab3335f427404425de0fbfed4686d93c4f', // v1.5.0
   ),
   setupFlutter(
     name: 'Setup Flutter SDK',
     repo: 'subosito/flutter-action',
-    version: '1e6ee87cb840500837bcd50a667fb28815d8e310', // v2.7.1
+    version: '48cafc24713cca54bbe03cdc3a423187d413aafa', // v2.10.0
   ),
 
   /// See https://github.com/marketplace/actions/coveralls-github-action

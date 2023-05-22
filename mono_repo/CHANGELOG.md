@@ -1,6 +1,47 @@
+## 6.5.6
+
+- Restore the previous ordering behavior for jobs by using a secondary sort
+  based on the insertion order (this matches the listed configuration order).
+
+## 6.5.5
+
+- Add the pub package topics `tool` and `repository-management`.
+
+## 6.5.4
+
+- Updated `actions/checkout` to the latest version.
+
+## 6.5.3
+
+- Updated `actions/cache` and `subosito/flutter-action` to the latest versions.
+
+## 6.5.2
+
+- Updated `actions/cache`, `actions/checkout`, and `dart-lang/setup-dart` to
+  the latest versions.
+
+## 6.5.1
+- Updated `actions/cache` to latest version.
+
+## 6.5.0
+
+- Support for generating dependabot configurations.
+- Updated `actions/cache`, `actions/checkout`, and `dart-lang/setup-dart` to
+  the latest versions.
+
+## 6.4.3
+
+- Updated `actions/cache` and `actions/checkout` to latest versions.
+- Require at least Dart >= 2.18.0
+
+## 6.4.2
+
+- Updated `actions/cache`, `subosito/flutter-action`, and
+  `actions/checkout` to latest versions.
+
 ## 6.4.1
 
-- Updated `actions/cache`, `subosito/flutter-action`, and 
+- Updated `actions/cache`, `subosito/flutter-action`, and
   `coverallsapp/github-action` to latest versions.
 
 ## 6.4.0

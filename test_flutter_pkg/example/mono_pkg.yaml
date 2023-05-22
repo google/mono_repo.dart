@@ -5,5 +5,3 @@ sdk:
 stages:
 - test:
   - test: --test-randomize-ordering-seed=random
-    os:
-    - linux

@@ -18,6 +18,7 @@ GitHubConfig _$GitHubConfigFromJson(Map json) => $checkedCreate(
             'env',
             'on',
             'on_completion',
+            'dependabot',
             'cron',
             'stages',
             'workflows'
@@ -46,6 +47,11 @@ GitHubConfig _$GitHubConfigFromJson(Map json) => $checkedCreate(
               (v) => (v as Map?)?.map(
                     (k, e) => MapEntry(
                         k as String, GitHubWorkflow.fromJson(e as Map)),
+                  )),
+          $checkedConvert(
+              'dependabot',
+              (v) => (v as Map?)?.map(
+                    (k, e) => MapEntry(k as String, e),
                   )),
         );
         return val;

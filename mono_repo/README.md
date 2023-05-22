@@ -161,6 +161,28 @@ commands.
 To enable `generate` and `presubmit`, you must populate `mono_pkg.yaml` with
 details on how you'd like tests to be run.
 
+### Generating `.github/dependabot.yml`
+By adding
+
+```yaml
+github:
+  dependabot: {}
+```
+
+To your `mono_repo.yaml` configuration, mono_repo will generate a `.github/dependabot.yml` file that updates all your packages with a default configuration.
+
+Any further configuration can go into the map and will be merged with the
+updates of the packages. For example:
+
+```yaml
+github:
+  dependabot:
+    updates:
+      - package-ecosystem: "github-actions"
+        directory: "/"
+        schedule:
+          interval: "monthly"
+```
 #### `mono_pkg.yaml` example
 
 ```yaml

@@ -20,6 +20,8 @@ class GitHubConfig {
   @JsonKey(name: 'on_completion')
   final List<Job>? onCompletion;
 
+  final Map<String, dynamic>? dependabot;
+
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
@@ -35,6 +37,7 @@ class GitHubConfig {
     String? cron,
     this.stages,
     this.workflows,
+    this.dependabot,
   ) : on = _parseOn(on, cron) {
     if (workflows != null) {
       _noDefaultFileName();

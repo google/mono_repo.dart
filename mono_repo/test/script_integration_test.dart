@@ -1,5 +1,5 @@
 @TestOn('!windows')
-import 'package:mono_repo/src/commands/github/generate.dart';
+import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -22,7 +22,7 @@ void main() {
       d.file('pubspec.yaml', '''
 name: pkg_a
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0<3.0.0"
       ''')
     ]).create();
 
@@ -34,7 +34,7 @@ environment:
       d.file('pubspec.yaml', '''
 name: pkg_b
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0<3.0.0"
 
 dependencies:
   not_a_package_at_all: any
@@ -49,7 +49,7 @@ dependencies:
       d.file('pubspec.yaml', '''
 name: pkg_c
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0<3.0.0"
 '''),
       d.file('some_dart_file.dart', 'void main() => print("hello");'),
     ]).create();
