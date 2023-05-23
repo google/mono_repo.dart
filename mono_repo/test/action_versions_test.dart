@@ -8,12 +8,10 @@ import 'package:test/test.dart';
 
 void main() {
   test('action versions are up to date', () {
-    expect(
-      Process.runSync(
-        Platform.executable,
-        ['tool/generate_action_versions.dart', '--validate'],
-      ).exitCode,
-      0,
+    final result = Process.runSync(
+      Platform.executable,
+      ['tool/generate_action_versions.dart', '--validate'],
     );
+    expect(result.exitCode, 0, reason: result.stdout as String);
   });
 }
