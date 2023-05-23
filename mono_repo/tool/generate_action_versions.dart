@@ -40,7 +40,16 @@ void main(List<String> args) {
   final tmpFile =
       File.fromUri(tmpDir.uri.resolve('generate_action_versions.dart'))
         ..writeAsStringSync(newContentBuffer.toString());
-  Process.runSync(Platform.executable, ['format', tmpFile.path]);
+  final fmtResult =
+      Process.runSync(Platform.resolvedExecutable, ['format', tmpFile.path]);
+  if (fmtResult.exitCode != 0) {
+    tmpDir.deleteSync(recursive: true);
+    stdout
+      ..writeln('Error: Failed to run dartfmt')
+      ..write(fmtResult.stdout);
+    stderr.write(fmtResult.stderr);
+    exit(1);
+  }
   final newContent = tmpFile.readAsStringSync();
 
   if (previousContent == newContent) {
@@ -59,7 +68,7 @@ $newContent
     if (validateOnly) {
       exit(1);
     } else {
-      tmpFile.renameSync(versionsFile.path);
+      tmpDir.renameSync(versionsFile.path);
     }
   }
 }
