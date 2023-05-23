@@ -42,8 +42,12 @@ void main(List<String> args) {
         ..writeAsStringSync(newContentBuffer.toString());
   Process.runSync(Platform.executable, ['format', tmpFile.path]);
   final newContent = tmpFile.readAsStringSync();
-  if (validateOnly) {
-    stderr.write('''
+
+  if (previousContent == newContent) {
+    print('No change');
+    tmpFile.deleteSync();
+  } else {
+    stdout.write('''
 Content changed!
 
 Previous:
@@ -52,14 +56,11 @@ $previousContent
 New:
 $newContent
 ''');
-    exit(previousContent == newContent ? 0 : 1);
-  }
-  if (previousContent == newContent) {
-    print('No change');
-    tmpFile.deleteSync();
-  } else {
-    print('Versions changed, updating');
-    tmpFile.renameSync(versionsFile.path);
+    if (validateOnly) {
+      exit(1);
+    } else {
+      tmpFile.renameSync(versionsFile.path);
+    }
   }
 }
 
