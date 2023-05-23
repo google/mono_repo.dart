@@ -17,7 +17,7 @@ void main(List<String> args) {
         'make sure you are running from the `mono_repo` package directory');
     exit(1);
   }
-  final previousConent = versionsFile.readAsStringSync();
+  final previousContent = versionsFile.readAsStringSync();
   final workflowFile = File('../.github/workflows/dart.yml');
   final versions =
       RootConfig.parseActionVersions(workflowFile.readAsStringSync());
@@ -43,9 +43,18 @@ void main(List<String> args) {
   Process.runSync(Platform.executable, ['format', tmpFile.path]);
   final newContent = tmpFile.readAsStringSync();
   if (validateOnly) {
-    exit(previousConent == newContent ? 0 : 1);
+    stderr.write('''
+Content changed!
+
+Previous:
+$previousContent
+
+New:
+$newContent
+''');
+    exit(previousContent == newContent ? 0 : 1);
   }
-  if (previousConent == newContent) {
+  if (previousContent == newContent) {
     print('No change');
     tmpFile.deleteSync();
   } else {
