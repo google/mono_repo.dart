@@ -36,15 +36,21 @@ void main(List<String> args) {
       ..writeln("const ${entry.key.toVariableName} = '${entry.value}';")
       ..writeln();
   }
-  final newContent = newContentBuffer.toString();
+  final tmpDir = Directory.systemTemp.createTempSync('gen_action_versions');
+  final tmpFile =
+      File.fromUri(tmpDir.uri.resolve('generate_action_versions.dart'))
+        ..writeAsStringSync(newContentBuffer.toString());
+  Process.runSync(Platform.executable, ['format', tmpFile.path]);
+  final newContent = tmpFile.readAsStringSync();
   if (validateOnly) {
     exit(previousConent == newContent ? 0 : 1);
   }
   if (previousConent == newContent) {
     print('No change');
+    tmpFile.deleteSync();
   } else {
     print('Versions changed, updating');
-    versionsFile.writeAsStringSync(newContent);
+    tmpFile.renameSync(versionsFile.path);
   }
 }
 

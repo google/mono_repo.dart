@@ -17,4 +17,3 @@ const subositoFlutterActionVersion = '48cafc24713cca54bbe03cdc3a423187d413aafa';
 const coverallsappGithubActionVersion = 'master';
 
 const codecovCodecovActionVersion = 'main';
-
