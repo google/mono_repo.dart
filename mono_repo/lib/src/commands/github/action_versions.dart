@@ -2,6 +2,10 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+/// This file is generated, and should not be modified by hand.
+///
+/// To regenerate it, run the `tool/generate_action_versions.dart` script.
+
 const actionsCacheVersion = '88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8';
 
 const dartLangSetupDartVersion = 'd6a63dab3335f427404425de0fbfed4686d93c4f';
