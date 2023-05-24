@@ -42,20 +42,18 @@ void main(List<String> args) {
   final fmtResult =
       Process.runSync(Platform.resolvedExecutable, ['format', tmpFile.path]);
   if (fmtResult.exitCode != 0) {
-    tmpDir.deleteSync(recursive: true);
     stdout
       ..writeln('Error: Failed to run dartfmt')
       ..write(fmtResult.stdout);
     stderr.write(fmtResult.stderr);
-    exit(1);
-  }
-  final newContent = tmpFile.readAsStringSync();
-
-  if (previousContent == newContent) {
-    print('No change');
-    tmpFile.deleteSync();
+    exitCode = 1;
   } else {
-    stdout.write('''
+    final newContent = tmpFile.readAsStringSync();
+
+    if (previousContent == newContent) {
+      print('No change');
+    } else {
+      stdout.write('''
 Content changed!
 
 Previous:
@@ -68,12 +66,14 @@ New:
 $newContent
 ```
 ''');
-    if (validateOnly) {
-      exit(1);
-    } else {
-      tmpDir.renameSync(versionsFile.path);
+      if (validateOnly) {
+        exitCode = 1;
+      } else {
+        tmpFile.renameSync(versionsFile.path);
+      }
     }
   }
+  tmpDir.deleteSync(recursive: true);
 }
 
 final argParser = ArgParser()..addFlag('validate');
