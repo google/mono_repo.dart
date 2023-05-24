@@ -33,8 +33,7 @@ void main(List<String> args) {
 ''');
   for (var entry in versions.entries) {
     newContentBuffer
-      ..writeln("const ${entry.key.toVariableName} = '${entry.value}';")
-      ..writeln();
+        .writeln("const ${entry.key.toVariableName} = '${entry.value}';");
   }
   final tmpDir = Directory.systemTemp.createTempSync('gen_action_versions');
   final tmpFile =
@@ -60,10 +59,14 @@ void main(List<String> args) {
 Content changed!
 
 Previous:
+```
 $previousContent
+```
 
 New:
+```
 $newContent
+```
 ''');
     if (validateOnly) {
       exit(1);
