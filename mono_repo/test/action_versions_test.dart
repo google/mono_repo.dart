@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-// On windows this test fails for unknown reasons, possibly there are carraige
+// On windows this test fails for unknown reasons, possibly there are carriage
 // returns being introduced during formatting.
 @TestOn('linux')
 import 'dart:io';
