@@ -4,13 +4,16 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:mono_repo/mono_repo.dart';
 import 'package:mono_repo/src/ci_test_script.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
+import 'package:mono_repo/src/commands/generate.dart';
 import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/github_config.dart';
 import 'package:mono_repo/src/package_config.dart';
+import 'package:mono_repo/src/root_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:term_glyph/term_glyph.dart' as glyph;
@@ -284,12 +287,12 @@ package:pkg_b''',
 
   group('--validate', () {
     setUp(() async {
-      await d.dir('sub_pkg', [
-        d.file(monoPkgFileName, testConfig2),
-        d.file('pubspec.yaml', '''
-name: pkg_name
-      ''')
-      ]).create();
+      await populateConfig(
+        r'''
+github:
+  dependabot: {}
+''',
+      );
     });
 
     test('throws if there is no generated config', () async {
@@ -315,15 +318,32 @@ name: pkg_name
 
     test("doesn't throw if the previous config is up to date", () async {
       testGenerateConfig(
-        printMatcher: _subPkgStandardOutput,
+        printMatcher: _subPkgStandardOutput(withDependabot: true),
       );
 
       // Just check that this doesn't throw.
       testGenerateConfig(
-        printMatcher: '''
-package:sub_pkg
-Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
-Wrote `${p.join(d.sandbox, ciScriptPath)}`.''',
+        printMatcher: 'package:sub_pkg',
+        validateOnly: true,
+      );
+    });
+
+    test("doesn't throw if the previous config has different action versions",
+        () async {
+      testGenerateConfig(
+        printMatcher: _subPkgStandardOutput(withDependabot: true),
+      );
+      final generatedFile = File(d.path(defaultGitHubWorkflowFilePath));
+      final contents = generatedFile.readAsStringSync();
+      generatedFile.writeAsStringSync(
+        contents.replaceAll(
+          'dart-lang/setup-dart@',
+          'dart-lang/setup-dart@Foo',
+        ),
+      );
+      testGenerateConfig(
+        printMatcher: 'package:sub_pkg',
+        validateOnly: true,
       );
     });
   });
@@ -337,7 +357,7 @@ name: pkg_name
     ]).create();
 
     testGenerateConfig(
-      printMatcher: _subPkgStandardOutput,
+      printMatcher: _subPkgStandardOutput(),
     );
     await d.file(ciScriptPath, ciShellOutput).validate();
   });
@@ -782,7 +802,7 @@ $lines
       await d.nothing(ciScriptPath).validate();
 
       testGenerateConfig(
-        printMatcher: _subPkgStandardOutput,
+        printMatcher: _subPkgStandardOutput(),
       );
 
       if (expectedGithubContent != null) {
@@ -961,7 +981,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         await populateConfig(monoConfigContent);
 
         testGenerateConfig(
-          printMatcher: _subPkgStandardOutput,
+          printMatcher: _subPkgStandardOutput(),
         );
 
         // TODO: validate GitHub case
@@ -974,7 +994,7 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
         await populateConfig(monoConfigContent);
 
         testGenerateConfig(
-          printMatcher: _subPkgStandardOutput,
+          printMatcher: _subPkgStandardOutput(),
         );
 
         // TODO: validate GitHub case
@@ -1009,7 +1029,7 @@ line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value 
         await populateConfig(toYaml({'pretty_ansi': false}));
 
         testGenerateConfig(
-          printMatcher: _subPkgStandardOutput,
+          printMatcher: _subPkgStandardOutput(),
         );
 
         await d
@@ -1126,7 +1146,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
         await populateConfig(monoConfigContent);
 
         testGenerateConfig(
-          printMatcher: _subPkgStandardOutput,
+          printMatcher: _subPkgStandardOutput(),
         );
 
         validateSandbox(
@@ -1143,7 +1163,7 @@ line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Valu
         await populateConfig(monoConfigContent);
 
         testGenerateConfig(
-          printMatcher: _subPkgStandardOutput,
+          printMatcher: _subPkgStandardOutput(),
         );
 
         validateSandbox(
@@ -1245,7 +1265,7 @@ line 2, column 1 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "
   ╷
 2 │ ┌ - pubspec
 3 │ │ - dev
-4 │ └ 
+4 │ └
   ╵'''),
       );
     });
@@ -1388,13 +1408,16 @@ github:
   });
 }
 
-String get _subPkgStandardOutput => '''
+String _subPkgStandardOutput({bool withDependabot = false}) => '''
 package:sub_pkg
-$_writeScriptOutput''';
+${_writeScriptOutput(withDependabot)}''';
 
-String get _writeScriptOutput => '''
-Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.
-$ciScriptPathMessage''';
+String _writeScriptOutput(bool withDependabot) => [
+      'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
+      if (withDependabot)
+        'Wrote `${p.join(d.sandbox, '.github/dependabot.yml')}`.',
+      ciScriptPathMessage
+    ].join('\n');
 
 Future<void> _testBadConfig(
   Object monoRepoYaml,
