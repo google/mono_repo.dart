@@ -102,11 +102,14 @@ class RootConfig extends ListBase<PackageConfig> {
     // the generated workflow file are maintained by dependabot; parse and use
     // those versions.
     Map<String, String>? existingActionVersions;
-    final hasDependabot =
-        dependabotFileNames.map(File.new).any((file) => file.existsSync());
-    if (hasDependabot && File(defaultGitHubWorkflowFilePath).existsSync()) {
+    final hasDependabot = dependabotFileNames
+        .map((name) => File(p.join(rootDirectory!, name)))
+        .any((file) => file.existsSync());
+    final githubWorkflowFile =
+        File(p.join(rootDirectory, defaultGitHubWorkflowFilePath));
+    if (hasDependabot && githubWorkflowFile.existsSync()) {
       existingActionVersions = parseActionVersions(
-        File(defaultGitHubWorkflowFilePath).readAsStringSync(),
+        githubWorkflowFile.readAsStringSync(),
       );
     }
 
