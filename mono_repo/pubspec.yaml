@@ -2,11 +2,12 @@ name: mono_repo
 description: >-
   CLI tools to make it easier to manage a single source repository containing
   multiple Dart packages.
-version: 6.5.6
+version: 6.5.7
 repository: https://github.com/google/mono_repo.dart
+
 topics:
- - tool
- - repository-management
+  - tool
+  - repository-management
 
 environment:
   sdk: '>=2.18.0 <3.0.0'

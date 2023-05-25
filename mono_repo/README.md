@@ -238,7 +238,8 @@ When generating your workflow configuration (`mono_repo generate`) mono_repo
 will write out its current default action versions into the workflow file. If
 however it sees that the repo has a Dependabot configuration - has a file named
 `.github/dependabot.yaml` in the repo - mono_repo will instead parse the
-workflow file, read out the current action versions, and use those versions when re-generating the file. This lets mono_repo manage the overall structure of the
+workflow file, read out the current action versions, and use those versions when
+re-generating the file. This lets mono_repo manage the overall structure of the
 file, while allowing Dependabot to independently move various action versions
 forward as necessary.
 
