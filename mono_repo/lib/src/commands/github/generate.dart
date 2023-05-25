@@ -12,6 +12,11 @@ import '../../root_config.dart';
 import '../../user_exception.dart';
 import 'github_yaml.dart';
 
+const dependabotFileNames = [
+  '.github/dependabot.yaml',
+  '.github/dependabot.yml',
+];
+
 void generateGitHubActions(
   RootConfig rootConfig, {
   bool validateOnly = false,

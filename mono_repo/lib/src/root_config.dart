@@ -7,7 +7,10 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:pubspec_parse/pubspec_parse.dart';
+import 'package:yaml/yaml.dart';
 
+import 'commands/github/generate.dart';
+import 'commands/github/github_yaml.dart';
 import 'mono_config.dart';
 import 'package_config.dart';
 import 'user_exception.dart';
@@ -60,6 +63,7 @@ class RootConfig extends ListBase<PackageConfig> {
   final String rootDirectory;
   final MonoConfig monoConfig;
   final List<PackageConfig> _configs;
+  final Map<String, String>? existingActionVersions;
 
   factory RootConfig({String? rootDirectory, bool recursive = true}) {
     rootDirectory ??= p.current;
@@ -94,14 +98,35 @@ class RootConfig extends ListBase<PackageConfig> {
       );
     }
 
+    // If a dependabot configuration file exists, assume the action versions in
+    // the generated workflow file are maintained by dependabot; parse and use
+    // those versions.
+    Map<String, String>? existingActionVersions;
+    final hasDependabot = dependabotFileNames
+        .map((name) => File(p.join(rootDirectory!, name)))
+        .any((file) => file.existsSync());
+    final githubWorkflowFile =
+        File(p.join(rootDirectory, defaultGitHubWorkflowFilePath));
+    if (hasDependabot && githubWorkflowFile.existsSync()) {
+      existingActionVersions = parseActionVersions(
+        githubWorkflowFile.readAsStringSync(),
+      );
+    }
+
     return RootConfig._(
       rootDirectory,
       MonoConfig.fromRepo(rootDirectory: rootDirectory),
       configs,
+      existingActionVersions,
     );
   }
 
-  RootConfig._(this.rootDirectory, this.monoConfig, this._configs);
+  RootConfig._(
+    this.rootDirectory,
+    this.monoConfig,
+    this._configs,
+    this.existingActionVersions,
+  );
 
   @override
   int get length => _configs.length;
@@ -116,4 +141,42 @@ class RootConfig extends ListBase<PackageConfig> {
   @override
   void operator []=(int index, PackageConfig pkg) =>
       throw UnsupportedError('This List is read-only.');
+
+  /// Parse any github action versions from a workflow file.
+  ///
+  /// This returns a map of <action name> to <action version>.
+  static Map<String, String> parseActionVersions(String yamlText) {
+    // "dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d"
+    final usageRegex = RegExp(r'([\w\.-]+)\/([\w\.-]+)@([\w\.]+)');
+
+    final yaml = loadYaml(yamlText);
+    final result = <String, String>{};
+
+    void collect(dynamic yaml) {
+      if (yaml is List) {
+        for (var item in yaml) {
+          collect(item);
+        }
+      } else if (yaml is Map) {
+        const usesKey = 'uses';
+
+        if (yaml.containsKey(usesKey)) {
+          // dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+          final usage = yaml[usesKey] as String;
+          final match = usageRegex.firstMatch(usage);
+          if (match != null) {
+            result['${match.group(1)}/${match.group(2)}'] = match.group(3)!;
+          }
+        }
+
+        for (var item in yaml.entries) {
+          collect(item.value);
+        }
+      }
+    }
+
+    collect(yaml);
+
+    return result;
+  }
 }

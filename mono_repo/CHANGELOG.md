@@ -1,3 +1,8 @@
+## 6.5.7
+
+- Updated `mono_repo` to use the existing action versions from the generated
+  workflow file when dependabot is configured for the repo.
+
 ## 6.5.6
 
 - Restore the previous ordering behavior for jobs by using a secondary sort
