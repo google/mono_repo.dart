@@ -374,7 +374,7 @@ environment:
       printMatcher: '''
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
     );
 
     await d.file(ciScriptPath, ciShellOutput).validate();
@@ -411,7 +411,7 @@ name: pkg_a
       printMatcher: '''
 ${Iterable.generate(count, (i) => 'package:${pkgName(i)}').join('\n')}
 package:sub_pkg
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
     );
 
     validateSandbox(
@@ -464,7 +464,7 @@ name: pkg_b
       printMatcher: '''
 package:pkg_a
 package:pkg_b
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
     );
 
     validateSandbox(
@@ -535,7 +535,7 @@ name: pkg_b
       printMatcher: '''
 package:pkg_a
 package:pkg_b
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
     );
 
     validateSandbox(
@@ -631,7 +631,7 @@ name: pkg_a
 package:pkg_a
   `dart` values (stable) are not used and can be removed.
   `os` values (unneeded) are not used and can be removed.
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
     );
 
     validateSandbox(
@@ -662,7 +662,7 @@ name: pkg_a
     testGenerateConfig(
       printMatcher: '''
 package:pkg_a
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
     );
 
     validateSandbox(
@@ -938,7 +938,7 @@ dependencies:
 package:pkg_a
 package:pkg_b
 package:pkg_c
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
         );
 
         validateSandbox(
@@ -1228,7 +1228,7 @@ environment:
       testGenerateConfig(
         printMatcher: '''
 package:pkg_a
-$_writeScriptOutput''',
+${_writeScriptOutput(false)}''',
       );
 
       validateSandbox(
@@ -1263,7 +1263,7 @@ line 2, column 1 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "
   ╷
 2 │ ┌ - pubspec
 3 │ │ - dev
-4 │ └
+4 │ └ 
   ╵'''),
       );
     });
