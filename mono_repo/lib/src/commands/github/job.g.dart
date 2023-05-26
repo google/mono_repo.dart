@@ -24,12 +24,20 @@ Job _$JobFromJson(Map json) => $checkedCreate(
               (v) => (v as List<dynamic>)
                   .map((e) => Step.fromJson(e as Map))
                   .toList()),
+          ifContent: $checkedConvert('if', (v) => v as String?),
+          needs: $checkedConvert('needs',
+              (v) => (v as List<dynamic>?)?.map((e) => e as String).toList()),
+          outputs: $checkedConvert(
+              'outputs',
+              (v) => (v as Map?)?.map(
+                    (k, e) => MapEntry(k as String, e as String),
+                  )),
+          permissions: $checkedConvert(
+              'permissions',
+              (v) => (v as Map?)?.map(
+                    (k, e) => MapEntry(k as String, e as String),
+                  )),
         );
-        $checkedConvert('if', (v) => val.ifContent = v as String?);
-        $checkedConvert(
-            'needs',
-            (v) => val.needs =
-                (v as List<dynamic>?)?.map((e) => e as String).toList());
         return val;
       },
       fieldKeyMap: const {'runsOn': 'runs-on', 'ifContent': 'if'},
@@ -49,5 +57,7 @@ Map<String, dynamic> _$JobToJson(Job instance) {
   writeNotNull('if', instance.ifContent);
   val['steps'] = instance.steps.map((e) => e.toJson()).toList();
   writeNotNull('needs', instance.needs);
+  writeNotNull('outputs', instance.outputs);
+  writeNotNull('permissions', instance.permissions);
   return val;
 }

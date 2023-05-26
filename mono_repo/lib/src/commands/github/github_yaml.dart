@@ -18,6 +18,7 @@ import 'action_info.dart';
 import 'job.dart';
 import 'step.dart';
 
+const _calculateChangesJobId = 'changedPackages';
 const _onCompletionStage = '_on_completion';
 
 const githubWorkflowDirectory = '.github/workflows';
@@ -36,6 +37,10 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
   if (selfValidateStage != null) {
     jobs.add(_SelfValidateJob(selfValidateStage));
+  }
+
+  if (rootConfig.monoConfig.smartJobs == true) {
+    jobs.add(const _CalculateChangesJob());
   }
 
   final allJobStages = {for (var job in jobs) job.stageName};
@@ -64,10 +69,13 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
             .compareTo(orderedStages.indexOf(b.stageName));
 
         if (value == 0) {
-          if (a is _SelfValidateJob) {
+          if (a is _CalculateChangesJob) {
             value = -1;
-          }
-          if (b is _SelfValidateJob) {
+          } else if (b is _CalculateChangesJob) {
+            value = 1;
+          } else if (a is _SelfValidateJob) {
+            value = -1;
+          } else if (b is _SelfValidateJob) {
             value = 1;
           }
         }
@@ -105,7 +113,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       }
       currStageJobs.add(job.id);
       if (allPrevStageJobs.isNotEmpty) {
-        job.value.needs = allPrevStageJobs.toList();
+        (job.value.needs ??= []).addAll(allPrevStageJobs);
       }
 
       // process post-run logic
@@ -122,8 +130,8 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
         Map.fromEntries(allJobs.map((e) => MapEntry(e.id, e.value)));
 
     for (var completion in completionMap.entries) {
-      final job = completion.key.completionJobFactory!(rootConfig)
-        ..needs = completion.value.toList();
+      final job = completion.key.completionJobFactory!(rootConfig);
+      (job.needs ??= []).addAll(completion.value);
 
       jobList['job_${jobList.length + 1}'] = job;
     }
@@ -190,13 +198,15 @@ Iterable<_MapEntryWithStage> _listJobs(
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
-  _MapEntryWithStage jobEntry(Job content, String stage) {
+  _MapEntryWithStage jobEntry(Job content, String stage, {String? id}) {
     final conditional = conditionalStages[stage];
-    if (conditional != null) {
-      content.ifContent = conditional.ifCondition;
+    if (conditional != null && conditional.ifCondition != null) {
+      content.ifContent =
+          (content.ifContent == null ? '' : '${content.ifContent} && ') +
+              conditional.ifCondition!;
     }
     return _MapEntryWithStage(
-      jobName(++count),
+      id ?? jobName(++count),
       content,
       stage,
     );
@@ -205,8 +215,16 @@ Iterable<_MapEntryWithStage> _listJobs(
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
       yield jobEntry(
-        _selfValidateJob(rootConfig.monoConfig, rootConfig),
+        job.job(rootConfig.monoConfig, rootConfig),
         job.stageName,
+      );
+      continue;
+    }
+    if (job is _CalculateChangesJob) {
+      yield jobEntry(
+        job.job(rootConfig.monoConfig, rootConfig),
+        job.stageName,
+        id: _calculateChangesJobId,
       );
       continue;
     }
@@ -349,6 +367,14 @@ extension on CIJobEntry {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
       },
+      packages: packages
+          .map(
+            (path) => rootConfig
+                .singleWhere((pkg) => pkg.relativePath == path)
+                .pubspec
+                .name,
+          )
+          .toList(),
     );
   }
 
@@ -390,30 +416,48 @@ Job _githubJob(
   RootConfig rootConfig, {
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
-}) =>
-    Job(
-      name: jobName,
-      runsOn: runsOn,
-      steps: [
-        if (!runsOn.startsWith('windows'))
-          _cacheEntries(
-            runsOn,
-            rootConfig: rootConfig,
-            additionalCacheKeys: {
-              'sdk': sdkVersion,
-              if (additionalCacheKeys != null) ...additionalCacheKeys,
-            },
-          ),
-        packageFlavor.setupStep(sdkVersion, rootConfig),
-        ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
-        ActionInfo.checkout.usage(
-          id: 'checkout',
-          versionOverrides: rootConfig.existingActionVersions,
-        ),
-        for (var command in runCommands)
-          ...command.runContent(config, rootConfig),
-      ],
+  // Used for "smart jobs" configuration, only applies for packages.
+  List<String>? packages,
+}) {
+  StringBuffer? ifContent;
+  if (rootConfig.monoConfig.smartJobs &&
+      packages != null &&
+      packages.isNotEmpty) {
+    ifContent = StringBuffer(
+      '(contains(fromJSON(\'["push", "schedule"]\'), github.event_name)',
     );
+    for (var package in packages) {
+      ifContent.write(
+        ' || needs.$_calculateChangesJobId.outputs.$package == \'true\'',
+      );
+    }
+    ifContent.write(')');
+  }
+  return Job(
+    name: jobName,
+    runsOn: runsOn,
+    ifContent: ifContent?.toString(),
+    steps: [
+      if (!runsOn.startsWith('windows'))
+        _cacheEntries(
+          runsOn,
+          rootConfig: rootConfig,
+          additionalCacheKeys: {
+            'sdk': sdkVersion,
+            if (additionalCacheKeys != null) ...additionalCacheKeys,
+          },
+        ),
+      packageFlavor.setupStep(sdkVersion, rootConfig),
+      ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
+      ActionInfo.checkout.usage(
+        id: 'checkout',
+        versionOverrides: rootConfig.existingActionVersions,
+      ),
+      for (var command in runCommands)
+        ...command.runContent(config, rootConfig),
+    ],
+  );
+}
 
 Set<TaskType> _orderedTypes(Iterable<_CommandEntry> commands) =>
     SplayTreeSet.of(commands.map((e) => e.type).whereType<TaskType>());
@@ -511,20 +555,6 @@ String _maxLength(String input) {
   return input.substring(0, 512 - hash.length) + hash;
 }
 
-Job _selfValidateJob(BasicConfiguration config, RootConfig rootConfig) =>
-    _githubJob(
-      selfValidateJobName,
-      _ubuntuLatest,
-      PackageFlavor.dart,
-      'stable',
-      [
-        for (var command in selfValidateCommands)
-          _CommandEntryBase(selfValidateJobName, command),
-      ],
-      rootConfig,
-      config: config,
-    );
-
 const _ubuntuLatest = 'ubuntu-latest';
 
 /// Used as a place-holder so we can treat all jobs the same in certain
@@ -534,6 +564,58 @@ class _SelfValidateJob implements HasStageName {
   final String stageName;
 
   _SelfValidateJob(this.stageName);
+
+  Job job(BasicConfiguration config, RootConfig rootConfig) => _githubJob(
+        selfValidateJobName,
+        _ubuntuLatest,
+        PackageFlavor.dart,
+        'stable',
+        [
+          for (var command in selfValidateCommands)
+            _CommandEntryBase(selfValidateJobName, command),
+        ],
+        rootConfig,
+        config: config,
+      );
+}
+
+/// Used a place-holder, actual job is created later.
+class _CalculateChangesJob implements HasStageName {
+  const _CalculateChangesJob();
+
+  @override
+  // This should always go before any other stages.
+  String get stageName => '';
+
+  Job job(BasicConfiguration config, RootConfig rootConfig) {
+    final outputs = {
+      for (var package in rootConfig)
+        package.pubspec.name:
+            '\${{ steps.filter.outputs.${package.pubspec.name} }}',
+    };
+    return Job(
+      name: calculateChangesJobName,
+      runsOn: _ubuntuLatest,
+      outputs: outputs,
+      permissions: {'pull-requests': 'read'},
+      steps: [
+        ActionInfo.pathsFilter.usage(
+          id: 'filter',
+          versionOverrides: rootConfig.existingActionVersions,
+          withContent: {
+            'filters': [
+              for (var package in rootConfig) ...[
+                '${package.pubspec.name}:',
+                '  - ${package.relativePath}/**',
+                for (var dependencyPath in package.pathDependencies)
+                  '  - $dependencyPath/**',
+              ]
+            ].join('\n'),
+          },
+        ),
+      ],
+    );
+  }
 }
 
 class _MapEntryWithStage {

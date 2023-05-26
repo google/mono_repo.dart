@@ -5,6 +5,7 @@
 import 'package:checked_yaml/checked_yaml.dart';
 import 'package:io/ansi.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:yaml/yaml.dart';
@@ -22,23 +23,27 @@ const monoPkgFileName = 'mono_pkg.yaml';
 class PackageConfig {
   final String relativePath;
   final Pubspec pubspec;
+  final Pubspec? pubspecOverrides;
 
   final List<String> oses;
   final List<String>? sdks;
   final List<String> stageNames;
   final List<CIJob> jobs;
   final List<String> cacheDirectories;
+  final List<String> pathDependencies;
   final bool dartSdkConfigUsed;
   final bool osConfigUsed;
 
   PackageConfig(
     this.relativePath,
     this.pubspec,
+    this.pubspecOverrides,
     this.oses,
     this.sdks,
     this.stageNames,
     this.jobs,
     this.cacheDirectories,
+    this.pathDependencies,
     this.dartSdkConfigUsed,
     this.osConfigUsed,
   ) : assert(() {
@@ -54,15 +59,22 @@ class PackageConfig {
   factory PackageConfig.parse(
     String relativePath,
     Pubspec pubspec,
+    Pubspec? pubspecOverrides,
     Map monoPkgYaml,
   ) =>
       createWithCheck(
-        () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
+        () => PackageConfig._parse(
+          relativePath,
+          pubspec,
+          pubspecOverrides,
+          monoPkgYaml,
+        ),
       );
 
   factory PackageConfig._parse(
     String relativePath,
     Pubspec pubspec,
+    Pubspec? pubspecOverrides,
     Map monoPkgYaml,
   ) {
     if (monoPkgYaml.isEmpty) {
@@ -71,6 +83,8 @@ class PackageConfig {
       return PackageConfig(
         relativePath,
         pubspec,
+        pubspecOverrides,
+        [],
         [],
         [],
         [],
@@ -178,14 +192,27 @@ class PackageConfig {
       return stage.name;
     }).toList();
 
+    final deps = {
+      ...pubspec.dependencies,
+      if (pubspecOverrides != null) ...pubspecOverrides.dependencies,
+      ...pubspec.dependencyOverrides,
+      if (pubspecOverrides != null) ...pubspecOverrides.dependencyOverrides,
+    };
+    final pathDependencies = [
+      for (final dep in deps.values)
+        if (dep is PathDependency) p.normalize(p.join(relativePath, dep.path)),
+    ];
+
     return PackageConfig(
       relativePath,
       pubspec,
+      pubspecOverrides,
       rawConfig.oses,
       rawConfig.sdks,
       stageNames,
       jobs,
       rawConfig.cache?.directories ?? const [],
+      pathDependencies,
       sdkConfigUsed,
       osConfigUsed,
     );

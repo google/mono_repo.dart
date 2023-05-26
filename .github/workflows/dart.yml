@@ -16,9 +16,35 @@ env:
 permissions: read-all
 
 jobs:
+  changedPackages:
+    name: Calculating affected packages
+    runs-on: ubuntu-latest
+    steps:
+      - id: filter
+        name: Produce variables based on which packages are affected
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            mono_repo:
+              - mono_repo/**
+            test_flutter_pkg:
+              - test_flutter_pkg/**
+            test_flutter_pkg_example:
+              - test_flutter_pkg/example/**
+              - test_flutter_pkg/**
+            test_pkg:
+              - test_pkg/**
+    outputs:
+      mono_repo: "${{ steps.filter.outputs.mono_repo }}"
+      test_flutter_pkg: "${{ steps.filter.outputs.test_flutter_pkg }}"
+      test_flutter_pkg_example: "${{ steps.filter.outputs.test_flutter_pkg_example }}"
+      test_pkg: "${{ steps.filter.outputs.test_pkg }}"
+    permissions:
+      pull-requests: read
   job_001:
     name: "smoke_test; linux; Dart 2.16.0; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -50,9 +76,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_002:
     name: "smoke_test; linux; Dart 2.17.0-69.1.beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -84,9 +113,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_003:
     name: "smoke_test; linux; Dart 2.18.0-106.0.dev; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -118,9 +150,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_004:
     name: "smoke_test; linux; Dart 2.18.0; PKG: mono_repo; `dart analyze`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -148,9 +183,12 @@ jobs:
         run: dart analyze
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
+    needs:
+      - changedPackages
   job_005:
     name: "smoke_test; linux; Flutter beta; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_flutter_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -182,9 +220,12 @@ jobs:
         run: flutter analyze --fatal-infos .
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
+    needs:
+      - changedPackages
   job_006:
     name: "smoke_test; linux; Dart beta; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -216,9 +257,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_007:
     name: "smoke_test; linux; Dart dev; PKG: mono_repo; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -246,9 +290,12 @@ jobs:
         run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
+    needs:
+      - changedPackages
   job_008:
     name: "smoke_test; linux; Dart dev; PKGS: mono_repo, test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true' || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -293,9 +340,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_009:
     name: "smoke_test; linux; Dart main; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -327,9 +377,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_010:
     name: "smoke_test; linux; Flutter master; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_flutter_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -361,9 +414,12 @@ jobs:
         run: flutter analyze --fatal-infos .
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
+    needs:
+      - changedPackages
   job_011:
     name: "smoke_test; linux; Flutter stable; PKG: test_flutter_pkg; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_flutter_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -395,9 +451,12 @@ jobs:
         run: flutter analyze --fatal-infos .
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
+    needs:
+      - changedPackages
   job_012:
     name: "smoke_test; linux; Dart stable; PKG: test_pkg; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -429,9 +488,12 @@ jobs:
         run: dart analyze --fatal-infos .
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
+    needs:
+      - changedPackages
   job_013:
     name: "test; linux; Dart 2.18.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -460,6 +522,7 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -475,6 +538,7 @@ jobs:
   job_014:
     name: "test; linux; Flutter beta; PKG: test_flutter_pkg; `flutter test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_flutter_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -503,6 +567,7 @@ jobs:
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -518,6 +583,7 @@ jobs:
   job_015:
     name: "test; linux; Dart dev; PKG: mono_repo; `dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -561,6 +627,7 @@ jobs:
           fail_ci_if_error: true
           name: coverage_00
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -576,6 +643,7 @@ jobs:
   job_016:
     name: "test; linux; Dart dev; PKG: mono_repo; `dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -619,6 +687,7 @@ jobs:
           fail_ci_if_error: true
           name: coverage_01
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -634,6 +703,7 @@ jobs:
   job_017:
     name: "test; linux; Dart dev; PKG: mono_repo; `dart test -t yaml --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -662,6 +732,7 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -677,6 +748,7 @@ jobs:
   job_018:
     name: "test; linux; Dart dev; PKG: test_pkg; `dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_pkg == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -720,6 +792,7 @@ jobs:
           fail_ci_if_error: true
           name: coverage_02
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -735,6 +808,7 @@ jobs:
   job_019:
     name: "test; linux; Flutter stable; PKG: test_flutter_pkg/example; `flutter test --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.test_flutter_pkg_example == 'true')"
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
@@ -763,6 +837,7 @@ jobs:
         if: "always() && steps.test_flutter_pkg_example_pub_upgrade.conclusion == 'success'"
         working-directory: test_flutter_pkg/example
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -778,6 +853,7 @@ jobs:
   job_020:
     name: "test; windows; Dart 2.18.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
@@ -796,6 +872,7 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -811,6 +888,7 @@ jobs:
   job_021:
     name: "test; windows; Dart dev; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
+    if: "(contains(fromJSON('[\"push\", \"schedule\"]'), github.event_name) || needs.changedPackages.outputs.mono_repo == 'true')"
     steps:
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
@@ -829,6 +907,7 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -853,6 +932,7 @@ jobs:
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
     needs:
+      - changedPackages
       - job_001
       - job_002
       - job_003
@@ -874,7 +954,7 @@ jobs:
       - job_019
       - job_020
       - job_021
-  job_23:
+  job_24:
     name: Mark Coveralls job finished
     runs-on: ubuntu-latest
     steps:
