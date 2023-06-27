@@ -52,7 +52,7 @@ String readme(
         '[${pkg.pubspec.name}](${pkg.relativePath}/)',
         pkg.pubspec.description?.trim() ?? '',
         pkg.pubspec.pubBadge,
-      ]
+      ],
   ];
 
   final widths = [1, 1, 1];

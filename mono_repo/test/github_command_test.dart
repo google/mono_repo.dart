@@ -16,7 +16,7 @@ void main() {
     'only supported keys',
     () => _testBadConfigWithYamlException(
       {
-        'github': {'not_supported': 5}
+        'github': {'not_supported': 5},
       },
       r'''
 line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, dependabot, cron, stages, workflows]
@@ -31,7 +31,7 @@ line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supporte
     '"on" must be a Map',
     () => _testBadConfigWithYamlException(
       {
-        'github': {'on': 'not a map'}
+        'github': {'on': 'not a map'},
       },
       r'''
 line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
@@ -46,7 +46,7 @@ line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is
     'no cron with on',
     () => _testBadConfigWithYamlException(
       {
-        'github': {'cron': 'some value', 'on': {}}
+        'github': {'cron': 'some value', 'on': {}},
       },
       r'''
 line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cron` if `on` has a value.
@@ -82,8 +82,8 @@ line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' i
               'steps': [],
               'needs': ['foo'],
             }
-          ]
-        }
+          ],
+        },
       },
       r'''
 line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Cannot define a `needs` key for `on_completion` jobs, this is filled in for you to depend on all jobs.
@@ -100,8 +100,8 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Canno
     () => _testBadConfigWithYamlException(
       {
         'github': {
-          'on_completion': [{}]
-        }
+          'on_completion': [{}],
+        },
       },
       r'''
 line 3, column 7 of mono_repo.yaml: Required keys are missing: steps.
@@ -119,10 +119,10 @@ line 3, column 7 of mono_repo.yaml: Required keys are missing: steps.
         'github': {
           'on_completion': [
             {
-              'steps': [{}]
+              'steps': [{}],
             }
-          ]
-        }
+          ],
+        },
       },
       r'''
 line 4, column 11 of mono_repo.yaml: Missing key "uses". Either `run` or `uses` must be defined.
@@ -145,10 +145,10 @@ line 4, column 11 of mono_repo.yaml: Missing key "uses". Either `run` or `uses` 
                   'run': 'bob',
                   'uses': 'bob',
                 }
-              ]
+              ],
             }
-          ]
-        }
+          ],
+        },
       },
       r'''
 line 5, column 17 of mono_repo.yaml: Unsupported value for "uses". `uses` and `run` cannot both be defined.
@@ -171,10 +171,10 @@ line 5, column 17 of mono_repo.yaml: Unsupported value for "uses". `uses` and `r
                   'run': 'bob',
                   'with': {},
                 }
-              ]
+              ],
             }
-          ]
-        }
+          ],
+        },
       },
       r'''
 line 5, column 17 of mono_repo.yaml: Unsupported value for "with". `withContent` cannot be defined unless `uses` is defined.`
@@ -189,7 +189,7 @@ line 5, column 17 of mono_repo.yaml: Unsupported value for "with". `withContent`
     'stages config only accepts a list',
     () => _testBadConfigWithYamlException(
       {
-        'github': {'stages': 5}
+        'github': {'stages': 5},
       },
       r'''
 line 2, column 11 of mono_repo.yaml: Unsupported value for "stages". `stages` must be an array.
@@ -205,8 +205,8 @@ line 2, column 11 of mono_repo.yaml: Unsupported value for "stages". `stages` mu
     () => _testBadConfigWithYamlException(
       {
         'github': {
-          'stages': [5]
-        }
+          'stages': [5],
+        },
       },
       r'''
 line 3, column 5 of mono_repo.yaml: Unsupported value for "stages". All values must be String or Map instances.
@@ -222,8 +222,8 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "stages". All values m
     () => _testBadConfigWithUserException(
       {
         'github': {
-          'stages': ['missing']
-        }
+          'stages': ['missing'],
+        },
       },
       'Error parsing mono_repo.yaml',
       expectedDetails: r'''
@@ -240,9 +240,9 @@ One or more stage was referenced in `mono_repo.yaml` that do not exist in any `m
       {
         'github': {
           'stages': [
-            {'name': 'foo', 'if': 1}
+            {'name': 'foo', 'if': 1},
           ],
-        }
+        },
       },
       r'''
 line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is not a subtype of type 'String?' in type cast
@@ -259,9 +259,9 @@ line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is n
       {
         'github': {
           'stages': [
-            {'foo': 'bar'}
+            {'foo': 'bar'},
           ],
-        }
+        },
       },
       r'''
 line 3, column 7 of mono_repo.yaml: Unrecognized keys: [foo]; supported keys: [name, if]
@@ -280,7 +280,7 @@ void _testWorkflows() {
     'must be a map',
     () => _testBadConfigWithYamlException(
       {
-        'github': {'workflows': 'some value'}
+        'github': {'workflows': 'some value'},
       },
       r'''
 line 2, column 14 of mono_repo.yaml: Unsupported value for "workflows". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
@@ -296,8 +296,8 @@ line 2, column 14 of mono_repo.yaml: Unsupported value for "workflows". type 'St
     () => _testBadConfigWithYamlException(
       {
         'github': {
-          'workflows': {'bob': {}}
-        }
+          'workflows': {'bob': {}},
+        },
       },
       r'''
 line 3, column 10 of mono_repo.yaml: Required keys are missing: name, stages.
@@ -318,9 +318,9 @@ line 3, column 10 of mono_repo.yaml: Required keys are missing: name, stages.
               'name': 'bob',
               'stages': ['bob'],
               'extra': 42,
-            }
-          }
-        }
+            },
+          },
+        },
       },
       r'''
 line 7, column 7 of mono_repo.yaml: Unrecognized keys: [extra]; supported keys: [name, stages]

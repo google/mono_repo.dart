@@ -135,7 +135,7 @@ List<String> scriptLines(String scriptPath) => [
         'It appears you are using Windows, and may not have access to chmod.',
         'If you are using git, the following will emulate the Unix permissions '
             'change:',
-        '  git update-index --add --chmod=+x $scriptPath'
+        '  git update-index --add --chmod=+x $scriptPath',
       ],
     ];
 

@@ -22,7 +22,7 @@ Future<void> populateConfig(String monoRepoContent) async {
     d.file(monoPkgFileName, testConfig2),
     d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
   ]).create();
 }
 
@@ -156,7 +156,7 @@ environment:
 
 dependencies:
   meta: any
-''')
+'''),
   ]).create();
 
   await d.dir('pkg2_dir', [
@@ -170,7 +170,7 @@ environment:
 
 dependencies:
   meta: any
-''')
+'''),
   ]).create();
 
   await d.dir('pkg3_dir', [
@@ -184,7 +184,7 @@ environment:
 
 dependencies:
   meta: any
-''')
+'''),
   ]).create();
 
   await d.dir('pkg4_dir', [
@@ -197,6 +197,6 @@ environment:
 
 dependencies:
   meta: any
-''')
+'''),
   ]).create();
 }

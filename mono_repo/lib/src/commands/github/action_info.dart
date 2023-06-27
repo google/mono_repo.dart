@@ -85,10 +85,10 @@ Job _coverageCompletionJob(RootConfig rootConfig) => Job(
           withContent: {
             // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
             'github-token': r'${{ secrets.GITHUB_TOKEN }}',
-            'parallel-finished': true
+            'parallel-finished': true,
           },
           versionOverrides: rootConfig.existingActionVersions,
-        )
+        ),
       ],
     );
 

@@ -106,7 +106,7 @@ name: no_mono_repo_file
 dependencies:
   build: any
   implied_any:
-''')
+'''),
   ]).create();
 
   await d.dir('foo', [
@@ -117,7 +117,7 @@ name: foo
 dependencies:
   build: any
   implied_any:
-''')
+'''),
   ]).create();
 
   await d.dir('bar', [
@@ -131,7 +131,7 @@ dependencies:
       url: https://github.com/dart-lang/build.git
       path: build
       ref: hacking
-''')
+'''),
   ]).create();
 
   await d.dir('baz', [
@@ -180,6 +180,6 @@ flutter:
         - asset: fonts/Schyler-Italic.ttf
           style: italic
           weight: 700
-''')
+'''),
   ]).create();
 }
