@@ -34,7 +34,7 @@ curl -H "Content-Type: application/json" -X POST -d \
 key: |
   curl -H "Content-Type: application/json" -X POST -d \
     "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
-    "${CHAT_WEBHOOK_URL}"'''
+    "${CHAT_WEBHOOK_URL}"''',
     }.entries) {
       _testRoundTrip({'key': entry.key}, expectedEncoding: entry.value);
     }
@@ -63,7 +63,7 @@ key: |
       {
         'on': {
           'push': {
-            'branches': [r'$default-branch']
+            'branches': [r'$default-branch'],
           },
           'pull_request': null,
         },
@@ -231,11 +231,11 @@ final _testItems = [
     'double': 3.14,
     'string': 'string',
     'list': [],
-    'map': {}
+    'map': {},
   },
   {null: 'null', true: 'bool', 1: 'int', 3.14: 'double', 'string': 'string'},
   {
-    'stages': [1, 2, 3]
+    'stages': [1, 2, 3],
   },
   {'list': []},
   {'map': {}},
@@ -244,8 +244,8 @@ final _testItems = [
       'include': [
         {'item1': 'value1', 'item2': 'value2'},
         {'item1': 'value1', 'item2': 'value2'},
-      ]
-    }
+      ],
+    },
   },
 
   // Lists
@@ -254,7 +254,7 @@ final _testItems = [
   [null, true, false, 1, 3.14, 'string', [], {}],
   [
     {'test': 1},
-    {'test': 2}
+    {'test': 2},
   ]
 ];
 
@@ -267,7 +267,7 @@ const _stringEscapeSamples = [
     'vertical tab': '\v',
     'form feed': '\r',
     'carriage return': '\r',
-    'delete': '\x7F'
+    'delete': '\x7F',
   },
   'simple string',
   "'string with single quotes'",
@@ -796,5 +796,5 @@ const _naughtyStrings = [
   'Roses are \x1B[0;31mred\x1B[0m, violets are \x1B[0;34mblue. Hope you enjoy terminal hue',
   'But now...\x1B[20Cfor my greatest trick...\x1B[8m',
   'The quic\b\b\b\b\b\bk brown fo\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07\x07x... [Beeeep]',
-  'Powerلُلُصّبُلُلصّبُررً ॣ ॣh ॣ ॣ冗'
+  'Powerلُلُصّبُلُلصّبُررً ॣ ॣh ॣ ॣ冗',
 ];

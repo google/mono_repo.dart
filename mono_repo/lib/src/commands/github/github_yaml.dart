@@ -481,13 +481,13 @@ Step _cacheEntries(
     'pub-cache-hosted',
     if (additionalCacheKeys != null) ...[
       for (var entry in additionalCacheKeys.entries)
-        '${entry.key}:${entry.value}'
-    ]
+        '${entry.key}:${entry.value}',
+    ],
   ];
 
   final restoreKeys = [
     for (var i = cacheKeyParts.length; i > 0; i--)
-      _maxLength(cacheKeyParts.take(i).join(';'))
+      _maxLength(cacheKeyParts.take(i).join(';')),
   ];
 
   // Just caching the `hosted` directory because caching git dependencies or

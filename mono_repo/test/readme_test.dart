@@ -35,7 +35,7 @@ void main() {
 name: sub_pkg
 environment:
   sdk: '>=2.17.0 <3.0.0'
-''')
+'''),
       ]).create();
 
       testGenerateConfig(

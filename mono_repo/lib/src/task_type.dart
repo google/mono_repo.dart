@@ -90,7 +90,7 @@ class _AnalyzeTask extends TaskType {
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) => [
         flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
-        if (args != null) args
+        if (args != null) args,
       ];
 
   @override

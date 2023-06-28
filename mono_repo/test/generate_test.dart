@@ -60,7 +60,7 @@ void main() {
       d.file('mono_pkg.yaml', 'bob'),
       d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
     ]).create();
 
     final path = p.join('sub_pkg', 'mono_pkg.yaml');
@@ -75,7 +75,7 @@ name: pkg_name
       d.file('mono_pkg.yaml', '# just a comment!'),
       d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -103,7 +103,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -129,7 +129,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -160,14 +160,14 @@ name: pkg_name
                 'sdk': values,
                 'stages': [
                   {
-                    'unit_test': ['test']
+                    'unit_test': ['test'],
                   }
-                ]
+                ],
               }),
             ),
             d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
           ]).create();
 
           expect(
@@ -194,14 +194,14 @@ name: pkg_name
                         'test': '',
                         'sdk': values,
                       }
-                    ]
+                    ],
                   }
-                ]
+                ],
               }),
             ),
             d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
           ]).create();
 
           expect(
@@ -224,7 +224,7 @@ name: pkg_name
       d.file('.mono_repo.yml', ''),
       d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -251,7 +251,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
     ]).create();
 
     await d.dir('pkg_b', [
@@ -267,7 +267,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_b
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -351,7 +351,7 @@ github:
       d.file(monoPkgFileName, testConfig2),
       d.file('pubspec.yaml', '''
 name: pkg_name
-      ''')
+      '''),
     ]).create();
 
     testGenerateConfig(
@@ -367,7 +367,7 @@ name: pkg_name
 name: pkg_name
 environment:
   sdk: '>=2.1.0 <3.0.0'
-''')
+'''),
     ]).create();
 
     testGenerateConfig(
@@ -382,7 +382,7 @@ ${_writeScriptOutput(false)}''',
 
   test('max cache key', () async {
     final monoConfigContent = toYaml({
-      'merge_stages': ['format']
+      'merge_stages': ['format'],
     });
     await populateConfig(monoConfigContent);
 
@@ -403,7 +403,7 @@ stages:
 '''),
         d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
       ]).create();
     }
 
@@ -438,7 +438,7 @@ cache:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
     ]).create();
 
     await d.dir('pkg_b', [
@@ -457,7 +457,7 @@ cache:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_b
-      ''')
+      '''),
     ]).create();
 
     testGenerateConfig(
@@ -509,7 +509,7 @@ cache:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
     ]).create();
 
     await d.dir('pkg_b', [
@@ -528,7 +528,7 @@ cache:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_b
-      ''')
+      '''),
     ]).create();
 
     testGenerateConfig(
@@ -575,7 +575,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -623,7 +623,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
     ]).create();
 
     testGenerateConfig(
@@ -656,7 +656,7 @@ stages:
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      ''')
+      '''),
     ]).create();
 
     testGenerateConfig(
@@ -688,7 +688,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-      ''')
+      '''),
     ]).create();
 
     expect(
@@ -716,7 +716,7 @@ stages:
 '''),
         d.file('pubspec.yaml', '''
 name: pkg_a
-''')
+'''),
       ]).create();
 
       expect(
@@ -740,7 +740,7 @@ sdk:
 stages:
 - unit_test
   - before_script: "echo hi"
-''')
+'''),
     ]).create();
 
     expect(
@@ -771,7 +771,7 @@ sdk:
 stages:
   - unit_test:
 $lines
-''')
+'''),
     ]).create();
 
     testGenerateConfig(printMatcher: isNotEmpty);
@@ -815,7 +815,7 @@ $lines
       'disallows unsupported keys',
       () => _testBadConfig(
         {
-          'other': {'stages': 5}
+          'other': {'stages': 5},
         },
         r'''
 line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service` keys are supported.
@@ -831,7 +831,7 @@ line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`
         'must be a list',
         () => _testBadConfig(
           {
-            'merge_stages': {'stages': 5}
+            'merge_stages': {'stages': 5},
           },
           startsWith(
             'line 2, column 3 of mono_repo.yaml: Unsupported value for '
@@ -844,7 +844,7 @@ line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`
         'must be String items',
         () => _testBadConfig(
           {
-            'merge_stages': [5]
+            'merge_stages': [5],
           },
           startsWith(
             'line 2, column 3 of mono_repo.yaml: Unsupported value for '
@@ -855,7 +855,7 @@ line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`
 
       test('must match a configured stage from pkg_config', () async {
         final monoConfigContent = toYaml({
-          'merge_stages': ['bob']
+          'merge_stages': ['bob'],
         });
         await populateConfig(monoConfigContent);
         expect(
@@ -891,7 +891,7 @@ stages:
 '''),
           d.file('pubspec.yaml', r'''
 name: pkg_a
-''')
+'''),
         ]).create();
 
         await d.dir('pkg_b', [
@@ -911,7 +911,7 @@ stages:
 '''),
           d.file('pubspec.yaml', '''
 name: pkg_b
-      ''')
+      '''),
         ]).create();
 
         await d.dir('pkg_c', [
@@ -930,7 +930,7 @@ name: pkg_c
 dependencies:
   flutter:
     sdk: flutter
-      ''')
+      '''),
         ]).create();
 
         testGenerateConfig(
@@ -1222,7 +1222,7 @@ stages:
 name: pkg_a
 environment:
   sdk: '>=2.16.0 <3.0.0'
-''')
+'''),
       ]).create();
 
       testGenerateConfig(
@@ -1253,7 +1253,7 @@ stages:
         ),
         d.file('pubspec.yaml', '''
 name: pkg_a
-''')
+'''),
       ]).create();
 
       expect(
@@ -1281,7 +1281,7 @@ stages:
         ),
         d.file('pubspec.yaml', '''
 name: pkg_a
-''')
+'''),
       ]).create();
 
       expect(
@@ -1315,7 +1315,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-''')
+'''),
       ]).create();
 
       expect(
@@ -1357,7 +1357,7 @@ github:
     }
   ]
 }
-''')
+'''),
       ]).validate();
     });
 
@@ -1400,7 +1400,7 @@ github:
     }
   ]
 }
-''')
+'''),
       ]).validate();
     });
   });
@@ -1414,7 +1414,7 @@ String _writeScriptOutput(bool withDependabot) => [
       'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
       if (withDependabot)
         'Wrote `${p.join(d.sandbox, '.github/dependabot.yml')}`.',
-      ciScriptPathMessage
+      ciScriptPathMessage,
     ].join('\n');
 
 Future<void> _testBadConfig(

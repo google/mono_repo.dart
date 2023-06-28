@@ -155,7 +155,7 @@ pkg_b
           'presubmit',
           '--sdk=dev',
           '-p',
-          'pkg_b'
+          'pkg_b',
         ],
         workingDirectory: repoPath,
       );
@@ -184,7 +184,7 @@ pkg_b
           'presubmit',
           '--sdk=dev',
           '-t',
-          'format'
+          'format',
         ],
         workingDirectory: repoPath,
       );

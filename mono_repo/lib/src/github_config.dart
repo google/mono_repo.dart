@@ -113,11 +113,11 @@ class GitHubConfig {
         'name': workflowName,
         if (on != null) 'on': on,
         'defaults': {
-          'run': {'shell': 'bash'}
+          'run': {'shell': 'bash'},
         },
         'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
         // Declare default permissions as read only.
-        'permissions': 'read-all'
+        'permissions': 'read-all',
       };
 }
 
@@ -152,8 +152,8 @@ Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
       return {
         ..._defaultOn,
         'schedule': [
-          {'cron': cron}
-        ]
+          {'cron': cron},
+        ],
       };
     }
   }
@@ -174,7 +174,7 @@ const _defaultOn = {
     'branches': [
       'main',
       'master',
-    ]
+    ],
   },
   // A `null` value here means all pull requests are processed by this workflow.
   'pull_request': null,

@@ -28,6 +28,6 @@ environment:
 
 dependencies:
   meta: any
-''')
+'''),
   ]).create();
 }

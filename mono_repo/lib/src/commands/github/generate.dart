@@ -73,7 +73,7 @@ class _GeneratedDependabotConfig {
 
       config['updates'] = [
         ...config['updates'] as List? ?? <dynamic>[],
-        ...packageUpdates
+        ...packageUpdates,
       ];
       result['.github/dependabot.yml'] = '''
 $createdWith

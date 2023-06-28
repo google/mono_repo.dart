@@ -31,7 +31,7 @@ class RawConfig {
     this.cache,
   }) : stages = stages ??
             [
-              RawStage('unit_test', ['test'])
+              RawStage('unit_test', ['test']),
             ] {
     if (sdks != null) {
       sortNormalizeVerifySdksList(

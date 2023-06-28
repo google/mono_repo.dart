@@ -23,7 +23,7 @@ void main() {
 name: pkg_a
 environment:
   sdk: ">=2.12.0<3.0.0"
-      ''')
+      '''),
     ]).create();
 
     await d.dir('pkg_b', [
@@ -38,7 +38,7 @@ environment:
 
 dependencies:
   not_a_package_at_all: any
-      ''')
+      '''),
     ]).create();
 
     await d.dir('pkg_c', [
