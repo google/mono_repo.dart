@@ -23,7 +23,7 @@ Or, once you've [setup your PATH]:
 > mono_repo
 ```
 
-Prints the following help message: 
+Prints the following help message:
 
 ```
 Manage multiple packages in one source repository.
@@ -39,6 +39,7 @@ Global options:
 
 Available commands:
   check       Check the state of the repository.
+  dart        Runs the `dart` command with the provided arguments across all packages.
   generate    Generates the CI configuration for child packages.
   list        List all packages configured for mono_repo.
   presubmit   Run the CI presubmits locally.
@@ -83,12 +84,12 @@ github:
   # `pull_request` while adding a single `schedule` entry.
   # `on` and `cron` cannot both be set.
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
-  
+
   # Specify additional environment variables accessible to all jobs
   env:
     FOO: BAR
 
-  # You can group stages into individual workflows  
+  # You can group stages into individual workflows
   #
   # Any stages that are omitted here are put in a default workflow
   # named `dart.yml`.
@@ -156,7 +157,7 @@ To configure a package directory to be included it must contain a
 `mono_pkg.yaml` file (along with the normal `pubspec.yaml` file).
 
 You can use an empty `mono_pkg.yaml` file to enable the `check` and `pub`
-commands. 
+commands.
 
 To enable `generate` and `presubmit`, you must populate `mono_pkg.yaml` with
 details on how you'd like tests to be run.
