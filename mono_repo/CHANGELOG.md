@@ -1,3 +1,8 @@
+## 6.6.0
+
+- Added the `dart` command to run arbitrary dart commands across all packages.
+- Require the 3.0.0 Dart SDK.
+
 ## 6.5.7
 
 - Updated `mono_repo` to use the existing action versions from the generated

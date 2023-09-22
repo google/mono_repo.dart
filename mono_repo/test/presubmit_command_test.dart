@@ -9,8 +9,8 @@ import 'dart:io';
 import 'package:io/ansi.dart';
 import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
+import 'package:mono_repo/src/commands/dart.dart';
 import 'package:mono_repo/src/commands/presubmit.dart';
-import 'package:mono_repo/src/commands/pub.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/root_config.dart';
 import 'package:path/path.dart' as p;
@@ -96,9 +96,13 @@ environment:
         ['+x', p.join('tool', 'ci.sh')],
         workingDirectory: repoPath,
       );
-      await Process.run(dartPath, ['pub', 'get'], workingDirectory: pkgAPath);
       await Process.run(
-        dartPath,
+        Executable.dart.path,
+        ['pub', 'get'],
+        workingDirectory: pkgAPath,
+      );
+      await Process.run(
+        Executable.dart.path,
         ['pub', 'global', 'activate', '-s', 'path', Directory.current.path],
       );
     });
@@ -111,7 +115,7 @@ environment:
       'runs all tasks and packages',
       () async {
         final result = await Process.run(
-          dartPath,
+          Executable.dart.path,
           ['pub', 'global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
           workingDirectory: repoPath,
         );
@@ -146,7 +150,7 @@ pkg_b
 
     test('can filter by package', () async {
       final result = await Process.run(
-        dartPath,
+        Executable.dart.path,
         [
           'pub',
           'global',
@@ -175,7 +179,7 @@ pkg_b
 
     test('can filter by task', () async {
       final result = await Process.run(
-        dartPath,
+        Executable.dart.path,
         [
           'pub',
           'global',
@@ -221,7 +225,7 @@ pkg_b
 
       test('cause an error and are reported', () async {
         final result = await Process.run(
-          dartPath,
+          Executable.dart.path,
           [
             'pub',
             'global',
