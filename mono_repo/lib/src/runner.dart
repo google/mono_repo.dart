@@ -8,6 +8,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
 import 'commands/check.dart';
+import 'commands/dart.dart';
 import 'commands/generate.dart';
 import 'commands/list_command.dart';
 import 'commands/mono_repo_command.dart';
@@ -19,6 +20,7 @@ import 'version.dart';
 final commands = List<Command<void>>.unmodifiable(
   [
     CheckCommand(),
+    DartCommand(),
     GenerateCommand(),
     ListCommand(),
     PresubmitCommand(),

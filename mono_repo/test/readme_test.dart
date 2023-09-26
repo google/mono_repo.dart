@@ -89,12 +89,12 @@ github:
   # `pull_request` while adding a single `schedule` entry.
   # `on` and `cron` cannot both be set.
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
-  
+
   # Specify additional environment variables accessible to all jobs
   env:
     FOO: BAR
 
-  # You can group stages into individual workflows  
+  # You can group stages into individual workflows
   #
   # Any stages that are omitted here are put in a default workflow
   # named `dart.yml`.

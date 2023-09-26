@@ -41,6 +41,7 @@ Global options:
 
 Available commands:
   check       Check the state of the repository.
+  dart        Runs the `dart` command with the provided arguments across all packages.
   generate    Generates the CI configuration for child packages.
   list        List all packages configured for mono_repo.
   presubmit   Run the CI presubmits locally.
