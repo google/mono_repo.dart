@@ -1,3 +1,8 @@
+## 6.6.2
+
+- Remove usage of removed `flutter format` command in
+  the generated `tool/ci.sh` file.
+
 ## 6.6.1
 
 - Update to latest action versions.
