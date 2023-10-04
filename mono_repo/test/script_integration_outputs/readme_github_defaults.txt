@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:sub_pkg;commands:test"
@@ -32,12 +32,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
+        uses: dart-lang/setup-dart@8a4b97ea2017cc079571daec46542f76189836b1
         with:
           sdk: "2.17.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test"
@@ -62,12 +62,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
+        uses: dart-lang/setup-dart@8a4b97ea2017cc079571daec46542f76189836b1
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -83,7 +83,7 @@ jobs:
     if: "github.event_name == 'schedule'"
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:sub_pkg;commands:test"
@@ -93,12 +93,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
+        uses: dart-lang/setup-dart@8a4b97ea2017cc079571daec46542f76189836b1
         with:
           sdk: "2.17.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -117,7 +117,7 @@ jobs:
     if: "github.event_name == 'schedule'"
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test"
@@ -127,12 +127,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
+        uses: dart-lang/setup-dart@8a4b97ea2017cc079571daec46542f76189836b1
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -151,12 +151,12 @@ jobs:
     if: "github.event_name == 'schedule'"
     steps:
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
+        uses: dart-lang/setup-dart@8a4b97ea2017cc079571daec46542f76189836b1
         with:
           sdk: "2.17.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -175,12 +175,12 @@ jobs:
     if: "github.event_name == 'schedule'"
     steps:
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@d6a63dab3335f427404425de0fbfed4686d93c4f
+        uses: dart-lang/setup-dart@8a4b97ea2017cc079571daec46542f76189836b1
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
       - id: sub_pkg_pub_upgrade
         name: sub_pkg; dart pub upgrade
         run: dart pub upgrade

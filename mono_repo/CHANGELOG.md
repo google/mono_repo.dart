@@ -1,3 +1,7 @@
+## 6.6.1
+
+- Update to latest action versions.
+
 ## 6.6.0
 
 - Added the `dart` command to run arbitrary dart commands across all packages.

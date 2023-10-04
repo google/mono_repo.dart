@@ -78,7 +78,7 @@ $newContent
 
 final argParser = ArgParser()..addFlag('validate');
 
-extension _ToVariableName on String {
+extension on String {
   String get toVariableName {
     final buffer = StringBuffer();
     var capitalizeNext = false;
