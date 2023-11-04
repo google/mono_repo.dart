@@ -7,8 +7,8 @@
 /// To regenerate it, run the `tool/generate_action_versions.dart` script.
 
 const actionsCacheVersion = '704facf57e6136b1bc63b828d79edcd491f0ee84';
-const dartLangSetupDartVersion = '8a4b97ea2017cc079571daec46542f76189836b1';
-const actionsCheckoutVersion = '8ade135a41bc03ea155e62e844d188df1ea18608';
-const subositoFlutterActionVersion = '48cafc24713cca54bbe03cdc3a423187d413aafa';
+const dartLangSetupDartVersion = 'b64355ae6ca0b5d484f0106a033dd1388965d06d';
+const actionsCheckoutVersion = 'b4ffde65f46336ab88eb53be808477a3936bae11';
+const subositoFlutterActionVersion = '2783a3f08e1baf891508463f8c6653c258246225';
 const coverallsappGithubActionVersion = 'master';
 const codecovCodecovActionVersion = 'main';
