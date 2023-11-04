@@ -554,12 +554,6 @@ jobs:
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_00
           parallel: true
-      - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
-        with:
-          files: mono_repo/coverage/lcov.info
-          fail_ci_if_error: true
-          name: coverage_00
     needs:
       - job_001
       - job_002
@@ -612,12 +606,6 @@ jobs:
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_01
           parallel: true
-      - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
-        with:
-          files: mono_repo/coverage/lcov.info
-          fail_ci_if_error: true
-          name: coverage_01
     needs:
       - job_001
       - job_002
@@ -713,12 +701,6 @@ jobs:
           path-to-lcov: test_pkg/coverage/lcov.info
           flag-name: coverage_02
           parallel: true
-      - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
-        with:
-          files: test_pkg/coverage/lcov.info
-          fail_ci_if_error: true
-          name: coverage_02
     needs:
       - job_001
       - job_002
