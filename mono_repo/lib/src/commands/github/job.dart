@@ -18,16 +18,27 @@ class Job implements YamlLike {
 
   @JsonKey(name: 'runs-on')
   final String? runsOn;
+
   @JsonKey(name: 'if')
   String? ifContent;
+
   @JsonKey(required: true)
   final List<Step> steps;
+
   List<String>? needs;
+
+  Map<String, String>? outputs;
+
+  Map<String, String>? permissions;
 
   Job({
     this.name,
     this.runsOn,
     required this.steps,
+    this.ifContent,
+    this.needs,
+    this.outputs,
+    this.permissions,
   });
 
   factory Job.fromJson(Map json) => _$JobFromJson(json);

@@ -38,6 +38,13 @@ enum ActionInfo implements Comparable<ActionInfo> {
     name: 'Upload coverage to codecov.io',
     repo: 'codecov/codecov-action',
     version: codecovCodecovActionVersion,
+  ),
+
+  /// See https://github.com/marketplace/actions/paths-changes-filter
+  pathsFilter(
+    name: 'Produce variables based on which packages are affected',
+    repo: 'dorny/paths-filter',
+    version: dornyPathsFilterVersion,
   );
 
   const ActionInfo({

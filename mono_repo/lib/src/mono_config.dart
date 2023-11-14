@@ -21,6 +21,7 @@ const _allowedMonoConfigKeys = {
   'pub_action',
   'self_validate',
   'coverage_service',
+  'smart_jobs',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -37,6 +38,7 @@ class MonoConfig implements BasicConfiguration {
   final String pubAction;
   final String? selfValidateStage;
   final GitHubConfig github;
+  final bool smartJobs;
   @override
   final Set<CoverageProcessor> coverageProcessors;
 
@@ -47,6 +49,7 @@ class MonoConfig implements BasicConfiguration {
     required this.selfValidateStage,
     required Map github,
     required this.coverageProcessors,
+    required this.smartJobs,
   })  : githubConditionalStages = _readConditionalStages(github),
         github = GitHubConfig.fromJson(github);
 
@@ -126,6 +129,16 @@ class MonoConfig implements BasicConfiguration {
 
     final coverageServices = _asList(json, 'coverage_service');
 
+    final smartJobs = json['smart_jobs'] ?? false;
+    if (smartJobs is! bool) {
+      throw CheckedFromJsonException(
+        json,
+        'smart_jobs',
+        'MonoConfig',
+        'Value must be `true` or `false`.',
+      );
+    }
+
     return MonoConfig._(
       mergeStages: Set.from(mergeStages),
       prettyAnsi: prettyAnsi,
@@ -135,6 +148,7 @@ class MonoConfig implements BasicConfiguration {
       coverageProcessors: coverageServices
           .map((e) => CoverageProcessor.values.byName(e))
           .toSet(),
+      smartJobs: smartJobs,
     );
   }
 
@@ -150,6 +164,7 @@ class MonoConfig implements BasicConfiguration {
         selfValidateStage: null,
         github: {},
         coverageProcessors: {CoverageProcessor.coveralls},
+        smartJobs: false,
       );
     }
 

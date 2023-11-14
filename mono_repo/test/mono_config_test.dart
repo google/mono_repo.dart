@@ -21,6 +21,7 @@ String _encodeJson(Object? input) =>
 PackageConfig _parse(map) => PackageConfig.parse(
       'a',
       _dummyPubspec,
+      null,
       map is YamlMap
           ? map
           : loadYamlChecked(

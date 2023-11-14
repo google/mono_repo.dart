@@ -6,6 +6,8 @@ coverage_service:
 - coveralls
 - codecov
 
+smart_jobs: true
+
 github:
   # Setting just `cron` keeps the defaults for `push` and `pull_request`
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
