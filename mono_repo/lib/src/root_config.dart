@@ -18,6 +18,7 @@ import 'yaml.dart';
 
 const _legacyPkgConfigFileName = '.mono_repo.yml';
 const _pubspecFileName = 'pubspec.yaml';
+const _pubspecOverridesFileName = 'pubspec_overrides.yaml';
 
 PackageConfig? _packageConfigFromDir(
   String rootDirectory,
@@ -56,7 +57,22 @@ PackageConfig? _packageConfigFromDir(
     sourceUrl: Uri.parse(pubspecFile.path),
   );
 
-  return PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
+  Pubspec? pubspecOverrides;
+  final pubspecOverridesFile =
+      File(p.join(rootDirectory, pkgRelativePath, _pubspecOverridesFileName));
+  if (pubspecOverridesFile.existsSync()) {
+    pubspecOverrides = Pubspec.parse(
+      pubspecOverridesFile.readAsStringSync(),
+      sourceUrl: Uri.parse(pubspecOverridesFile.path),
+    );
+  }
+
+  return PackageConfig.parse(
+    pkgRelativePath,
+    pubspec,
+    pubspecOverrides,
+    pkgConfigYaml,
+  );
 }
 
 class RootConfig extends ListBase<PackageConfig> {

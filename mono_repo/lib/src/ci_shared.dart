@@ -32,6 +32,7 @@ String get createdWith => '# Created with package:mono_repo v$_pkgVersion';
 
 String get _pkgVersion => _isTesting ? '1.2.3' : packageVersion;
 
+const calculateChangesJobName = 'Calculating affected packages';
 const selfValidateJobName = 'mono_repo self validate';
 
 final selfValidateCommands = [

@@ -12,3 +12,4 @@ const actionsCheckoutVersion = 'b4ffde65f46336ab88eb53be808477a3936bae11';
 const subositoFlutterActionVersion = '2783a3f08e1baf891508463f8c6653c258246225';
 const coverallsappGithubActionVersion = 'master';
 const codecovCodecovActionVersion = 'main';
+const dornyPathsFilterVersion = 'v2';
