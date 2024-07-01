@@ -31,12 +31,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: "2.16.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -65,12 +65,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: "2.17.0-69.1.beta"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -99,12 +99,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: "2.18.0-106.0.dev"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -133,12 +133,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: "3.0.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -163,12 +163,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@3d804929922b667a63a229bc59037807f969e885
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1
         with:
           channel: beta
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -197,12 +197,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: beta
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -231,12 +231,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -261,12 +261,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -308,12 +308,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: main
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -342,12 +342,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@3d804929922b667a63a229bc59037807f969e885
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1
         with:
           channel: master
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -376,12 +376,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@3d804929922b667a63a229bc59037807f969e885
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1
         with:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -410,12 +410,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -444,12 +444,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: "3.0.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -487,12 +487,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@3d804929922b667a63a229bc59037807f969e885
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1
         with:
           channel: beta
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -530,14 +530,14 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - name: "Activate package:coverage"
         run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -548,14 +548,14 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
       - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@643bc377ffa44ace6394b2b5d0d3950076de9f63
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_00
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673
         with:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
@@ -588,14 +588,14 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - name: "Activate package:coverage"
         run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -606,14 +606,14 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
       - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@643bc377ffa44ace6394b2b5d0d3950076de9f63
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: mono_repo/coverage/lcov.info
           flag-name: coverage_01
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673
         with:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
@@ -646,12 +646,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -689,14 +689,14 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - name: "Activate package:coverage"
         run: "dart pub global activate coverage '>=1.5.0'"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -707,14 +707,14 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
       - name: Upload coverage to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@643bc377ffa44ace6394b2b5d0d3950076de9f63
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           path-to-lcov: test_pkg/coverage/lcov.info
           flag-name: coverage_02
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@main
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673
         with:
           files: test_pkg/coverage/lcov.info
           fail_ci_if_error: true
@@ -747,12 +747,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@3d804929922b667a63a229bc59037807f969e885
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1
         with:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: test_flutter_pkg_example_pub_upgrade
         name: test_flutter_pkg/example; flutter pub upgrade
         run: flutter pub upgrade
@@ -780,12 +780,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: "3.0.0"
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -813,12 +813,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@fedb1266e91cf51be2fdb382869461a434b920a3
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: dev
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -879,7 +879,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Mark Coveralls job finished
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@643bc377ffa44ace6394b2b5d0d3950076de9f63
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           parallel-finished: true
