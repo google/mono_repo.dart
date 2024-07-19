@@ -4,7 +4,7 @@
 
 // On windows this test fails for unknown reasons, possibly there are carriage
 // returns being introduced during formatting.
-@TestOn('linux')
+@OnPlatform({'windows': Skip('Broken on windows')})
 import 'dart:io';
 
 import 'package:test/test.dart';

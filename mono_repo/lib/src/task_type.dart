@@ -151,30 +151,31 @@ class _TestWithCoverageTask extends TaskType {
     String packageDirectory,
     BasicConfiguration config,
     RootConfig rootConfig,
-  ) {
+  ) sync* {
     final countString = (_count++).toString().padLeft(2, '0');
-    return [
-      if (config.coverageProcessors.contains(CoverageProcessor.coveralls))
-        ActionInfo.coveralls.usage(
-          name: 'Upload coverage to Coveralls',
-          withContent: {
-            // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
-            'github-token': r'${{ secrets.GITHUB_TOKEN }}',
-            'path-to-lcov': '$packageDirectory/coverage/lcov.info',
-            'flag-name': 'coverage_$countString',
-            'parallel': true,
-          },
-          versionOverrides: rootConfig.existingActionVersions,
-        ),
-      if (config.coverageProcessors.contains(CoverageProcessor.codecov))
-        ActionInfo.codecov.usage(
-          withContent: {
-            'files': '$packageDirectory/coverage/lcov.info',
-            'fail_ci_if_error': true,
-            'name': 'coverage_$countString',
-          },
-          versionOverrides: rootConfig.existingActionVersions,
-        ),
-    ];
+    if (config.coverageProcessors.contains(CoverageProcessor.coveralls)) {
+      yield ActionInfo.coveralls.usage(
+        name: 'Upload coverage to Coveralls',
+        withContent: {
+          // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+          'github-token': r'${{ secrets.GITHUB_TOKEN }}',
+          'path-to-lcov': '$packageDirectory/coverage/lcov.info',
+          'flag-name': 'coverage_$countString',
+          'parallel': true,
+        },
+        versionOverrides: rootConfig.existingActionVersions,
+      );
+    }
+    if (config.coverageProcessors.contains(CoverageProcessor.codecov)) {
+      yield ActionInfo.codecov.usage(
+        withContent: {
+          'files': '$packageDirectory/coverage/lcov.info',
+          'fail_ci_if_error': true,
+          'name': 'coverage_$countString',
+          'token': r'${{ secrets.CODECOV_TOKEN }}',
+        },
+        versionOverrides: rootConfig.existingActionVersions,
+      );
+    }
   }
 }
