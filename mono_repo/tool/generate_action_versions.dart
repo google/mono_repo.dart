@@ -29,6 +29,7 @@ void main(List<String> args) {
 /// This file is generated, and should not be modified by hand.
 ///
 /// To regenerate it, run the `tool/generate_action_versions.dart` script.
+library;
 
 ''');
   for (var entry in versions.entries) {
