@@ -148,6 +148,7 @@ coverage_service:
 # https://coveralls.io/ - the default
 - coveralls
 # https://codecov.io/ – the other option
+# NOTE: `CODECOV_TOKEN` must be populated in your GitHub actions secrets
 - codecov
 ```
 

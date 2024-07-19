@@ -560,6 +560,7 @@ jobs:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
           name: coverage_00
+          token: "${{ secrets.CODECOV_TOKEN }}"
     needs:
       - job_001
       - job_002
@@ -618,6 +619,7 @@ jobs:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
           name: coverage_01
+          token: "${{ secrets.CODECOV_TOKEN }}"
     needs:
       - job_001
       - job_002
@@ -719,6 +721,7 @@ jobs:
           files: test_pkg/coverage/lcov.info
           fail_ci_if_error: true
           name: coverage_02
+          token: "${{ secrets.CODECOV_TOKEN }}"
     needs:
       - job_001
       - job_002
