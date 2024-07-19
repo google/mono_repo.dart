@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a-pkg_b;commands:analyze_0-format"
@@ -29,12 +29,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_c;commands:analyze_1-format"
@@ -76,12 +76,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Flutter SDK
-        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225
+        uses: subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1
         with:
           channel: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: pkg_c_pub_upgrade
         name: pkg_c; flutter pub upgrade
         run: flutter pub upgrade
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_1"
@@ -110,12 +110,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -133,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b;commands:test_1"
@@ -143,12 +143,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         run: dart pub upgrade
@@ -166,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_0"
@@ -176,12 +176,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: pkg_a_pub_upgrade
         name: pkg_a; dart pub upgrade
         run: dart pub upgrade
@@ -199,7 +199,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_b;commands:test_0"
@@ -209,12 +209,12 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@b64355ae6ca0b5d484f0106a033dd1388965d06d
+        uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
           sdk: stable
       - id: checkout
         name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
       - id: pkg_b_pub_upgrade
         name: pkg_b; dart pub upgrade
         run: dart pub upgrade
