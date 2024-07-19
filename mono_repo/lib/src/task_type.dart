@@ -172,7 +172,7 @@ class _TestWithCoverageTask extends TaskType {
           'files': '$packageDirectory/coverage/lcov.info',
           'fail_ci_if_error': true,
           'name': 'coverage_$countString',
-          'token': r'${{ secrets.CODECOV_TOKEN }}'
+          'token': r'${{ secrets.CODECOV_TOKEN }}',
         },
         versionOverrides: rootConfig.existingActionVersions,
       );
