@@ -1,3 +1,10 @@
+## 6.6.2
+
+- Require Dart `sdk: ^3.4.0`.
+- Populate `token` for `codecov` action.
+  (Requires the user to provide `CODECOV_TOKEN` in their secrets.)
+- Update to latest action versions.
+
 ## 6.6.1
 
 - Update to latest action versions.

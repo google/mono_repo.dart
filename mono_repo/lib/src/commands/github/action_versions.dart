@@ -5,6 +5,7 @@
 /// This file is generated, and should not be modified by hand.
 ///
 /// To regenerate it, run the `tool/generate_action_versions.dart` script.
+library;
 
 const actionsCacheVersion = '0c45773b623bea8c8e75f6c82b208c3cf94ea4f9';
 const dartLangSetupDartVersion = '0a8a0fc875eb934c15d08629302413c671d3f672';

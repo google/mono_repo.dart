@@ -4,6 +4,8 @@
 
 @Tags(['presubmit-only'])
 @OnPlatform({'windows': Skip('Cant run shell scripts on windows')})
+library;
+
 import 'dart:io';
 
 import 'package:io/ansi.dart';
