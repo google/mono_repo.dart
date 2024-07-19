@@ -75,7 +75,7 @@ $ciScriptPathMessage''',
   );
 
   _registerTest(
-    'just successes',
+    'just succeeds',
     args: [
       'analyze',
       'command_0',
