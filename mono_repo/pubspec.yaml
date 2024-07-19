@@ -18,7 +18,7 @@ dependencies:
   collection: ^1.14.3
   graphs: ^2.2.0
   io: ^1.0.0
-  json_annotation: ^4.8.0
+  json_annotation: ^4.9.0
   meta: ^1.0.0
   path: ^1.4.1
   pub_semver: ^2.0.0
