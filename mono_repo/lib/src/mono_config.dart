@@ -70,7 +70,7 @@ class MonoConfig implements BasicConfiguration {
 
     Map parseCI(CI targetCI) {
       final key = targetCI.toString().split('.').last;
-      final value = json[key] ?? {};
+      final value = json[key] ?? <String, dynamic>{};
 
       if (value is bool) {
         if (!value) {

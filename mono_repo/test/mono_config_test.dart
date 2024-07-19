@@ -18,7 +18,7 @@ final _dummyPubspec = Pubspec('_example');
 String _encodeJson(Object? input) =>
     const JsonEncoder.withIndent(' ').convert(input);
 
-PackageConfig _parse(map) => PackageConfig.parse(
+PackageConfig _parse(Object map) => PackageConfig.parse(
       'a',
       _dummyPubspec,
       map is YamlMap
@@ -122,7 +122,7 @@ line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an ar
 
     test('sdk value cannot be empty', () {
       _expectParseThrows(
-        {'sdk': []},
+        {'sdk': <Never>[]},
         r'''
 line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an array with at least one value.
   ╷
@@ -246,7 +246,7 @@ line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`
       final monoYaml = {
         'sdk': ['stable'],
         'stages': [
-          {'a': []},
+          {'a': <Never>[]},
         ],
       };
       _expectParseThrows(
@@ -281,7 +281,7 @@ line 8, column 4: Stages must be a list of maps with exactly one key (the name o
     test('no keys under a stage', () {
       final monoYaml = {
         'sdk': ['stable'],
-        'stages': [{}],
+        'stages': [<String, dynamic>{}],
       };
       _expectParseThrows(
         monoYaml,

@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.6.1
+# Created with package:mono_repo v6.6.2
 name: Dart CI
 on:
   push:
@@ -119,23 +119,23 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_004:
-    name: "smoke_test; linux; Dart 3.0.0; PKG: mono_repo; `dart analyze`"
+    name: "smoke_test; linux; Dart 3.4.0; PKG: mono_repo; `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:mono_repo;commands:analyze_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.4.0;packages:mono_repo;commands:analyze_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:3.4.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:3.4.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
-          sdk: "3.0.0"
+          sdk: "3.4.0"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -430,23 +430,23 @@ jobs:
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_013:
-    name: "test; linux; Dart 3.0.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "test; linux; Dart 3.4.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:mono_repo;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.4.0;packages:mono_repo;commands:test_0"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:mono_repo
-            os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0
+            os:ubuntu-latest;pub-cache-hosted;sdk:3.4.0;packages:mono_repo
+            os:ubuntu-latest;pub-cache-hosted;sdk:3.4.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
-          sdk: "3.0.0"
+          sdk: "3.4.0"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
@@ -779,13 +779,13 @@ jobs:
       - job_011
       - job_012
   job_020:
-    name: "test; windows; Dart 3.0.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
+    name: "test; windows; Dart 3.4.0; PKG: mono_repo; `dart test -x yaml -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: windows-latest
     steps:
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@0a8a0fc875eb934c15d08629302413c671d3f672
         with:
-          sdk: "3.0.0"
+          sdk: "3.4.0"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332

@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: inference_failure_on_collection_literal
+
 import 'package:mono_repo/src/github_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:term_glyph/term_glyph.dart' as glyph;
