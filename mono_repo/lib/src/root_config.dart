@@ -160,9 +160,8 @@ class RootConfig extends ListBase<PackageConfig> {
       } else if (yaml is Map) {
         const usesKey = 'uses';
 
-        if (yaml.containsKey(usesKey)) {
+        if (yaml case {usesKey: final usage as String}) {
           // dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
-          final usage = yaml[usesKey] as String;
           final match = usageRegex.firstMatch(usage);
           if (match != null) {
             result['${match.group(1)}/${match.group(2)}'] = match.group(3)!;
