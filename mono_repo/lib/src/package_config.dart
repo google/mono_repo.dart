@@ -96,7 +96,6 @@ class PackageConfig {
       for (var job in stageYaml) {
         var jobSdks = rawConfig.sdks;
         if (job case {'sdk': final jobValue}) {
-
           jobSdks = (jobValue is List)
               ? jobSdks = List.from(jobValue)
               : [jobValue as String];
