@@ -95,9 +95,7 @@ class PackageConfig {
       final stageYaml = stage.items;
       for (var job in stageYaml) {
         var jobSdks = rawConfig.sdks;
-        if (job is Map && job.containsKey('sdk')) {
-          final jobValue = job['sdk'];
-
+        if (job case {'sdk': final jobValue}) {
           jobSdks = (jobValue is List)
               ? jobSdks = List.from(jobValue)
               : [jobValue as String];
@@ -149,8 +147,7 @@ class PackageConfig {
         }
 
         var jobOses = rawConfig.oses;
-        if (job is Map && job.containsKey('os')) {
-          final jobValue = job['os'];
+        if (job case {'os': final jobValue}) {
           if (jobValue is List) {
             jobOses = jobValue.cast<String>();
           } else {
