@@ -160,15 +160,18 @@ class PackageConfig {
           osConfigUsed = true;
         }
 
+        final (:description, :tasks) =
+            CIJob.parse(job as Object, flavor: flavor);
         for (var sdk in jobSdks) {
           for (var os in jobOses) {
             jobs.add(
-              CIJob.parse(
+              CIJob(
                 os,
                 relativePath,
                 sdk,
                 stage.name,
-                job as Object,
+                tasks,
+                description: description,
                 flavor: flavor,
               ),
             );
@@ -255,11 +258,7 @@ class CIJob implements HasStageName {
           'Should have caught bad sdk value `$sdk` before here!',
         );
 
-  factory CIJob.parse(
-    String os,
-    String package,
-    String sdk,
-    String stageName,
+  static ({String? description, List<Task> tasks}) parse(
     Object yaml, {
     required PackageFlavor flavor,
   }) {
@@ -272,14 +271,9 @@ class CIJob implements HasStageName {
       withoutDescription = yaml;
     }
     final tasks = Task.parseTaskOrGroup(flavor, withoutDescription);
-    return CIJob(
-      os,
-      package,
-      sdk,
-      stageName,
-      tasks,
+    return (
+      tasks: tasks,
       description: description,
-      flavor: flavor,
     );
   }
 
