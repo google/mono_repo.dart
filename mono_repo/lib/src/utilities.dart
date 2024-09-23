@@ -32,8 +32,6 @@ String? errorForSdkConfig(PackageFlavor flavor, String sdk) {
               '$_flutterLiteralsPretty.';
         }
         return null;
-      default:
-        throw UnsupportedError('should never get a flavor of `$flavor`');
     }
   }
 }
