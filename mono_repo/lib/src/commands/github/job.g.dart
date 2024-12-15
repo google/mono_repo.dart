@@ -35,19 +35,10 @@ Job _$JobFromJson(Map json) => $checkedCreate(
       fieldKeyMap: const {'runsOn': 'runs-on', 'ifContent': 'if'},
     );
 
-Map<String, dynamic> _$JobToJson(Job instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('name', instance.name);
-  writeNotNull('runs-on', instance.runsOn);
-  writeNotNull('if', instance.ifContent);
-  val['steps'] = instance.steps.map((e) => e.toJson()).toList();
-  writeNotNull('needs', instance.needs);
-  return val;
-}
+Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
+      if (instance.name case final value?) 'name': value,
+      if (instance.runsOn case final value?) 'runs-on': value,
+      if (instance.ifContent case final value?) 'if': value,
+      'steps': instance.steps.map((e) => e.toJson()).toList(),
+      if (instance.needs case final value?) 'needs': value,
+    };

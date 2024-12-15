@@ -32,22 +32,14 @@ Step _$StepFromJson(Map json) => $checkedCreate(
       },
     );
 
-Map<String, dynamic> _$StepToJson(Step instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('id', instance.id);
-  writeNotNull('name', instance.name);
-  writeNotNull('run', instance.run);
-  writeNotNull('if', instance.ifContent);
-  writeNotNull('working-directory', instance.workingDirectory);
-  writeNotNull('env', instance.env);
-  writeNotNull('uses', instance.uses);
-  writeNotNull('with', instance.withContent);
-  return val;
-}
+Map<String, dynamic> _$StepToJson(Step instance) => <String, dynamic>{
+      if (instance.id case final value?) 'id': value,
+      if (instance.name case final value?) 'name': value,
+      if (instance.run case final value?) 'run': value,
+      if (instance.ifContent case final value?) 'if': value,
+      if (instance.workingDirectory case final value?)
+        'working-directory': value,
+      if (instance.env case final value?) 'env': value,
+      if (instance.uses case final value?) 'uses': value,
+      if (instance.withContent case final value?) 'with': value,
+    };
