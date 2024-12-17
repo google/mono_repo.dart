@@ -1,2 +1,0 @@
-PKG: pkg_d
-PKG: 'pkg_d' does not exist - TERMINATING JOB

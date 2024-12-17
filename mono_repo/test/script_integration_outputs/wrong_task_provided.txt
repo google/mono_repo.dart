@@ -1,7 +1,0 @@
-PKG: pkg_c
-Resolving dependencies...
-Downloading packages...
-No dependencies changed.
-
-PKG: pkg_c; TASK: not_a_task
-Unknown TASK 'not_a_task' - TERMINATING JOB

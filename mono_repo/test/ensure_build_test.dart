@@ -7,6 +7,8 @@
 @Timeout.factor(4)
 library;
 
+import 'dart:io';
+
 import 'package:build_verify/build_verify.dart';
 import 'package:test/test.dart';
 
@@ -14,5 +16,6 @@ void main() {
   test(
     'ensure_build',
     () => expectBuildClean(packageRelativeDirectory: 'mono_repo'),
+    skip: !Platform.version.contains('dev') ? 'Only run in release mode' : null,
   );
 }

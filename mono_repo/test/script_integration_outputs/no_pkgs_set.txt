@@ -1,1 +1,0 @@
-PKGS environment variable must be set! - TERMINATING JOB
