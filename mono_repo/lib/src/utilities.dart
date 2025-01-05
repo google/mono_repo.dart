@@ -48,7 +48,7 @@ void handlePubspecInSdkList(
     return;
   }
 
-  final sdkConstraint = pubspec.environment?['sdk'];
+  final sdkConstraint = pubspec.environment['sdk'];
 
   Version? lowerVersion;
   if (sdkConstraint is VersionRange && sdkConstraint.includeMin) {
@@ -142,7 +142,7 @@ extension PubspecExtension on Pubspec {
       ? '[![pub package](https://img.shields.io/pub/v/$name.svg)](https://pub.dev/packages/$name)'
       : '';
 
-  bool get _dependsOnFlutterSdk => environment?.containsKey('flutter') ?? false;
+  bool get _dependsOnFlutterSdk => environment.containsKey('flutter');
 
   bool get _dependsOnFlutterPackage => _dependsOnPackage('flutter');
 
