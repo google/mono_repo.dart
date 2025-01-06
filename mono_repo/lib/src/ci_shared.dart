@@ -77,7 +77,7 @@ Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
 
 void validateRootConfig(RootConfig rootConfig) {
   for (var config in rootConfig) {
-    final sdkConstraint = config.pubspec.environment?['sdk'];
+    final sdkConstraint = config.pubspec.environment['sdk'];
 
     if (sdkConstraint == null) {
       continue;
