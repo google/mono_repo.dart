@@ -6,10 +6,10 @@
 //
 // To regenerate it, run the `tool/generate_action_versions.dart` script.
 
-const actionsCacheVersion = '6849a6489940f00c2f30c0fb92c6274307ccb58a';
-const dartLangSetupDartVersion = 'e630b99d28a3b71860378cafdc2a067c71107f94';
+const actionsCacheVersion = 'd4323d4df104b026a6aa633fdb11d772146be0bf';
+const dartLangSetupDartVersion = 'e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c';
 const actionsCheckoutVersion = '11bd71901bbe5b1630ceea73d27597364c9af683';
-const subositoFlutterActionVersion = '74af56c5ed2697ba4621264652728e8d217e53d3';
+const subositoFlutterActionVersion = 'f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff';
 const coverallsappGithubActionVersion =
-    'cfd0633edbd2411b532b808ba7a8b5e04f76d2c8';
-const codecovCodecovActionVersion = '015f24e6818733317a2da2edd6290ab26238649a';
+    '648a8eb78e6d50909eff900e4ec85cab4524a45b';
+const codecovCodecovActionVersion = '0565863a31f2c772f9f0395002a31e3f06189574';
