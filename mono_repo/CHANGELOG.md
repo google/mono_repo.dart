@@ -1,4 +1,4 @@
-## 6.6.3-wip
+## 6.6.3
 
 - Update to latest action versions.
 
