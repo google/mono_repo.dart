@@ -1,3 +1,8 @@
+## 6.6.4
+
+- Update to latest action versions.
+- Require `sdk: ^3.7.0`.
+
 ## 6.6.3
 
 - Update to latest action versions.
