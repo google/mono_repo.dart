@@ -26,11 +26,7 @@ class DartCommand extends MonoRepoCommand {
       'packages.';
 
   @override
-  Future<void> run() => dart(
-        rootConfig(),
-        arguments,
-        executableForPackage,
-      );
+  Future<void> run() => dart(rootConfig(), arguments, executableForPackage);
 
   /// The arguments to pass to the executable.
   List<String> get arguments => argResults?.rest ?? const [];
@@ -61,10 +57,7 @@ Future<void> dart(
 
     print('');
     print(
-      wrapWith(
-        '`$dir`: Starting `${args.join(' ')}`',
-        [styleBold, lightBlue],
-      ),
+      wrapWith('`$dir`: Starting `${args.join(' ')}`', [styleBold, lightBlue]),
     );
     final workingDir = p.join(rootConfig.rootDirectory, dir);
 
@@ -116,14 +109,11 @@ final String _dartPath = p.join(_sdkDir, 'bin', 'dart');
 /// The "flutter[.bat]" command.
 final String _flutterPath = Platform.isWindows ? 'flutter.bat' : 'flutter';
 
-enum Executable {
-  dart,
-  flutter,
-}
+enum Executable { dart, flutter }
 
 extension ExecutablePath on Executable {
   String get path => switch (this) {
-        Executable.dart => _dartPath,
-        Executable.flutter => _flutterPath,
-      };
+    Executable.dart => _dartPath,
+    Executable.flutter => _flutterPath,
+  };
 }

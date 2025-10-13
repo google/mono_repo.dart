@@ -23,8 +23,11 @@ PackageConfig? _packageConfigFromDir(
   String rootDirectory,
   String pkgRelativePath,
 ) {
-  final legacyConfigPath =
-      p.join(rootDirectory, pkgRelativePath, _legacyPkgConfigFileName);
+  final legacyConfigPath = p.join(
+    rootDirectory,
+    pkgRelativePath,
+    _legacyPkgConfigFileName,
+  );
   if (FileSystemEntity.isFileSync(legacyConfigPath)) {
     throw UserException(
       'Found legacy package configuration file '
@@ -41,8 +44,9 @@ PackageConfig? _packageConfigFromDir(
     return null;
   }
 
-  final pubspecFile =
-      File(p.join(rootDirectory, pkgRelativePath, _pubspecFileName));
+  final pubspecFile = File(
+    p.join(rootDirectory, pkgRelativePath, _pubspecFileName),
+  );
 
   if (!pubspecFile.existsSync()) {
     throw UserException(
@@ -76,8 +80,10 @@ class RootConfig extends ListBase<PackageConfig> {
       for (var subdir in dirs) {
         final relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
 
-        final pkgConfig =
-            _packageConfigFromDir(rootDirectory!, relativeSubDirPath);
+        final pkgConfig = _packageConfigFromDir(
+          rootDirectory!,
+          relativeSubDirPath,
+        );
         if (pkgConfig != null) {
           configs.add(pkgConfig);
         }
@@ -93,7 +99,8 @@ class RootConfig extends ListBase<PackageConfig> {
     if (configs.isEmpty) {
       throw UserException(
         'No packages found.',
-        details: 'Each target package directory must contain '
+        details:
+            'Each target package directory must contain '
             'a `$monoPkgFileName` file.',
       );
     }
@@ -105,8 +112,9 @@ class RootConfig extends ListBase<PackageConfig> {
     final hasDependabot = dependabotFileNames
         .map((name) => File(p.join(rootDirectory!, name)))
         .any((file) => file.existsSync());
-    final githubWorkflowFile =
-        File(p.join(rootDirectory, defaultGitHubWorkflowFilePath));
+    final githubWorkflowFile = File(
+      p.join(rootDirectory, defaultGitHubWorkflowFilePath),
+    );
     if (hasDependabot && githubWorkflowFile.existsSync()) {
       existingActionVersions = parseActionVersions(
         githubWorkflowFile.readAsStringSync(),

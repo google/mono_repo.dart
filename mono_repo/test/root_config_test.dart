@@ -9,8 +9,9 @@ void main() {
   group('RootConfig', () {
     test('parseActionVersions', () {
       final file = File(path.join('..', defaultGitHubWorkflowFilePath));
-      final parsedVersions =
-          RootConfig.parseActionVersions(file.readAsStringSync());
+      final parsedVersions = RootConfig.parseActionVersions(
+        file.readAsStringSync(),
+      );
 
       expect(parsedVersions, isNotEmpty);
 

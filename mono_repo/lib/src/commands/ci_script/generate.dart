@@ -13,24 +13,12 @@ import '../../user_exception.dart';
 
 const ciScriptPath = 'tool/ci.sh';
 
-void generateCIScript(
-  RootConfig rootConfig, {
-  bool validateOnly = false,
-}) {
+void generateCIScript(RootConfig rootConfig, {bool validateOnly = false}) {
   final ciScript = _GeneratedCIScript.generate(rootConfig).ciScript;
   if (validateOnly) {
-    _validateFile(
-      rootConfig.rootDirectory,
-      ciScript,
-      ciScriptPath,
-    );
+    _validateFile(rootConfig.rootDirectory, ciScript, ciScriptPath);
   } else {
-    writeFile(
-      rootConfig.rootDirectory,
-      ciScriptPath,
-      ciScript,
-      isScript: true,
-    );
+    writeFile(rootConfig.rootDirectory, ciScriptPath, ciScript, isScript: true);
   }
 }
 
@@ -57,10 +45,10 @@ class _GeneratedCIScript {
 /// the `--validate` option.
 class CIScriptOutOfDateException extends UserException {
   CIScriptOutOfDateException()
-      : super(
-          'Generated ci script is out of date',
-          details: 'Rerun `mono_repo generate` to update the generated script',
-        );
+    : super(
+        'Generated ci script is out of date',
+        details: 'Rerun `mono_repo generate` to update the generated script',
+      );
 }
 
 /// Checks [expectedPath] versus the content in [expectedContent].

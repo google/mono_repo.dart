@@ -36,10 +36,8 @@ Map<String, PackageReport> getPackageReports(RootConfig rootConfig) {
   final siblings = rootConfig.map((pc) => pc.pubspec).toSet();
   return Map.fromEntries(
     rootConfig.map(
-      (p) => MapEntry(
-        p.relativePath,
-        PackageReport.create(p.pubspec, siblings),
-      ),
+      (p) =>
+          MapEntry(p.relativePath, PackageReport.create(p.pubspec, siblings)),
     ),
   );
 }

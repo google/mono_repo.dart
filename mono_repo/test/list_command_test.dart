@@ -42,17 +42,9 @@ void main() {
       listPackages(
         RootConfig(rootDirectory: d.sandbox),
         onlyPublished: false,
-        showItems: {
-          Column.path,
-          Column.name,
-        },
+        showItems: {Column.path, Column.name},
       ),
-      [
-        'pkg1_dir,pkg1',
-        'pkg2_dir,pkg2',
-        'pkg3_dir,pkg3',
-        'pkg4_dir,pkg4',
-      ],
+      ['pkg1_dir,pkg1', 'pkg2_dir,pkg2', 'pkg3_dir,pkg3', 'pkg4_dir,pkg4'],
     );
   });
 }

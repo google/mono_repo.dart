@@ -26,20 +26,14 @@ name: pkg_name
   ]).create();
 }
 
-void testGenerateConfig({
-  bool validateOnly = false,
-  Object? printMatcher,
-}) {
+void testGenerateConfig({bool validateOnly = false, Object? printMatcher}) {
   printMatcher ??= isEmpty;
   final printOutput = <String>[];
   try {
     testGenerate(
       () {
         final config = RootConfig(rootDirectory: d.sandbox);
-        generate(
-          config,
-          validateOnly,
-        );
+        generate(config, validateOnly);
       },
       zoneSpec: ZoneSpecification(
         print: (z1, zd, z2, value) {
@@ -55,21 +49,21 @@ void testGenerateConfig({
 }
 
 Matcher throwsUserExceptionWith(Object message, {Object? details}) => throwsA(
-      const TypeMatcher<UserException>()
-          .having((e) => e.message, 'message', message)
-          .having((e) => e.details, 'details', details ?? isNull),
-    );
+  const TypeMatcher<UserException>()
+      .having((e) => e.message, 'message', message)
+      .having((e) => e.details, 'details', details ?? isNull),
+);
 
 Matcher throwsAParsedYamlException(Object matcher) => throwsA(
-      isA<ParsedYamlException>().having(
-        (e) {
-          printOnFailure("r'''\n${e.formattedMessage}'''");
-          return e.formattedMessage;
-        },
-        'formattedMessage',
-        matcher,
-      ),
-    );
+  isA<ParsedYamlException>().having(
+    (e) {
+      printOnFailure("r'''\n${e.formattedMessage}'''");
+      return e.formattedMessage;
+    },
+    'formattedMessage',
+    matcher,
+  ),
+);
 
 const testConfig2 = r'''
 sdk:
@@ -101,7 +95,8 @@ stages:
     - test: --preset travis
 ''';
 
-String get ciScriptPathMessage => '''
+String get ciScriptPathMessage =>
+    '''
 ${scriptLines(ciScriptPath).join('\n')}
 Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
 
@@ -114,28 +109,19 @@ void validateOutput(String fileName, String output) {
   expect(output, isNotEmpty);
 
   final expectedOutputFile = File(
-    p.join(
-      'test',
-      'script_integration_outputs',
-      fileName,
-    ),
+    p.join('test', 'script_integration_outputs', fileName),
   );
 
   if (expectedOutputFile.existsSync()) {
-    final expected =
-        expectedOutputFile.readAsStringSync().replaceAll('\r\n', '\n');
-    expect(
-      output,
-      expected,
+    final expected = expectedOutputFile.readAsStringSync().replaceAll(
+      '\r\n',
+      '\n',
     );
+    expect(output, expected);
   } else {
     expectedOutputFile
       ..createSync(recursive: true)
-      ..writeAsStringSync(
-        output,
-        mode: FileMode.writeOnly,
-        flush: true,
-      );
+      ..writeAsStringSync(output, mode: FileMode.writeOnly, flush: true);
 
     // Using addTearDown here so all files in a test are processed before any
     // error is raised. This allows the expected output files to be processed

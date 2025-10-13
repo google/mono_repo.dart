@@ -13,14 +13,17 @@ void main(List<String> args) {
   final validateOnly = parsedArgs['validate'] as bool;
   final versionsFile = File('lib/src/commands/github/action_versions.dart');
   if (!versionsFile.existsSync()) {
-    print('Unable to find existing versions file at `${versionsFile.path}`, '
-        'make sure you are running from the `mono_repo` package directory');
+    print(
+      'Unable to find existing versions file at `${versionsFile.path}`, '
+      'make sure you are running from the `mono_repo` package directory',
+    );
     exit(1);
   }
   final previousContent = versionsFile.readAsStringSync();
   final workflowFile = File('../.github/workflows/dart.yml');
-  final versions =
-      RootConfig.parseActionVersions(workflowFile.readAsStringSync());
+  final versions = RootConfig.parseActionVersions(
+    workflowFile.readAsStringSync(),
+  );
   final newContentBuffer = StringBuffer('''
 // Copyright (c) 2023, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -32,15 +35,18 @@ void main(List<String> args) {
 
 ''');
   for (var entry in versions.entries) {
-    newContentBuffer
-        .writeln("const ${entry.key.toVariableName} = '${entry.value}';");
+    newContentBuffer.writeln(
+      "const ${entry.key.toVariableName} = '${entry.value}';",
+    );
   }
   final tmpDir = Directory.systemTemp.createTempSync('gen_action_versions');
-  final tmpFile =
-      File.fromUri(tmpDir.uri.resolve('generate_action_versions.dart'))
-        ..writeAsStringSync(newContentBuffer.toString());
-  final fmtResult =
-      Process.runSync(Platform.resolvedExecutable, ['format', tmpFile.path]);
+  final tmpFile = File.fromUri(
+    tmpDir.uri.resolve('generate_action_versions.dart'),
+  )..writeAsStringSync(newContentBuffer.toString());
+  final fmtResult = Process.runSync(Platform.resolvedExecutable, [
+    'format',
+    tmpFile.path,
+  ]);
   if (fmtResult.exitCode != 0) {
     stdout
       ..writeln('Error: Failed to run dartfmt')

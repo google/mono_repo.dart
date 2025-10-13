@@ -22,16 +22,15 @@ const _onCompletionStage = '_on_completion';
 
 const githubWorkflowDirectory = '.github/workflows';
 
-final defaultGitHubWorkflowFilePath =
-    githubWorkflowFilePath(defaultGitHubWorkflowFileName);
+final defaultGitHubWorkflowFilePath = githubWorkflowFilePath(
+  defaultGitHubWorkflowFileName,
+);
 
 String githubWorkflowFilePath(String filename) =>
     '$githubWorkflowDirectory/$filename.yml';
 
 Map<String, String> generateGitHubYml(RootConfig rootConfig) {
-  final jobs = <HasStageName>[
-    ...rootConfig.expand((config) => config.jobs),
-  ];
+  final jobs = <HasStageName>[...rootConfig.expand((config) => config.jobs)];
 
   final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
   if (selfValidateStage != null) {
@@ -118,8 +117,9 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       }
     }
 
-    final jobList =
-        Map.fromEntries(allJobs.map((e) => MapEntry(e.id, e.value)));
+    final jobList = Map.fromEntries(
+      allJobs.map((e) => MapEntry(e.id, e.value)),
+    );
 
     for (var completion in completionMap.entries) {
       final job = completion.key.completionJobFactory!(rootConfig)
@@ -128,7 +128,8 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       jobList['job_${jobList.length + 1}'] = job;
     }
 
-    output[githubWorkflowFilePath(fileName)] = '''
+    output[githubWorkflowFilePath(fileName)] =
+        '''
 $createdWith
 ${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
 
@@ -195,11 +196,7 @@ Iterable<_MapEntryWithStage> _listJobs(
     if (conditional != null) {
       content.ifContent = conditional.ifCondition;
     }
-    return _MapEntryWithStage(
-      jobName(++count),
-      content,
-      stage,
-    );
+    return _MapEntryWithStage(jobName(++count), content, stage);
   }
 
   for (var job in jobs) {
@@ -215,8 +212,9 @@ Iterable<_MapEntryWithStage> _listJobs(
 
     final commandsToKeys = extractCommands(rootConfig);
 
-    final commands =
-        ciJob.tasks.map((task) => commandsToKeys[task.command]!).toList();
+    final commands = ciJob.tasks
+        .map((task) => commandsToKeys[task.command]!)
+        .toList();
 
     jobEntries.add(CIJobEntry(ciJob, commands));
   }
@@ -248,17 +246,15 @@ Iterable<_MapEntryWithStage> _listJobs(
       );
       yield jobEntry(yaml, first.job.stageName);
     } else {
-      yield* entry.value.map(
-        (e) {
-          final yaml = e._createJob(
-            rootConfig,
-            oneOs: differentOperatingSystems.length == 1,
-            oneSdk: differentSdks.length == 1,
-            onePackage: differentPackages.length == 1,
-          );
-          return jobEntry(yaml, e.job.stageName);
-        },
-      );
+      yield* entry.value.map((e) {
+        final yaml = e._createJob(
+          rootConfig,
+          oneOs: differentOperatingSystems.length == 1,
+          oneSdk: differentSdks.length == 1,
+          onePackage: differentPackages.length == 1,
+        );
+        return jobEntry(yaml, e.job.stageName);
+      });
     }
   }
 
@@ -266,10 +262,7 @@ Iterable<_MapEntryWithStage> _listJobs(
   // appropriate `needs` config to each.
   if (onCompletionJobs != null && onCompletionJobs.isNotEmpty) {
     for (var jobConfig in onCompletionJobs) {
-      yield jobEntry(
-        jobConfig,
-        _onCompletionStage,
-      );
+      yield jobEntry(jobConfig, _onCompletionStage);
     }
   }
 }
@@ -303,7 +296,8 @@ extension on CIJobEntry {
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
-      final pubStepId = '${package.replaceAll('/', '_')}_'
+      final pubStepId =
+          '${package.replaceAll('/', '_')}_'
           'pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(
         _CommandEntry(
@@ -390,37 +384,33 @@ Job _githubJob(
   RootConfig rootConfig, {
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
-}) =>
-    Job(
-      name: jobName,
-      runsOn: runsOn,
-      steps: [
-        if (!runsOn.startsWith('windows'))
-          _cacheEntries(
-            runsOn,
-            rootConfig: rootConfig,
-            additionalCacheKeys: {
-              'sdk': sdkVersion,
-              if (additionalCacheKeys != null) ...additionalCacheKeys,
-            },
-          ),
-        packageFlavor.setupStep(sdkVersion, rootConfig),
-        ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
-        ActionInfo.checkout.usage(
-          id: 'checkout',
-          versionOverrides: rootConfig.existingActionVersions,
-        ),
-        for (var command in runCommands)
-          ...command.runContent(config, rootConfig),
-      ],
-    );
+}) => Job(
+  name: jobName,
+  runsOn: runsOn,
+  steps: [
+    if (!runsOn.startsWith('windows'))
+      _cacheEntries(
+        runsOn,
+        rootConfig: rootConfig,
+        additionalCacheKeys: {
+          'sdk': sdkVersion,
+          if (additionalCacheKeys != null) ...additionalCacheKeys,
+        },
+      ),
+    packageFlavor.setupStep(sdkVersion, rootConfig),
+    ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
+    ActionInfo.checkout.usage(
+      id: 'checkout',
+      versionOverrides: rootConfig.existingActionVersions,
+    ),
+    for (var command in runCommands) ...command.runContent(config, rootConfig),
+  ],
+);
 
 Set<TaskType> _orderedTypes(Iterable<_CommandEntry> commands) =>
     SplayTreeSet.of(commands.map((e) => e.type).whereType<TaskType>());
 
-Iterable<Step> _beforeSteps(
-  Iterable<_CommandEntry> commands,
-) sync* {
+Iterable<Step> _beforeSteps(Iterable<_CommandEntry> commands) sync* {
   for (var type in _orderedTypes(commands)) {
     yield* type.beforeAllSteps;
   }
@@ -542,11 +532,7 @@ class _MapEntryWithStage {
 
   final String stageName;
 
-  _MapEntryWithStage(
-    this.id,
-    this.value,
-    this.stageName,
-  );
+  _MapEntryWithStage(this.id, this.value, this.stageName);
 }
 
 extension on PackageFlavor {

@@ -8,11 +8,7 @@ import '../../yaml.dart';
 
 part 'step.g.dart';
 
-@JsonSerializable(
-  explicitToJson: true,
-  includeIfNull: false,
-  constructor: '_',
-)
+@JsonSerializable(explicitToJson: true, includeIfNull: false, constructor: '_')
 class Step implements YamlLike {
   final String? id;
   final String? name;
@@ -71,8 +67,8 @@ class Step implements YamlLike {
     this.ifContent,
     this.workingDirectory,
     this.env,
-  })  : uses = null,
-        withContent = null;
+  }) : uses = null,
+       withContent = null;
 
   Step.uses({
     this.id,
@@ -80,9 +76,9 @@ class Step implements YamlLike {
     required this.uses,
     this.withContent,
     this.ifContent,
-  })  : run = null,
-        env = null,
-        workingDirectory = null;
+  }) : run = null,
+       env = null,
+       workingDirectory = null;
 
   factory Step.fromJson(Map json) => _$StepFromJson(json);
 

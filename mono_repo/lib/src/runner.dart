@@ -17,24 +17,19 @@ import 'commands/pub.dart';
 import 'commands/readme_command.dart';
 import 'version.dart';
 
-final commands = List<Command<void>>.unmodifiable(
-  [
-    CheckCommand(),
-    DartCommand(),
-    GenerateCommand(),
-    ListCommand(),
-    PresubmitCommand(),
-    PubCommand(),
-    ReadmeCommand(),
-  ],
-);
+final commands = List<Command<void>>.unmodifiable([
+  CheckCommand(),
+  DartCommand(),
+  GenerateCommand(),
+  ListCommand(),
+  PresubmitCommand(),
+  PubCommand(),
+  ReadmeCommand(),
+]);
 
 class MonoRepoRunner extends CommandRunner<void> {
   MonoRepoRunner()
-      : super(
-          'mono_repo',
-          'Manage multiple packages in one source repository.',
-        ) {
+    : super('mono_repo', 'Manage multiple packages in one source repository.') {
     commands.forEach(addCommand);
     argParser
       ..addFlag(

@@ -1,6 +1,7 @@
 import 'package:mono_repo/src/ci_test_script.dart';
 
-final ciShellOutput = '''
+final ciShellOutput =
+    '''
 $bashScriptHeader
 
 '''
@@ -91,7 +92,8 @@ if [ ${#FAILURES[@]} -ne 0 ]; then
 fi
 """;
 
-final ciShellOutputMultiFlavor = '''
+final ciShellOutputMultiFlavor =
+    '''
 $bashScriptHeader
 
 '''

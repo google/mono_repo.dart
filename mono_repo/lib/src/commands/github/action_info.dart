@@ -77,20 +77,20 @@ enum ActionInfo implements Comparable<ActionInfo> {
 }
 
 Job _coverageCompletionJob(RootConfig rootConfig) => Job(
+  name: 'Mark Coveralls job finished',
+  runsOn: 'ubuntu-latest',
+  steps: [
+    ActionInfo.coveralls.usage(
       name: 'Mark Coveralls job finished',
-      runsOn: 'ubuntu-latest',
-      steps: [
-        ActionInfo.coveralls.usage(
-          name: 'Mark Coveralls job finished',
-          withContent: {
-            // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
-            'github-token': r'${{ secrets.GITHUB_TOKEN }}',
-            'parallel-finished': true,
-          },
-          versionOverrides: rootConfig.existingActionVersions,
-        ),
-      ],
-    );
+      withContent: {
+        // https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+        'github-token': r'${{ secrets.GITHUB_TOKEN }}',
+        'parallel-finished': true,
+      },
+      versionOverrides: rootConfig.existingActionVersions,
+    ),
+  ],
+);
 
 /// Allows finding [ActionInfo] for a corresponding [Step].
 final _actionInfoExpando = Expando<ActionInfo>();

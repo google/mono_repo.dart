@@ -13,12 +13,14 @@ class ReadmeCommand extends MonoRepoCommand {
       ..addFlag(
         'only-published',
         abbr: 'p',
-        help: 'Only list packages with a version and without publish_to set to '
+        help:
+            'Only list packages with a version and without publish_to set to '
             'none.',
       )
       ..addFlag(
         'pad',
-        help: 'Pad table contents so cells in the same column are the same '
+        help:
+            'Pad table contents so cells in the same column are the same '
             'width.',
       );
   }
@@ -32,12 +34,12 @@ class ReadmeCommand extends MonoRepoCommand {
 
   @override
   void run() => print(
-        readme(
-          rootConfig(),
-          onlyPublished: argResults!['only-published'] as bool,
-          pad: argResults!['pad'] as bool,
-        ),
-      );
+    readme(
+      rootConfig(),
+      onlyPublished: argResults!['only-published'] as bool,
+      pad: argResults!['pad'] as bool,
+    ),
+  );
 }
 
 String readme(

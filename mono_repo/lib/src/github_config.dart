@@ -99,10 +99,11 @@ class GitHubConfig {
     for (var jobConfig in onCompletion!) {
       if (jobConfig.needs != null) {
         throw ArgumentError.value(
-            jobConfig,
-            'on_completion',
-            'Cannot define a `needs` key for `on_completion` jobs, this is '
-                'filled in for you to depend on all jobs.');
+          jobConfig,
+          'on_completion',
+          'Cannot define a `needs` key for `on_completion` jobs, this is '
+              'filled in for you to depend on all jobs.',
+        );
       }
     }
   }
@@ -110,15 +111,15 @@ class GitHubConfig {
   factory GitHubConfig.fromJson(Map json) => _$GitHubConfigFromJson(json);
 
   Map<String, dynamic> generate(String workflowName) => {
-        'name': workflowName,
-        if (on != null) 'on': on,
-        'defaults': {
-          'run': {'shell': 'bash'},
-        },
-        'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
-        // Declare default permissions as read only.
-        'permissions': 'read-all',
-      };
+    'name': workflowName,
+    if (on != null) 'on': on,
+    'defaults': {
+      'run': {'shell': 'bash'},
+    },
+    'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
+    // Declare default permissions as read only.
+    'permissions': 'read-all',
+  };
 }
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
@@ -171,10 +172,7 @@ Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
 
 const _defaultOn = {
   'push': {
-    'branches': [
-      'main',
-      'master',
-    ],
+    'branches': ['main', 'master'],
   },
   // A `null` value here means all pull requests are processed by this workflow.
   'pull_request': null,

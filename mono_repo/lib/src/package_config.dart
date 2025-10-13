@@ -42,23 +42,18 @@ class PackageConfig {
     this.dartSdkConfigUsed,
     this.osConfigUsed,
   ) : assert(() {
-          if (sdks == null) return true;
-          sortNormalizeVerifySdksList(
-            pubspec.flavor,
-            sdks,
-            AssertionError.new,
-          );
-          return true;
-        }());
+        if (sdks == null) return true;
+        sortNormalizeVerifySdksList(pubspec.flavor, sdks, AssertionError.new);
+        return true;
+      }());
 
   factory PackageConfig.parse(
     String relativePath,
     Pubspec pubspec,
     Map monoPkgYaml,
-  ) =>
-      createWithCheck(
-        () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
-      );
+  ) => createWithCheck(
+    () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
+  );
 
   factory PackageConfig._parse(
     String relativePath,
@@ -157,8 +152,10 @@ class PackageConfig {
           osConfigUsed = true;
         }
 
-        final (:description, :tasks) =
-            CIJob.parse(job as Object, flavor: flavor);
+        final (:description, :tasks) = CIJob.parse(
+          job as Object,
+          flavor: flavor,
+        );
         for (var sdk in jobSdks) {
           for (var os in jobOses) {
             jobs.add(
@@ -236,11 +233,7 @@ class CIJob implements HasStageName {
   List<String> get groupByKeys => [os, stageName, sdk];
 
   /// Values used to sort jobs within a group.
-  String get sortBits => [
-        ...groupByKeys,
-        package,
-        name,
-      ].join(':::');
+  String get sortBits => [...groupByKeys, package, name].join(':::');
 
   CIJob(
     this.os,
@@ -251,9 +244,9 @@ class CIJob implements HasStageName {
     this.description,
     required this.flavor,
   }) : assert(
-          errorForSdkConfig(flavor, sdk) == null,
-          'Should have caught bad sdk value `$sdk` before here!',
-        );
+         errorForSdkConfig(flavor, sdk) == null,
+         'Should have caught bad sdk value `$sdk` before here!',
+       );
 
   static ({String? description, List<Task> tasks}) parse(
     Object yaml, {
@@ -268,10 +261,7 @@ class CIJob implements HasStageName {
       withoutDescription = yaml;
     }
     final tasks = Task.parseTaskOrGroup(flavor, withoutDescription);
-    return (
-      tasks: tasks,
-      description: description,
-    );
+    return (tasks: tasks, description: description);
   }
 
   /// If [sdk] is a valid [Version], return it. Otherwise, `null`.
@@ -305,7 +295,7 @@ class Task {
   final String command;
 
   Task(this.flavor, this.type, {this.args})
-      : command = type.commandValue(flavor, args).join(' ');
+    : command = type.commandValue(flavor, args).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.
@@ -408,12 +398,7 @@ class Task {
       try {
         return Task(flavor, taskType, args: args);
       } on InvalidTaskConfigException catch (e) {
-        throw CheckedFromJsonException(
-          yamlValue,
-          taskName,
-          'Task',
-          e.message,
-        );
+        throw CheckedFromJsonException(yamlValue, taskName, 'Task', e.message);
       }
     }
 

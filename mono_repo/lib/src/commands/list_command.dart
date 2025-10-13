@@ -13,7 +13,8 @@ class ListCommand extends MonoRepoCommand {
       ..addFlag(
         'only-published',
         abbr: 'p',
-        help: 'Only list packages with a version and without publish_to set to '
+        help:
+            'Only list packages with a version and without publish_to set to '
             'none.',
       )
       ..addMultiOption(
@@ -37,17 +38,14 @@ class ListCommand extends MonoRepoCommand {
 
   @override
   void run() => print(
-        listPackages(
-          rootConfig(),
-          onlyPublished: argResults!['only-published'] as bool,
-          showItems: (argResults!['show'] as List<String>)
-              .map(
-                (e) =>
-                    Column.values.singleWhere((element) => element.name == e),
-              )
-              .toSet(),
-        ).join('\n'),
-      );
+    listPackages(
+      rootConfig(),
+      onlyPublished: argResults!['only-published'] as bool,
+      showItems: (argResults!['show'] as List<String>)
+          .map((e) => Column.values.singleWhere((element) => element.name == e))
+          .toSet(),
+    ).join('\n'),
+  );
 }
 
 enum Column {
@@ -63,15 +61,9 @@ enum Column {
     help: 'The version of the package as specified in the "version" field.',
     defaultsTo: false,
   ),
-  publishTo(
-    help: 'The value of the "publish_to" field.',
-    defaultsTo: false,
-  );
+  publishTo(help: 'The value of the "publish_to" field.', defaultsTo: false);
 
-  const Column({
-    required this.help,
-    required this.defaultsTo,
-  });
+  const Column({required this.help, required this.defaultsTo});
 
   final String help;
   final bool defaultsTo;

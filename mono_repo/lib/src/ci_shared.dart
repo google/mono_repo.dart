@@ -69,10 +69,7 @@ class CIJobEntry {
 Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
     groupBy<CIJobEntry, String>(
       jobEntries,
-      (e) => [
-        ...e.job.groupByKeys,
-        e.commands,
-      ].join(':::'),
+      (e) => [...e.job.groupByKeys, e.commands].join(':::'),
     );
 
 void validateRootConfig(RootConfig rootConfig) {
@@ -83,17 +80,19 @@ void validateRootConfig(RootConfig rootConfig) {
       continue;
     }
 
-    final disallowedExplicitVersions = config.jobs
-        .map((tj) => tj.explicitSdkVersion)
-        .whereType<Version>()
-        .toSet()
-        .where((v) => !sdkConstraint.allows(v))
-        .toList()
-      ..sort();
+    final disallowedExplicitVersions =
+        config.jobs
+            .map((tj) => tj.explicitSdkVersion)
+            .whereType<Version>()
+            .toSet()
+            .where((v) => !sdkConstraint.allows(v))
+            .toList()
+          ..sort();
 
     if (disallowedExplicitVersions.isNotEmpty) {
-      final disallowedString =
-          disallowedExplicitVersions.map((v) => '`$v`').join(', ');
+      final disallowedString = disallowedExplicitVersions
+          .map((v) => '`$v`')
+          .join(', ');
       print(
         yellow.wrap(
           '  There are jobs defined that are not compatible with '
@@ -129,15 +128,15 @@ void writeFile(
 
 @visibleForTesting
 List<String> scriptLines(String scriptPath) => [
-      'Make sure to mark `$scriptPath` as executable.',
-      '  chmod +x $scriptPath',
-      if (Platform.isWindows) ...[
-        'It appears you are using Windows, and may not have access to chmod.',
-        'If you are using git, the following will emulate the Unix permissions '
-            'change:',
-        '  git update-index --add --chmod=+x $scriptPath',
-      ],
-    ];
+  'Make sure to mark `$scriptPath` as executable.',
+  '  chmod +x $scriptPath',
+  if (Platform.isWindows) ...[
+    'It appears you are using Windows, and may not have access to chmod.',
+    'If you are using git, the following will emulate the Unix permissions '
+        'change:',
+    '  git update-index --add --chmod=+x $scriptPath',
+  ],
+];
 
 /// Gives a map of command to unique task key for all [configs].
 Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
@@ -241,7 +240,8 @@ List<String> calculateOrderedStages(
 
     throw UserException(
       'Error parsing mono_repo.yaml',
-      details: 'One or more stage was referenced in `mono_repo.yaml` that do '
+      details:
+          'One or more stage was referenced in `mono_repo.yaml` that do '
           'not exist in any `$monoPkgFileName` files: $items.',
     );
   }
@@ -252,9 +252,7 @@ List<String> calculateOrderedStages(
     // as a secondary sort. This is an intuitive secondary sort order as it
     // follows the order given in configuration files.
     final keys = edges.keys.toList();
-    final edgeIndexes = {
-      for (var i = 0; i < keys.length; i++) keys[i]: i,
-    };
+    final edgeIndexes = {for (var i = 0; i < keys.length; i++) keys[i]: i};
 
     // Orders by dependencies first, and detect cycles (which aren't allowed).
     // Our edges here are actually reverse edges already, so a topological sort
