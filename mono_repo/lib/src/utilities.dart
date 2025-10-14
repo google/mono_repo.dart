@@ -104,11 +104,7 @@ void sortNormalizeVerifySdksList(
   }
 }
 
-const _supportedFlutterSdkLiterals = {
-  'master',
-  'beta',
-  'stable',
-};
+const _supportedFlutterSdkLiterals = {'master', 'beta', 'stable'};
 
 const _supportedDartSdkLiterals = {
   _githubSetupMainSdk,
@@ -124,11 +120,13 @@ const _allowedMainVersions = {
   _githubSetupMainSdk,
 };
 
-final _dartSdkLiteralsPretty =
-    _supportedDartSdkLiterals.map((e) => '"$e"').join(', ');
+final _dartSdkLiteralsPretty = _supportedDartSdkLiterals
+    .map((e) => '"$e"')
+    .join(', ');
 
-final _flutterLiteralsPretty =
-    _supportedFlutterSdkLiterals.map((e) => '"$e"').join(', ');
+final _flutterLiteralsPretty = _supportedFlutterSdkLiterals
+    .map((e) => '"$e"')
+    .join(', ');
 
 extension PubspecExtension on Pubspec {
   PackageFlavor get flavor =>

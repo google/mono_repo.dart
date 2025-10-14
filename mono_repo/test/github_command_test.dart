@@ -83,7 +83,7 @@ line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' i
             {
               'steps': [],
               'needs': ['foo'],
-            }
+            },
           ],
         },
       },
@@ -122,7 +122,7 @@ line 3, column 7 of mono_repo.yaml: Required keys are missing: steps.
           'on_completion': [
             {
               'steps': [{}],
-            }
+            },
           ],
         },
       },
@@ -143,12 +143,9 @@ line 4, column 11 of mono_repo.yaml: Missing key "uses". Either `run` or `uses` 
           'on_completion': [
             {
               'steps': [
-                {
-                  'run': 'bob',
-                  'uses': 'bob',
-                }
+                {'run': 'bob', 'uses': 'bob'},
               ],
-            }
+            },
           ],
         },
       },
@@ -169,12 +166,9 @@ line 5, column 17 of mono_repo.yaml: Unsupported value for "uses". `uses` and `r
           'on_completion': [
             {
               'steps': [
-                {
-                  'run': 'bob',
-                  'with': {},
-                }
+                {'run': 'bob', 'with': {}},
               ],
-            }
+            },
           ],
         },
       },
@@ -339,10 +333,7 @@ line 7, column 7 of mono_repo.yaml: Unrecognized keys: [extra]; supported keys: 
       {
         'github': {
           'workflows': {
-            'bob': {
-              'name': 'bob',
-              'stages': [],
-            },
+            'bob': {'name': 'bob', 'stages': []},
           },
         },
       },
@@ -424,32 +415,27 @@ line 4, column 13 of mono_repo.yaml: Unsupported value for "name". Cannot be the
     ),
   );
 
-  test(
-    'all defined stages must have corresponding jobs',
-    () async {
-      final monoConfigContent = toYaml(
-        {
-          'github': {
-            'workflows': {
-              'bob': {
-                'name': 'bob',
-                'stages': ['oops'],
-              },
-            },
+  test('all defined stages must have corresponding jobs', () async {
+    final monoConfigContent = toYaml({
+      'github': {
+        'workflows': {
+          'bob': {
+            'name': 'bob',
+            'stages': ['oops'],
           },
         },
-      );
-      await populateConfig(monoConfigContent);
+      },
+    });
+    await populateConfig(monoConfigContent);
 
-      expect(
-        () => testGenerateConfig(printMatcher: 'package:sub_pkg'),
-        throwsUserExceptionWith(
-          'No jobs are defined for the stage "oops" '
-          'defined in GitHub workflow "bob".',
-        ),
-      );
-    },
-  );
+    expect(
+      () => testGenerateConfig(printMatcher: 'package:sub_pkg'),
+      throwsUserExceptionWith(
+        'No jobs are defined for the stage "oops" '
+        'defined in GitHub workflow "bob".',
+      ),
+    );
+  });
 
   test(
     'two workflows cannot have the same stage',
@@ -485,20 +471,22 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Stage "st
 
   test(
     'two workflows cannot have the same name',
-    () => _testBadConfigWithYamlException({
-      'github': {
-        'workflows': {
-          'alice': {
-            'name': 'bob',
-            'stages': ['oops'],
-          },
-          'bob': {
-            'name': 'bob',
-            'stages': ['oops'],
+    () => _testBadConfigWithYamlException(
+      {
+        'github': {
+          'workflows': {
+            'alice': {
+              'name': 'bob',
+              'stages': ['oops'],
+            },
+            'bob': {
+              'name': 'bob',
+              'stages': ['oops'],
+            },
           },
         },
       },
-    }, r'''
+      r'''
 line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Workflows must have different names. Duplicate name(s): bob
    ╷
 3  │ ┌     alice:
@@ -509,7 +497,8 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Workflows
 8  │ │       name: bob
 9  │ │       stages:
 10 │ └         - oops
-   ╵'''),
+   ╵''',
+    ),
   );
 }
 
@@ -519,10 +508,7 @@ Future<void> _testBadConfigWithYamlException(
 ) async {
   final monoConfigContent = toYaml(monoRepoYaml);
   await populateConfig(monoConfigContent);
-  expect(
-    testGenerateConfig,
-    throwsAParsedYamlException(expectedParsedYaml),
-  );
+  expect(testGenerateConfig, throwsAParsedYamlException(expectedParsedYaml));
 }
 
 Future<void> _testBadConfigWithUserException(

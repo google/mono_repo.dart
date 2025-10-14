@@ -25,10 +25,7 @@ const _allowedMonoConfigKeys = {
 
 const _defaultPubAction = 'upgrade';
 
-const _allowedPubActions = {
-  'get',
-  _defaultPubAction,
-};
+const _allowedPubActions = {'get', _defaultPubAction};
 
 class MonoConfig implements BasicConfiguration {
   final Map<String, ConditionalStage> githubConditionalStages;
@@ -47,12 +44,13 @@ class MonoConfig implements BasicConfiguration {
     required this.selfValidateStage,
     required Map github,
     required this.coverageProcessors,
-  })  : githubConditionalStages = _readConditionalStages(github),
-        github = GitHubConfig.fromJson(github);
+  }) : githubConditionalStages = _readConditionalStages(github),
+       github = GitHubConfig.fromJson(github);
 
   factory MonoConfig.fromJson(Map json) {
-    final unsupportedKeys =
-        json.keys.where((k) => !_allowedMonoConfigKeys.contains(k)).toList();
+    final unsupportedKeys = json.keys
+        .where((k) => !_allowedMonoConfigKeys.contains(k))
+        .toList();
 
     if (unsupportedKeys.isNotEmpty) {
       throw CheckedFromJsonException(
@@ -64,9 +62,7 @@ class MonoConfig implements BasicConfiguration {
       );
     }
 
-    final ci = {
-      if (json.containsKey('github')) CI.github,
-    };
+    final ci = {if (json.containsKey('github')) CI.github};
 
     Map parseCI(CI targetCI) {
       final key = targetCI.toString().split('.').last;
@@ -230,10 +226,7 @@ String? _selfValidateFromValue(Object? value) {
   throw ArgumentError.value(value, 'value', 'Must be a `String` or `bool`.');
 }
 
-@JsonSerializable(
-  createToJson: false,
-  disallowUnrecognizedKeys: true,
-)
+@JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class ConditionalStage {
   @JsonKey(required: true, disallowNullValue: true)
   final String name;
@@ -252,6 +245,4 @@ class ConditionalStage {
 }
 
 // The available CI providers that we generate config for.
-enum CI {
-  github,
-}
+enum CI { github }

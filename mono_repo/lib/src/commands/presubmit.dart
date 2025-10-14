@@ -63,8 +63,8 @@ class PresubmitCommand extends MonoRepoCommand {
 /// This also won't match any exact versions listed in your travis config.
 final _currentSdk =
     Version.parse(Platform.version.split(' ').first).isPreRelease
-        ? 'dev'
-        : 'stable';
+    ? 'dev'
+    : 'stable';
 
 Future<bool> presubmit(
   RootConfig rootConfig, {
@@ -79,8 +79,9 @@ Future<bool> presubmit(
 
   if (!File(ciScriptPath).existsSync()) {
     throw UserException(
-        'No $ciScriptPath file found, please run the `generate` command '
-        'first.');
+      'No $ciScriptPath file found, please run the `generate` command '
+      'first.',
+    );
   }
 
   final commandsToKeys = extractCommands(rootConfig);
@@ -99,14 +100,16 @@ Future<bool> presubmit(
       ),
   );
   if (tasks.isEmpty) tasks = allKnownTasks;
-  final unrecognizedTasks =
-      tasks.where((task) => !allKnownTasks.contains(task));
+  final unrecognizedTasks = tasks.where(
+    (task) => !allKnownTasks.contains(task),
+  );
   if (unrecognizedTasks.isNotEmpty) {
     throw UserException(
-        'Found ${unrecognizedTasks.length} unrecognized tasks:\n'
-        '${unrecognizedTasks.map((task) => '  $task').join('\n')}\n\n'
-        'Known tasks are:\n'
-        '${allKnownTasks.map((task) => '  $task').join('\n')}');
+      'Found ${unrecognizedTasks.length} unrecognized tasks:\n'
+      '${unrecognizedTasks.map((task) => '  $task').join('\n')}\n\n'
+      'Known tasks are:\n'
+      '${allKnownTasks.map((task) => '  $task').join('\n')}',
+    );
   }
 
   // Status of the presubmit.
@@ -116,8 +119,9 @@ Future<bool> presubmit(
       (pkg) => pkg.relativePath == package,
       orElse: () {
         throw UserException(
-            'Unrecognized package `$package`, known packages are:\n'
-            '${rootConfig.map((pkg) => '  ${pkg.relativePath}').join('\n')}');
+          'Unrecognized package `$package`, known packages are:\n'
+          '${rootConfig.map((pkg) => '  ${pkg.relativePath}').join('\n')}',
+        );
       },
     );
 
@@ -129,8 +133,10 @@ Future<bool> presubmit(
         // Skip tasks that weren't specified
         if (!tasks.contains(task.type.name)) continue;
 
-        print('  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
-            'TASK: ${styleBold.wrap(white.wrap(task.command))}');
+        print(
+          '  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
+          'TASK: ${styleBold.wrap(white.wrap(task.command))}',
+        );
         if (sdk != sdkToRun) {
           print(yellow.wrap('    skipped, mismatched sdk'));
           continue;
@@ -145,8 +151,9 @@ Future<bool> presubmit(
           print(green.wrap('    success'));
         } else {
           tmpDir ??= Directory.systemTemp.createTempSync('mono_repo_');
-          final file =
-              File(p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'));
+          final file = File(
+            p.join(tmpDir.path, '${package}_${taskKey}_${job.sdk}.txt'),
+          );
           await file.create(recursive: true);
           await file.writeAsString(result.stdout as String);
           print(red.wrap('    failure, ${file.path}'));

@@ -17,26 +17,15 @@ const dependabotFileNames = [
   '.github/dependabot.yml',
 ];
 
-void generateGitHubActions(
-  RootConfig rootConfig, {
-  bool validateOnly = false,
-}) {
-  final githubConfig = _GeneratedGitHubConfig.generate(
-    rootConfig,
-  );
-  final dependabotConfig = _GeneratedDependabotConfig.generate(
-    rootConfig,
-  );
+void generateGitHubActions(RootConfig rootConfig, {bool validateOnly = false}) {
+  final githubConfig = _GeneratedGitHubConfig.generate(rootConfig);
+  final dependabotConfig = _GeneratedDependabotConfig.generate(rootConfig);
   for (var entry in [
     ...githubConfig.workflowFiles.entries,
     ...dependabotConfig.workflowFiles.entries,
   ]) {
     if (validateOnly) {
-      _validateFile(
-        rootConfig.rootDirectory,
-        entry.value,
-        entry.key,
-      );
+      _validateFile(rootConfig.rootDirectory, entry.value, entry.key);
     } else {
       writeFile(
         rootConfig.rootDirectory,
@@ -58,10 +47,7 @@ class _GeneratedDependabotConfig {
     final result = <String, String>{};
     final dependabotConfig = rootConfig.monoConfig.github.dependabot;
     if (dependabotConfig != null) {
-      final config = {
-        'version': 2,
-        ...dependabotConfig,
-      };
+      final config = {'version': 2, ...dependabotConfig};
       final packageUpdates = rootConfig.map(
         (packageConfig) => {
           'package-ecosystem': 'pub',
@@ -75,7 +61,8 @@ class _GeneratedDependabotConfig {
         ...config['updates'] as List? ?? <dynamic>[],
         ...packageUpdates,
       ];
-      result['.github/dependabot.yml'] = '''
+      result['.github/dependabot.yml'] =
+          '''
 $createdWith
 ${const JsonEncoder.withIndent('  ').convert(config)}
 ''';
@@ -101,10 +88,10 @@ class _GeneratedGitHubConfig {
 /// the `--validate` option.
 class GithubConfigOutOfDateException extends UserException {
   GithubConfigOutOfDateException()
-      : super(
-          'Generated github config is out of date',
-          details: 'Rerun `mono_repo generate` to update generated config',
-        );
+    : super(
+        'Generated github config is out of date',
+        details: 'Rerun `mono_repo generate` to update generated config',
+      );
 }
 
 /// Checks [expectedPath] versus the content in [expectedContent].

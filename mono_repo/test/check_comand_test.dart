@@ -29,10 +29,13 @@ void main() {
     test('check', () {
       final reports = getPackageReports(RootConfig(rootDirectory: d.sandbox));
 
-      expect(
-        reports.keys,
-        ['bar', 'baz', p.join('baz', 'recursive'), 'flutter', 'foo'],
-      );
+      expect(reports.keys, [
+        'bar',
+        'baz',
+        p.join('baz', 'recursive'),
+        'flutter',
+        'foo',
+      ]);
 
       final fooReport = reports['foo']!;
       expect(fooReport.packageName, 'foo');

@@ -9,18 +9,19 @@ void main() {
   setUp(listReadmeSetup);
   test('show everything', () async {
     expect(
-        readme(
-          RootConfig(rootDirectory: d.sandbox),
-          onlyPublished: false,
-          pad: false,
-        ),
-        '''
+      readme(
+        RootConfig(rootDirectory: d.sandbox),
+        onlyPublished: false,
+        pad: false,
+      ),
+      '''
 | Package | Description | Version |
 |---|---|---|
 | [pkg1](pkg1_dir/) |  |  |
 | [pkg2](pkg2_dir/) |  |  |
 | [pkg3](pkg3_dir/) |  | [![pub package](https://img.shields.io/pub/v/pkg3.svg)](https://pub.dev/packages/pkg3) |
-| [pkg4](pkg4_dir/) |  | [![pub package](https://img.shields.io/pub/v/pkg4.svg)](https://pub.dev/packages/pkg4) |''');
+| [pkg4](pkg4_dir/) |  | [![pub package](https://img.shields.io/pub/v/pkg4.svg)](https://pub.dev/packages/pkg4) |''',
+    );
   });
 
   test('only published', () async {

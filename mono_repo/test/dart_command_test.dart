@@ -14,11 +14,10 @@ void main() {
 
     test('can run pub get', () async {
       expect(
-        () => dart(
-          RootConfig(rootDirectory: d.sandbox),
-          ['pub', 'get'],
-          PubCommand().executableForPackage,
-        ),
+        () => dart(RootConfig(rootDirectory: d.sandbox), [
+          'pub',
+          'get',
+        ], PubCommand().executableForPackage),
         prints(allOf(contains('success!'), isNot(contains('Failures:')))),
       );
     });
@@ -31,11 +30,10 @@ import 'a.dart';
 ''');
       addTearDown(() => file.deleteSync);
       await expectLater(
-        () => dart(
-          RootConfig(rootDirectory: d.sandbox),
-          ['fix', '--apply'],
-          (_) => Executable.dart,
-        ),
+        () => dart(RootConfig(rootDirectory: d.sandbox), [
+          'fix',
+          '--apply',
+        ], (_) => Executable.dart),
         prints(allOf(contains('success!'), isNot(contains('Failures:')))),
       );
       expect(file.readAsStringSync(), '''

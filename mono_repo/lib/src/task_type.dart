@@ -42,8 +42,7 @@ abstract class TaskType implements Comparable<TaskType> {
     String packageDirectory,
     BasicConfiguration config,
     RootConfig rootConfig,
-  ) =>
-      const Iterable.empty();
+  ) => const Iterable.empty();
 
   static Iterable<String> get allowedTaskNames sync* {
     for (var val in TaskType._values) {
@@ -52,13 +51,13 @@ abstract class TaskType implements Comparable<TaskType> {
     }
   }
 
-  static final prettyTaskList =
-      TaskType._values.map((t) => '`${t.name}`').join(', ');
+  static final prettyTaskList = TaskType._values
+      .map((t) => '`${t.name}`')
+      .join(', ');
 
   static TaskType taskFromName(String input) => TaskType._values.singleWhere(
-        (element) =>
-            element.name == input || element.alternates.contains(input),
-      );
+    (element) => element.name == input || element.alternates.contains(input),
+  );
 }
 
 /// Special [Exception] type used to convey error state that can be caught and
@@ -74,11 +73,11 @@ class _FormatTask extends TaskType {
 
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) => [
-        'dart format',
-        (args == null || args == 'sdk')
-            ? '--output=none --set-exit-if-changed .'
-            : args,
-      ];
+    'dart format',
+    (args == null || args == 'sdk')
+        ? '--output=none --set-exit-if-changed .'
+        : args,
+  ];
 
   @override
   Iterable<String> get alternates => const {'dartfmt'};
@@ -89,9 +88,9 @@ class _AnalyzeTask extends TaskType {
 
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) => [
-        flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
-        if (args != null) args,
-      ];
+    flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
+    if (args != null) args,
+  ];
 
   @override
   Iterable<String> get alternates => const {'dartanalyzer'};
@@ -102,9 +101,9 @@ class _TestTask extends TaskType {
 
   @override
   List<String> commandValue(PackageFlavor flavor, String? args) => [
-        flavor == PackageFlavor.dart ? 'dart test' : 'flutter test',
-        if (args != null) args,
-      ];
+    flavor == PackageFlavor.dart ? 'dart test' : 'flutter test',
+    if (args != null) args,
+  ];
 }
 
 class _CommandTask extends TaskType {
@@ -138,13 +137,13 @@ class _TestWithCoverageTask extends TaskType {
 
   @override
   Iterable<Step> get beforeAllSteps => [
-        Step.run(
-          name: 'Activate package:coverage',
-          // Requiring the latest version of pkg:coverage as the when this
-          // feature was added.
-          run: "dart pub global activate coverage '>=1.5.0'",
-        ),
-      ];
+    Step.run(
+      name: 'Activate package:coverage',
+      // Requiring the latest version of pkg:coverage as the when this
+      // feature was added.
+      run: "dart pub global activate coverage '>=1.5.0'",
+    ),
+  ];
 
   @override
   Iterable<Step> afterEachSteps(

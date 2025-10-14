@@ -39,25 +39,17 @@ environment:
       ]).create();
 
       testGenerateConfig(
-        printMatcher: stringContainsInOrder(
-          [
-            'package:sub_pkg\n',
-            'Make sure to mark `tool/ci.sh` as executable.\n',
-            '  chmod +x tool/ci.sh\n',
-          ],
-        ),
+        printMatcher: stringContainsInOrder([
+          'package:sub_pkg\n',
+          'Make sure to mark `tool/ci.sh` as executable.\n',
+          '  chmod +x tool/ci.sh\n',
+        ]),
       );
 
-      void validateFile(
-        String fileToVerify,
-        String expectedOutputFileName,
-      ) {
+      void validateFile(String fileToVerify, String expectedOutputFileName) {
         final inputFile = File(p.join(d.sandbox, fileToVerify));
         final sourceContent = inputFile.readAsStringSync();
-        validateOutput(
-          'readme_$expectedOutputFileName.txt',
-          sourceContent,
-        );
+        validateOutput('readme_$expectedOutputFileName.txt', sourceContent);
       }
 
       validateFile(ciScriptPath, 'ci');

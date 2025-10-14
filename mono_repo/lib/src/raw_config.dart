@@ -24,15 +24,12 @@ class RawConfig {
 
   final RawCache? cache;
 
-  RawConfig({
-    required this.oses,
-    this.sdks,
-    List<RawStage>? stages,
-    this.cache,
-  }) : stages = stages ??
-            [
-              RawStage('unit_test', ['test']),
-            ] {
+  RawConfig({required this.oses, this.sdks, List<RawStage>? stages, this.cache})
+    : stages =
+          stages ??
+          [
+            RawStage('unit_test', ['test']),
+          ] {
     if (sdks != null) {
       sortNormalizeVerifySdksList(
         Zone.current[_flavorKey] as PackageFlavor,

@@ -130,10 +130,12 @@ String _escapeString(String source) {
       !_yamlSpecialStrings.contains(source.toLowerCase())) {
     return source;
   }
-  final output = source.replaceAllMapped(_escapeRegExp, (match) {
-    final value = match[0]!;
-    return _escapeMap[value] ?? _getHexLiteral(value);
-  }).replaceAll('"', r'\"');
+  final output = source
+      .replaceAllMapped(_escapeRegExp, (match) {
+        final value = match[0]!;
+        return _escapeMap[value] ?? _getHexLiteral(value);
+      })
+      .replaceAll('"', r'\"');
 
   return '"$output"';
 }
@@ -280,8 +282,9 @@ final _yamlIndicators = {
   '`',
 }.map(RegExp.escape).join();
 
-final _simpleString =
-    RegExp('^[^${_yamlIndicators}0-9"~][^$_yamlIndicators]*\$');
+final _simpleString = RegExp(
+  '^[^${_yamlIndicators}0-9"~][^$_yamlIndicators]*\$',
+);
 
 final _maybeNumber = RegExp(r'\+?\.?\d');
 

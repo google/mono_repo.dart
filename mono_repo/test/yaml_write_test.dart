@@ -148,9 +148,7 @@ void _testRoundTrip(Object? source, {String? expectedEncoding}) {
 
   if (source is String) {
     // multi-line map value
-    _testRoundTripCore({
-      'double the value': '$source\n$source',
-    });
+    _testRoundTripCore({'double the value': '$source\n$source'});
     _testRoundTripCore({
       'double the value, indent second': '$source\n  $source',
     });
@@ -257,7 +255,7 @@ final _testItems = [
   [
     {'test': 1},
     {'test': 2},
-  ]
+  ],
 ];
 
 /// From json_serializable tests

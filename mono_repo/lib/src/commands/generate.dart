@@ -20,7 +20,8 @@ class GenerateCommand extends MonoRepoCommand {
     argParser.addFlag(
       'validate',
       negatable: false,
-      help: 'Validates that the existing CI config is up to date with '
+      help:
+          'Validates that the existing CI config is up to date with '
           'the current configuration. Does not write any files.',
     );
   }

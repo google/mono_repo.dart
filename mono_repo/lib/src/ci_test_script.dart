@@ -30,7 +30,8 @@ function $commandName() {
 }''';
 }
 
-final bashScriptHeader = '''
+final bashScriptHeader =
+    '''
 #!/bin/bash
 $createdWith
 

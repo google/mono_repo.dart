@@ -82,51 +82,52 @@ environment:
             generateCIScript(config);
           },
           prints(
-            stringContainsInOrder(
-              [
-                'package:pkg_a',
-                'package:pkg_b',
-                'Make sure to mark `tool/ci.sh` as executable.',
-              ],
-            ),
+            stringContainsInOrder([
+              'package:pkg_a',
+              'package:pkg_b',
+              'Make sure to mark `tool/ci.sh` as executable.',
+            ]),
           ),
         );
       });
 
-      await Process.run(
-        'chmod',
-        ['+x', p.join('tool', 'ci.sh')],
-        workingDirectory: repoPath,
-      );
-      await Process.run(
-        Executable.dart.path,
-        ['pub', 'get'],
-        workingDirectory: pkgAPath,
-      );
-      await Process.run(
-        Executable.dart.path,
-        ['pub', 'global', 'activate', '-s', 'path', Directory.current.path],
-      );
+      await Process.run('chmod', [
+        '+x',
+        p.join('tool', 'ci.sh'),
+      ], workingDirectory: repoPath);
+      await Process.run(Executable.dart.path, [
+        'pub',
+        'get',
+      ], workingDirectory: pkgAPath);
+      await Process.run(Executable.dart.path, [
+        'pub',
+        'global',
+        'activate',
+        '-s',
+        'path',
+        Directory.current.path,
+      ]);
     });
 
     tearDownAll(() {
       Directory(repoPath).deleteSync(recursive: true);
     });
 
-    test(
-      'runs all tasks and packages',
-      () async {
-        final result = await Process.run(
-          Executable.dart.path,
-          ['pub', 'global', 'run', 'mono_repo', 'presubmit', '--sdk=dev'],
-          workingDirectory: repoPath,
-        );
-        expect(
-          result.exitCode,
-          0,
-          reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}',
-        );
-        expect(result.stdout, '''
+    test('runs all tasks and packages', () async {
+      final result = await Process.run(Executable.dart.path, [
+        'pub',
+        'global',
+        'run',
+        'mono_repo',
+        'presubmit',
+        '--sdk=dev',
+      ], workingDirectory: repoPath);
+      expect(
+        result.exitCode,
+        0,
+        reason: 'stderr:\n${result.stderr}\nstdout:\n${result.stdout}',
+      );
+      expect(result.stdout, '''
 pkg_a
   SDK: dev TASK: dart analyze
     success
@@ -146,25 +147,19 @@ pkg_b
   SDK: stable TASK: dart format --output=none --set-exit-if-changed .
     skipped, mismatched sdk
 ''');
-      },
-      timeout: const Timeout.factor(2),
-    );
+    }, timeout: const Timeout.factor(2));
 
     test('can filter by package', () async {
-      final result = await Process.run(
-        Executable.dart.path,
-        [
-          'pub',
-          'global',
-          'run',
-          'mono_repo',
-          'presubmit',
-          '--sdk=dev',
-          '-p',
-          'pkg_b',
-        ],
-        workingDirectory: repoPath,
-      );
+      final result = await Process.run(Executable.dart.path, [
+        'pub',
+        'global',
+        'run',
+        'mono_repo',
+        'presubmit',
+        '--sdk=dev',
+        '-p',
+        'pkg_b',
+      ], workingDirectory: repoPath);
       expect(
         result.exitCode,
         0,
@@ -180,20 +175,16 @@ pkg_b
     });
 
     test('can filter by task', () async {
-      final result = await Process.run(
-        Executable.dart.path,
-        [
-          'pub',
-          'global',
-          'run',
-          'mono_repo',
-          'presubmit',
-          '--sdk=dev',
-          '-t',
-          'format',
-        ],
-        workingDirectory: repoPath,
-      );
+      final result = await Process.run(Executable.dart.path, [
+        'pub',
+        'global',
+        'run',
+        'mono_repo',
+        'presubmit',
+        '--sdk=dev',
+        '-t',
+        'format',
+      ], workingDirectory: repoPath);
       expect(
         result.exitCode,
         0,
