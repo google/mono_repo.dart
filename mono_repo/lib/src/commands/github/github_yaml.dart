@@ -12,7 +12,6 @@ import '../../package_config.dart';
 import '../../package_flavor.dart';
 import '../../root_config.dart';
 import '../../task_type.dart';
-import '../../user_exception.dart';
 import '../../yaml.dart';
 import 'action_info.dart';
 import 'job.dart';
@@ -30,26 +29,19 @@ String githubWorkflowFilePath(String filename) =>
     '$githubWorkflowDirectory/$filename.yml';
 
 Map<String, String> generateGitHubYml(RootConfig rootConfig) {
-  final jobs = <HasStageName>[...rootConfig.expand((config) => config.jobs)];
+  final output = <String, String>{};
 
-  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
-  if (selfValidateStage != null) {
-    jobs.add(_SelfValidateJob(selfValidateStage));
-  }
-
-  final allJobStages = {for (var job in jobs) job.stageName};
   final orderedStages = calculateOrderedStages(
     rootConfig,
     rootConfig.monoConfig.githubConditionalStages,
   )..add(_onCompletionStage);
 
-  final output = <String, String>{};
-
   void populateJobs(
     String fileName,
     String workflowName,
-    Iterable<HasStageName> myJobs,
-  ) {
+    Iterable<HasStageName> myJobs, {
+    List<String>? paths,
+  }) {
     if (output.containsKey(fileName)) {
       throw UnsupportedError(
         'Should not get here – duplicate workflow "$fileName".',
@@ -84,7 +76,6 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
     final allJobs = _listJobs(
       rootConfig,
       sortedJobs,
-      rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
     ).toList();
@@ -128,50 +119,47 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       jobList['job_${jobList.length + 1}'] = job;
     }
 
+    final githubConfig = Map<String, dynamic>.from(
+      rootConfig.monoConfig.github.generate(workflowName),
+    );
+    if (paths != null) {
+      final on = Map<String, dynamic>.from(githubConfig['on'] as Map);
+      githubConfig['on'] = on;
+      for (var entry in on.entries) {
+        final value = entry.value;
+        if (value is Map) {
+          on[entry.key] = {...value, 'paths': paths};
+        }
+      }
+    }
+
     output[githubWorkflowFilePath(fileName)] =
         '''
 $createdWith
-${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
+${toYaml(githubConfig)}
 
 ${toYaml({'jobs': jobList})}
 ''';
   }
 
-  final workflows = rootConfig.monoConfig.github.workflows;
-
-  if (workflows != null) {
-    for (var entry in workflows.entries) {
-      assert(entry.value.stages.isNotEmpty);
-      final myJobs = {
-        for (var entry in entry.value.stages)
-          entry: jobs.where((element) => element.stageName == entry).toList(),
-      };
-
-      for (var jobEntry in myJobs.entries) {
-        if (jobEntry.value.isEmpty) {
-          throw UserException(
-            'No jobs are defined for the stage "${jobEntry.key}" '
-            'defined in GitHub workflow "${entry.key}".',
-          );
-        }
-      }
-
-      allJobStages.removeAll(entry.value.stages);
-
-      populateJobs(
-        entry.key,
-        entry.value.name,
-        myJobs.values.expand((element) => element),
-      );
-    }
+  for (var packageConfig in rootConfig) {
+    final fileName = packageConfig.relativePath.replaceAll('/', '_');
+    populateJobs(
+      fileName,
+      'package:${packageConfig.pubspec.name}',
+      packageConfig.jobs,
+      paths: [
+        githubWorkflowFilePath(fileName),
+        '${packageConfig.relativePath}/**',
+      ],
+    );
   }
 
-  if (allJobStages.isNotEmpty) {
-    populateJobs(
-      defaultGitHubWorkflowFileName,
-      defaultGitHubWorkflowName,
-      jobs.where((element) => allJobStages.contains(element.stageName)),
-    );
+  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
+  if (selfValidateStage != null) {
+    populateJobs('mono_repo_self_validate', 'mono_repo self validate', [
+      _SelfValidateJob(selfValidateStage),
+    ]);
   }
 
   return output;
@@ -181,12 +169,9 @@ ${toYaml({'jobs': jobList})}
 Iterable<_MapEntryWithStage> _listJobs(
   RootConfig rootConfig,
   List<HasStageName> jobs,
-  Set<String> mergeStages,
   List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
 ) sync* {
-  final jobEntries = <CIJobEntry>[];
-
   var count = 0;
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
@@ -199,6 +184,8 @@ Iterable<_MapEntryWithStage> _listJobs(
     return _MapEntryWithStage(jobName(++count), content, stage);
   }
 
+  final commandsToKeys = _extractCommands(jobs);
+
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
       yield jobEntry(
@@ -210,52 +197,19 @@ Iterable<_MapEntryWithStage> _listJobs(
 
     final ciJob = job as CIJob;
 
-    final commandsToKeys = extractCommands(rootConfig);
-
     final commands = ciJob.tasks
-        .map((task) => commandsToKeys[task.command]!)
+        .map((task) => commandsToKeys[task.command(ciJob.isNewest)]!)
         .toList();
 
-    jobEntries.add(CIJobEntry(ciJob, commands));
-  }
+    final entry = CIJobEntry(ciJob, commands);
 
-  final differentOperatingSystems = <String>{};
-  final differentPackages = <String>{};
-  final differentSdks = <String>{};
-
-  for (var entry in jobEntries) {
-    differentOperatingSystems.add(entry.job.os);
-    differentPackages.add(entry.job.package);
-    differentSdks.add(entry.job.sdk);
-  }
-
-  // Group jobs by all of the values that would allow them to merge
-  final groupedItems = groupCIJobEntries(jobEntries);
-
-  for (var entry in groupedItems.entries) {
-    final first = entry.value.first;
-
-    if (mergeStages.contains(first.job.stageName)) {
-      final packages = entry.value.map((t) => t.job.package).toList()..sort();
-      final yaml = first._createJob(
-        rootConfig,
-        packages: packages,
-        oneOs: differentOperatingSystems.length == 1,
-        oneSdk: differentSdks.length == 1,
-        onePackage: differentPackages.length == 1,
-      );
-      yield jobEntry(yaml, first.job.stageName);
-    } else {
-      yield* entry.value.map((e) {
-        final yaml = e._createJob(
-          rootConfig,
-          oneOs: differentOperatingSystems.length == 1,
-          oneSdk: differentSdks.length == 1,
-          onePackage: differentPackages.length == 1,
-        );
-        return jobEntry(yaml, e.job.stageName);
-      });
-    }
+    final yaml = entry._createJob(
+      rootConfig,
+      oneOs: false,
+      oneSdk: false,
+      onePackage: true,
+    );
+    yield jobEntry(yaml, ciJob.stageName);
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
@@ -265,6 +219,41 @@ Iterable<_MapEntryWithStage> _listJobs(
       yield jobEntry(jobConfig, _onCompletionStage);
     }
   }
+}
+
+/// Gives a map of command to unique task key for all [jobs].
+Map<String, String> _extractCommands(Iterable<HasStageName> jobs) {
+  final commandsToKeys = <String, String>{};
+
+  final tasksToConfigure = jobs
+      .whereType<CIJob>()
+      .expand((job) => job.tasks.map((task) => (task, job.isNewest)))
+      .toList();
+
+  final taskTypes = tasksToConfigure.map((t) => t.$1.type).toSet();
+
+  for (var taskType in taskTypes) {
+    final commands = tasksToConfigure
+        .where((t) => t.$1.type == taskType)
+        .map((t) => t.$1.command(t.$2))
+        .toSet();
+
+    if (commands.length == 1) {
+      commandsToKeys[commands.single] = taskType.name;
+      continue;
+    }
+
+    final paddingSize = (commands.length - 1).toString().length;
+
+    var count = 0;
+    for (var command in commands) {
+      commandsToKeys[command] =
+          '${taskType.name}_${count.toString().padLeft(paddingSize, '0')}';
+      count++;
+    }
+  }
+
+  return commandsToKeys;
 }
 
 extension on CIJobEntry {
@@ -313,8 +302,8 @@ extension on CIJobEntry {
       for (var i = 0; i < commands.length; i++) {
         commandEntries.add(
           _CommandEntry(
-            '$package; ${job.tasks[i].command}',
-            _commandForOs(job.tasks[i].command),
+            '$package; ${job.tasks[i].command(job.isNewest)}',
+            _commandForOs(job.tasks[i].command(job.isNewest)),
             type: job.tasks[i].type,
             // Run this regardless of the success of other steps other than the
             // pub step.

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:collection/collection.dart' hide stronglyConnectedComponents;
 import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
@@ -64,13 +63,6 @@ class CIJobEntry {
     return sections.join('; ');
   }
 }
-
-/// Group jobs by all of the values that would allow them to merge
-Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
-    groupBy<CIJobEntry, String>(
-      jobEntries,
-      (e) => [...e.job.groupByKeys, e.commands].join(':::'),
-    );
 
 void validateRootConfig(RootConfig rootConfig) {
   for (var config in rootConfig) {
@@ -138,38 +130,6 @@ List<String> scriptLines(String scriptPath) => [
   ],
 ];
 
-/// Gives a map of command to unique task key for all [configs].
-Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
-  final commandsToKeys = <String, String>{};
-
-  final tasksToConfigure = _travisTasks(configs);
-  final taskNames = tasksToConfigure.map((task) => task.type).toSet();
-
-  for (var taskName in taskNames) {
-    final commands = tasksToConfigure
-        .where((task) => task.type == taskName)
-        .map((task) => task.command)
-        .toSet();
-
-    if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskName.name;
-      continue;
-    }
-
-    // TODO: could likely use some clever `log` math here
-    final paddingSize = (commands.length - 1).toString().length;
-
-    var count = 0;
-    for (var command in commands) {
-      commandsToKeys[command] =
-          '${taskName}_${count.toString().padLeft(paddingSize, '0')}';
-      count++;
-    }
-  }
-
-  return commandsToKeys;
-}
-
 void logPackages(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {
     print(styleBold.wrap('package:${pkg.relativePath}'));
@@ -218,10 +178,7 @@ List<String> calculateOrderedStages(
     previous = stage;
   }
 
-  final rootMentionedStages = <String>{
-    ...conditionalStages.keys,
-    ...rootConfig.monoConfig.mergeStages,
-  };
+  final rootMentionedStages = <String>{...conditionalStages.keys};
 
   for (var config in rootConfig) {
     String? previous;
@@ -277,6 +234,3 @@ List<String> calculateOrderedStages(
 
   return components;
 }
-
-List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
-    configs.expand((config) => config.jobs).expand((job) => job.tasks).toList();

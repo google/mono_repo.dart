@@ -9,7 +9,6 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
-import '../ci_shared.dart';
 import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
@@ -129,13 +128,13 @@ Future<bool> presubmit(
     for (var job in config.jobs) {
       final sdk = job.sdk;
       for (var task in job.tasks) {
-        final taskKey = commandsToKeys[task.command]!;
+        final taskKey = commandsToKeys[task.command(job.isNewest)]!;
         // Skip tasks that weren't specified
         if (!tasks.contains(task.type.name)) continue;
 
         print(
           '  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
-          'TASK: ${styleBold.wrap(white.wrap(task.command))}',
+          'TASK: ${styleBold.wrap(white.wrap(task.command(job.isNewest)))}',
         );
         if (sdk != sdkToRun) {
           print(yellow.wrap('    skipped, mismatched sdk'));

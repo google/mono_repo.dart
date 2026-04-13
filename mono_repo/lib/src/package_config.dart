@@ -78,7 +78,35 @@ class PackageConfig {
 
     final flavor = pubspec.flavor;
 
-    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml, pubspec);
+    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml);
+
+    final rawSdks = rawConfig.sdks;
+    final List<String> sdks;
+    if (rawSdks == null || rawSdks.isEmpty) {
+      if (monoPkgYaml.containsKey('sdk')) {
+        throw CheckedFromJsonException(
+          monoPkgYaml,
+          'sdk',
+          'RawConfig',
+          'The value for "sdk" must be an array with at least one value.',
+        );
+      }
+      sdks = ['pubspec', 'dev'];
+    } else {
+      sdks = List.from(rawSdks);
+    }
+
+    handlePubspecInSdkList(
+      flavor,
+      sdks,
+      pubspec,
+      (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+    );
+    sortNormalizeVerifySdksList(
+      flavor,
+      sdks,
+      (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+    );
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <CIJob>[];
@@ -89,7 +117,13 @@ class PackageConfig {
     final stageNames = rawConfig.stages.map((stage) {
       final stageYaml = stage.items;
       for (var job in stageYaml) {
-        var jobSdks = rawConfig.sdks;
+        if (job is! Map && job is! String) {
+          throw ParsedYamlException(
+            'Each item within a stage must be a map or a string.',
+            job is YamlNode ? job : stageYaml as YamlNode,
+          );
+        }
+        var jobSdks = sdks;
         if (job case {'sdk': final jobValue}) {
           jobSdks = (jobValue is List)
               ? jobSdks = List.from(jobValue)
@@ -105,37 +139,6 @@ class PackageConfig {
             flavor,
             jobSdks,
             (m) => CheckedFromJsonException(job, 'sdk', 'RawConfig', m),
-          );
-        } else if (jobSdks == null || jobSdks.isEmpty) {
-          if (monoPkgYaml.containsKey('sdk')) {
-            throw CheckedFromJsonException(
-              monoPkgYaml,
-              'sdk',
-              'RawConfig',
-              'The value for "sdk" must be an array with at least '
-                  'one value.',
-            );
-          }
-
-          if (job is! Map) {
-            throw ParsedYamlException(
-              'Each item within a stage must be a map.',
-              job is YamlNode ? job : stageYaml as YamlNode,
-            );
-          }
-
-          if (job.containsKey('dart')) {
-            throw CheckedFromJsonException(
-              job as YamlMap,
-              'dart',
-              'RawConfig',
-              '"dart" is no longer supported. Use "sdk" instead.',
-            );
-          }
-
-          throw ParsedYamlException(
-            'An "sdk" key is required.',
-            job as YamlMap,
           );
         } else {
           sdkConfigUsed = true;
@@ -156,6 +159,9 @@ class PackageConfig {
           job as Object,
           flavor: flavor,
         );
+
+        final newestSdk = sdks.last;
+
         for (var sdk in jobSdks) {
           for (var os in jobOses) {
             jobs.add(
@@ -167,6 +173,7 @@ class PackageConfig {
                 tasks,
                 description: description,
                 flavor: flavor,
+                isNewest: sdk == newestSdk,
               ),
             );
           }
@@ -223,8 +230,11 @@ class CIJob implements HasStageName {
   @JsonKey()
   final PackageFlavor flavor;
 
+  @JsonKey()
+  final bool isNewest;
+
   Iterable<String> get _taskCommandsTickQuoted =>
-      tasks.map((t) => '`${t.command}`');
+      tasks.map((t) => '`${t.command(isNewest)}`');
 
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
@@ -243,6 +253,7 @@ class CIJob implements HasStageName {
     this.tasks, {
     this.description,
     required this.flavor,
+    this.isNewest = false,
   }) : assert(
          errorForSdkConfig(flavor, sdk) == null,
          'Should have caught bad sdk value `$sdk` before here!',
@@ -292,10 +303,10 @@ class Task {
   @JsonKey()
   final String? args;
 
-  final String command;
+  Task(this.flavor, this.type, {this.args});
 
-  Task(this.flavor, this.type, {this.args})
-    : command = type.commandValue(flavor, args).join(' ');
+  String command(bool isNewest) =>
+      type.commandValue(flavor, args, isNewest: isNewest).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.

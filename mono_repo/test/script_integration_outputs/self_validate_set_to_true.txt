@@ -1,10 +1,13 @@
 # Created with package:mono_repo v1.2.3
-name: Dart CI
+name: "package:pkg_name"
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - .github/workflows/sub_pkg.yml
+      - "sub_pkg/**"
   pull_request:
 defaults:
   run:
@@ -15,30 +18,7 @@ permissions: read-all
 
 jobs:
   job_001:
-    name: mono_repo self validate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
-        with:
-          sdk: stable
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - name: mono_repo self validate
-        run: dart pub global activate mono_repo 1.2.3
-      - name: mono_repo self validate
-        run: dart pub global run mono_repo generate --validate
-  job_002:
-    name: "analyze; osx; Dart dev; `dart analyze`, `dart format --output=none --set-exit-if-changed .`"
+    name: "analyze; osx; Dart dev; `dart analyze`, `true`"
     runs-on: macos-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -67,13 +47,11 @@ jobs:
         run: dart analyze
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-      - name: "sub_pkg; dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
+      - name: sub_pkg; true
+        run: "true"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-    needs:
-      - job_001
-  job_003:
+  job_002:
     name: "analyze; windows; Dart 1.23.0; `dart analyze`"
     runs-on: windows-latest
     steps:
@@ -93,44 +71,8 @@ jobs:
         run: dart analyze
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
-    needs:
-      - job_001
-  job_004:
+  job_003:
     name: "unit_test; linux; Dart 1.23.0; `dart test --preset travis`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0;packages:sub_pkg;commands:test_1"
-          restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0;packages:sub_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
-        with:
-          sdk: "1.23.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: "sub_pkg; dart test --preset travis"
-        run: dart test --preset travis
-        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
-    needs:
-      - job_001
-      - job_002
-      - job_003
-  job_005:
-    name: unit_test; linux; Dart 1.23.0; chrome tests
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -155,32 +97,31 @@ jobs:
         run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-      - name: "sub_pkg; dart test --platform chrome"
-        run: dart test --platform chrome
+      - name: "sub_pkg; dart test --preset travis"
+        run: dart test --preset travis
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
     needs:
       - job_001
       - job_002
-      - job_003
-  job_006:
-    name: "unit_test; linux; Dart dev; `dart test --preset travis`"
+  job_004:
+    name: unit_test; linux; Dart 1.23.0; chrome tests
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0;packages:sub_pkg;commands:test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
+            os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:1.23.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
         with:
-          sdk: dev
+          sdk: "1.23.0"
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -189,16 +130,15 @@ jobs:
         run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-      - name: "sub_pkg; dart test --preset travis"
-        run: dart test --preset travis
+      - name: "sub_pkg; dart test --platform chrome"
+        run: dart test --platform chrome
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
     needs:
       - job_001
       - job_002
-      - job_003
-  job_007:
-    name: unit_test; linux; Dart dev; chrome tests
+  job_005:
+    name: "unit_test; linux; Dart dev; `dart test --preset travis`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -223,32 +163,31 @@ jobs:
         run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-      - name: "sub_pkg; dart test --platform chrome"
-        run: dart test --platform chrome
+      - name: "sub_pkg; dart test --preset travis"
+        run: dart test --preset travis
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
     needs:
       - job_001
       - job_002
-      - job_003
-  job_008:
-    name: "unit_test; linux; Dart stable; `dart test --preset travis`"
+  job_006:
+    name: unit_test; linux; Dart dev; chrome tests
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:sub_pkg;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test_1"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:sub_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable
+            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
         with:
-          sdk: stable
+          sdk: dev
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -257,16 +196,15 @@ jobs:
         run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
-      - name: "sub_pkg; dart test --preset travis"
-        run: dart test --preset travis
+      - name: "sub_pkg; dart test --platform chrome"
+        run: dart test --platform chrome
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: sub_pkg
     needs:
       - job_001
       - job_002
-      - job_003
-  job_009:
-    name: unit_test; linux; Dart stable; chrome tests
+  job_007:
+    name: "unit_test; linux; Dart stable; `dart test --preset travis`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -291,6 +229,39 @@ jobs:
         run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: sub_pkg
+      - name: "sub_pkg; dart test --preset travis"
+        run: dart test --preset travis
+        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+        working-directory: sub_pkg
+    needs:
+      - job_001
+      - job_002
+  job_008:
+    name: unit_test; linux; Dart stable; chrome tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Pub hosted dependencies
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+        with:
+          path: "~/.pub-cache/hosted"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:sub_pkg;commands:test_1"
+          restore-keys: |
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:sub_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
+            os:ubuntu-latest;pub-cache-hosted
+            os:ubuntu-latest
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+        with:
+          sdk: stable
+      - id: checkout
+        name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - id: sub_pkg_pub_upgrade
+        name: sub_pkg; dart pub upgrade
+        run: dart pub upgrade
+        if: "always() && steps.checkout.conclusion == 'success'"
+        working-directory: sub_pkg
       - name: "sub_pkg; dart test --platform chrome"
         run: dart test --platform chrome
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
@@ -298,8 +269,7 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003
-  job_010:
+  job_009:
     name: "unit_test; windows; Dart 1.23.0; `dart test --preset travis`"
     runs-on: windows-latest
     steps:
@@ -322,8 +292,7 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003
-  job_011:
+  job_010:
     name: unit_test; windows; Dart 1.23.0; chrome tests
     runs-on: windows-latest
     steps:
@@ -346,8 +315,7 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003
-  job_012:
+  job_011:
     name: "unit_test; windows; Dart dev; `dart test --preset travis`"
     runs-on: windows-latest
     steps:
@@ -370,8 +338,7 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003
-  job_013:
+  job_012:
     name: unit_test; windows; Dart dev; chrome tests
     runs-on: windows-latest
     steps:
@@ -394,8 +361,7 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003
-  job_014:
+  job_013:
     name: "unit_test; windows; Dart stable; `dart test --preset travis`"
     runs-on: windows-latest
     steps:
@@ -418,8 +384,7 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003
-  job_015:
+  job_014:
     name: unit_test; windows; Dart stable; chrome tests
     runs-on: windows-latest
     steps:
@@ -442,4 +407,3 @@ jobs:
     needs:
       - job_001
       - job_002
-      - job_003

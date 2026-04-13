@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
 import '../../ci_test_script.dart';
+import '../../package_config.dart';
 import '../../root_config.dart';
 import '../../user_exception.dart';
 
@@ -39,6 +40,42 @@ class _GeneratedCIScript {
 
     return _GeneratedCIScript._(script);
   }
+}
+
+/// Gives a map of command to unique task key for all [configs].
+Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
+  final commandsToKeys = <String, String>{};
+
+  final tasksToConfigure = configs
+      .expand((config) => config.jobs)
+      .expand(
+        (job) => job.tasks.map((task) => (task: task, isNewest: job.isNewest)),
+      )
+      .toList();
+  final taskTypes = tasksToConfigure.map((t) => t.task.type).toSet();
+
+  for (var taskType in taskTypes) {
+    final commands = tasksToConfigure
+        .where((t) => t.task.type == taskType)
+        .map((t) => t.task.command(t.isNewest))
+        .toSet();
+
+    if (commands.length == 1) {
+      commandsToKeys[commands.single] = taskType.name;
+      continue;
+    }
+
+    final paddingSize = (commands.length - 1).toString().length;
+
+    var count = 0;
+    for (var command in commands) {
+      commandsToKeys[command] =
+          '${taskType.name}_${count.toString().padLeft(paddingSize, '0')}';
+      count++;
+    }
+  }
+
+  return commandsToKeys;
 }
 
 /// Thrown if generated config does not match existing config when running with

@@ -6,6 +6,7 @@ import 'dart:convert';
 
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
@@ -13,7 +14,10 @@ import 'package:yaml/yaml.dart';
 
 import 'shared.dart';
 
-final _dummyPubspec = Pubspec('_example');
+final _dummyPubspec = Pubspec(
+  '_example',
+  environment: {'sdk': VersionConstraint.parse('^3.0.0')},
+);
 
 String _encodeJson(Object? input) =>
     const JsonEncoder.withIndent(' ').convert(input);
@@ -73,16 +77,16 @@ void main() {
         {
           'stages': [
             {
-              'format': ['dartfmt'],
+              'format': [42],
             },
           ],
         },
         r'''
-line 4, column 14: Each item within a stage must be a map.
+line 4, column 14: Each item within a stage must be a map or a string.
   ╷
 4 │      "format": [
   │ ┌──────────────^
-5 │ │     "dartfmt"
+5 │ │     42
 6 │ └    ]
   ╵''',
       );
@@ -130,24 +134,6 @@ line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an ar
   │         ^^
   ╵''',
       );
-    });
-
-    test('Stages tasks must be a list', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {'a': 42},
-        ],
-      };
-
-      _expectParseThrows(monoYaml, r'''
-line 7, column 9: Unsupported value for "a". Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
-  ╷
-7 │      "a": 42
-  │ ┌─────────^
-8 │ │   }
-  │ └──^
-  ╵''');
     });
 
     test('Stages tasks must be a list', () {
@@ -353,6 +339,18 @@ line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a v
   │ └──^
   ╵''');
     });
+    group('smart defaults', () {
+      test('SDK inferred from pubspec if missing', () {
+        final config = _parse({
+          'stages': [
+            {
+              'unit_test': ['test'],
+            },
+          ],
+        });
+        expect(config.jobs.map((j) => j.sdk), containsAll(['3.0.0', 'dev']));
+      });
+    });
   });
 }
 
@@ -403,6 +401,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'format'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'description': 'dartanalyzer && dartfmt',
@@ -419,6 +418,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'format'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'osx',
@@ -433,6 +433,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -443,6 +444,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -453,6 +455,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -463,6 +466,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -477,6 +481,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -491,6 +496,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -505,6 +511,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -519,6 +526,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -533,6 +541,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -547,6 +556,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -557,6 +567,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -567,6 +578,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -577,5 +589,6 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
 ];

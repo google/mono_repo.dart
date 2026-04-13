@@ -26,7 +26,11 @@ abstract class TaskType implements Comparable<TaskType> {
 
   const TaskType._(this.name);
 
-  List<String> commandValue(PackageFlavor flavor, String? args);
+  List<String> commandValue(
+    PackageFlavor flavor,
+    String? args, {
+    required bool isNewest,
+  });
 
   String toJson() => name;
 
@@ -72,11 +76,18 @@ class _FormatTask extends TaskType {
   const _FormatTask() : super._('format');
 
   @override
-  List<String> commandValue(PackageFlavor flavor, String? args) => [
-    'dart format',
-    (args == null || args == 'sdk')
-        ? '--output=none --set-exit-if-changed .'
-        : args,
+  List<String> commandValue(
+    PackageFlavor flavor,
+    String? args, {
+    required bool isNewest,
+  }) => [
+    if (isNewest) ...[
+      'dart format',
+      (args == null || args == 'sdk')
+          ? '--output=none --set-exit-if-changed .'
+          : args,
+    ] else
+      'true',
   ];
 
   @override
@@ -87,8 +98,13 @@ class _AnalyzeTask extends TaskType {
   const _AnalyzeTask() : super._('analyze');
 
   @override
-  List<String> commandValue(PackageFlavor flavor, String? args) => [
+  List<String> commandValue(
+    PackageFlavor flavor,
+    String? args, {
+    required bool isNewest,
+  }) => [
     flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
+    if (isNewest) '--fatal-infos',
     if (args != null) args,
   ];
 
@@ -100,7 +116,11 @@ class _TestTask extends TaskType {
   const _TestTask() : super._('test');
 
   @override
-  List<String> commandValue(PackageFlavor flavor, String? args) => [
+  List<String> commandValue(
+    PackageFlavor flavor,
+    String? args, {
+    required bool isNewest,
+  }) => [
     flavor == PackageFlavor.dart ? 'dart test' : 'flutter test',
     if (args != null) args,
   ];
@@ -110,7 +130,11 @@ class _CommandTask extends TaskType {
   const _CommandTask() : super._('command');
 
   @override
-  List<String> commandValue(PackageFlavor flavor, String? args) => [args!];
+  List<String> commandValue(
+    PackageFlavor flavor,
+    String? args, {
+    required bool isNewest,
+  }) => [args!];
 }
 
 class _TestWithCoverageTask extends TaskType {
@@ -119,7 +143,11 @@ class _TestWithCoverageTask extends TaskType {
   const _TestWithCoverageTask() : super._('test_with_coverage');
 
   @override
-  List<String> commandValue(PackageFlavor flavor, String? args) {
+  List<String> commandValue(
+    PackageFlavor flavor,
+    String? args, {
+    required bool isNewest,
+  }) {
     if (flavor == PackageFlavor.flutter) {
       throw const InvalidTaskConfigException(
         'Code coverage tests are not supported with Flutter.',

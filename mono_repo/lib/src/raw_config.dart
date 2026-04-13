@@ -5,10 +5,8 @@
 import 'dart:async';
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:pubspec_parse/pubspec_parse.dart';
 
 import 'package_flavor.dart';
-import 'utilities.dart';
 
 part 'raw_config.g.dart';
 
@@ -30,27 +28,13 @@ class RawConfig {
           [
             RawStage('unit_test', ['test']),
           ] {
-    if (sdks != null) {
-      sortNormalizeVerifySdksList(
-        Zone.current[_flavorKey] as PackageFlavor,
-        sdks!,
-        (m) => ArgumentError.value(sdks, 'sdks', m),
-      );
-    }
     oses.sort();
   }
 
-  factory RawConfig.fromYaml(PackageFlavor flavor, Map json, Pubspec pubspec) {
+  factory RawConfig.fromYaml(PackageFlavor flavor, Map json) {
     final config = runZoned(
       () => _$RawConfigFromJson(json),
       zoneValues: {_flavorKey: flavor},
-    );
-
-    handlePubspecInSdkList(
-      flavor,
-      config.sdks,
-      pubspec,
-      (m) => CheckedFromJsonException(json, 'sdk', 'RawConfig', m),
     );
 
     final stages = <String>{};

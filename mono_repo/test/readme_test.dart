@@ -22,7 +22,7 @@ void main() {
         // For Windows tests
         .replaceAll('\r', '');
     expect(readmeContent, contains(_yamlWrap(_pkgYaml)));
-    expect(readmeContent, contains(_yamlWrap(_repoYaml)));
+    expect(readmeContent, contains('self_validate: analyze'));
   });
 
   test(
@@ -34,10 +34,9 @@ void main() {
         d.file('pubspec.yaml', '''
 name: sub_pkg
 environment:
-  sdk: '>=2.17.0 <3.0.0'
+  sdk: '^3.0.0'
 '''),
       ]).create();
-
       testGenerateConfig(
         printMatcher: stringContainsInOrder([
           'package:sub_pkg\n',
@@ -53,8 +52,7 @@ environment:
       }
 
       validateFile(ciScriptPath, 'ci');
-      validateFile(githubWorkflowFilePath('lint'), 'github_lints');
-      validateFile(defaultGitHubWorkflowFilePath, 'github_defaults');
+      validateFile(githubWorkflowFilePath('sub_pkg'), 'github_defaults');
     },
     onPlatform: const {'windows': Skip('Many platform-specific differences')},
   );
@@ -85,19 +83,6 @@ github:
   # Specify additional environment variables accessible to all jobs
   env:
     FOO: BAR
-
-  # You can group stages into individual workflows
-  #
-  # Any stages that are omitted here are put in a default workflow
-  # named `dart.yml`.
-  workflows:
-    # The key here is the name of the file - .github/workflows/lint.yml
-    lint:
-      # This populates `name` in the workflow
-      name: Dart Lint CI
-      # These are the stages that are populated in the workflow file
-      stages:
-      - analyze
 
   # You can add custom github actions configurations to run after completion
   # of all other jobs here. This accepts normal github job config except that
@@ -131,10 +116,6 @@ github:
 # is up to date. You can specify the value as just `true` or give a `stage`
 # you'd like this job to run in.
 self_validate: analyze
-
-# Use this key to merge stages across packages to create fewer jobs
-merge_stages:
-- analyze
 
 # When using `test_with_coverage`, this setting configures the service that
 # results are uploaded to.

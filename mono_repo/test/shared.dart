@@ -22,6 +22,8 @@ Future<void> populateConfig(String monoRepoContent) async {
     d.file(monoPkgFileName, testConfig2),
     d.file('pubspec.yaml', '''
 name: pkg_name
+environment:
+  sdk: '^3.0.0'
       '''),
   ]).create();
 }
