@@ -6,7 +6,7 @@ stages:
 - smoke_test:
   - group:
     - format
-    - analyze: .
+    - analyze
     sdk:
     - beta
     - stable

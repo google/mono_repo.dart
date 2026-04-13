@@ -20,7 +20,7 @@ permissions: read-all
 
 jobs:
   job_001:
-    name: "smoke_test; linux; Dart 2.16.0; `true`, `dart analyze .`"
+    name: "smoke_test; linux; Dart 2.16.0; `true`, `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -49,12 +49,12 @@ jobs:
         run: "true"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: test_pkg; dart analyze .
-        run: dart analyze .
+      - name: test_pkg; dart analyze
+        run: dart analyze
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_002:
-    name: "smoke_test; linux; Dart 2.17.0-69.1.beta; `true`, `dart analyze .`"
+    name: "smoke_test; linux; Dart 2.17.0-69.1.beta; `true`, `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -83,12 +83,12 @@ jobs:
         run: "true"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: test_pkg; dart analyze .
-        run: dart analyze .
+      - name: test_pkg; dart analyze
+        run: dart analyze
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_003:
-    name: "smoke_test; linux; Dart 2.18.0-106.0.dev; `true`, `dart analyze .`"
+    name: "smoke_test; linux; Dart 2.18.0-106.0.dev; `true`, `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -117,12 +117,12 @@ jobs:
         run: "true"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: test_pkg; dart analyze .
-        run: dart analyze .
+      - name: test_pkg; dart analyze
+        run: dart analyze
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_004:
-    name: "smoke_test; linux; Dart beta; `true`, `dart analyze .`"
+    name: "smoke_test; linux; Dart beta; `true`, `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -151,12 +151,12 @@ jobs:
         run: "true"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: test_pkg; dart analyze .
-        run: dart analyze .
+      - name: test_pkg; dart analyze
+        run: dart analyze
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_005:
-    name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -185,12 +185,12 @@ jobs:
         run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: "test_pkg; dart analyze --fatal-infos ."
-        run: dart analyze --fatal-infos .
+      - name: "test_pkg; dart analyze --fatal-infos"
+        run: dart analyze --fatal-infos
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_006:
-    name: "smoke_test; linux; Dart main; `true`, `dart analyze .`"
+    name: "smoke_test; linux; Dart main; `true`, `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -219,12 +219,12 @@ jobs:
         run: "true"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: test_pkg; dart analyze .
-        run: dart analyze .
+      - name: test_pkg; dart analyze
+        run: dart analyze
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_007:
-    name: "smoke_test; linux; Dart stable; `true`, `dart analyze .`"
+    name: "smoke_test; linux; Dart stable; `true`, `dart analyze`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -253,8 +253,8 @@ jobs:
         run: "true"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
-      - name: test_pkg; dart analyze .
-        run: dart analyze .
+      - name: test_pkg; dart analyze
+        run: dart analyze
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: test_pkg
   job_008:

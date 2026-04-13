@@ -80,7 +80,7 @@ jobs:
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
   job_003:
-    name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
@@ -109,8 +109,8 @@ jobs:
         run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
-      - name: "mono_repo; dart analyze --fatal-infos ."
-        run: dart analyze --fatal-infos .
+      - name: "mono_repo; dart analyze --fatal-infos"
+        run: dart analyze --fatal-infos
         if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
         working-directory: mono_repo
   job_004:

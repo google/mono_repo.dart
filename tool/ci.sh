@@ -64,24 +64,20 @@ for PKG in ${PKGS}; do
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
       analyze_0)
-        echo 'dart analyze --fatal-infos .'
-        dart analyze --fatal-infos . || EXIT_CODE=$?
+        echo 'dart analyze --fatal-infos'
+        dart analyze --fatal-infos || EXIT_CODE=$?
         ;;
       analyze_1)
         echo 'dart analyze'
         dart analyze || EXIT_CODE=$?
         ;;
       analyze_2)
-        echo 'flutter analyze --fatal-infos .'
-        flutter analyze --fatal-infos . || EXIT_CODE=$?
+        echo 'flutter analyze --fatal-infos'
+        flutter analyze --fatal-infos || EXIT_CODE=$?
         ;;
       analyze_3)
-        echo 'flutter analyze .'
-        flutter analyze . || EXIT_CODE=$?
-        ;;
-      analyze_4)
-        echo 'dart analyze .'
-        dart analyze . || EXIT_CODE=$?
+        echo 'flutter analyze'
+        flutter analyze || EXIT_CODE=$?
         ;;
       command)
         echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
