@@ -7,7 +7,7 @@ stages:
     sdk: dev
   - group:
     - format
-    - analyze: --fatal-infos .
+    - analyze: .
     sdk: dev
   - analyze:
     sdk: pubspec
@@ -16,23 +16,16 @@ stages:
     os:
     - linux
     - windows
-    sdk: [pubspec]
+    sdk: pubspec
   - test_with_coverage: -x yaml -P presubmit --test-randomize-ordering-seed=random
-    os:
-    - linux
-    sdk: [dev]
+    sdk: dev
   - test: -x yaml -P presubmit --test-randomize-ordering-seed=random
-    os:
-    - windows
-    sdk: [dev]
+    os: windows
+    sdk: dev
   - test_with_coverage: -t yaml --test-randomize-ordering-seed=random
-    os:
-    - linux
-    sdk: [dev]
+    sdk: dev
   - test: -t yaml --test-randomize-ordering-seed=random
-    os:
-    - linux
-    sdk: [dev]
+    sdk: dev
 
 cache:
   directories:

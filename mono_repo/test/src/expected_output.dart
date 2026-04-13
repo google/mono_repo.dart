@@ -1,4 +1,4 @@
-final ciShellOutput = r'''
+const ciShellOutput = r'''
 #!/bin/bash
 # Created with package:mono_repo v1.2.3
 
@@ -116,7 +116,7 @@ if [ ${#FAILURES[@]} -ne 0 ]; then
 fi
 ''';
 
-final githubConfigOutput = r'''
+const githubConfigOutput = r'''
 # Created with package:mono_repo v1.2.3
 name: "package:pkg_name"
 on:
@@ -528,4 +528,4 @@ jobs:
       - job_002
 ''';
 
-final ciShellOutputMultiFlavor = ciShellOutput;
+const ciShellOutputMultiFlavor = ciShellOutput;

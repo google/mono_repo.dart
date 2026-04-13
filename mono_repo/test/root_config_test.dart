@@ -13,7 +13,7 @@ import 'package:test_descriptor/test_descriptor.dart' as d;
 void main() {
   group('RootConfig', () {
     test('parseActionVersions', () async {
-      final content = '''
+      const content = '''
 # Created with package:mono_repo v1.2.3
 name: "package:pkg_a"
 on:

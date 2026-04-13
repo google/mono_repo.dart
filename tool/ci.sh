@@ -75,13 +75,25 @@ for PKG in ${PKGS}; do
         echo 'flutter analyze --fatal-infos .'
         flutter analyze --fatal-infos . || EXIT_CODE=$?
         ;;
+      analyze_3)
+        echo 'flutter analyze .'
+        flutter analyze . || EXIT_CODE=$?
+        ;;
+      analyze_4)
+        echo 'dart analyze .'
+        dart analyze . || EXIT_CODE=$?
+        ;;
       command)
         echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
         cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate || EXIT_CODE=$?
         ;;
-      format)
+      format_0)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      format_1)
+        echo 'true'
+        true || EXIT_CODE=$?
         ;;
       test_0)
         echo 'dart test -x yaml -P presubmit --test-randomize-ordering-seed=random'
