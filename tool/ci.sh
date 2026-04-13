@@ -92,26 +92,22 @@ for PKG in ${PKGS}; do
         true || EXIT_CODE=$?
         ;;
       test_0)
-        echo 'dart test -x yaml -P presubmit --test-randomize-ordering-seed=random'
-        dart test -x yaml -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart test -P presubmit --test-randomize-ordering-seed=random'
+        dart test -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_1)
-        echo 'dart test -t yaml --test-randomize-ordering-seed=random'
-        dart test -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart test --test-randomize-ordering-seed=random'
+        dart test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_2)
         echo 'flutter test --test-randomize-ordering-seed=random'
         flutter test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_with_coverage_0)
-        echo 'dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random'
-        dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random'
+        dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_with_coverage_1)
-        echo 'dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random'
-        dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
-        ;;
-      test_with_coverage_2)
         echo 'dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random'
         dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
