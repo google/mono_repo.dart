@@ -3,349 +3,350 @@ name: "package:sub_pkg"
 on:
   push:
     branches:
-      - main
-      - master
+      - "main"
+      - "master"
     paths:
-      - .github/workflows/sub_pkg.yml
+      - ".github/workflows/sub_pkg.yml"
       - "sub_pkg/**"
-  pull_request:
+  pull_request: null
   schedule:
     - cron: "0 0 * * 0"
 defaults:
   run:
-    shell: bash
+    shell: "bash"
 env:
-  PUB_ENVIRONMENT: bot.github
-  FOO: BAR
-permissions: read-all
+  PUB_ENVIRONMENT: "bot.github"
+  FOO: "BAR"
+permissions: "read-all"
+
 
 jobs:
   job_001:
     name: "analyze; linux; Dart 3.0.0; `dart analyze`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg;commands:analyze_0"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
           sdk: "3.0.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart analyze
-        run: dart analyze
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart analyze"
+        run: "dart analyze"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
   job_002:
     name: "analyze; linux; Dart 3.0.0; `true`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg;commands:format_0"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
           sdk: "3.0.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; true
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; true"
         run: "true"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
   job_003:
     name: "analyze; linux; Dart dev; `dart analyze --fatal-infos`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:analyze_1"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
       - name: "sub_pkg; dart analyze --fatal-infos"
-        run: dart analyze --fatal-infos
+        run: "dart analyze --fatal-infos"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
   job_004:
     name: "analyze; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:format_1"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
       - name: "sub_pkg; dart format --output=none --set-exit-if-changed ."
         run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
   job_005:
     name: "unit_test; linux; Dart 3.0.0; `dart test`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg;commands:test"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
           sdk: "3.0.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart test
-        run: dart test
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart test"
+        run: "dart test"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
   job_006:
     name: "unit_test; linux; Dart dev; `dart test`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart test
-        run: dart test
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart test"
+        run: "dart test"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
   job_007:
     name: "cron; linux; Dart 3.0.0; `dart test`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     if: "github.event_name == 'schedule'"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg;commands:test"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:3.0.0
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
           sdk: "3.0.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart test
-        run: dart test
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart test"
+        run: "dart test"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
+      - "job_005"
+      - "job_006"
   job_008:
     name: "cron; linux; Dart dev; `dart test`"
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     if: "github.event_name == 'schedule'"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:test"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart test
-        run: dart test
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart test"
+        run: "dart test"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
+      - "job_005"
+      - "job_006"
   job_009:
     name: "cron; windows; Dart 3.0.0; `dart test`"
-    runs-on: windows-latest
+    runs-on: "windows-latest"
     if: "github.event_name == 'schedule'"
     steps:
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
           sdk: "3.0.0"
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart test
-        run: dart test
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart test"
+        run: "dart test"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
+      - "job_005"
+      - "job_006"
   job_010:
     name: "cron; windows; Dart dev; `dart test`"
-    runs-on: windows-latest
+    runs-on: "windows-latest"
     if: "github.event_name == 'schedule'"
     steps:
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - id: sub_pkg_pub_upgrade
-        name: sub_pkg; dart pub upgrade
-        run: dart pub upgrade
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      - id: "sub_pkg_pub_upgrade"
+        name: "sub_pkg; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: sub_pkg
-      - name: sub_pkg; dart test
-        run: dart test
+        working-directory: "sub_pkg"
+      - name: "sub_pkg; dart test"
+        run: "dart test"
         if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: sub_pkg
+        working-directory: "sub_pkg"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
+      - "job_005"
+      - "job_006"
   job_011:
-    name: Notify failure
-    runs-on: ubuntu-latest
-    if: failure()
+    name: "Notify failure"
+    runs-on: "ubuntu-latest"
+    if: "failure()"
     steps:
       - run: |
           curl -H "Content-Type: application/json" -X POST -d \
@@ -354,13 +355,14 @@ jobs:
         env:
           CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
     needs:
-      - job_001
-      - job_002
-      - job_003
-      - job_004
-      - job_005
-      - job_006
-      - job_007
-      - job_008
-      - job_009
-      - job_010
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
+      - "job_005"
+      - "job_006"
+      - "job_007"
+      - "job_008"
+      - "job_009"
+      - "job_010"
+

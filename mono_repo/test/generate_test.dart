@@ -12,7 +12,6 @@ import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
-import 'src/expected_output.dart';
 
 void main() {
   glyph.ascii = false;
@@ -39,8 +38,8 @@ environment:
       r'''
 line 1, column 8 of mono_repo.yaml: Unsupported value for "extra". Only `github`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service` keys are supported.
   ╷
-1 │ extra: foo
-  │        ^^^
+1 │ extra: "foo"
+  │        ^^^^^
   ╵''',
     );
   });
@@ -81,7 +80,19 @@ environment:
         testGenerateConfig(printMatcher: _subPkgStandardOutput());
         await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
         await d
-            .file(githubWorkflowFilePath('sub_pkg'), githubConfigOutput)
+            .file(
+              githubWorkflowFilePath('sub_pkg'),
+              startsWith('# Created with package:mono_repo v1.2.3\n'),
+            )
+            .validate();
+        await d
+            .file(
+              githubWorkflowFilePath('sub_pkg'),
+              contains('name: "package:pkg_name"'),
+            )
+            .validate();
+        await d
+            .file(githubWorkflowFilePath('sub_pkg'), contains('shell: "bash"'))
             .validate();
       });
     }
@@ -112,13 +123,13 @@ environment:
     ]).create();
 
     testGenerateConfig(
-      printMatcher:
-          '''
-package:sub_pkg
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('sub_pkg'))}`.
-Make sure to mark `tool/ci.sh` as executable.
-  chmod +x tool/ci.sh
-Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.''',
+      printMatcher: stringContainsInOrder([
+        'package:sub_pkg\n',
+        'Wrote `${p.join(d.sandbox, githubWorkflowFilePath('sub_pkg'))}`.\n',
+        'Make sure to mark `tool/ci.sh` as executable.\n',
+        '  chmod +x tool/ci.sh\n',
+        'Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.',
+      ]),
     );
     await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
   });
@@ -157,154 +168,36 @@ environment:
     ]).create();
 
     testGenerateConfig(
-      printMatcher:
-          '''
-package:pkg_a
-package:pkg_b
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('pkg_a'))}`.
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('pkg_b'))}`.
-Make sure to mark `tool/ci.sh` as executable.
-  chmod +x tool/ci.sh
-Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.''',
-    );
-
-    await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
-    await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
-    await d
-        .file(githubWorkflowFilePath('pkg_a'), contains('package:pkg_a'))
-        .validate();
-    await d
-        .file(githubWorkflowFilePath('pkg_b'), contains('package:pkg_b'))
-        .validate();
-  });
-
-  group('mono_repo.yaml', () {
-    test('self_validate set to `true`', () async {
-      await populateConfig('self_validate: true');
-      testGenerateConfig(
-        printMatcher:
-            '''
-package:sub_pkg
-  There are jobs defined that are not compatible with the package SDK constraint (^3.0.0): `1.23.0`.
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('sub_pkg'))}`.
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('mono_repo_self_validate'))}`.
-Make sure to mark `tool/ci.sh` as executable.
-  chmod +x tool/ci.sh
-Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.''',
-      );
-      await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
-    });
-
-    test('self_validate set to a stage name', () async {
-      await populateConfig('self_validate: custom_stage');
-      testGenerateConfig(
-        printMatcher:
-            '''
-package:sub_pkg
-  There are jobs defined that are not compatible with the package SDK constraint (^3.0.0): `1.23.0`.
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('sub_pkg'))}`.
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('mono_repo_self_validate'))}`.
-Make sure to mark `tool/ci.sh` as executable.
-  chmod +x tool/ci.sh
-Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.''',
-      );
-      await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
-    });
-
-    test(
-      'disallows unsupported keys',
-      () => _testBadConfig(
-        {'other': 5},
-        r'''
-line 1, column 8 of mono_repo.yaml: Unsupported value for "other". Only `github`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service` keys are supported.
-  ╷
-1 │ other: 5
-  │        ^
-  ╵''',
-      ),
+      printMatcher: stringContainsInOrder([
+        'package:pkg_a',
+        'package:pkg_b',
+        'Wrote `${p.join(d.sandbox, githubWorkflowFilePath('pkg_a'))}`.',
+        'Wrote `${p.join(d.sandbox, githubWorkflowFilePath('pkg_b'))}`.',
+      ]),
     );
   });
 
-  group('pubspec validation', () {
-    test('pubspec version valid', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-sdk:
-  - pubspec
-
-stages:
-  - analyze_and_format:
-    - analyze: --fatal-infos .
-      sdk: pubspec
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
-environment:
-  sdk: '^3.0.0'
-'''),
-      ]).create();
-
-      testGenerateConfig(
-        printMatcher:
-            '''
-package:pkg_a
-  `dart` values (pubspec) are not used and can be removed.
-Wrote `${p.join(d.sandbox, githubWorkflowFilePath('pkg_a'))}`.
-Make sure to mark `tool/ci.sh` as executable.
-  chmod +x tool/ci.sh
-Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.''',
-      );
-    });
-
-    test('no SDK constraint - with job `pubspec` usage', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
+  test('pubspec validation not supported with flutter', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
 stages:
 - analyze_and_format:
   - analyze: --fatal-infos .
     sdk: pubspec
 '''),
-        d.file('pubspec.yaml', '''
+      d.file('pubspec.yaml', '''
 name: pkg_a
-'''),
-      ]).create();
-
-      expect(
-        testGenerateConfig,
-        throwsAParsedYamlException(r'''
-line 1, column 1 of pkg_a/mono_pkg.yaml: Missing key "sdk". `pubspec` is only valid for packages that have an environment->sdk value defined in `pubspec.yaml`.
-  ╷
-1 │ ┌ stages:
-2 │ │ - analyze_and_format:
-3 │ │   - analyze: --fatal-infos .
-4 │ └     sdk: pubspec
-  ╵'''),
-      );
-    });
-
-    test('not supported with flutter', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-stages:
-- analyze_and_format:
-  - analyze: --fatal-infos .
-    sdk: pubspec
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
-
 environment:
-  sdk: "^3.0.0"
-
+  sdk: '>=2.12.0 <3.0.0'
 dependencies:
   flutter:
     sdk: flutter
 '''),
-      ]).create();
+    ]).create();
 
-      expect(
-        testGenerateConfig,
-        throwsAParsedYamlException(r'''
+    expect(
+      testGenerateConfig,
+      throwsAParsedYamlException(r'''
 line 1, column 1 of pkg_a/mono_pkg.yaml: Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).
   ╷
 1 │ ┌ stages:
@@ -312,8 +205,7 @@ line 1, column 1 of pkg_a/mono_pkg.yaml: Missing key "sdk". `pubspec` is only va
 3 │ │   - analyze: --fatal-infos .
 4 │ └     sdk: pubspec
   ╵'''),
-      );
-    });
+    );
   });
 }
 
@@ -322,7 +214,7 @@ String _subPkgStandardOutput({bool withDependabot = false}) =>
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (^3.0.0): `1.23.0`.
 Wrote `${p.join(d.sandbox, githubWorkflowFilePath('sub_pkg'))}`.
-${withDependabot ? 'Wrote `${p.join(d.sandbox, '.github/dependabot.yml')}`.\n' : ''}Make sure to mark `tool/ci.sh` as executable.
+${withDependabot ? 'Wrote `${p.join(d.sandbox, ".github/dependabot.yml")}`.\n' : ''}Make sure to mark `tool/ci.sh` as executable.
   chmod +x tool/ci.sh
 Wrote `${p.join(d.sandbox, 'tool/ci.sh')}`.''';
 

@@ -126,7 +126,7 @@ class PackageConfig {
         var jobSdks = sdks;
         if (job case {'sdk': final jobValue}) {
           jobSdks = (jobValue is List)
-              ? jobSdks = List.from(jobValue)
+              ? List.from(jobValue)
               : [jobValue as String];
 
           handlePubspecInSdkList(

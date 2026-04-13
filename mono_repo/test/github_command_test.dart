@@ -37,8 +37,8 @@ line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supporte
       r'''
 line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
-2 │   on: not a map
-  │       ^^^^^^^^^
+2 │   on: "not a map"
+  │       ^^^^^^^^^^^
   ╵''',
     ),
   );
@@ -52,8 +52,8 @@ line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is
       r'''
 line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cron` if `on` has a value.
   ╷
-2 │   cron: some value
-  │         ^^^^^^^^^^
+2 │   cron: "some value"
+  │         ^^^^^^^^^^^^
   ╵''',
     ),
   );
@@ -67,8 +67,8 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
       r'''
 line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
-2 │   env: notAmap
-  │        ^^^^^^^
+2 │   env: "notAmap"
+  │        ^^^^^^^^^
   ╵''',
     ),
   );
@@ -91,7 +91,7 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Canno
   ╷
 3 │ ┌     - steps: []
 4 │ │       needs:
-5 │ └         - foo
+5 │ └         - "foo"
   ╵''',
     ),
   );
@@ -151,8 +151,8 @@ line 4, column 11 of mono_repo.yaml: Missing key "uses". Either `run` or `uses` 
       r'''
 line 5, column 17 of mono_repo.yaml: Unsupported value for "uses". `uses` and `run` cannot both be defined.
   ╷
-5 │           uses: bob
-  │                 ^^^
+5 │           uses: "bob"
+  │                 ^^^^^
   ╵''',
     ),
   );
@@ -261,7 +261,7 @@ line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is n
       r'''
 line 3, column 7 of mono_repo.yaml: Unrecognized keys: [foo]; supported keys: [name, if]
   ╷
-3 │     - foo: bar
+3 │     - foo: "bar"
   │       ^^^
   ╵''',
     ),

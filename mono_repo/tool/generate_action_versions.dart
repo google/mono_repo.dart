@@ -20,10 +20,13 @@ void main(List<String> args) {
     exit(1);
   }
   final previousContent = versionsFile.readAsStringSync();
-  final workflowFile = File('../.github/workflows/dart.yml');
-  final versions = RootConfig.parseActionVersions(
-    workflowFile.readAsStringSync(),
-  );
+  final workflowDir = Directory('../.github/workflows');
+  final versions = <String, String>{};
+  for (var file in workflowDir.listSync().whereType<File>().where(
+    (f) => f.path.endsWith('.yml') || f.path.endsWith('.yaml'),
+  )) {
+    versions.addAll(RootConfig.parseActionVersions(file.readAsStringSync()));
+  }
   final newContentBuffer = StringBuffer('''
 // Copyright (c) 2023, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a

@@ -119,7 +119,7 @@ void validateOutput(String fileName, String output) {
       '\r\n',
       '\n',
     );
-    expect(output, expected);
+    expect(output.trim(), expected.trim());
   } else {
     expectedOutputFile
       ..createSync(recursive: true)

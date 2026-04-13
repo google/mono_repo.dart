@@ -155,7 +155,8 @@ class RootConfig extends ListBase<PackageConfig> {
   /// This returns a map of <action name> to <action version>.
   static Map<String, String> parseActionVersions(String yamlText) {
     // "dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d"
-    final usageRegex = RegExp(r'([\w\.-]+)\/([\w\.-]+)@([\w\.]+)');
+    // Does NOT match "./.github/workflows/publish.yaml"
+    final usageRegex = RegExp(r'^([\w\.-]+)\/([\w\.-]+)@([\w\.]+)$');
 
     final yaml = loadYaml(yamlText);
     final result = <String, String>{};
