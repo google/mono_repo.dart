@@ -122,8 +122,9 @@ environment:
       '''),
     ]).create();
 
-    final workflowPath =
-        p.normalize(p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')));
+    final workflowPath = p.normalize(
+      p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
+    );
     final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
     testGenerateConfig(
       printMatcher: stringContainsInOrder([
@@ -170,10 +171,12 @@ environment:
       '''),
     ]).create();
 
-    final pkgAWorkflowPath =
-        p.normalize(p.join(d.sandbox, githubWorkflowFilePath('pkg_a')));
-    final pkgBWorkflowPath =
-        p.normalize(p.join(d.sandbox, githubWorkflowFilePath('pkg_b')));
+    final pkgAWorkflowPath = p.normalize(
+      p.join(d.sandbox, githubWorkflowFilePath('pkg_a')),
+    );
+    final pkgBWorkflowPath = p.normalize(
+      p.join(d.sandbox, githubWorkflowFilePath('pkg_b')),
+    );
     testGenerateConfig(
       printMatcher: stringContainsInOrder([
         'package:pkg_a',
@@ -219,8 +222,9 @@ dependencies:
 }
 
 String _subPkgStandardOutput({bool withDependabot = false}) {
-  final workflowPath =
-      p.normalize(p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')));
+  final workflowPath = p.normalize(
+    p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
+  );
   final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
   return '''
 package:sub_pkg
