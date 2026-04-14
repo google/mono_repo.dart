@@ -37,9 +37,10 @@ void main(List<String> args) {
 // To regenerate it, run the `tool/generate_action_versions.dart` script.
 
 ''');
-  for (var entry in versions.entries) {
+  final sortedKeys = versions.keys.toList()..sort();
+  for (var key in sortedKeys) {
     newContentBuffer.writeln(
-      "const ${entry.key.toVariableName} = '${entry.value}';",
+      "const ${key.toVariableName} = '${versions[key]}';",
     );
   }
   final tmpDir = Directory.systemTemp.createTempSync('gen_action_versions');
