@@ -28,7 +28,7 @@ jobs:
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg/example;commands:test"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg/example;commands:test_2"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg/example
             os:ubuntu-latest;pub-cache-hosted;sdk:stable

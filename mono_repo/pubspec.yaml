@@ -15,7 +15,7 @@ environment:
 dependencies:
   args: ^2.0.0
   checked_yaml: ^2.0.1
-  collection: ^1.19.0
+  collection: ^1.19.1
   graphs: ^2.2.0
   io: ^1.0.0
   json_annotation: ^4.9.0

@@ -122,7 +122,7 @@ jobs:
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.8.0;packages:mono_repo;commands:test_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:3.8.0;packages:mono_repo;commands:test_1"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:3.8.0;packages:mono_repo
             os:ubuntu-latest;pub-cache-hosted;sdk:3.8.0
@@ -256,7 +256,7 @@ jobs:
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo;commands:test_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo;commands:test_0"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:mono_repo
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
@@ -283,13 +283,13 @@ jobs:
       - "job_002"
       - "job_003"
   job_008:
-    name: "test; windows; Dart 3.8.0; `dart test -P presubmit --test-randomize-ordering-seed=random`"
+    name: "test; windows; `dart test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: "windows-latest"
     steps:
       - name: "Setup Dart SDK"
         uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: "3.8.0"
+          sdk: "${{ matrix.sdk }}"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
@@ -306,31 +306,13 @@ jobs:
       - "job_001"
       - "job_002"
       - "job_003"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "3.8.0"
+          - "dev"
   job_009:
-    name: "test; windows; Dart dev; `dart test -P presubmit --test-randomize-ordering-seed=random`"
-    runs-on: "windows-latest"
-    steps:
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
-        with:
-          sdk: "dev"
-      - id: "checkout"
-        name: "Checkout repository"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-      - id: "mono_repo_pub_upgrade"
-        name: "mono_repo; dart pub upgrade"
-        run: "dart pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "mono_repo"
-      - name: "mono_repo; dart test -P presubmit --test-randomize-ordering-seed=random"
-        run: "dart test -P presubmit --test-randomize-ordering-seed=random"
-        if: "always() && steps.mono_repo_pub_upgrade.conclusion == 'success'"
-        working-directory: "mono_repo"
-    needs:
-      - "job_001"
-      - "job_002"
-      - "job_003"
-  job_010:
     name: "Notify failure"
     runs-on: "ubuntu-latest"
     if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
@@ -350,8 +332,7 @@ jobs:
       - "job_006"
       - "job_007"
       - "job_008"
-      - "job_009"
-  job_11:
+  job_10:
     name: "Mark Coveralls job finished"
     runs-on: "ubuntu-latest"
     steps:

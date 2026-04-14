@@ -71,11 +71,7 @@ for PKG in ${PKGS}; do
         echo 'dart analyze --fatal-infos'
         dart analyze --fatal-infos || EXIT_CODE=$?
         ;;
-      format_0)
-        echo 'true'
-        true || EXIT_CODE=$?
-        ;;
-      format_1)
+      format)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
@@ -117,4 +113,3 @@ done
 if [ ${#FAILURES[@]} -ne 0 ]; then
   exit 1
 fi
-

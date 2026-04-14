@@ -83,13 +83,9 @@ for PKG in ${PKGS}; do
         echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
         cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate || EXIT_CODE=$?
         ;;
-      format_0)
+      format)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
-        ;;
-      format_1)
-        echo 'true'
-        true || EXIT_CODE=$?
         ;;
       test_0)
         echo 'dart test -P presubmit --test-randomize-ordering-seed=random'

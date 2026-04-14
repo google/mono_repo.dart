@@ -86,8 +86,7 @@ class _FormatTask extends TaskType {
       (args == null || args == 'sdk')
           ? '--output=none --set-exit-if-changed .'
           : args,
-    ] else
-      'true',
+    ],
   ];
 
   @override

@@ -28,7 +28,7 @@ jobs:
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg;commands:format_0-analyze_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg;commands:format-analyze_3"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
@@ -55,23 +55,23 @@ jobs:
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: "test_flutter_pkg"
   job_002:
-    name: "smoke_test; linux; Flutter master; `true`, `flutter analyze`"
+    name: "smoke_test; linux; `flutter analyze`"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Cache Pub hosted dependencies"
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:master;packages:test_flutter_pkg;commands:format_1-analyze_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:${{ matrix.sdk }};packages:test_flutter_pkg;commands:analyze_2"
           restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:master;packages:test_flutter_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:master
+            os:ubuntu-latest;pub-cache-hosted;sdk:${{ matrix.sdk }};packages:test_flutter_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:${{ matrix.sdk }}
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: "Setup Flutter SDK"
         uses: "subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2"
         with:
-          channel: "master"
+          channel: "${{ matrix.sdk }}"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
@@ -80,49 +80,17 @@ jobs:
         run: "flutter pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: "test_flutter_pkg"
-      - name: "test_flutter_pkg; true"
-        run: "true"
-        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: "test_flutter_pkg"
       - name: "test_flutter_pkg; flutter analyze"
         run: "flutter analyze"
         if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: "test_flutter_pkg"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "master"
+          - "stable"
   job_003:
-    name: "smoke_test; linux; Flutter stable; `true`, `flutter analyze`"
-    runs-on: "ubuntu-latest"
-    steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg;commands:format_1-analyze_1"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_flutter_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Flutter SDK"
-        uses: "subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2"
-        with:
-          channel: "stable"
-      - id: "checkout"
-        name: "Checkout repository"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-      - id: "test_flutter_pkg_pub_upgrade"
-        name: "test_flutter_pkg; flutter pub upgrade"
-        run: "flutter pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "test_flutter_pkg"
-      - name: "test_flutter_pkg; true"
-        run: "true"
-        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: "test_flutter_pkg"
-      - name: "test_flutter_pkg; flutter analyze"
-        run: "flutter analyze"
-        if: "always() && steps.test_flutter_pkg_pub_upgrade.conclusion == 'success'"
-        working-directory: "test_flutter_pkg"
-  job_004:
     name: "test; linux; Flutter beta; `flutter test --test-randomize-ordering-seed=random`"
     runs-on: "ubuntu-latest"
     steps:
@@ -130,7 +98,7 @@ jobs:
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg;commands:test"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg;commands:test_2"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:beta;packages:test_flutter_pkg
             os:ubuntu-latest;pub-cache-hosted;sdk:beta
@@ -155,8 +123,7 @@ jobs:
     needs:
       - "job_001"
       - "job_002"
-      - "job_003"
-  job_005:
+  job_004:
     name: "Notify failure"
     runs-on: "ubuntu-latest"
     if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
@@ -171,5 +138,4 @@ jobs:
       - "job_001"
       - "job_002"
       - "job_003"
-      - "job_004"
 

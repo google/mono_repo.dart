@@ -4,6 +4,8 @@
 
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
+
 import '../../basic_config.dart';
 import '../../ci_shared.dart';
 import '../../github_config.dart';
@@ -35,6 +37,14 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
     rootConfig,
     rootConfig.monoConfig.githubConditionalStages,
   )..add(_onCompletionStage);
+
+  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
+  final allModernJobs = [
+    ...rootConfig.expand((p) => p.jobs),
+    if (selfValidateStage != null) _SelfValidateJob(selfValidateStage),
+  ];
+
+  final commandsToKeys = _extractCommands(allModernJobs);
 
   void populateJobs(
     String fileName,
@@ -78,6 +88,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       sortedJobs,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
+      commandsToKeys,
     ).toList();
 
     var currStageJobs = <String>{};
@@ -155,7 +166,6 @@ ${toYaml({'jobs': jobList})}
     );
   }
 
-  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
   if (selfValidateStage != null) {
     populateJobs('mono_repo_self_validate', 'mono_repo self validate', [
       _SelfValidateJob(selfValidateStage),
@@ -171,6 +181,7 @@ Iterable<_MapEntryWithStage> _listJobs(
   List<HasStageName> jobs,
   List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
+  Map<String, String> commandsToKeys,
 ) sync* {
   var count = 0;
 
@@ -184,7 +195,7 @@ Iterable<_MapEntryWithStage> _listJobs(
     return _MapEntryWithStage(jobName(++count), content, stage);
   }
 
-  final commandsToKeys = _extractCommands(jobs);
+  final groupedCIJobs = <_JobGroupKey, List<CIJob>>{};
 
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
@@ -196,20 +207,39 @@ Iterable<_MapEntryWithStage> _listJobs(
     }
 
     final ciJob = job as CIJob;
-
     final commands = ciJob.tasks
-        .map((task) => commandsToKeys[task.command(ciJob.isNewest)]!)
+        .map((task) => task.command(ciJob.isNewest))
         .toList();
 
-    final entry = CIJobEntry(ciJob, commands);
+    final key = _JobGroupKey(
+      stageName: ciJob.stageName,
+      os: ciJob.os,
+      flavor: ciJob.flavor,
+      commands: commands,
+      description: ciJob.description,
+    );
 
-    final yaml = entry._createJob(
+    groupedCIJobs.putIfAbsent(key, () => []).add(ciJob);
+  }
+
+  for (var entry in groupedCIJobs.entries) {
+    final jobsInGroup = entry.value;
+
+    final firstJob = jobsInGroup.first;
+    final commands = firstJob.tasks
+        .map((task) => commandsToKeys[task.command(firstJob.isNewest)]!)
+        .toList();
+
+    final ciEntry = CIJobEntry(firstJob, commands);
+
+    final job = ciEntry._createJob(
       rootConfig,
       oneOs: false,
       oneSdk: false,
       onePackage: true,
+      sdks: jobsInGroup.map((j) => j.sdk).toList(),
     );
-    yield jobEntry(yaml, ciJob.stageName);
+    yield jobEntry(job, firstJob.stageName);
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
@@ -219,6 +249,41 @@ Iterable<_MapEntryWithStage> _listJobs(
       yield jobEntry(jobConfig, _onCompletionStage);
     }
   }
+}
+
+class _JobGroupKey {
+  final String stageName;
+  final String os;
+  final PackageFlavor flavor;
+  final List<String> commands;
+  final String? description;
+
+  _JobGroupKey({
+    required this.stageName,
+    required this.os,
+    required this.flavor,
+    required this.commands,
+    this.description,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _JobGroupKey &&
+          runtimeType == other.runtimeType &&
+          stageName == other.stageName &&
+          os == other.os &&
+          flavor == other.flavor &&
+          const IterableEquality().equals(commands, other.commands) &&
+          description == other.description;
+
+  @override
+  int get hashCode =>
+      stageName.hashCode ^
+      os.hashCode ^
+      flavor.hashCode ^
+      const IterableEquality().hash(commands) ^
+      description.hashCode;
 }
 
 /// Gives a map of command to unique task key for all [jobs].
@@ -233,23 +298,27 @@ Map<String, String> _extractCommands(Iterable<HasStageName> jobs) {
   final taskTypes = tasksToConfigure.map((t) => t.$1.type).toSet();
 
   for (var taskType in taskTypes) {
-    final commands = tasksToConfigure
-        .where((t) => t.$1.type == taskType)
-        .map((t) => t.$1.command(t.$2))
-        .toSet();
+    final commands =
+        tasksToConfigure
+            .where((t) => t.$1.type == taskType)
+            .map((t) => t.$1.command(t.$2))
+            .toSet()
+            .toList()
+          ..sort();
 
     if (commands.length == 1) {
       commandsToKeys[commands.single] = taskType.name;
       continue;
     }
 
+    // If we have multiple, we want a stable mapping.
+    // We also want to try and keep the 'simplest' command as just the task name
+    // if possible.
     final paddingSize = (commands.length - 1).toString().length;
 
-    var count = 0;
-    for (var command in commands) {
-      commandsToKeys[command] =
-          '${taskType.name}_${count.toString().padLeft(paddingSize, '0')}';
-      count++;
+    for (var i = 0; i < commands.length; i++) {
+      commandsToKeys[commands[i]] =
+          '${taskType.name}_${i.toString().padLeft(paddingSize, '0')}';
     }
   }
 
@@ -276,6 +345,7 @@ extension on CIJobEntry {
     required bool oneOs,
     required bool oneSdk,
     required bool onePackage,
+    List<String>? sdks,
   }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
@@ -300,10 +370,12 @@ extension on CIJobEntry {
         ),
       );
       for (var i = 0; i < commands.length; i++) {
+        final command = job.tasks[i].command(job.isNewest);
+        if (command.isEmpty || command == 'true') continue;
         commandEntries.add(
           _CommandEntry(
-            '$package; ${job.tasks[i].command(job.isNewest)}',
-            _commandForOs(job.tasks[i].command(job.isNewest)),
+            '$package; $command',
+            _commandForOs(command),
             type: job.tasks[i].type,
             // Run this regardless of the success of other steps other than the
             // pub step.
@@ -314,17 +386,20 @@ extension on CIJobEntry {
       }
     }
 
+    final useMatrix = sdks != null && sdks.length > 1;
+    final sdkVersion = useMatrix ? r'${{ matrix.sdk }}' : job.sdk;
+
     return _githubJob(
       jobName(
         packages,
         includeOs: oneOs,
-        includeSdk: oneSdk,
+        includeSdk: oneSdk || useMatrix,
         includePackage: onePackage,
         includeStage: true,
       ),
       _githubJobOs,
       job.flavor,
-      job.sdk,
+      sdkVersion,
       commandEntries,
       rootConfig,
       config: rootConfig.monoConfig,
@@ -332,6 +407,12 @@ extension on CIJobEntry {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
       },
+      strategy: useMatrix
+          ? {
+              'fail-fast': false,
+              'matrix': {'sdk': sdks},
+            }
+          : null,
     );
   }
 
@@ -373,9 +454,11 @@ Job _githubJob(
   RootConfig rootConfig, {
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
+  Map<String, dynamic>? strategy,
 }) => Job(
   name: jobName,
   runsOn: runsOn,
+  strategy: strategy,
   steps: [
     if (!runsOn.startsWith('windows'))
       _cacheEntries(

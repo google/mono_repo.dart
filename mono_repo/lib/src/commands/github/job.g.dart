@@ -17,6 +17,10 @@ Job _$JobFromJson(Map json) => $checkedCreate('Job', json, ($checkedConvert) {
       'steps',
       (v) => (v as List<dynamic>).map((e) => Step.fromJson(e as Map)).toList(),
     ),
+    strategy: $checkedConvert(
+      'strategy',
+      (v) => (v as Map?)?.map((k, e) => MapEntry(k as String, e)),
+    ),
   );
   $checkedConvert('if', (v) => val.ifContent = v as String?);
   $checkedConvert(
@@ -32,4 +36,5 @@ Map<String, dynamic> _$JobToJson(Job instance) => <String, dynamic>{
   'if': ?instance.ifContent,
   'steps': instance.steps.map((e) => e.toJson()).toList(),
   'needs': ?instance.needs,
+  'strategy': ?instance.strategy,
 };
