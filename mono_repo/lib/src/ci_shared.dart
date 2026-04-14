@@ -101,7 +101,7 @@ void writeFile(
   String fileContent, {
   required bool isScript,
 }) {
-  final fullPath = p.join(rootDirectory, targetFilePath);
+  final fullPath = p.normalize(p.join(rootDirectory, targetFilePath));
   final scriptFile = File(fullPath);
 
   if (!scriptFile.existsSync()) {

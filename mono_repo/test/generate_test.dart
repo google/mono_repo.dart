@@ -207,8 +207,8 @@ dependencies:
 
     expect(
       testGenerateConfig,
-      throwsAParsedYamlException(r'''
-line 1, column 1 of pkg_a/mono_pkg.yaml: Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).
+      throwsAParsedYamlException('''
+line 1, column 1 of pkg_a${p.separator}mono_pkg.yaml: Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).
   ╷
 1 │ ┌ stages:
 2 │ │ - analyze_and_format:
