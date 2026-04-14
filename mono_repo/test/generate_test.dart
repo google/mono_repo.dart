@@ -122,9 +122,8 @@ environment:
       '''),
     ]).create();
 
-    final workflowPath = p.normalize(
-      p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
-    );
+    final workflowPath =
+        p.normalize(p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')));
     final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
     testGenerateConfig(
       printMatcher: stringContainsInOrder([
@@ -171,12 +170,10 @@ environment:
       '''),
     ]).create();
 
-    final pkgAWorkflowPath = p.normalize(
-      p.join(d.sandbox, githubWorkflowFilePath('pkg_a')),
-    );
-    final pkgBWorkflowPath = p.normalize(
-      p.join(d.sandbox, githubWorkflowFilePath('pkg_b')),
-    );
+    final pkgAWorkflowPath =
+        p.normalize(p.join(d.sandbox, githubWorkflowFilePath('pkg_a')));
+    final pkgBWorkflowPath =
+        p.normalize(p.join(d.sandbox, githubWorkflowFilePath('pkg_b')));
     testGenerateConfig(
       printMatcher: stringContainsInOrder([
         'package:pkg_a',
@@ -207,26 +204,32 @@ dependencies:
 
     expect(
       testGenerateConfig,
-      throwsAParsedYamlException(r'''
-line 1, column 1 of pkg_a/mono_pkg.yaml: Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).
-  ╷
-1 │ ┌ stages:
-2 │ │ - analyze_and_format:
-3 │ │   - analyze: .
-4 │ └     sdk: pubspec
-  ╵'''),
+      throwsAParsedYamlException(
+        'line 1, column 1 of ${p.join('pkg_a', 'mono_pkg.yaml')}: '
+        'Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).\n'
+        '  ╷\n'
+        '1 │ ┌ stages:\n'
+        '2 │ │ - analyze_and_format:\n'
+        '3 │ │   - analyze: .\n'
+        '4 │ └     sdk: pubspec\n'
+        '  ╵',
+      ),
     );
   });
 }
 
-String _subPkgStandardOutput({bool withDependabot = false}) =>
-    '''
+String _subPkgStandardOutput({bool withDependabot = false}) {
+  final workflowPath =
+      p.normalize(p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')));
+  final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
+  return '''
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (^3.0.0): `1.23.0`.
-Wrote `${p.normalize(p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')))}`.
-${withDependabot ? 'Wrote `${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.\n' : ''}Make sure to mark `tool/ci.sh` as executable.
+Wrote `$workflowPath`.
+${withDependabot ? 'Wrote `${p.normalize(p.join(d.sandbox, ".github/dependabot.yml"))}`.\n' : ''}Make sure to mark `tool/ci.sh` as executable.
   chmod +x tool/ci.sh
-Wrote `${p.normalize(p.join(d.sandbox, 'tool/ci.sh'))}`.''';
+Wrote `$ciScriptPathNormalized`.''';
+}
 
 Future<void> _testBadConfig(
   Object monoRepoYaml,
