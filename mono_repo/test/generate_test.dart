@@ -209,7 +209,8 @@ dependencies:
       testGenerateConfig,
       throwsAParsedYamlException(
         'line 1, column 1 of ${p.join('pkg_a', 'mono_pkg.yaml')}: '
-        'Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).\n'
+        'Missing key "sdk". `pubspec` is only valid for Dart packages '
+        '(not Flutter).\n'
         '  ╷\n'
         '1 │ ┌ stages:\n'
         '2 │ │ - analyze_and_format:\n'
