@@ -192,7 +192,7 @@ jobs:
         uses: "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354"
         with:
           files: "mono_repo/coverage/lcov.info"
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           name: "coverage_00"
           token: "${{ secrets.CODECOV_TOKEN }}"
     needs:
@@ -242,7 +242,7 @@ jobs:
         uses: "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354"
         with:
           files: "mono_repo/coverage/lcov.info"
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           name: "coverage_01"
           token: "${{ secrets.CODECOV_TOKEN }}"
     needs:

@@ -196,7 +196,7 @@ class _TestWithCoverageTask extends TaskType {
       yield ActionInfo.codecov.usage(
         withContent: {
           'files': '$packageDirectory/coverage/lcov.info',
-          'fail_ci_if_error': true,
+          'fail_ci_if_error': false,
           'name': 'coverage_$countString',
           'token': r'${{ secrets.CODECOV_TOKEN }}',
         },
