@@ -218,9 +218,7 @@ Iterable<_MapEntryWithStage> _listJobs(
   Map<String, String> commandsToKeys,
 ) sync* {
   var count = 0;
-  final packageConfigByPath = {
-    for (var p in rootConfig) p.relativePath: p
-  };
+  final packageConfigByPath = {for (var p in rootConfig) p.relativePath: p};
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
@@ -323,8 +321,6 @@ class _JobGroupKey {
       const IterableEquality().hash(commands) ^
       description.hashCode;
 }
-
-
 
 extension on CIJobEntry {
   String get _githubJobOs {

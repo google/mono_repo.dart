@@ -8,7 +8,7 @@ import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
 import '../../ci_test_script.dart';
-import '../../package_config.dart';
+
 import '../../root_config.dart';
 import '../../user_exception.dart';
 
@@ -41,8 +41,6 @@ class _GeneratedCIScript {
     return _GeneratedCIScript._(script);
   }
 }
-
-
 
 /// Thrown if generated config does not match existing config when running with
 /// the `--validate` option.
