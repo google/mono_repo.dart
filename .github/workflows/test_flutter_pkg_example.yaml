@@ -8,6 +8,8 @@ on:
     paths:
       - ".github/workflows/test_flutter_pkg_example.yaml"
       - "test_flutter_pkg/example/**"
+      - "test_flutter_pkg/**"
+      - "pubspec.yaml"
   pull_request: null
   schedule:
     - cron: "0 0 * * 0"

@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/test_pkg.yaml"
       - "test_pkg/**"
+      - "pubspec.yaml"
   pull_request: null
   schedule:
     - cron: "0 0 * * 0"

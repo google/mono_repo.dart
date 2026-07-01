@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/mono_repo.yaml"
       - "mono_repo/**"
+      - "pubspec.yaml"
   pull_request: null
   schedule:
     - cron: "0 0 * * 0"

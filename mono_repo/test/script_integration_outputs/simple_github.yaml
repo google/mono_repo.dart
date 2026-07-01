@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/sub_pkg.yaml"
       - "sub_pkg/**"
+      - "pubspec.yaml"
   pull_request: null
 defaults:
   run:

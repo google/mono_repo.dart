@@ -153,8 +153,30 @@ ${toYaml({'jobs': jobList})}
 ''';
   }
 
+  final packageMap = {for (var p in rootConfig) p.pubspec.name: p};
+
+  Iterable<PackageConfig> transitiveDeps(PackageConfig config) {
+    final deps = <PackageConfig>{};
+    final queue = Queue<PackageConfig>()..add(config);
+    while (queue.isNotEmpty) {
+      final current = queue.removeFirst();
+      final depNames = [
+        ...current.pubspec.dependencies.keys,
+        ...current.pubspec.devDependencies.keys,
+      ];
+      for (var depName in depNames) {
+        final depConfig = packageMap[depName];
+        if (depConfig != null && deps.add(depConfig)) {
+          queue.add(depConfig);
+        }
+      }
+    }
+    return deps;
+  }
+
   for (var packageConfig in rootConfig) {
     final fileName = packageConfig.relativePath.replaceAll('/', '_');
+    final tDeps = transitiveDeps(packageConfig);
     populateJobs(
       fileName,
       'package:${packageConfig.pubspec.name}',
@@ -162,6 +184,8 @@ ${toYaml({'jobs': jobList})}
       paths: [
         githubWorkflowFilePath(fileName),
         '${packageConfig.relativePath}/**',
+        for (var dep in tDeps) '${dep.relativePath}/**',
+        'pubspec.yaml',
       ],
     );
   }
