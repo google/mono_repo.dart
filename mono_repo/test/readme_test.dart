@@ -25,37 +25,33 @@ void main() {
     expect(readmeContent, contains('self_validate: analyze'));
   });
 
-  test(
-    'validate readme example output',
-    () async {
-      await d.file('mono_repo.yaml', _repoYaml).create();
-      await d.dir('sub_pkg', [
-        d.file(monoPkgFileName, _pkgYaml),
-        d.file('pubspec.yaml', '''
+  test('validate readme example output', () async {
+    await d.file('mono_repo.yaml', _repoYaml).create();
+    await d.dir('sub_pkg', [
+      d.file(monoPkgFileName, _pkgYaml),
+      d.file('pubspec.yaml', '''
 name: sub_pkg
 environment:
   sdk: '^3.0.0'
 '''),
-      ]).create();
-      testGenerateConfig(
-        printMatcher: stringContainsInOrder([
-          'package:sub_pkg\n',
-          'Make sure to mark `tool/ci.sh` as executable.\n',
-          '  chmod +x tool/ci.sh\n',
-        ]),
-      );
+    ]).create();
+    testGenerateConfig(
+      printMatcher: stringContainsInOrder([
+        'package:sub_pkg\n',
+        'Make sure to mark `tool/ci.sh` as executable.\n',
+        '  chmod +x tool/ci.sh\n',
+      ]),
+    );
 
-      void validateFile(String fileToVerify, String expectedOutputFileName) {
-        final inputFile = File(p.join(d.sandbox, fileToVerify));
-        final sourceContent = inputFile.readAsStringSync();
-        validateOutput('readme_$expectedOutputFileName.txt', sourceContent);
-      }
+    void validateFile(String fileToVerify, String expectedOutputFileName) {
+      final inputFile = File(p.join(d.sandbox, fileToVerify));
+      final sourceContent = inputFile.readAsStringSync();
+      validateOutput('readme_$expectedOutputFileName.txt', sourceContent);
+    }
 
-      validateFile(ciScriptPath, 'ci');
-      validateFile(githubWorkflowFilePath('sub_pkg'), 'github_defaults');
-    },
-    onPlatform: const {'windows': Skip('Many platform-specific differences')},
-  );
+    validateFile(ciScriptPath, 'ci');
+    validateFile(githubWorkflowFilePath('sub_pkg'), 'github_defaults');
+  }, onPlatform: const {'windows': Skip('Many platform-specific differences')});
 }
 
 String _yamlWrap(String content) => '```yaml\n$content```';

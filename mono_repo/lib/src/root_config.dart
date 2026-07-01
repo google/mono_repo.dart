@@ -22,6 +22,7 @@ const _pubspecFileName = 'pubspec.yaml';
 PackageConfig? _packageConfigFromDir(
   String rootDirectory,
   String pkgRelativePath,
+  MonoConfig monoConfig,
 ) {
   final legacyConfigPath = p.join(
     rootDirectory,
@@ -40,19 +41,22 @@ PackageConfig? _packageConfigFromDir(
 
   final pkgConfigYaml = yamlMapOrNull(rootDirectory, pkgConfigRelativePath);
 
-  if (pkgConfigYaml == null) {
-    return null;
-  }
-
   final pubspecFile = File(
     p.join(rootDirectory, pkgRelativePath, _pubspecFileName),
   );
 
   if (!pubspecFile.existsSync()) {
-    throw UserException(
-      'A `$monoPkgFileName` file was found, but missing'
-      ' an expected `$_pubspecFileName` in `$pkgRelativePath`.',
-    );
+    if (pkgConfigYaml != null) {
+      throw UserException(
+        'A `$monoPkgFileName` file was found, but missing'
+        ' an expected `$_pubspecFileName` in `$pkgRelativePath`.',
+      );
+    }
+    return null;
+  }
+
+  if (pkgConfigYaml == null && monoConfig.defaults.isEmpty) {
+    return null;
   }
 
   final pubspec = Pubspec.parse(
@@ -60,7 +64,12 @@ PackageConfig? _packageConfigFromDir(
     sourceUrl: Uri.parse(pubspecFile.path),
   );
 
-  return PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
+  return PackageConfig.parse(
+    pkgRelativePath,
+    pubspec,
+    pkgConfigYaml ?? const {},
+    defaults: monoConfig.defaults,
+  );
 }
 
 class RootConfig extends ListBase<PackageConfig> {
@@ -74,6 +83,8 @@ class RootConfig extends ListBase<PackageConfig> {
 
     final configs = <PackageConfig>[];
 
+    final monoConfig = MonoConfig.fromRepo(rootDirectory: rootDirectory);
+
     void visitDirectory(Directory directory) {
       final dirs = directory.listSync().whereType<Directory>().toList()
         ..sort((a, b) => a.path.compareTo(b.path));
@@ -83,6 +94,7 @@ class RootConfig extends ListBase<PackageConfig> {
         final pkgConfig = _packageConfigFromDir(
           rootDirectory!,
           relativeSubDirPath,
+          monoConfig,
         );
         if (pkgConfig != null) {
           configs.add(pkgConfig);
@@ -123,7 +135,7 @@ class RootConfig extends ListBase<PackageConfig> {
 
     return RootConfig._(
       rootDirectory,
-      MonoConfig.fromRepo(rootDirectory: rootDirectory),
+      monoConfig,
       configs,
       existingActionVersions,
     );

@@ -50,17 +50,24 @@ class PackageConfig {
   factory PackageConfig.parse(
     String relativePath,
     Pubspec pubspec,
-    Map monoPkgYaml,
-  ) => createWithCheck(
-    () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
+    Map monoPkgYaml, {
+    Map<String, dynamic>? defaults,
+  }) => createWithCheck(
+    () => PackageConfig._parse(
+      relativePath,
+      pubspec,
+      monoPkgYaml,
+      defaults: defaults,
+    ),
   );
 
   factory PackageConfig._parse(
     String relativePath,
     Pubspec pubspec,
-    Map monoPkgYaml,
-  ) {
-    if (monoPkgYaml.isEmpty) {
+    Map monoPkgYaml, {
+    Map<String, dynamic>? defaults,
+  }) {
+    if (monoPkgYaml.isEmpty && (defaults == null || defaults.isEmpty)) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
       return PackageConfig(
@@ -78,12 +85,18 @@ class PackageConfig {
 
     final flavor = pubspec.flavor;
 
-    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml);
+    final Map mergedConfig = {};
+    if (defaults != null) {
+      mergedConfig.addAll(defaults);
+    }
+    mergedConfig.addAll(monoPkgYaml);
+
+    final rawConfig = RawConfig.fromYaml(flavor, mergedConfig);
 
     final rawSdks = rawConfig.sdks;
     final List<String> sdks;
     if (rawSdks == null || rawSdks.isEmpty) {
-      if (monoPkgYaml.containsKey('sdk')) {
+      if (mergedConfig.containsKey('sdk')) {
         throw CheckedFromJsonException(
           monoPkgYaml,
           'sdk',

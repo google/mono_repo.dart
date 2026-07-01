@@ -37,7 +37,7 @@ environment:
     await _testBadConfig(
       {'extra': 'foo'},
       r'''
-line 1, column 8 of mono_repo.yaml: Unsupported value for "extra". Only `github`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service` keys are supported.
+line 1, column 8 of mono_repo.yaml: Unsupported value for "extra". Only `github`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service`, `defaults` keys are supported.
   ╷
 1 │ extra: "foo"
   │        ^^^^^
