@@ -21,7 +21,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/pkg_a.yml
+      - .github/workflows/pkg_a.yaml
       - "pkg_a/**"
 jobs:
   job_001:
@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 ''';
       await d.dir('.github', [
-        d.dir('workflows', [d.file('pkg_a.yml', content)]),
+        d.dir('workflows', [d.file('pkg_a.yaml', content)]),
       ]).create();
 
       final file = File(path.join(d.sandbox, githubWorkflowFilePath('pkg_a')));

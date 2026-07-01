@@ -79,22 +79,11 @@ environment:
         await populateConfig(monoConfigContent);
 
         testGenerateConfig(printMatcher: _subPkgStandardOutput());
-        await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
-        await d
-            .file(
-              githubWorkflowFilePath('sub_pkg'),
-              startsWith('# Created with package:mono_repo v1.2.3\n'),
-            )
-            .validate();
-        await d
-            .file(
-              githubWorkflowFilePath('sub_pkg'),
-              contains('name: "package:pkg_name"'),
-            )
-            .validate();
-        await d
-            .file(githubWorkflowFilePath('sub_pkg'), contains('shell: "bash"'))
-            .validate();
+        validateSandbox('simple_ci.sh', ciScriptPath);
+        validateSandbox(
+          'simple_github.yaml',
+          githubWorkflowFilePath('sub_pkg'),
+        );
       });
     }
   });

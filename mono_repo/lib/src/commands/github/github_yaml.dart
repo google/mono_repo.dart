@@ -28,7 +28,7 @@ final defaultGitHubWorkflowFilePath = githubWorkflowFilePath(
 );
 
 String githubWorkflowFilePath(String filename) =>
-    '$githubWorkflowDirectory/$filename.yml';
+    '$githubWorkflowDirectory/$filename.yaml';
 
 Map<String, String> generateGitHubYml(RootConfig rootConfig) {
   final output = <String, String>{};

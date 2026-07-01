@@ -1,76 +1,99 @@
-# mono_repo Reboot Plan (Updated)
+# `pkg:mono_repo` Reboot Master Plan (`future` branch)
 
-This document outlines the strategy for simplifying `pkg:mono_repo` and making it more powerful for modern Dart monorepos.
+> [!IMPORTANT]
+> This document is the single **Source of Truth** for the `pkg:mono_repo` reboot. It incorporates all locked-in architectural decisions, monorepo ecosystem research, Dart 3.5+ Workspace support, and the step-by-step implementation roadmap for landing PR #519.
 
-## Goals
+---
 
-1.  **Simplify Configuration**: Reduce boilerplate in `mono_pkg.yaml`.
-2.  **Smart Defaults**: Use information from `pubspec.yaml` to drive CI configuration.
-3.  **Efficient CI**: Automatically generate path-based filters for GitHub Actions to only run necessary tests.
-4.  **Workspace Awareness**: Support Dart workspaces by understanding internal dependencies and triggering downstream tests.
-5.  **Simplify Implementation**: **Kill the "optimal merge" logic.** It is complex, hard to maintain, and no longer necessary for modern GitHub Actions.
+## 1. Executive Summary & Architectural Pillars
 
-## Proposed Changes
+The `future` reboot transforms `pkg:mono_repo` from a legacy Travis-CI-era job-merging tool into a modern, zero-config CI workflow generator for Dart & Flutter monorepos:
 
-### 1. Simplify `mono_pkg.yaml`
+1. **One Workflow Per Package**: Generates `.github/workflows/<package_name>.yaml` for every package instead of a single monolithic `dart.yml`.
+2. **Root Cascading Defaults (`defaults:`)**:
+   - Define default stages, SDK targets, and OS runners once in root `mono_repo.yaml` (e.g. `defaults: sdk: [pubspec, dev]`, `stages: [analyze_and_format, test]`).
+   - Subpackages inherit these defaults automatically. **Subpackages require zero `mono_pkg.yaml` files** unless they need custom overrides.
+3. **One-Layer Deep Stage Merging**:
+   - Subpackages overriding `mono_pkg.yaml` overwrite top-level keys (`sdk`, `os`, `stages`). No complex deep child-item merging within a stage.
+4. **Transitive Path Filtering**:
+   - Automatically computes internal package dependencies. If `pkg_c` depends on `pkg_b`, `.github/workflows/pkg_c.yaml` includes `pkgs/pkg_c/**`, `pkgs/pkg_b/**`, AND root `pubspec.yaml` under `paths:`.
+   - `mono_repo.yaml` is excluded from per-package workflows and included in `mono_repo_self_validate.yaml`.
+5. **Dart Workspaces Auto-Detection**:
+   - Auto-detects packages listed under `workspace:` in root `pubspec.yaml`.
+   - Emits uniform `working-directory: <pkg_dir>` for `dart pub upgrade` steps across all packages.
+6. **Pragmatic Escape Hatches (`ignore: [...]`)**:
+   - Packages with hand-rolled CI (e.g. Docker emulators or Google Cloud Build steps) are listed under `ignore:` in `mono_repo.yaml`.
+   - Custom step hooks (`pre_steps:`, `post_steps:`) allow injecting setup/teardown steps into generated jobs.
+7. **No Cross-Package Job Merging**: Strips out legacy Travis-CI-era `groupCIJobEntries` and `merge_stages` algorithms.
 
-Currently, `mono_pkg.yaml` often requires repeating SDKs and stages. We should support:
+---
 
-- **SDK Inference**: If `sdk` is omitted or set to `pubspec`, automatically test on:
-  - **Oldest**: The minimum SDK version specified in `pubspec.yaml`.
-  - **Newest**: The current `dev` (or `stable`) SDK.
-- **Default Tasks**: If no tasks are specified, default to:
-  - **Oldest SDK**: `dart analyze` and `dart test`.
-  - **Newest SDK**: `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`, and `dart test`.
-- **Repo-wide Defaults**: Move common configuration (like `oses`, `sdks`, or `stages`) to the root `mono_repo.yaml`.
+## 2. Status Audit of `future` Branch
 
-### 2. Smart GitHub Action Generation
+| Component | Status | Source Location | Notes |
+| :--- | :---: | :--- | :--- |
+| **Per-Package Workflow Generator** | ✅ Complete | [github_yaml.dart](file:///usr/local/google/home/kevmoo/github/mono_repo.dart/mono_repo/lib/src/commands/github/github_yaml.dart#L156-L167) | Generates `.github/workflows/<pkg>.yaml` |
+| **Self-Validate Workflow** | ✅ Complete | [github_yaml.dart](file:///usr/local/google/home/kevmoo/github/mono_repo.dart/mono_repo/lib/src/commands/github/github_yaml.dart#L169-L173) | Generates `mono_repo_self_validate.yaml` |
+| **SDK Inference** | ✅ Complete | [package_config.dart](file:///usr/local/google/home/kevmoo/github/mono_repo.dart/mono_repo/lib/src/package_config.dart) | Infers `oldest`, `newest`, `pubspec` versions |
+| **Legacy Code Removal** | ✅ Complete | `mono_config.dart`, `yaml.dart` | Removed `merge_stages` and legacy job merging |
+| **Unit Tests Passing** | ✅ Complete | `mono_repo/test/` | All 45 unit tests pass cleanly |
+| **Golden Fixture Refactoring** | 🟡 Phase 4 | `mono_repo/test/` | Extract string constants into `.yaml` golden files |
+| **Root Cascading Defaults** | 🟡 Phase 5A | `root_config.dart` & `mono_config.dart` | Cascade `defaults:` down to packages missing `mono_pkg.yaml` |
+| **Transitive Path Filtering** | 🟡 Phase 5B | `github_yaml.dart` | Compute transitive internal package paths |
+| **Escape Hatches (`ignore: [...]`)** | 🟡 Phase 5C | `mono_config.dart` | Skip workflow codegen for ignored packages |
 
-- **One Workflow Per Package**: Instead of a monolithic `dart.yml`, generate `.github/workflows/<package_name>.yaml`.
-- **Automatic Path Filtering**: Each workflow will automatically include `paths` filters for its package directory and its own workflow file.
-  - *Example:* `paths: ['pkgs/my_pkg/**', '.github/workflows/my_pkg.yaml']`
-- **Kill Merge Logic**: Stop attempting to merge jobs across different packages into a single workflow. This simplifies the generator and makes individual package CI status clearer in the GitHub UI.
-- **Workspace-aware Triggers**: If `package_b` depends on `package_a`, then a change in `package_a` should trigger the CI for `package_b`.
+---
 
-### 3. Workflow Improvements
+## 3. Step-by-Step Implementation Roadmap
 
-- **SDK Management**: Better handling of Flutter vs. Dart SDKs.
-- **Action Versions**: Keep GitHub Action versions (e.g., `actions/checkout@v4`) up to date easily (already partially supported but could be more robust).
-
-## Implementation Strategy
-
-### Phase 1: Research & Discovery (Done)
-- Analyze current implementation of configuration parsing and YAML generation.
-- Study existing "best-in-class" monorepo CI setups (like `tools`).
-
-### Phase 2: Core Simplification & SDK Inference
-- Update `PackageConfig.parse` to handle missing fields by looking at `pubspec.yaml` and `MonoConfig`.
-- Implement SDK version extraction from `pubspec.yaml`'s `environment` block.
-- Define the "Oldest" vs "Newest" SDK logic.
-
-### Phase 3: New GitHub Action Generator
-- Create a new generator that produces one workflow file per package.
-- Implement path-based triggers (`on: push: paths:` and `on: pull_request: paths:`).
-- Implement dependency graph analysis for the monorepo to support workspace-aware triggers (downstream testing).
-
-### Phase 4: Refactoring & Cleanup
-- Remove the legacy `groupCIJobEntries` and Travis-CI-era optimization logic.
-- Simplify the internal "stage" and "job" models.
-
-## Example of New `mono_pkg.yaml`
-
-```yaml
-# Minimal config!
-# SDKs and tasks are entirely inferred.
+```mermaid
+flowchart TD
+    Phase4[Phase 4: Golden Fixture Extraction & Test Modernization] --> Phase5A[Phase 5A: Root Cascading Defaults]
+    Phase5A --> Phase5B[Phase 5B: Transitive Dependency Path Filtering]
+    Phase5B --> Phase5C[Phase 5C: Escape Hatches ignore: & Step Hooks]
+    Phase5C --> Phase6[Phase 6: Dogfooding & PR Landing]
 ```
 
-## Example of Root `mono_repo.yaml` Defaults
+### Phase 4: Golden Fixture Extraction & Test Modernization
+- **Goal**: Refactor `mono_repo/test/src/expected_output.dart` by extracting inline string constants into dedicated, diffable `.yaml` golden files under `test/script_integration_outputs/`.
+- **Target Files**:
+  - `mono_repo/test/src/expected_output.dart`
+  - `mono_repo/test/generate_test.dart`
+  - `mono_repo/test/shared.dart`
 
-```yaml
-defaults:
-  sdk: [pubspec, dev]
-  os: [ubuntu-latest]
-  stages:
-    - analyze
-    - test
+### Phase 5A: Root Cascading Defaults Implementation
+- **Goal**: Allow `mono_repo.yaml` to define global `defaults:`. If a subpackage lacks a `mono_pkg.yaml`, automatically synthesize its configuration using root defaults and `pubspec.yaml` SDK inferencing.
+- **Target Files**:
+  - `mono_repo/lib/src/mono_config.dart`
+  - `mono_repo/lib/src/package_config.dart`
+  - `mono_repo/lib/src/root_config.dart`
+
+### Phase 5B: Transitive Dependency Path Filtering
+- **Goal**: Calculate internal package dependency graph in `github_yaml.dart`. Append all transitive internal dependency directory paths and root `pubspec.yaml` to each package's `paths:` trigger list.
+- **Target Files**:
+  - `mono_repo/lib/src/commands/github/github_yaml.dart`
+  - `mono_repo/lib/src/root_config.dart`
+
+### Phase 5C: Escape Hatches (`ignore: [...]` & Step Hooks)
+- **Goal**: Add `ignore:` array parsing in `mono_config.dart` to skip workflow generation for ignored packages. Add support for `pre_steps:` and `post_steps:` in `package_config.dart`.
+- **Target Files**:
+  - `mono_repo/lib/src/mono_config.dart`
+  - `mono_repo/lib/src/commands/github/github_yaml.dart`
+
+### Phase 6: Dogfooding, Self-Generation & PR Landing
+- **Goal**: Run `mono_repo generate` on `pkg:mono_repo` itself. Verify generated `.github/workflows/mono_repo.yaml` and `mono_repo_self_validate.yaml`. Run full test suite (`dart test`) and prepare PR #519.
+
+---
+
+## 4. Verification Protocol
+
+```bash
+# 1. Run full unit & integration test suite
+cd /usr/local/google/home/kevmoo/github/mono_repo.dart/mono_repo
+PATH="$HOME/github/flutter/bin:$PATH" ~/github/flutter/bin/dart test
+
+# 2. Test self-generation on pkg:mono_repo
+cd /usr/local/google/home/kevmoo/github/mono_repo.dart
+PATH="$HOME/github/flutter/bin:$PATH" ~/github/flutter/bin/dart run mono_repo generate
+git status
 ```
