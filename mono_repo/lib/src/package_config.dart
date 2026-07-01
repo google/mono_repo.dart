@@ -30,6 +30,8 @@ class PackageConfig {
   final List<String> cacheDirectories;
   final bool dartSdkConfigUsed;
   final bool osConfigUsed;
+  final List<Map>? preSteps;
+  final List<Map>? postSteps;
 
   PackageConfig(
     this.relativePath,
@@ -41,6 +43,8 @@ class PackageConfig {
     this.cacheDirectories,
     this.dartSdkConfigUsed,
     this.osConfigUsed,
+    this.preSteps,
+    this.postSteps,
   ) : assert(() {
         if (sdks == null) return true;
         sortNormalizeVerifySdksList(pubspec.flavor, sdks, AssertionError.new);
@@ -80,6 +84,8 @@ class PackageConfig {
         [],
         false,
         false,
+        null,
+        null,
       );
     }
 
@@ -211,6 +217,8 @@ class PackageConfig {
       rawConfig.cache?.directories ?? const [],
       sdkConfigUsed,
       osConfigUsed,
+      rawConfig.preSteps,
+      rawConfig.postSteps,
     );
   }
 }

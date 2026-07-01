@@ -22,12 +22,24 @@ class RawConfig {
 
   final RawCache? cache;
 
-  RawConfig({required this.oses, this.sdks, List<RawStage>? stages, this.cache})
-    : stages =
-          stages ??
-          [
-            RawStage('unit_test', ['test']),
-          ] {
+  @JsonKey(name: 'pre_steps')
+  final List<Map>? preSteps;
+
+  @JsonKey(name: 'post_steps')
+  final List<Map>? postSteps;
+
+  RawConfig({
+    required this.oses,
+    this.sdks,
+    List<RawStage>? stages,
+    this.cache,
+    this.preSteps,
+    this.postSteps,
+  }) : stages =
+           stages ??
+           [
+             RawStage('unit_test', ['test']),
+           ] {
     oses.sort();
   }
 

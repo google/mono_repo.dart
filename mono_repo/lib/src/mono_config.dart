@@ -21,6 +21,7 @@ const _allowedMonoConfigKeys = {
   'self_validate',
   'coverage_service',
   'defaults',
+  'ignore',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -34,6 +35,7 @@ class MonoConfig implements BasicConfiguration {
   final String? selfValidateStage;
   final GitHubConfig github;
   final Map<String, dynamic> defaults;
+  final Set<String> ignore;
   @override
   final Set<CoverageProcessor> coverageProcessors;
 
@@ -43,6 +45,7 @@ class MonoConfig implements BasicConfiguration {
     required this.selfValidateStage,
     required Map github,
     required this.defaults,
+    required this.ignore,
     required this.coverageProcessors,
   }) : githubConditionalStages = _readConditionalStages(github),
        github = GitHubConfig.fromJson(github);
@@ -134,12 +137,15 @@ class MonoConfig implements BasicConfiguration {
       defaults = Map<String, dynamic>.from(rawDefaults);
     }
 
+    final ignore = _asList(json, 'ignore').toSet();
+
     return MonoConfig._(
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
       selfValidateStage: _selfValidateFromValue(selfValidate),
       github: github,
       defaults: defaults,
+      ignore: ignore,
       coverageProcessors: coverageServices
           .map((e) => CoverageProcessor.values.byName(e))
           .toSet(),
@@ -157,6 +163,7 @@ class MonoConfig implements BasicConfiguration {
         selfValidateStage: null,
         github: {},
         defaults: {},
+        ignore: const {},
         coverageProcessors: {CoverageProcessor.coveralls},
       );
     }

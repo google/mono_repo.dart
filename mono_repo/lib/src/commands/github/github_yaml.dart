@@ -175,6 +175,9 @@ ${toYaml({'jobs': jobList})}
   }
 
   for (var packageConfig in rootConfig) {
+    if (rootConfig.monoConfig.ignore.contains(packageConfig.relativePath)) {
+      continue;
+    }
     final fileName = packageConfig.relativePath.replaceAll('/', '_');
     final tDeps = transitiveDeps(packageConfig);
     populateJobs(
@@ -413,6 +416,8 @@ extension on CIJobEntry {
     final useMatrix = sdks != null && sdks.length > 1;
     final sdkVersion = useMatrix ? r'${{ matrix.sdk }}' : job.sdk;
 
+    final packageConfig = rootConfig.singleWhere((p) => p.relativePath == job.package);
+
     return _githubJob(
       jobName(
         packages,
@@ -437,6 +442,8 @@ extension on CIJobEntry {
               'matrix': {'sdk': sdks},
             }
           : null,
+      preSteps: packageConfig.preSteps,
+      postSteps: packageConfig.postSteps,
     );
   }
 
@@ -479,6 +486,8 @@ Job _githubJob(
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
   Map<String, dynamic>? strategy,
+  List<Map>? preSteps,
+  List<Map>? postSteps,
 }) => Job(
   name: jobName,
   runsOn: runsOn,
@@ -494,12 +503,14 @@ Job _githubJob(
         },
       ),
     packageFlavor.setupStep(sdkVersion, rootConfig),
+    if (preSteps != null) ...preSteps.map((m) => Step.fromJson(m)),
     ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
     ),
     for (var command in runCommands) ...command.runContent(config, rootConfig),
+    if (postSteps != null) ...postSteps.map((m) => Step.fromJson(m)),
   ],
 );
 

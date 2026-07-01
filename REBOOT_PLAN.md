@@ -40,7 +40,7 @@ The `future` reboot transforms `pkg:mono_repo` from a legacy Travis-CI-era job-m
 | **Golden Fixture Refactoring** | 🟡 Phase 4 | `mono_repo/test/` | Extract string constants into `.yaml` golden files |
 | **Root Cascading Defaults** | ✅ Phase 5A | `root_config.dart` & `mono_config.dart` | Cascade `defaults:` down to packages missing `mono_pkg.yaml` |
 | **Transitive Path Filtering** | ✅ Phase 5B | `github_yaml.dart` | Compute transitive internal package paths |
-| **Escape Hatches (`ignore: [...]`)** | 🟡 Phase 5C | `mono_config.dart` | Skip workflow codegen for ignored packages |
+| **Escape Hatches (`ignore: [...]`)** | ✅ Phase 5C | `mono_config.dart` | Skip workflow codegen for ignored packages |
 
 ---
 
