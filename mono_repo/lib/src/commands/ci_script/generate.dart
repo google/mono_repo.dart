@@ -30,7 +30,7 @@ class _GeneratedCIScript {
   _GeneratedCIScript._(this.ciScript);
 
   factory _GeneratedCIScript.generate(RootConfig rootConfig) {
-    final commandsToKeys = extractCommands(rootConfig);
+    final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
 
     final script = generateTestScript(
       commandsToKeys,
@@ -42,41 +42,7 @@ class _GeneratedCIScript {
   }
 }
 
-/// Gives a map of command to unique task key for all [configs].
-Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
-  final commandsToKeys = <String, String>{};
 
-  final tasksToConfigure = configs
-      .expand((config) => config.jobs)
-      .expand(
-        (job) => job.tasks.map((task) => (task: task, isNewest: job.isNewest)),
-      )
-      .toList();
-  final taskTypes = tasksToConfigure.map((t) => t.task.type).toSet();
-
-  for (var taskType in taskTypes) {
-    final commands = tasksToConfigure
-        .where((t) => t.task.type == taskType)
-        .map((t) => t.task.command(t.isNewest))
-        .toSet();
-
-    if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskType.name;
-      continue;
-    }
-
-    final paddingSize = (commands.length - 1).toString().length;
-
-    var count = 0;
-    for (var command in commands) {
-      commandsToKeys[command] =
-          '${taskType.name}_${count.toString().padLeft(paddingSize, '0')}';
-      count++;
-    }
-  }
-
-  return commandsToKeys;
-}
 
 /// Thrown if generated config does not match existing config when running with
 /// the `--validate` option.

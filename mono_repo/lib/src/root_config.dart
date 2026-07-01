@@ -91,6 +91,10 @@ class RootConfig extends ListBase<PackageConfig> {
       for (var subdir in dirs) {
         final relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
 
+        if (monoConfig.ignore.contains(relativeSubDirPath)) {
+          continue;
+        }
+
         final pkgConfig = _packageConfigFromDir(
           rootDirectory!,
           relativeSubDirPath,

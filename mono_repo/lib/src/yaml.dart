@@ -27,6 +27,14 @@ Map<String, dynamic> transferYamlMap(y.YamlMap source) {
   return newMap;
 }
 
+Map<String, dynamic> setYamlMapContext(
+  Map<String, dynamic> target,
+  y.YamlMap source,
+) {
+  _yamlMapExpando[target] = source;
+  return target;
+}
+
 T createWithCheck<T>(T Function() constructor) {
   try {
     return constructor();

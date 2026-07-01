@@ -37,9 +37,10 @@ void main() {
               'type': 'analyze',
               'args': '--fatal-infos --fatal-warnings .',
             },
+            {'flavor': 'dart', 'type': 'format'},
           ],
           'flavor': 'dart',
-          'isNewest': false,
+          'isNewest': true,
         },
         {
           'description': 'dartanalyzer && dartfmt',
@@ -53,9 +54,10 @@ void main() {
               'type': 'analyze',
               'args': '--fatal-infos --fatal-warnings .',
             },
+            {'flavor': 'dart', 'type': 'format'},
           ],
           'flavor': 'dart',
-          'isNewest': false,
+          'isNewest': true,
         },
         {
           'os': 'osx',

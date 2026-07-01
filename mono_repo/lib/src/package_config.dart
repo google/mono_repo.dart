@@ -91,11 +91,17 @@ class PackageConfig {
 
     final flavor = pubspec.flavor;
 
-    final mergedConfig = {};
+    // Note: This is a shallow merge.
+    // If a package specifies `stages` or `cache`, it completely overwrites
+    // the values from `defaults` rather than deep merging them.
+    final mergedConfig = <String, dynamic>{};
     if (defaults != null) {
-      mergedConfig.addAll(defaults);
+      mergedConfig.addAll(defaults.cast<String, dynamic>());
     }
-    mergedConfig.addAll(monoPkgYaml);
+    mergedConfig.addAll(monoPkgYaml.cast<String, dynamic>());
+    if (monoPkgYaml is YamlMap) {
+      setYamlMapContext(mergedConfig, monoPkgYaml);
+    }
 
     final rawConfig = RawConfig.fromYaml(flavor, mergedConfig);
 
@@ -179,7 +185,7 @@ class PackageConfig {
           flavor: flavor,
         );
 
-        final newestSdk = sdks.last;
+        final newestSdk = jobSdks.last;
 
         for (var sdk in jobSdks) {
           final isNewest = sdk == newestSdk;

@@ -44,7 +44,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
     if (selfValidateStage != null) _SelfValidateJob(selfValidateStage),
   ];
 
-  final commandsToKeys = _extractCommands(allModernJobs);
+  final commandsToKeys = extractCommands(allModernJobs);
 
   void populateJobs(
     String fileName,
@@ -140,6 +140,8 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
         final value = entry.value;
         if (value is Map) {
           on[entry.key] = {...value, 'paths': paths};
+        } else if (value == null) {
+          on[entry.key] = {'paths': paths};
         }
       }
     }
@@ -162,7 +164,7 @@ ${toYaml({'jobs': jobList})}
       final current = queue.removeFirst();
       final depNames = [
         ...current.pubspec.dependencies.keys,
-        ...current.pubspec.devDependencies.keys,
+        if (current == config) ...current.pubspec.devDependencies.keys,
       ];
       for (var depName in depNames) {
         final depConfig = packageMap[depName];
@@ -186,7 +188,12 @@ ${toYaml({'jobs': jobList})}
       packageConfig.jobs,
       paths: [
         githubWorkflowFilePath(fileName),
-        '${packageConfig.relativePath}/**',
+        if (packageConfig.relativePath == '.') ...[
+          '**',
+          for (var p in rootConfig)
+            if (p.relativePath != '.') '!${p.relativePath}/**',
+        ] else
+          '${packageConfig.relativePath}/**',
         for (var dep in tDeps) '${dep.relativePath}/**',
         'pubspec.yaml',
       ],
@@ -211,6 +218,9 @@ Iterable<_MapEntryWithStage> _listJobs(
   Map<String, String> commandsToKeys,
 ) sync* {
   var count = 0;
+  final packageConfigByPath = {
+    for (var p in rootConfig) p.relativePath: p
+  };
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
@@ -260,6 +270,7 @@ Iterable<_MapEntryWithStage> _listJobs(
     final ciEntry = CIJobEntry(firstJob, commands);
 
     final job = ciEntry._createJob(
+      packageConfigByPath[firstJob.package]!,
       rootConfig,
       oneOs: false,
       oneSdk: false,
@@ -313,44 +324,7 @@ class _JobGroupKey {
       description.hashCode;
 }
 
-/// Gives a map of command to unique task key for all [jobs].
-Map<String, String> _extractCommands(Iterable<HasStageName> jobs) {
-  final commandsToKeys = <String, String>{};
 
-  final tasksToConfigure = jobs
-      .whereType<CIJob>()
-      .expand((job) => job.tasks.map((task) => (task, job.isNewest)))
-      .toList();
-
-  final taskTypes = tasksToConfigure.map((t) => t.$1.type).toSet();
-
-  for (var taskType in taskTypes) {
-    final commands =
-        tasksToConfigure
-            .where((t) => t.$1.type == taskType)
-            .map((t) => t.$1.command(t.$2))
-            .toSet()
-            .toList()
-          ..sort();
-
-    if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskType.name;
-      continue;
-    }
-
-    // If we have multiple, we want a stable mapping.
-    // We also want to try and keep the 'simplest' command as just the task name
-    // if possible.
-    final paddingSize = (commands.length - 1).toString().length;
-
-    for (var i = 0; i < commands.length; i++) {
-      commandsToKeys[commands[i]] =
-          '${taskType.name}_${i.toString().padLeft(paddingSize, '0')}';
-    }
-  }
-
-  return commandsToKeys;
-}
 
 extension on CIJobEntry {
   String get _githubJobOs {
@@ -367,6 +341,7 @@ extension on CIJobEntry {
   }
 
   Job _createJob(
+    PackageConfig packageConfig,
     RootConfig rootConfig, {
     List<String>? packages,
     required bool oneOs,
@@ -382,12 +357,13 @@ extension on CIJobEntry {
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
+      final stepNamePrefix = packages.length > 1 ? '$package; ' : '';
       final pubStepId =
           '${package.replaceAll('/', '_')}_'
           'pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(
         _CommandEntry(
-          '$package; $pubCommand',
+          '$stepNamePrefix$pubCommand',
           pubCommand,
           id: pubStepId,
           // Run this regardless of the success of other steps other than the
@@ -401,7 +377,7 @@ extension on CIJobEntry {
         if (command.isEmpty || command == 'true') continue;
         commandEntries.add(
           _CommandEntry(
-            '$package; $command',
+            '$stepNamePrefix$command',
             _commandForOs(command),
             type: job.tasks[i].type,
             // Run this regardless of the success of other steps other than the
@@ -415,10 +391,6 @@ extension on CIJobEntry {
 
     final useMatrix = sdks != null && sdks.length > 1;
     final sdkVersion = useMatrix ? r'${{ matrix.sdk }}' : job.sdk;
-
-    final packageConfig = rootConfig.singleWhere(
-      (p) => p.relativePath == job.package,
-    );
 
     return _githubJob(
       jobName(
@@ -505,12 +477,12 @@ Job _githubJob(
         },
       ),
     packageFlavor.setupStep(sdkVersion, rootConfig),
-    if (preSteps != null) ...preSteps.map(Step.fromJson),
     ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
     ),
+    if (preSteps != null) ...preSteps.map(Step.fromJson),
     for (var command in runCommands) ...command.runContent(config, rootConfig),
     if (postSteps != null) ...postSteps.map(Step.fromJson),
   ],

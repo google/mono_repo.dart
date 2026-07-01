@@ -9,6 +9,7 @@ import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 
+import '../ci_shared.dart';
 import '../package_config.dart';
 import '../root_config.dart';
 import '../user_exception.dart';
@@ -83,7 +84,7 @@ Future<bool> presubmit(
     );
   }
 
-  final commandsToKeys = extractCommands(rootConfig);
+  final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
   // By default, run on all packages.
   if (packages.isEmpty) {
     packages = rootConfig.map((pc) => pc.relativePath).toList();

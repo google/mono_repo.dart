@@ -9,7 +9,11 @@ on:
       - ".github/workflows/test_pkg.yaml"
       - "test_pkg/**"
       - "pubspec.yaml"
-  pull_request: null
+  pull_request:
+    paths:
+      - ".github/workflows/test_pkg.yaml"
+      - "test_pkg/**"
+      - "pubspec.yaml"
   schedule:
     - cron: "0 0 * * 0"
 defaults:
@@ -43,11 +47,11 @@ jobs:
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
       - id: "test_pkg_pub_upgrade"
-        name: "test_pkg; dart pub upgrade"
+        name: "dart pub upgrade"
         run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: "test_pkg"
-      - name: "test_pkg; dart analyze"
+      - name: "dart analyze"
         run: "dart analyze"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: "test_pkg"
@@ -59,39 +63,39 @@ jobs:
           - "2.17.0-69.1.beta"
           - "2.18.0-106.0.dev"
           - "beta"
+          - "dev"
           - "main"
-          - "stable"
   job_002:
-    name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
+    name: "smoke_test; linux; Dart stable; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Cache Pub hosted dependencies"
         uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:test_pkg;commands:format-analyze_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_pkg;commands:format-analyze_1"
           restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:test_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:test_pkg
+            os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
       - name: "Setup Dart SDK"
         uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: "dev"
+          sdk: "stable"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
       - id: "test_pkg_pub_upgrade"
-        name: "test_pkg; dart pub upgrade"
+        name: "dart pub upgrade"
         run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: "test_pkg"
-      - name: "test_pkg; dart format --output=none --set-exit-if-changed ."
+      - name: "dart format --output=none --set-exit-if-changed ."
         run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: "test_pkg"
-      - name: "test_pkg; dart analyze --fatal-infos"
+      - name: "dart analyze --fatal-infos"
         run: "dart analyze --fatal-infos"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: "test_pkg"
@@ -119,11 +123,11 @@ jobs:
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
       - id: "test_pkg_pub_upgrade"
-        name: "test_pkg; dart pub upgrade"
+        name: "dart pub upgrade"
         run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: "test_pkg"
-      - name: "test_pkg; dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
+      - name: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
         run: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
         if: "always() && steps.test_pkg_pub_upgrade.conclusion == 'success'"
         working-directory: "test_pkg"
