@@ -416,7 +416,9 @@ extension on CIJobEntry {
     final useMatrix = sdks != null && sdks.length > 1;
     final sdkVersion = useMatrix ? r'${{ matrix.sdk }}' : job.sdk;
 
-    final packageConfig = rootConfig.singleWhere((p) => p.relativePath == job.package);
+    final packageConfig = rootConfig.singleWhere(
+      (p) => p.relativePath == job.package,
+    );
 
     return _githubJob(
       jobName(
@@ -503,14 +505,14 @@ Job _githubJob(
         },
       ),
     packageFlavor.setupStep(sdkVersion, rootConfig),
-    if (preSteps != null) ...preSteps.map((m) => Step.fromJson(m)),
+    if (preSteps != null) ...preSteps.map(Step.fromJson),
     ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
     ),
     for (var command in runCommands) ...command.runContent(config, rootConfig),
-    if (postSteps != null) ...postSteps.map((m) => Step.fromJson(m)),
+    if (postSteps != null) ...postSteps.map(Step.fromJson),
   ],
 );
 

@@ -123,7 +123,7 @@ class MonoConfig implements BasicConfiguration {
 
     final coverageServices = _asList(json, 'coverage_service');
 
-    Map<String, dynamic> defaults = {};
+    var defaults = <String, dynamic>{};
     final rawDefaults = json['defaults'];
     if (rawDefaults != null) {
       if (rawDefaults is! Map) {

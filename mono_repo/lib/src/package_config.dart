@@ -91,7 +91,7 @@ class PackageConfig {
 
     final flavor = pubspec.flavor;
 
-    final Map mergedConfig = {};
+    final mergedConfig = {};
     if (defaults != null) {
       mergedConfig.addAll(defaults);
     }

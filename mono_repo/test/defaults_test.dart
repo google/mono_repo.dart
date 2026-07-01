@@ -1,7 +1,5 @@
-import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/github/github_yaml.dart';
 import 'package:mono_repo/src/yaml.dart';
-import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
@@ -33,9 +31,6 @@ environment:
       printMatcher: stringContainsInOrder(['package:sub_pkg', 'Wrote ']),
     );
 
-    final workflowPath = p.normalize(
-      p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
-    );
     await d
         .file(githubWorkflowFilePath('sub_pkg'), contains('sdk: "dev"'))
         .validate();
@@ -70,7 +65,7 @@ environment:
       printMatcher: stringContainsInOrder(['package:sub_pkg', 'Wrote ']),
     );
 
-    // Should use stable SDK from mono_pkg.yaml, but inherit stages from defaults
+    // Should use stable SDK from mono_pkg.yaml, inheriting stages from defaults
     await d
         .file(githubWorkflowFilePath('sub_pkg'), contains('sdk: "stable"'))
         .validate();
