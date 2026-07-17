@@ -37,6 +37,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -71,6 +73,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -105,6 +109,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -139,6 +145,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -169,6 +177,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -203,6 +213,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -237,6 +249,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -267,6 +281,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -314,6 +330,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -348,6 +366,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -382,6 +402,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -416,6 +438,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -450,6 +474,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -493,6 +519,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_flutter_pkg_pub_upgrade
         name: test_flutter_pkg; flutter pub upgrade
         run: flutter pub upgrade
@@ -538,6 +566,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -597,6 +627,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -654,6 +686,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -699,6 +733,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_pkg_pub_upgrade
         name: test_pkg; dart pub upgrade
         run: dart pub upgrade
@@ -756,6 +792,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: test_flutter_pkg_example_pub_upgrade
         name: test_flutter_pkg/example; flutter pub upgrade
         run: flutter pub upgrade
@@ -789,6 +827,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
@@ -822,6 +862,8 @@ jobs:
       - id: checkout
         name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - id: mono_repo_pub_upgrade
         name: mono_repo; dart pub upgrade
         run: dart pub upgrade
