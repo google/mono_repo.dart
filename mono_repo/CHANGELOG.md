@@ -1,5 +1,6 @@
-## 6.6.5-wip
+## 6.6.5
 
+- Add `persist-credentials: false` to the checkout action.
 - Update to latest action versions.
 
 ## 6.6.4

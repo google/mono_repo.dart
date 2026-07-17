@@ -402,6 +402,7 @@ Job _githubJob(
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
+      withContent: {'persist-credentials': false},
     ),
     for (var command in runCommands) ...command.runContent(config, rootConfig),
   ],
