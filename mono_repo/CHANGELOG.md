@@ -1,4 +1,4 @@
-## 6.6.5
+## 6.7.0
 
 - Add `persist-credentials: false` to the checkout action.
 - Update to latest action versions.
