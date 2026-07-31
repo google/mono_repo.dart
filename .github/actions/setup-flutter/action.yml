@@ -27,7 +27,7 @@ runs:
           os:${{ runner.os }};pub-cache-hosted;channel:${{ inputs.channel }}
           os:${{ runner.os }};pub-cache-hosted
     - name: "Setup Flutter SDK"
-      uses: "subosito/flutter-action@f2c484b01f202e2666925e7785c86a14fed841d9"
+      uses: "subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2"
       with:
         channel: "${{ inputs.channel }}"
     - id: "pub_action"
