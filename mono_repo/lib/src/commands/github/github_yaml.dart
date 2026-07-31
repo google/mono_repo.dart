@@ -138,6 +138,7 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       final on = Map<String, dynamic>.from(githubConfig['on'] as Map);
       githubConfig['on'] = on;
       for (var entry in on.entries) {
+        if (entry.key == 'schedule') continue;
         final value = entry.value;
         if (value is Map) {
           on[entry.key] = {...value, 'paths': paths};

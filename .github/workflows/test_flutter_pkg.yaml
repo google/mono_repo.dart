@@ -13,11 +13,7 @@ on:
       - ".github/workflows/test_flutter_pkg.yaml"
       - "test_flutter_pkg/**"
   schedule:
-    branches:
-      - cron: "0 0 * * 0"
-    paths:
-      - ".github/workflows/test_flutter_pkg.yaml"
-      - "test_flutter_pkg/**"
+    - cron: "0 0 * * 0"
 defaults:
   run:
     shell: "bash"

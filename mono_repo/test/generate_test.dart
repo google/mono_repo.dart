@@ -372,6 +372,38 @@ defaults:
         .file(githubWorkflowFilePath('pkg_a'), contains('paths:'))
         .validate();
   });
+
+  test('schedule triggers are preserved without paths or branches', () async {
+    await d.dir('pkg_a', [
+      d.file('pubspec.yaml', '''
+name: pkg_a
+environment:
+  sdk: '^3.0.0'
+'''),
+    ]).create();
+
+    await d.file('mono_repo.yaml', '''
+github:
+  on:
+    schedule:
+      - cron: "0 0 * * 0"
+defaults:
+  sdk:
+    - dev
+  stages:
+    - analyze:
+      - analyze
+''').create();
+
+    testGenerateConfig(printMatcher: stringContainsInOrder(['package:pkg_a']));
+
+    await d
+        .file(
+          githubWorkflowFilePath('pkg_a'),
+          contains('schedule:\n    - cron: "0 0 * * 0"'),
+        )
+        .validate();
+  });
 }
 
 String _subPkgStandardOutput({bool withDependabot = false}) {
