@@ -477,6 +477,7 @@ Job _githubJob(
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
+      withContent: {'persist-credentials': false},
     ),
     if (preSteps != null) ...preSteps.map(Step.fromJson),
     for (var command in runCommands) ...command.runContent(config, rootConfig),

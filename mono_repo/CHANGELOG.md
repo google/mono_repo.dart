@@ -1,5 +1,10 @@
-## 6.6.5-wip
+## 6.7.1
 
+- Fix version number output.
+
+## 6.7.0 (retracted)
+
+- Add `persist-credentials: false` to the checkout action.
 - Update to latest action versions.
 
 ## 6.6.4
