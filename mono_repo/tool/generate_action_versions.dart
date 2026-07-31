@@ -20,11 +20,13 @@ void main(List<String> args) {
     exit(1);
   }
   final previousContent = versionsFile.readAsStringSync();
-  final workflowDir = Directory('../.github/workflows');
+  final githubDir = Directory('../.github');
   final versions = <String, String>{};
-  for (var file in workflowDir.listSync().whereType<File>().where(
-    (f) => f.path.endsWith('.yml') || f.path.endsWith('.yaml'),
-  )) {
+  for (var file
+      in githubDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.yml') || f.path.endsWith('.yaml'))) {
     versions.addAll(RootConfig.parseActionVersions(file.readAsStringSync()));
   }
   final newContentBuffer = StringBuffer('''
@@ -79,7 +81,7 @@ $newContent
       if (validateOnly) {
         exitCode = 1;
       } else {
-        tmpFile.renameSync(versionsFile.path);
+        tmpFile.copySync(versionsFile.path);
       }
     }
   }

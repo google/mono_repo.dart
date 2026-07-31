@@ -1,0 +1,42 @@
+# Created with package:mono_repo v6.7.1
+name: "Setup Flutter Package"
+description: "Setup Flutter SDK, cache pub dependencies, checkout repository, and run flutter pub action."
+inputs:
+  channel:
+    description: "Flutter SDK channel or version"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:${{ runner.os }};pub-cache-hosted;channel:${{ inputs.channel }};pkg:${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:${{ runner.os }};pub-cache-hosted;channel:${{ inputs.channel }}
+          os:${{ runner.os }};pub-cache-hosted
+    - name: "Setup Flutter SDK"
+      uses: "subosito/flutter-action@f2c484b01f202e2666925e7785c86a14fed841d9"
+      with:
+        channel: "${{ inputs.channel }}"
+    - id: "checkout"
+      name: "Checkout repository"
+      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      with:
+        persist-credentials: false
+    - id: "pub_action"
+      name: "flutter pub ${{ inputs.pub-action }}"
+      run: "flutter pub ${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "${{ inputs.working-directory }}"

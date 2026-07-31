@@ -13,4 +13,4 @@ const codecovCodecovActionVersion = 'e79a6962e0d4c0c17b229090214935d2e33f8354';
 const coverallsappGithubActionVersion =
     '648a8eb78e6d50909eff900e4ec85cab4524a45b';
 const dartLangSetupDartVersion = '65eb853c7ba17dde3be364c3d2858773e7144260';
-const subositoFlutterActionVersion = '1a449444c387b1966244ae4d4f8c696479add0b2';
+const subositoFlutterActionVersion = 'f2c484b01f202e2666925e7785c86a14fed841d9';

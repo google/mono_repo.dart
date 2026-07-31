@@ -195,7 +195,6 @@ ${toYaml({'jobs': jobList})}
         ] else
           '${packageConfig.relativePath}/**',
         for (var dep in tDeps) '${dep.relativePath}/**',
-        'pubspec.yaml',
       ],
     );
   }
@@ -204,6 +203,99 @@ ${toYaml({'jobs': jobList})}
     populateJobs('mono_repo_self_validate', 'mono_repo self validate', [
       _SelfValidateJob(selfValidateStage),
     ]);
+  }
+
+  if (output.isNotEmpty) {
+    output['.github/actions/setup-dart/action.yml'] =
+        '''
+$createdWith
+name: "Setup Dart Package"
+description: "Setup Dart SDK, cache pub dependencies, checkout repository, and run pub action."
+inputs:
+  sdk:
+    description: "Dart SDK version or channel"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }};pkg:\${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }}
+          os:\${{ runner.os }};pub-cache-hosted
+    - name: "Setup Dart SDK"
+      uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
+      with:
+        sdk: "\${{ inputs.sdk }}"
+    - id: "checkout"
+      name: "Checkout repository"
+      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      with:
+        persist-credentials: false
+    - id: "pub_action"
+      name: "dart pub \${{ inputs.pub-action }}"
+      run: "dart pub \${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "\${{ inputs.working-directory }}"
+''';
+    output['.github/actions/setup-flutter/action.yml'] =
+        '''
+$createdWith
+name: "Setup Flutter Package"
+description: "Setup Flutter SDK, cache pub dependencies, checkout repository, and run flutter pub action."
+inputs:
+  channel:
+    description: "Flutter SDK channel or version"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }};pkg:\${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }}
+          os:\${{ runner.os }};pub-cache-hosted
+    - name: "Setup Flutter SDK"
+      uses: "subosito/flutter-action@f2c484b01f202e2666925e7785c86a14fed841d9"
+      with:
+        channel: "\${{ inputs.channel }}"
+    - id: "checkout"
+      name: "Checkout repository"
+      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+      with:
+        persist-credentials: false
+    - id: "pub_action"
+      name: "flutter pub \${{ inputs.pub-action }}"
+      run: "flutter pub \${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "\${{ inputs.working-directory }}"
+''';
   }
 
   return output;
@@ -376,9 +468,6 @@ extension on CIJobEntry {
             '$stepNamePrefix$command',
             _commandForOs(command),
             type: job.tasks[i].type,
-            // Run this regardless of the success of other steps other than the
-            // pub step.
-            ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
             workingDirectory: package,
           ),
         );
@@ -463,24 +552,28 @@ Job _githubJob(
   runsOn: runsOn,
   strategy: strategy,
   steps: [
-    if (!runsOn.startsWith('windows'))
-      _cacheEntries(
-        runsOn,
-        rootConfig: rootConfig,
-        additionalCacheKeys: {
-          'sdk': sdkVersion,
-          if (additionalCacheKeys != null) ...additionalCacheKeys,
+    () {
+      final workingDir = runCommands
+          .whereType<_CommandEntry>()
+          .firstOrNull
+          ?.workingDirectory;
+      return Step.uses(
+        name: 'Setup ${packageFlavor.name} package',
+        uses: './.github/actions/setup-${packageFlavor.name}',
+        withContent: {
+          packageFlavor == PackageFlavor.flutter ? 'channel' : 'sdk':
+              sdkVersion,
+          if (workingDir != null && workingDir != '.')
+            'working-directory': workingDir,
         },
-      ),
-    packageFlavor.setupStep(sdkVersion, rootConfig),
+      );
+    }(),
     ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
-    ActionInfo.checkout.usage(
-      id: 'checkout',
-      versionOverrides: rootConfig.existingActionVersions,
-      withContent: {'persist-credentials': false},
-    ),
     if (preSteps != null) ...preSteps.map(Step.fromJson),
-    for (var command in runCommands) ...command.runContent(config, rootConfig),
+    for (var command in runCommands.where(
+      (c) => c is! _CommandEntry || c.type != null,
+    ))
+      ...command.runContent(config, rootConfig),
     if (postSteps != null) ...postSteps.map(Step.fromJson),
   ],
 );
@@ -533,52 +626,6 @@ class _CommandEntry extends _CommandEntryBase {
       ];
 }
 
-/// Creates a "step" for enabling caching for the containing job.
-///
-/// See https://github.com/marketplace/actions/cache
-///
-/// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
-/// store and retrieve the cache.
-Step _cacheEntries(
-  String runsOn, {
-  required RootConfig rootConfig,
-  Map<String, String>? additionalCacheKeys,
-}) {
-  final cacheKeyParts = [
-    'os:$runsOn',
-    'pub-cache-hosted',
-    if (additionalCacheKeys != null) ...[
-      for (var entry in additionalCacheKeys.entries)
-        '${entry.key}:${entry.value}',
-    ],
-  ];
-
-  final restoreKeys = [
-    for (var i = cacheKeyParts.length; i > 0; i--)
-      _maxLength(cacheKeyParts.take(i).join(';')),
-  ];
-
-  // Just caching the `hosted` directory because caching git dependencies or
-  // activated packages can cause problems.
-  const pubCacheHosted = '~/.pub-cache/hosted';
-
-  return ActionInfo.cache.usage(
-    withContent: {
-      'path': pubCacheHosted,
-      'key': restoreKeys.first,
-      'restore-keys': restoreKeys.skip(1).join('\n'),
-    },
-    versionOverrides: rootConfig.existingActionVersions,
-  );
-}
-
-String _maxLength(String input) {
-  if (input.length <= 512) return input;
-  final hash = ['-!!too_long!!', input.length, input.hashCode].join('-');
-
-  return input.substring(0, 512 - hash.length) + hash;
-}
-
 Job _selfValidateJob(BasicConfiguration config, RootConfig rootConfig) =>
     _githubJob(
       selfValidateJobName,
@@ -611,22 +658,4 @@ class _MapEntryWithStage {
   final String stageName;
 
   _MapEntryWithStage(this.id, this.value, this.stageName);
-}
-
-extension on PackageFlavor {
-  Step setupStep(String sdkVersion, RootConfig rootConfig) {
-    switch (this) {
-      case PackageFlavor.dart:
-        return ActionInfo.setupDart.usage(
-          withContent: {'sdk': sdkVersion},
-          versionOverrides: rootConfig.existingActionVersions,
-        );
-
-      case PackageFlavor.flutter:
-        return ActionInfo.setupFlutter.usage(
-          withContent: {'channel': sdkVersion},
-          versionOverrides: rootConfig.existingActionVersions,
-        );
-    }
-  }
 }

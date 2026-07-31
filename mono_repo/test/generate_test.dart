@@ -213,11 +213,19 @@ String _subPkgStandardOutput({bool withDependabot = false}) {
   final workflowPath = p.normalize(
     p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
   );
+  final setupDartPath = p.normalize(
+    p.join(d.sandbox, '.github/actions/setup-dart/action.yml'),
+  );
+  final setupFlutterPath = p.normalize(
+    p.join(d.sandbox, '.github/actions/setup-flutter/action.yml'),
+  );
   final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
   return '''
 package:sub_pkg
   There are jobs defined that are not compatible with the package SDK constraint (^3.0.0): `1.23.0`.
 Wrote `$workflowPath`.
+Wrote `$setupDartPath`.
+Wrote `$setupFlutterPath`.
 ${withDependabot ? 'Wrote `${p.normalize(p.join(d.sandbox, ".github/dependabot.yml"))}`.\n' : ''}${scriptLines('tool/ci.sh').join('\n')}
 Wrote `$ciScriptPathNormalized`.''';
 }
