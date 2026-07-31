@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.7.1
+# Created with package:mono_repo v7.0.0-wip
 name: "Setup Dart Package"
 description: "Setup Dart SDK, cache pub dependencies, checkout repository, and run pub action."
 inputs:
