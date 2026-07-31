@@ -8,6 +8,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/coverage_processor.dart';
 import 'package:mono_repo/src/mono_config.dart';
 import 'package:mono_repo/src/package_config.dart';
+import 'package:mono_repo/src/utilities.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
 
@@ -438,6 +439,12 @@ void main() {
         () => MonoConfig.fromJson({'unsupported_key': true}),
         throwsA(isA<CheckedFromJsonException>()),
       );
+    });
+
+    test('SDK channel sorting ranks stable < beta < dev < main', () {
+      final sdks = ['dev', 'stable', '3.8.0', 'main', 'pubspec', 'beta']
+        ..sort(compareSdks);
+      expect(sdks, ['pubspec', '3.8.0', 'stable', 'beta', 'dev', 'main']);
     });
   });
 }
