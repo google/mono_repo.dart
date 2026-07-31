@@ -22,6 +22,8 @@ class GitHubConfig {
 
   final Map<String, dynamic>? dependabot;
 
+  final Object? permissions;
+
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
@@ -37,8 +39,9 @@ class GitHubConfig {
     String? cron,
     this.stages,
     this.workflows,
-    this.dependabot,
-  ) : on = _parseOn(on, cron) {
+    this.dependabot, [
+    this.permissions,
+  ]) : on = _parseOn(on, cron) {
     if (workflows != null) {
       _noDefaultFileName();
       _noDuplicateWorkflowNames();
@@ -118,7 +121,7 @@ class GitHubConfig {
     },
     'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
     // Declare default permissions as read only.
-    'permissions': 'read-all',
+    'permissions': permissions ?? 'read-all',
   };
 }
 

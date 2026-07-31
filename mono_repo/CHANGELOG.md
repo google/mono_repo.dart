@@ -1,3 +1,7 @@
+## 6.7.2-wip
+
+- Support configuring `permissions` under `github` in `mono_repo.yaml`.
+
 ## 6.7.1
 
 - Fix version number output.
