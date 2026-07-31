@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 
-import 'package:checked_yaml/checked_yaml.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mono_repo/src/coverage_processor.dart';
 import 'package:mono_repo/src/mono_config.dart';
