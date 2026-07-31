@@ -28,6 +28,11 @@ jobs:
     name: "smoke_test; linux; `dart analyze`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -50,6 +55,11 @@ jobs:
     name: "smoke_test; linux; Dart stable; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -65,6 +75,11 @@ jobs:
     name: "test; linux; `dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:

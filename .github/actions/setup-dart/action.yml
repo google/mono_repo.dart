@@ -30,11 +30,6 @@ runs:
       uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
       with:
         sdk: "${{ inputs.sdk }}"
-    - id: "checkout"
-      name: "Checkout repository"
-      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-      with:
-        persist-credentials: false
     - id: "pub_action"
       name: "dart pub ${{ inputs.pub-action }}"
       run: "dart pub ${{ inputs.pub-action }}"

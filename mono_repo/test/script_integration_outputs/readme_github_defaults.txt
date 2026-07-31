@@ -29,6 +29,11 @@ jobs:
     name: "analyze; linux; Dart 3.0.0; `dart analyze`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -41,6 +46,11 @@ jobs:
     name: "analyze; linux; Dart dev; `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -53,6 +63,11 @@ jobs:
     name: "analyze; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -65,6 +80,11 @@ jobs:
     name: "unit_test; linux; `dart test`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -88,6 +108,11 @@ jobs:
     runs-on: "ubuntu-latest"
     if: "github.event_name == 'schedule'"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -112,6 +137,11 @@ jobs:
     runs-on: "windows-latest"
     if: "github.event_name == 'schedule'"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:

@@ -240,11 +240,6 @@ runs:
       uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
       with:
         sdk: "\${{ inputs.sdk }}"
-    - id: "checkout"
-      name: "Checkout repository"
-      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-      with:
-        persist-credentials: false
     - id: "pub_action"
       name: "dart pub \${{ inputs.pub-action }}"
       run: "dart pub \${{ inputs.pub-action }}"
@@ -255,7 +250,7 @@ runs:
         '''
 $createdWith
 name: "Setup Flutter Package"
-description: "Setup Flutter SDK, cache pub dependencies, checkout repository, and run flutter pub action."
+description: "Setup Flutter SDK, cache pub dependencies, and run flutter pub action."
 inputs:
   channel:
     description: "Flutter SDK channel or version"
@@ -285,11 +280,6 @@ runs:
       uses: "subosito/flutter-action@f2c484b01f202e2666925e7785c86a14fed841d9"
       with:
         channel: "\${{ inputs.channel }}"
-    - id: "checkout"
-      name: "Checkout repository"
-      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-      with:
-        persist-credentials: false
     - id: "pub_action"
       name: "flutter pub \${{ inputs.pub-action }}"
       run: "flutter pub \${{ inputs.pub-action }}"
@@ -552,6 +542,11 @@ Job _githubJob(
   runsOn: runsOn,
   strategy: strategy,
   steps: [
+    ActionInfo.checkout.usage(
+      id: 'checkout',
+      versionOverrides: rootConfig.existingActionVersions,
+      withContent: {'persist-credentials': false},
+    ),
     () {
       final workingDir = runCommands
           .whereType<_CommandEntry>()

@@ -28,6 +28,11 @@ jobs:
     name: "smoke_test; linux; Dart 3.8.0; `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -40,6 +45,11 @@ jobs:
     name: "smoke_test; linux; Dart dev; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -52,6 +62,11 @@ jobs:
     name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -67,6 +82,11 @@ jobs:
     name: "test; linux; Dart 3.8.0; `dart test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -83,6 +103,11 @@ jobs:
     name: "test; linux; Dart dev; `dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -115,6 +140,11 @@ jobs:
     name: "test; linux; Dart dev; `dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -147,6 +177,11 @@ jobs:
     name: "test; linux; Dart dev; `dart test --test-randomize-ordering-seed=random`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -163,6 +198,11 @@ jobs:
     name: "test; windows; `dart test -P presubmit --test-randomize-ordering-seed=random`"
     runs-on: "windows-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:

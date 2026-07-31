@@ -26,6 +26,11 @@ jobs:
     name: "analyze; osx; Dart dev; `dart analyze --fatal-infos`, `dart format --output=none --set-exit-if-changed .`"
     runs-on: "macos-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -41,6 +46,11 @@ jobs:
     name: "analyze; windows; Dart 1.23.0; `dart analyze --fatal-infos`"
     runs-on: "windows-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -53,6 +63,11 @@ jobs:
     name: "unit_test; linux; `dart test --preset travis`"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -75,6 +90,11 @@ jobs:
     name: "unit_test; linux; chrome tests"
     runs-on: "ubuntu-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -97,6 +117,11 @@ jobs:
     name: "unit_test; windows; `dart test --preset travis`"
     runs-on: "windows-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
@@ -119,6 +144,11 @@ jobs:
     name: "unit_test; windows; chrome tests"
     runs-on: "windows-latest"
     steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:

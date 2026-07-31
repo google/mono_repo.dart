@@ -1,6 +1,6 @@
 # Created with package:mono_repo v6.7.1
 name: "Setup Flutter Package"
-description: "Setup Flutter SDK, cache pub dependencies, checkout repository, and run flutter pub action."
+description: "Setup Flutter SDK, cache pub dependencies, and run flutter pub action."
 inputs:
   channel:
     description: "Flutter SDK channel or version"
@@ -30,11 +30,6 @@ runs:
       uses: "subosito/flutter-action@f2c484b01f202e2666925e7785c86a14fed841d9"
       with:
         channel: "${{ inputs.channel }}"
-    - id: "checkout"
-      name: "Checkout repository"
-      uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-      with:
-        persist-credentials: false
     - id: "pub_action"
       name: "flutter pub ${{ inputs.pub-action }}"
       run: "flutter pub ${{ inputs.pub-action }}"
