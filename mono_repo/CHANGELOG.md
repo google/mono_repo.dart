@@ -1,4 +1,4 @@
-## 6.7.2-wip
+## 6.7.2
 
 - Support configuring `permissions` under `github` in `mono_repo.yaml`.
 
