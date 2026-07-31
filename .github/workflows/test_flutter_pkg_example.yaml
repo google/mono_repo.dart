@@ -40,8 +40,7 @@ jobs:
         with:
           channel: "stable"
           working-directory: "test_flutter_pkg/example"
-      - name: "flutter test --test-randomize-ordering-seed=random"
-        run: "flutter test --test-randomize-ordering-seed=random"
+      - run: "flutter test --test-randomize-ordering-seed=random"
         working-directory: "test_flutter_pkg/example"
   job_002:
     name: "Notify failure"

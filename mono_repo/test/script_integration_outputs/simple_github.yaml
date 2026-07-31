@@ -36,11 +36,9 @@ jobs:
         with:
           sdk: "dev"
           working-directory: "sub_pkg"
-      - name: "dart analyze --fatal-infos"
-        run: "dart analyze --fatal-infos"
+      - run: "dart analyze --fatal-infos"
         working-directory: "sub_pkg"
-      - name: "dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "sub_pkg"
   job_002:
     name: "analyze; windows; Dart 1.23.0; `dart analyze --fatal-infos`"
@@ -56,8 +54,7 @@ jobs:
         with:
           sdk: "1.23.0"
           working-directory: "sub_pkg"
-      - name: "dart analyze --fatal-infos"
-        run: "dart analyze --fatal-infos"
+      - run: "dart analyze --fatal-infos"
         working-directory: "sub_pkg"
   job_003:
     name: "unit_test; linux; `dart test --preset travis`"
@@ -73,8 +70,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test --preset travis"
-        run: "dart test --preset travis"
+      - run: "dart test --preset travis"
         working-directory: "sub_pkg"
     needs:
       - "job_001"
@@ -100,8 +96,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test --platform chrome"
-        run: "dart test --platform chrome"
+      - run: "dart test --platform chrome"
         working-directory: "sub_pkg"
     needs:
       - "job_001"
@@ -127,8 +122,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test --preset travis"
-        run: "dart test --preset travis"
+      - run: "dart test --preset travis"
         working-directory: "sub_pkg"
     needs:
       - "job_001"
@@ -154,8 +148,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test --platform chrome"
-        run: "dart test --platform chrome"
+      - run: "dart test --platform chrome"
         working-directory: "sub_pkg"
     needs:
       - "job_001"

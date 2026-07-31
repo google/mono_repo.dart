@@ -38,8 +38,7 @@ jobs:
         with:
           sdk: "3.8.0"
           working-directory: "mono_repo"
-      - name: "dart analyze --fatal-infos"
-        run: "dart analyze --fatal-infos"
+      - run: "dart analyze --fatal-infos"
         working-directory: "mono_repo"
   job_002:
     name: "smoke_test; linux; Dart dev; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
@@ -55,8 +54,7 @@ jobs:
         with:
           sdk: "dev"
           working-directory: "mono_repo"
-      - name: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
-        run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
+      - run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
         working-directory: "mono_repo"
   job_003:
     name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
@@ -72,11 +70,9 @@ jobs:
         with:
           sdk: "dev"
           working-directory: "mono_repo"
-      - name: "dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "mono_repo"
-      - name: "dart analyze --fatal-infos"
-        run: "dart analyze --fatal-infos"
+      - run: "dart analyze --fatal-infos"
         working-directory: "mono_repo"
   job_004:
     name: "test; linux; Dart 3.8.0; `dart test -P presubmit --test-randomize-ordering-seed=random`"
@@ -92,8 +88,7 @@ jobs:
         with:
           sdk: "3.8.0"
           working-directory: "mono_repo"
-      - name: "dart test -P presubmit --test-randomize-ordering-seed=random"
-        run: "dart test -P presubmit --test-randomize-ordering-seed=random"
+      - run: "dart test -P presubmit --test-randomize-ordering-seed=random"
         working-directory: "mono_repo"
     needs:
       - "job_001"
@@ -115,8 +110,7 @@ jobs:
           working-directory: "mono_repo"
       - name: "Activate package:coverage"
         run: "dart pub global activate coverage '>=1.5.0'"
-      - name: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
-        run: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
+      - run: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
         working-directory: "mono_repo"
       - name: "Upload coverage to Coveralls"
         uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
@@ -152,8 +146,7 @@ jobs:
           working-directory: "mono_repo"
       - name: "Activate package:coverage"
         run: "dart pub global activate coverage '>=1.5.0'"
-      - name: "dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random"
-        run: "dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random"
+      - run: "dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random"
         working-directory: "mono_repo"
       - name: "Upload coverage to Coveralls"
         uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
@@ -187,8 +180,7 @@ jobs:
         with:
           sdk: "dev"
           working-directory: "mono_repo"
-      - name: "dart test --test-randomize-ordering-seed=random"
-        run: "dart test --test-randomize-ordering-seed=random"
+      - run: "dart test --test-randomize-ordering-seed=random"
         working-directory: "mono_repo"
     needs:
       - "job_001"
@@ -208,8 +200,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "mono_repo"
-      - name: "dart test -P presubmit --test-randomize-ordering-seed=random"
-        run: "dart test -P presubmit --test-randomize-ordering-seed=random"
+      - run: "dart test -P presubmit --test-randomize-ordering-seed=random"
         working-directory: "mono_repo"
     needs:
       - "job_001"

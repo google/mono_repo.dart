@@ -39,8 +39,7 @@ jobs:
         with:
           sdk: "3.0.0"
           working-directory: "sub_pkg"
-      - name: "dart analyze"
-        run: "dart analyze"
+      - run: "dart analyze"
         working-directory: "sub_pkg"
   job_002:
     name: "analyze; linux; Dart dev; `dart analyze --fatal-infos`"
@@ -56,8 +55,7 @@ jobs:
         with:
           sdk: "dev"
           working-directory: "sub_pkg"
-      - name: "dart analyze --fatal-infos"
-        run: "dart analyze --fatal-infos"
+      - run: "dart analyze --fatal-infos"
         working-directory: "sub_pkg"
   job_003:
     name: "analyze; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
@@ -73,8 +71,7 @@ jobs:
         with:
           sdk: "dev"
           working-directory: "sub_pkg"
-      - name: "dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "sub_pkg"
   job_004:
     name: "unit_test; linux; `dart test`"
@@ -90,8 +87,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test"
-        run: "dart test"
+      - run: "dart test"
         working-directory: "sub_pkg"
     needs:
       - "job_001"
@@ -118,8 +114,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test"
-        run: "dart test"
+      - run: "dart test"
         working-directory: "sub_pkg"
     needs:
       - "job_001"
@@ -147,8 +142,7 @@ jobs:
         with:
           sdk: "${{ matrix.sdk }}"
           working-directory: "sub_pkg"
-      - name: "dart test"
-        run: "dart test"
+      - run: "dart test"
         working-directory: "sub_pkg"
     needs:
       - "job_001"

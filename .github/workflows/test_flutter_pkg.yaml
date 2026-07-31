@@ -38,8 +38,7 @@ jobs:
         with:
           channel: "${{ matrix.sdk }}"
           working-directory: "test_flutter_pkg"
-      - name: "flutter analyze"
-        run: "flutter analyze"
+      - run: "flutter analyze"
         working-directory: "test_flutter_pkg"
     strategy:
       fail-fast: false
@@ -61,11 +60,9 @@ jobs:
         with:
           channel: "master"
           working-directory: "test_flutter_pkg"
-      - name: "dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "test_flutter_pkg"
-      - name: "flutter analyze --fatal-infos"
-        run: "flutter analyze --fatal-infos"
+      - run: "flutter analyze --fatal-infos"
         working-directory: "test_flutter_pkg"
   job_003:
     name: "test; linux; Flutter beta; `flutter test --test-randomize-ordering-seed=random`"
@@ -81,8 +78,7 @@ jobs:
         with:
           channel: "beta"
           working-directory: "test_flutter_pkg"
-      - name: "flutter test --test-randomize-ordering-seed=random"
-        run: "flutter test --test-randomize-ordering-seed=random"
+      - run: "flutter test --test-randomize-ordering-seed=random"
         working-directory: "test_flutter_pkg"
     needs:
       - "job_001"
