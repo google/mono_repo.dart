@@ -229,7 +229,7 @@ runs:
   using: "composite"
   steps:
     - name: "Cache Pub hosted dependencies"
-      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      uses: "actions/cache@${ActionInfo.cache.version}"
       with:
         path: "~/.pub-cache/hosted"
         key: "os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }};pkg:\${{ inputs.working-directory }}"
@@ -237,7 +237,7 @@ runs:
           os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }}
           os:\${{ runner.os }};pub-cache-hosted
     - name: "Setup Dart SDK"
-      uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
+      uses: "dart-lang/setup-dart@${ActionInfo.setupDart.version}"
       with:
         sdk: "\${{ inputs.sdk }}"
     - id: "pub_action"
@@ -269,7 +269,7 @@ runs:
   using: "composite"
   steps:
     - name: "Cache Pub hosted dependencies"
-      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      uses: "actions/cache@${ActionInfo.cache.version}"
       with:
         path: "~/.pub-cache/hosted"
         key: "os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }};pkg:\${{ inputs.working-directory }}"
@@ -277,7 +277,7 @@ runs:
           os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }}
           os:\${{ runner.os }};pub-cache-hosted
     - name: "Setup Flutter SDK"
-      uses: "subosito/flutter-action@f2c484b01f202e2666925e7785c86a14fed841d9"
+      uses: "subosito/flutter-action@${ActionInfo.setupFlutter.version}"
       with:
         channel: "\${{ inputs.channel }}"
     - id: "pub_action"
