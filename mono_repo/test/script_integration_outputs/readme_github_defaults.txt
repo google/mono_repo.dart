@@ -13,7 +13,11 @@ on:
       - ".github/workflows/sub_pkg.yaml"
       - "sub_pkg/**"
   schedule:
-    - cron: "0 0 * * 0"
+    branches:
+      - cron: "0 0 * * 0"
+    paths:
+      - ".github/workflows/sub_pkg.yaml"
+      - "sub_pkg/**"
 defaults:
   run:
     shell: "bash"

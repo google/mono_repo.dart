@@ -13,7 +13,11 @@ on:
       - ".github/workflows/test_pkg.yaml"
       - "test_pkg/**"
   schedule:
-    - cron: "0 0 * * 0"
+    branches:
+      - cron: "0 0 * * 0"
+    paths:
+      - ".github/workflows/test_pkg.yaml"
+      - "test_pkg/**"
 defaults:
   run:
     shell: "bash"
@@ -50,9 +54,9 @@ jobs:
           - "2.18.0-106.0.dev"
           - "beta"
           - "dev"
-          - "main"
+          - "stable"
   job_002:
-    name: "smoke_test; linux; Dart stable; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
+    name: "smoke_test; linux; Dart main; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
       - id: "checkout"
@@ -63,7 +67,7 @@ jobs:
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
-          sdk: "stable"
+          sdk: "main"
           working-directory: "test_pkg"
       - name: "dart format --output=none --set-exit-if-changed ."
         run: "dart format --output=none --set-exit-if-changed ."

@@ -24,7 +24,7 @@ void main() {
       );
 
       expect(pkgConfig.oses, ['linux', 'osx', 'windows']);
-      expect(pkgConfig.sdks, ['1.23.0', 'dev', 'stable']);
+      expect(pkgConfig.sdks, ['1.23.0', 'stable', 'dev']);
       expect(pkgConfig.jobs, hasLength(23));
 
       expect(jsonDecode(jsonEncode(pkgConfig.jobs)), [
@@ -80,21 +80,6 @@ void main() {
         {
           'os': 'osx',
           'package': 'a',
-          'sdk': 'dev',
-          'stageName': 'analyze_and_format',
-          'tasks': [
-            {
-              'flavor': 'dart',
-              'type': 'analyze',
-              'args': '--fatal-infos --fatal-warnings .',
-            },
-          ],
-          'flavor': 'dart',
-          'isNewest': false,
-        },
-        {
-          'os': 'osx',
-          'package': 'a',
           'sdk': 'stable',
           'stageName': 'analyze_and_format',
           'tasks': [
@@ -105,6 +90,21 @@ void main() {
             },
           ],
           'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'analyze_and_format',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'analyze',
+              'args': '--fatal-infos --fatal-warnings .',
+            },
+          ],
+          'flavor': 'dart',
           'isNewest': true,
         },
         {
@@ -121,7 +121,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'dev',
+          'sdk': 'stable',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
@@ -132,7 +132,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'stable',
+          'sdk': 'dev',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
@@ -158,7 +158,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'dev',
+          'sdk': 'stable',
           'stageName': 'unit_test',
           'tasks': [
             {
@@ -173,7 +173,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'stable',
+          'sdk': 'dev',
           'stageName': 'unit_test',
           'tasks': [
             {
@@ -203,7 +203,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'dev',
+          'sdk': 'stable',
           'stageName': 'unit_test',
           'tasks': [
             {
@@ -218,7 +218,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'stable',
+          'sdk': 'dev',
           'stageName': 'unit_test',
           'tasks': [
             {
@@ -266,7 +266,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'dev',
+          'sdk': 'stable',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test'},
@@ -277,7 +277,7 @@ void main() {
         {
           'os': 'osx',
           'package': 'a',
-          'sdk': 'dev',
+          'sdk': 'stable',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test'},
@@ -288,7 +288,7 @@ void main() {
         {
           'os': 'windows',
           'package': 'a',
-          'sdk': 'dev',
+          'sdk': 'stable',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test'},
@@ -299,7 +299,7 @@ void main() {
         {
           'os': 'linux',
           'package': 'a',
-          'sdk': 'stable',
+          'sdk': 'dev',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test'},
@@ -310,7 +310,7 @@ void main() {
         {
           'os': 'osx',
           'package': 'a',
-          'sdk': 'stable',
+          'sdk': 'dev',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test'},
@@ -321,7 +321,7 @@ void main() {
         {
           'os': 'windows',
           'package': 'a',
-          'sdk': 'stable',
+          'sdk': 'dev',
           'stageName': 'unit_test',
           'tasks': [
             {'flavor': 'dart', 'type': 'test'},

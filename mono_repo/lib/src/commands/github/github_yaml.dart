@@ -5,6 +5,7 @@
 import 'dart:collection';
 
 import 'package:collection/collection.dart';
+import 'package:path/path.dart' as p;
 
 import '../../basic_config.dart';
 import '../../ci_shared.dart';
@@ -140,6 +141,13 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
         final value = entry.value;
         if (value is Map) {
           on[entry.key] = {...value, 'paths': paths};
+        } else if (value is List) {
+          on[entry.key] = {'branches': value, 'paths': paths};
+        } else if (value is String) {
+          on[entry.key] = {
+            'branches': [value],
+            'paths': paths,
+          };
         } else if (value == null) {
           on[entry.key] = {'paths': paths};
         }
@@ -177,10 +185,13 @@ ${toYaml({'jobs': jobList})}
   }
 
   for (var packageConfig in rootConfig) {
-    if (rootConfig.monoConfig.ignore.contains(packageConfig.relativePath)) {
+    final posixPath = p.posix.joinAll(p.split(packageConfig.relativePath));
+    if (rootConfig.monoConfig.ignore.contains(posixPath)) {
       continue;
     }
-    final fileName = packageConfig.relativePath.replaceAll('/', '_');
+    final fileName = posixPath == '.'
+        ? packageConfig.pubspec.name
+        : posixPath.replaceAll('/', '_');
     final tDeps = transitiveDeps(packageConfig);
     populateJobs(
       fileName,
@@ -188,13 +199,15 @@ ${toYaml({'jobs': jobList})}
       packageConfig.jobs,
       paths: [
         githubWorkflowFilePath(fileName),
-        if (packageConfig.relativePath == '.') ...[
+        if (posixPath == '.') ...[
           '**',
-          for (var p in rootConfig)
-            if (p.relativePath != '.') '!${p.relativePath}/**',
+          for (var pkg in rootConfig)
+            if (pkg.relativePath != '.')
+              '!${p.posix.joinAll(p.split(pkg.relativePath))}/**',
         ] else
-          '${packageConfig.relativePath}/**',
-        for (var dep in tDeps) '${dep.relativePath}/**',
+          '$posixPath/**',
+        for (var dep in tDeps)
+          '${p.posix.joinAll(p.split(dep.relativePath))}/**',
       ],
     );
   }
@@ -436,9 +449,11 @@ extension on CIJobEntry {
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
       final stepNamePrefix = packages.length > 1 ? '$package; ' : '';
-      final pubStepId =
-          '${package.replaceAll('/', '_')}_'
-          'pub_${rootConfig.monoConfig.pubAction}';
+      final posixPkg = p.posix.joinAll(p.split(package));
+      final safePkg = (posixPkg == '.' || posixPkg.isEmpty)
+          ? 'root'
+          : posixPkg.replaceAll('/', '_');
+      final pubStepId = '${safePkg}_pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(
         _CommandEntry(
           '$stepNamePrefix$pubCommand',

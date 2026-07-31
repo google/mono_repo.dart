@@ -80,17 +80,54 @@ void handlePubspecInSdkList(
   }
 }
 
+int compareSdks(String a, String b) {
+  if (a == b) return 0;
+  if (a == _pubspecSdkKey) return -1;
+  if (b == _pubspecSdkKey) return 1;
+
+  const channelOrder = {
+    'stable': 1,
+    'beta': 2,
+    'dev': 3,
+    'main': 4,
+    'master': 4,
+  };
+  final rankA = channelOrder[a];
+  final rankB = channelOrder[b];
+
+  if (rankA != null && rankB != null) {
+    return rankA.compareTo(rankB);
+  }
+  if (rankA != null) {
+    return 1;
+  }
+  if (rankB != null) {
+    return -1;
+  }
+
+  try {
+    final vA = Version.parse(a);
+    final vB = Version.parse(b);
+    return vA.compareTo(vB);
+  } catch (_) {
+    return a.compareTo(b);
+  }
+}
+
 void sortNormalizeVerifySdksList(
   PackageFlavor flavor,
   List<String> sdks,
   Object Function(String message) errorFactory,
 ) {
-  sdks.sort();
   for (var i = 0; i < sdks.length; i++) {
     var value = sdks[i];
     if (flavor == PackageFlavor.dart && _allowedMainVersions.contains(value)) {
       sdks[i] = value = _githubSetupMainSdk;
     }
+  }
+  sdks.sort(compareSdks);
+  for (var i = 0; i < sdks.length; i++) {
+    final value = sdks[i];
     final error = errorForSdkConfig(flavor, value);
     if (error != null) {
       // ignore: only_throw_errors

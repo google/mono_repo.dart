@@ -13,7 +13,11 @@ on:
       - ".github/workflows/test_flutter_pkg.yaml"
       - "test_flutter_pkg/**"
   schedule:
-    - cron: "0 0 * * 0"
+    branches:
+      - cron: "0 0 * * 0"
+    paths:
+      - ".github/workflows/test_flutter_pkg.yaml"
+      - "test_flutter_pkg/**"
 defaults:
   run:
     shell: "bash"
@@ -46,9 +50,9 @@ jobs:
       matrix:
         sdk:
           - "beta"
-          - "master"
+          - "stable"
   job_002:
-    name: "smoke_test; linux; Flutter stable; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos`"
+    name: "smoke_test; linux; Flutter master; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
       - id: "checkout"
@@ -59,7 +63,7 @@ jobs:
       - name: "Setup flutter package"
         uses: "./.github/actions/setup-flutter"
         with:
-          channel: "stable"
+          channel: "master"
           working-directory: "test_flutter_pkg"
       - name: "dart format --output=none --set-exit-if-changed ."
         run: "dart format --output=none --set-exit-if-changed ."

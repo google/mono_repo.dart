@@ -89,7 +89,9 @@ class RootConfig extends ListBase<PackageConfig> {
       final dirs = directory.listSync().whereType<Directory>().toList()
         ..sort((a, b) => a.path.compareTo(b.path));
       for (var subdir in dirs) {
-        final relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
+        final relativeSubDirPath = p.posix.joinAll(
+          p.split(p.relative(subdir.path, from: rootDirectory)),
+        );
 
         if (monoConfig.ignore.contains(relativeSubDirPath)) {
           continue;
@@ -108,6 +110,11 @@ class RootConfig extends ListBase<PackageConfig> {
           visitDirectory(subdir);
         }
       }
+    }
+
+    final rootPkgConfig = _packageConfigFromDir(rootDirectory, '.', monoConfig);
+    if (rootPkgConfig != null) {
+      configs.add(rootPkgConfig);
     }
 
     visitDirectory(Directory(rootDirectory));

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:mono_repo/src/commands/github/github_yaml.dart';
+import 'package:mono_repo/src/utilities.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
@@ -107,4 +108,74 @@ environment:
           .validate();
     },
   );
+
+  test('root package produces valid workflow file name and step ID', () async {
+    await d.file('pubspec.yaml', '''
+name: root_pkg
+environment:
+  sdk: '^3.0.0'
+''').create();
+
+    await d.dir('sub_pkg', [
+      d.file('pubspec.yaml', '''
+name: sub_pkg
+environment:
+  sdk: '^3.0.0'
+'''),
+    ]).create();
+
+    await d.file('mono_repo.yaml', '''
+defaults:
+  sdk:
+    - dev
+  stages:
+    - analyze:
+      - analyze
+''').create();
+
+    testGenerateConfig(
+      printMatcher: stringContainsInOrder(['package:.', 'package:sub_pkg']),
+    );
+
+    // Verify root package workflow is created using pubspec name
+    // 'root_pkg.yaml'
+    await d
+        .file(githubWorkflowFilePath('root_pkg'), contains('package:root_pkg'))
+        .validate();
+  });
+
+  test('custom on triggers specified as lists get paths appended', () async {
+    await d.dir('pkg_a', [
+      d.file('pubspec.yaml', '''
+name: pkg_a
+environment:
+  sdk: '^3.0.0'
+'''),
+    ]).create();
+
+    await d.file('mono_repo.yaml', '''
+github:
+  on:
+    push:
+      - main
+defaults:
+  sdk:
+    - dev
+  stages:
+    - analyze:
+      - analyze
+''').create();
+
+    testGenerateConfig(printMatcher: stringContainsInOrder(['package:pkg_a']));
+
+    await d
+        .file(githubWorkflowFilePath('pkg_a'), contains('paths:'))
+        .validate();
+  });
+
+  test('SDK channel sorting ranks stable < beta < dev < main', () {
+    final sdks = ['dev', 'stable', '3.8.0', 'main', 'pubspec', 'beta']
+      ..sort(compareSdks);
+    expect(sdks, ['pubspec', '3.8.0', 'stable', 'beta', 'dev', 'main']);
+  });
 }
