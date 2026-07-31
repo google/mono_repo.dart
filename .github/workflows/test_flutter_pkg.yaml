@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.6.5-wip
+# Created with package:mono_repo v6.7.1
 name: "package:test_flutter_pkg"
 on:
   push:
@@ -46,6 +46,8 @@ jobs:
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - id: "test_flutter_pkg_pub_upgrade"
         name: "flutter pub upgrade"
         run: "flutter pub upgrade"
@@ -82,6 +84,8 @@ jobs:
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - id: "test_flutter_pkg_pub_upgrade"
         name: "flutter pub upgrade"
         run: "flutter pub upgrade"
@@ -116,6 +120,8 @@ jobs:
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
       - id: "test_flutter_pkg_pub_upgrade"
         name: "flutter pub upgrade"
         run: "flutter pub upgrade"
