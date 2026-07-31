@@ -118,7 +118,7 @@ class GitHubConfig {
     },
     'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
     // Declare default permissions as read only.
-    'permissions': 'read-all',
+    'permissions': {'contents': 'read'},
   };
 }
 
