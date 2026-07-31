@@ -4,6 +4,10 @@
 
 import 'dart:convert';
 
+import 'package:checked_yaml/checked_yaml.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:mono_repo/src/coverage_processor.dart';
+import 'package:mono_repo/src/mono_config.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 import 'package:test/test.dart';
@@ -327,6 +331,114 @@ void main() {
           'isNewest': true,
         },
       ]);
+    });
+  });
+
+  group('MonoConfig.fromJson', () {
+    test('default values', () {
+      final config = MonoConfig.fromJson({});
+      expect(config.prettyAnsi, isTrue);
+      expect(config.pubAction, 'upgrade');
+      expect(config.selfValidateStage, isNull);
+      expect(config.defaults, isEmpty);
+      expect(config.ignore, isEmpty);
+      expect(config.coverageProcessors, isEmpty);
+    });
+
+    group('self_validate', () {
+      test('set to true', () {
+        final config = MonoConfig.fromJson({'self_validate': true});
+        expect(config.selfValidateStage, 'mono_repo_self_validate');
+      });
+
+      test('set to false', () {
+        final config = MonoConfig.fromJson({'self_validate': false});
+        expect(config.selfValidateStage, isNull);
+      });
+
+      test('set to stage name', () {
+        final config = MonoConfig.fromJson({'self_validate': 'custom_stage'});
+        expect(config.selfValidateStage, 'custom_stage');
+      });
+
+      test('invalid type throws', () {
+        expect(
+          () => MonoConfig.fromJson({'self_validate': 123}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
+    });
+
+    group('pretty_ansi', () {
+      test('set to false', () {
+        final config = MonoConfig.fromJson({'pretty_ansi': false});
+        expect(config.prettyAnsi, isFalse);
+      });
+
+      test('invalid type throws', () {
+        expect(
+          () => MonoConfig.fromJson({'pretty_ansi': 'not_bool'}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
+    });
+
+    group('pub_action', () {
+      test('valid actions', () {
+        expect(MonoConfig.fromJson({'pub_action': 'get'}).pubAction, 'get');
+        expect(
+          MonoConfig.fromJson({'pub_action': 'upgrade'}).pubAction,
+          'upgrade',
+        );
+      });
+
+      test('invalid action throws', () {
+        expect(
+          () => MonoConfig.fromJson({'pub_action': 'invalid'}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
+    });
+
+    group('coverage_service', () {
+      test('valid coverage processors', () {
+        final config = MonoConfig.fromJson({
+          'coverage_service': ['coveralls', 'codecov'],
+        });
+        expect(
+          config.coverageProcessors,
+          containsAll([CoverageProcessor.coveralls, CoverageProcessor.codecov]),
+        );
+      });
+    });
+
+    group('defaults and ignore', () {
+      test('valid map defaults and string list ignore', () {
+        final config = MonoConfig.fromJson({
+          'defaults': {
+            'sdk': ['dev'],
+          },
+          'ignore': ['sub_pkg_a'],
+        });
+        expect(config.defaults, {
+          'sdk': ['dev'],
+        });
+        expect(config.ignore, contains('sub_pkg_a'));
+      });
+
+      test('invalid defaults type throws', () {
+        expect(
+          () => MonoConfig.fromJson({'defaults': 'not_map'}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
+    });
+
+    test('unsupported key throws', () {
+      expect(
+        () => MonoConfig.fromJson({'unsupported_key': true}),
+        throwsA(isA<CheckedFromJsonException>()),
+      );
     });
   });
 }
