@@ -75,7 +75,7 @@ $newContent
       if (validateOnly) {
         exitCode = 1;
       } else {
-        tmpFile.renameSync(versionsFile.path);
+        tmpFile.copySync(versionsFile.path);
       }
     }
   }

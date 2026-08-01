@@ -38,6 +38,30 @@ void main() {
         testGenerateConfig(printMatcher: expected);
       });
     }
+
+    test('custom permissions', () async {
+      final monoConfigContent = toYaml({
+        'github': {
+          'permissions': {'contents': 'read'},
+        },
+      });
+      await populateConfig(monoConfigContent);
+
+      final expected = [
+        'package:sub_pkg',
+        'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
+        ciScriptPathMessage,
+      ].join('\n');
+      testGenerateConfig(printMatcher: expected);
+
+      final workflowFile = File(
+        p.join(d.sandbox, defaultGitHubWorkflowFilePath),
+      );
+      expect(
+        workflowFile.readAsStringSync(),
+        contains('permissions:\n  contents: read'),
+      );
+    });
   });
 
   test('no package', () async {

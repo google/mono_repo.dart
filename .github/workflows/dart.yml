@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.7.1
+# Created with package:mono_repo v6.7.2
 name: Dart CI
 on:
   push:
@@ -13,7 +13,8 @@ defaults:
     shell: bash
 env:
   PUB_ENVIRONMENT: bot.github
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   job_001:
@@ -585,7 +586,7 @@ jobs:
           flag-name: coverage_00
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f
         with:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
@@ -646,7 +647,7 @@ jobs:
           flag-name: coverage_01
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f
         with:
           files: mono_repo/coverage/lcov.info
           fail_ci_if_error: true
@@ -752,7 +753,7 @@ jobs:
           flag-name: coverage_02
           parallel: true
       - name: Upload coverage to codecov.io
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f
         with:
           files: test_pkg/coverage/lcov.info
           fail_ci_if_error: true

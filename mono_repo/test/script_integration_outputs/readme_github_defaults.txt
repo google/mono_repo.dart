@@ -14,7 +14,8 @@ defaults:
 env:
   PUB_ENVIRONMENT: bot.github
   FOO: BAR
-permissions: read-all
+permissions:
+  contents: read
 
 jobs:
   job_001:
