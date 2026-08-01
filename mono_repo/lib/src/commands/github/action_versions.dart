@@ -12,4 +12,4 @@ const actionsCheckoutVersion = 'de0fac2e4500dabe0009e67214ff5f5447ce83dd';
 const subositoFlutterActionVersion = '1a449444c387b1966244ae4d4f8c696479add0b2';
 const coverallsappGithubActionVersion =
     '648a8eb78e6d50909eff900e4ec85cab4524a45b';
-const codecovCodecovActionVersion = '57e3a136b779b570ffcdbf80b3bdc90e7fab3de2';
+const codecovCodecovActionVersion = 'fb8b3582c8e4def4969c97caa2f19720cb33a72f';
