@@ -90,10 +90,6 @@ github:
   env:
     FOO: BAR
 
-  # Specify top-level permissions for the workflow (defaults to `read-all`)
-  permissions:
-    contents: read
-
   # You can group stages into individual workflows
   #
   # Any stages that are omitted here are put in a default workflow

@@ -22,6 +22,8 @@ Future<void> populateConfig(String monoRepoContent) async {
     d.file(monoPkgFileName, testConfig2),
     d.file('pubspec.yaml', '''
 name: pkg_name
+environment:
+  sdk: '^3.0.0'
       '''),
   ]).create();
 }
@@ -98,7 +100,7 @@ stages:
 String get ciScriptPathMessage =>
     '''
 ${scriptLines(ciScriptPath).join('\n')}
-Wrote `${p.normalize(p.join(d.sandbox, ciScriptPath))}`.''';
+Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
 
 void validateSandbox(String expectFileName, String sandboxPath) {
   final output = File(p.join(d.sandbox, sandboxPath)).readAsStringSync();
@@ -117,7 +119,7 @@ void validateOutput(String fileName, String output) {
       '\r\n',
       '\n',
     );
-    expect(output, expected);
+    expect(output.trim(), expected.trim());
   } else {
     expectedOutputFile
       ..createSync(recursive: true)

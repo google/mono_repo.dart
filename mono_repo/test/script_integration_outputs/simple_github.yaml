@@ -1,23 +1,30 @@
 # Created with package:mono_repo v1.2.3
-name: "Dart CI"
+name: "package:pkg_name"
 on:
   push:
     branches:
       - "main"
       - "master"
-  pull_request: null
+    paths:
+      - ".github/workflows/sub_pkg.yaml"
+      - "sub_pkg/**"
+  pull_request:
+    paths:
+      - ".github/workflows/sub_pkg.yaml"
+      - "sub_pkg/**"
 defaults:
   run:
     shell: "bash"
 env:
   PUB_ENVIRONMENT: "bot.github"
-permissions: "read-all"
+permissions:
+  contents: "read"
 
 
 jobs:
   job_001:
-    name: "analyze_and_format; linux; Dart 2.16.0; `dart analyze --fatal-infos`"
-    runs-on: "ubuntu-latest"
+    name: "analyze; osx; Dart dev; `dart analyze --fatal-infos`, `dart format --output=none --set-exit-if-changed .`"
+    runs-on: "macos-latest"
     steps:
       - id: "checkout"
         name: "Checkout repository"
@@ -27,44 +34,56 @@ jobs:
       - name: "Setup dart package"
         uses: "./.github/actions/setup-dart"
         with:
-          sdk: "2.16.0"
-          working-directory: "pkg_a"
+          sdk: "dev"
+          working-directory: "sub_pkg"
       - run: "dart analyze --fatal-infos"
-        working-directory: "pkg_a"
-  job_002:
-    name: "analyze_and_format; linux; Dart dev; `dart analyze --fatal-infos --fatal-infos .`"
-    runs-on: "ubuntu-latest"
-    steps:
-      - id: "checkout"
-        name: "Checkout repository"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-        with:
-          persist-credentials: false
-      - name: "Setup dart package"
-        uses: "./.github/actions/setup-dart"
-        with:
-          sdk: "dev"
-          working-directory: "pkg_a"
-      - run: "dart analyze --fatal-infos --fatal-infos ."
-        working-directory: "pkg_a"
-  job_003:
-    name: "analyze_and_format; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
-    runs-on: "ubuntu-latest"
-    steps:
-      - id: "checkout"
-        name: "Checkout repository"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-        with:
-          persist-credentials: false
-      - name: "Setup dart package"
-        uses: "./.github/actions/setup-dart"
-        with:
-          sdk: "dev"
-          working-directory: "pkg_a"
+        working-directory: "sub_pkg"
       - run: "dart format --output=none --set-exit-if-changed ."
-        working-directory: "pkg_a"
+        working-directory: "sub_pkg"
+  job_002:
+    name: "analyze; windows; Dart 1.23.0; `dart analyze --fatal-infos`"
+    runs-on: "windows-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "1.23.0"
+          working-directory: "sub_pkg"
+      - run: "dart analyze --fatal-infos"
+        working-directory: "sub_pkg"
+  job_003:
+    name: "unit_test; linux; `dart test --preset travis`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "${{ matrix.sdk }}"
+          working-directory: "sub_pkg"
+      - run: "dart test --preset travis"
+        working-directory: "sub_pkg"
+    needs:
+      - "job_001"
+      - "job_002"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "1.23.0"
+          - "dev"
+          - "stable"
   job_004:
-    name: "unit_test; linux; `dart test --test-randomize-ordering-seed=random -p chrome`"
+    name: "unit_test; linux; chrome tests"
     runs-on: "ubuntu-latest"
     steps:
       - id: "checkout"
@@ -76,47 +95,21 @@ jobs:
         uses: "./.github/actions/setup-dart"
         with:
           sdk: "${{ matrix.sdk }}"
-          working-directory: "pkg_a"
-      - run: "dart test --test-randomize-ordering-seed=random -p chrome"
-        working-directory: "pkg_a"
+          working-directory: "sub_pkg"
+      - run: "dart test --platform chrome"
+        working-directory: "sub_pkg"
     needs:
       - "job_001"
       - "job_002"
-      - "job_003"
     strategy:
       fail-fast: false
       matrix:
         sdk:
-          - "2.16.0"
+          - "1.23.0"
           - "dev"
+          - "stable"
   job_005:
-    name: "unit_test; linux; `dart test --test-randomize-ordering-seed=random`"
-    runs-on: "ubuntu-latest"
-    steps:
-      - id: "checkout"
-        name: "Checkout repository"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-        with:
-          persist-credentials: false
-      - name: "Setup dart package"
-        uses: "./.github/actions/setup-dart"
-        with:
-          sdk: "${{ matrix.sdk }}"
-          working-directory: "pkg_a"
-      - run: "dart test --test-randomize-ordering-seed=random"
-        working-directory: "pkg_a"
-    needs:
-      - "job_001"
-      - "job_002"
-      - "job_003"
-    strategy:
-      fail-fast: false
-      matrix:
-        sdk:
-          - "2.16.0"
-          - "dev"
-  job_006:
-    name: "unit_test; windows; `dart test --test-randomize-ordering-seed=random -p chrome`"
+    name: "unit_test; windows; `dart test --preset travis`"
     runs-on: "windows-latest"
     steps:
       - id: "checkout"
@@ -128,17 +121,43 @@ jobs:
         uses: "./.github/actions/setup-dart"
         with:
           sdk: "${{ matrix.sdk }}"
-          working-directory: "pkg_a"
-      - run: "dart test --test-randomize-ordering-seed=random -p chrome"
-        working-directory: "pkg_a"
+          working-directory: "sub_pkg"
+      - run: "dart test --preset travis"
+        working-directory: "sub_pkg"
     needs:
       - "job_001"
       - "job_002"
-      - "job_003"
     strategy:
       fail-fast: false
       matrix:
         sdk:
-          - "2.16.0"
+          - "1.23.0"
           - "dev"
+          - "stable"
+  job_006:
+    name: "unit_test; windows; chrome tests"
+    runs-on: "windows-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "${{ matrix.sdk }}"
+          working-directory: "sub_pkg"
+      - run: "dart test --platform chrome"
+        working-directory: "sub_pkg"
+    needs:
+      - "job_001"
+      - "job_002"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "1.23.0"
+          - "dev"
+          - "stable"
 

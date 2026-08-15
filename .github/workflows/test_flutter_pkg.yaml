@@ -1,0 +1,101 @@
+# Created with package:mono_repo v7.0.0-wip
+name: "package:test_flutter_pkg"
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - ".github/workflows/test_flutter_pkg.yaml"
+      - "test_flutter_pkg/**"
+  pull_request:
+    paths:
+      - ".github/workflows/test_flutter_pkg.yaml"
+      - "test_flutter_pkg/**"
+  schedule:
+    - cron: "0 0 * * 0"
+defaults:
+  run:
+    shell: "bash"
+env:
+  PUB_ENVIRONMENT: "bot.github"
+permissions:
+  contents: "read"
+
+
+jobs:
+  job_001:
+    name: "smoke_test; linux; `flutter analyze`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup flutter package"
+        uses: "./.github/actions/setup-flutter"
+        with:
+          channel: "${{ matrix.sdk }}"
+          working-directory: "test_flutter_pkg"
+      - run: "flutter analyze"
+        working-directory: "test_flutter_pkg"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "beta"
+          - "stable"
+  job_002:
+    name: "smoke_test; linux; Flutter master; `dart format --output=none --set-exit-if-changed .`, `flutter analyze --fatal-infos`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup flutter package"
+        uses: "./.github/actions/setup-flutter"
+        with:
+          channel: "master"
+          working-directory: "test_flutter_pkg"
+      - run: "dart format --output=none --set-exit-if-changed ."
+        working-directory: "test_flutter_pkg"
+      - run: "flutter analyze --fatal-infos"
+        working-directory: "test_flutter_pkg"
+  job_003:
+    name: "test; linux; Flutter beta; `flutter test --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup flutter package"
+        uses: "./.github/actions/setup-flutter"
+        with:
+          channel: "beta"
+          working-directory: "test_flutter_pkg"
+      - run: "flutter test --test-randomize-ordering-seed=random"
+        working-directory: "test_flutter_pkg"
+    needs:
+      - "job_001"
+      - "job_002"
+  job_004:
+    name: "Notify failure"
+    runs-on: "ubuntu-latest"
+    if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
+    steps:
+      - run: |
+          curl -H "Content-Type: application/json" -X POST -d \
+            "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+            "${CHAT_WEBHOOK_URL}"
+        env:
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+

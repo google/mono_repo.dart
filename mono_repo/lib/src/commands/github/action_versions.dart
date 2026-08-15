@@ -9,7 +9,7 @@
 const actionsCacheVersion = '668228422ae6a00e4ad889ee87cd7109ec5666a7';
 const actionsCheckoutVersion = 'de0fac2e4500dabe0009e67214ff5f5447ce83dd';
 const actionsStaleVersion = 'b5d41d4e1d5dceea10e7104786b73624c18a190f';
-const codecovCodecovActionVersion = 'fb8b3582c8e4def4969c97caa2f19720cb33a72f';
+const codecovCodecovActionVersion = 'e79a6962e0d4c0c17b229090214935d2e33f8354';
 const coverallsappGithubActionVersion =
     '648a8eb78e6d50909eff900e4ec85cab4524a45b';
 const dartLangSetupDartVersion = '65eb853c7ba17dde3be364c3d2858773e7144260';

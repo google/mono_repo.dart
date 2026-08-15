@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.7.2
+# Created with package:mono_repo v7.0.0-wip
 name: "Setup Flutter Package"
 description: "Setup Flutter SDK, cache pub dependencies, and run flutter pub action."
 inputs:

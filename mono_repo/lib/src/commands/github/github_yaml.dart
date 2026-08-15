@@ -15,7 +15,6 @@ import '../../package_config.dart';
 import '../../package_flavor.dart';
 import '../../root_config.dart';
 import '../../task_type.dart';
-import '../../user_exception.dart';
 import '../../yaml.dart';
 import 'action_info.dart';
 import 'job.dart';
@@ -30,31 +29,30 @@ final defaultGitHubWorkflowFilePath = githubWorkflowFilePath(
 );
 
 String githubWorkflowFilePath(String filename) =>
-    '$githubWorkflowDirectory/$filename.yml';
+    '$githubWorkflowDirectory/$filename.yaml';
 
 Map<String, String> generateGitHubYml(RootConfig rootConfig) {
-  final jobs = <HasStageName>[...rootConfig.expand((config) => config.jobs)];
+  final output = <String, String>{};
 
-  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
-  if (selfValidateStage != null) {
-    jobs.add(_SelfValidateJob(selfValidateStage));
-  }
-
-  final allJobStages = {for (var job in jobs) job.stageName};
   final orderedStages = calculateOrderedStages(
     rootConfig,
     rootConfig.monoConfig.githubConditionalStages,
   )..add(_onCompletionStage);
 
-  final output = <String, String>{};
+  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
+  final allModernJobs = [
+    ...rootConfig.expand((p) => p.jobs),
+    if (selfValidateStage != null) _SelfValidateJob(selfValidateStage),
+  ];
 
-  final commandsToKeys = extractCommands(jobs);
+  final commandsToKeys = extractCommands(allModernJobs);
 
   void populateJobs(
     String fileName,
     String workflowName,
-    Iterable<HasStageName> myJobs,
-  ) {
+    Iterable<HasStageName> myJobs, {
+    List<String>? paths,
+  }) {
     if (output.containsKey(fileName)) {
       throw UnsupportedError(
         'Should not get here – duplicate workflow "$fileName".',
@@ -133,50 +131,92 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       jobList['job_${jobList.length + 1}'] = job;
     }
 
+    final githubConfig = Map<String, dynamic>.from(
+      rootConfig.monoConfig.github.generate(workflowName),
+    );
+    if (paths != null) {
+      final on = Map<String, dynamic>.from(githubConfig['on'] as Map);
+      githubConfig['on'] = on;
+      for (var entry in on.entries) {
+        if (entry.key == 'schedule') continue;
+        final value = entry.value;
+        if (value is Map) {
+          on[entry.key] = {...value, 'paths': paths};
+        } else if (value is List) {
+          on[entry.key] = {'branches': value, 'paths': paths};
+        } else if (value is String) {
+          on[entry.key] = {
+            'branches': [value],
+            'paths': paths,
+          };
+        } else if (value == null) {
+          on[entry.key] = {'paths': paths};
+        }
+      }
+    }
+
     output[githubWorkflowFilePath(fileName)] =
         '''
 $createdWith
-${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
+${toYaml(githubConfig)}
 
 ${toYaml({'jobs': jobList})}
 ''';
   }
 
-  final workflows = rootConfig.monoConfig.github.workflows;
+  final packageMap = {for (var p in rootConfig) p.pubspec.name: p};
 
-  if (workflows != null) {
-    for (var entry in workflows.entries) {
-      assert(entry.value.stages.isNotEmpty);
-      final myJobs = {
-        for (var entry in entry.value.stages)
-          entry: jobs.where((element) => element.stageName == entry).toList(),
-      };
-
-      for (var jobEntry in myJobs.entries) {
-        if (jobEntry.value.isEmpty) {
-          throw UserException(
-            'No jobs are defined for the stage "${jobEntry.key}" '
-            'defined in GitHub workflow "${entry.key}".',
-          );
+  Iterable<PackageConfig> transitiveDeps(PackageConfig config) {
+    final deps = <PackageConfig>{};
+    final queue = Queue<PackageConfig>()..add(config);
+    while (queue.isNotEmpty) {
+      final current = queue.removeFirst();
+      final depNames = [
+        ...current.pubspec.dependencies.keys,
+        if (current == config) ...current.pubspec.devDependencies.keys,
+      ];
+      for (var depName in depNames) {
+        final depConfig = packageMap[depName];
+        if (depConfig != null && deps.add(depConfig)) {
+          queue.add(depConfig);
         }
       }
-
-      allJobStages.removeAll(entry.value.stages);
-
-      populateJobs(
-        entry.key,
-        entry.value.name,
-        myJobs.values.expand((element) => element),
-      );
     }
+    return deps;
   }
 
-  if (allJobStages.isNotEmpty) {
+  for (var packageConfig in rootConfig) {
+    final posixPath = p.posix.joinAll(p.split(packageConfig.relativePath));
+    if (rootConfig.monoConfig.ignore.contains(posixPath)) {
+      continue;
+    }
+    final fileName = posixPath == '.'
+        ? packageConfig.pubspec.name
+        : posixPath.replaceAll('/', '_');
+    final tDeps = transitiveDeps(packageConfig);
     populateJobs(
-      defaultGitHubWorkflowFileName,
-      defaultGitHubWorkflowName,
-      jobs.where((element) => allJobStages.contains(element.stageName)),
+      fileName,
+      'package:${packageConfig.pubspec.name}',
+      packageConfig.jobs,
+      paths: [
+        githubWorkflowFilePath(fileName),
+        if (posixPath == '.') ...[
+          '**',
+          for (var pkg in rootConfig)
+            if (pkg.relativePath != '.')
+              '!${p.posix.joinAll(p.split(pkg.relativePath))}/**',
+        ] else
+          '$posixPath/**',
+        for (var dep in tDeps)
+          '${p.posix.joinAll(p.split(dep.relativePath))}/**',
+      ],
     );
+  }
+
+  if (selfValidateStage != null) {
+    populateJobs('mono_repo_self_validate', 'mono_repo self validate', [
+      _SelfValidateJob(selfValidateStage),
+    ]);
   }
 
   if (output.isNotEmpty) {
@@ -303,7 +343,6 @@ Iterable<_MapEntryWithStage> _listJobs(
         .toList();
 
     final key = _JobGroupKey(
-      package: ciJob.package,
       stageName: ciJob.stageName,
       os: ciJob.os,
       flavor: ciJob.flavor,
@@ -324,10 +363,8 @@ Iterable<_MapEntryWithStage> _listJobs(
 
     final ciEntry = CIJobEntry(firstJob, commands);
 
-    final packageConfig = packageConfigByPath[firstJob.package]!;
-
     final job = ciEntry._createJob(
-      packageConfig,
+      packageConfigByPath[firstJob.package]!,
       rootConfig,
       oneOs: false,
       oneSdk: false,
@@ -347,7 +384,6 @@ Iterable<_MapEntryWithStage> _listJobs(
 }
 
 class _JobGroupKey {
-  final String package;
   final String stageName;
   final String os;
   final PackageFlavor flavor;
@@ -355,7 +391,6 @@ class _JobGroupKey {
   final String? description;
 
   _JobGroupKey({
-    required this.package,
     required this.stageName,
     required this.os,
     required this.flavor,
@@ -368,7 +403,6 @@ class _JobGroupKey {
       identical(this, other) ||
       other is _JobGroupKey &&
           runtimeType == other.runtimeType &&
-          package == other.package &&
           stageName == other.stageName &&
           os == other.os &&
           flavor == other.flavor &&
@@ -377,7 +411,6 @@ class _JobGroupKey {
 
   @override
   int get hashCode =>
-      package.hashCode ^
       stageName.hashCode ^
       os.hashCode ^
       flavor.hashCode ^

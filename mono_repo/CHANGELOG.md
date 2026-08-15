@@ -1,6 +1,20 @@
-## 6.7.2
+## 7.0.0-wip
 
-- Support configuring `permissions` under `github` in `mono_repo.yaml`.
+- **Per-Package Workflows**: Generate individual `.github/workflows/<package>.yaml`
+  files for each package instead of a single monolithic `dart.yml`.
+- **Root Cascading Defaults (`defaults:`)**: Support top-level `defaults:` in root
+  `mono_repo.yaml` (e.g. `sdk: [pubspec, dev]`, `stages: [...]`) that subpackages
+  inherit automatically, requiring zero `mono_pkg.yaml` files for standard packages.
+- **Transitive Dependency Filtering**: Automatically compute internal package dependencies
+  and append their paths to each workflow's `paths:` trigger filter.
+- **Local Composite Actions**: Generate reusable local composite actions
+  (`.github/actions/setup-dart/action.yml` and `.github/actions/setup-flutter/action.yml`)
+  to encapsulate SDK setup, dependency caching, and `pub upgrade` execution.
+- **Escape Hatches & Hooks**: Add `ignore:` package exclusion list and `pre_steps`/`post_steps`
+  custom task hooks.
+- **Least-Privilege Security**: Set default workflow permissions to `permissions: { contents: read }`.
+- **Legacy Removal**: Remove Travis-CI-era cross-package job merging algorithms.
+- **SDK Requirement**: Require Dart `sdk: ^3.8.0`.
 
 ## 6.7.1
 

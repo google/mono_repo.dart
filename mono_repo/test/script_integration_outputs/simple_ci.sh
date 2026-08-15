@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v7.0.0-wip
+# Created with package:mono_repo v1.2.3
 
 # Support built in commands on windows out of the box.
 
@@ -63,49 +63,21 @@ for PKG in ${PKGS}; do
       echo
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
-      analyze_0)
-        echo 'dart analyze'
-        dart analyze || EXIT_CODE=$?
-        ;;
-      analyze_1)
+      analyze)
         echo 'dart analyze --fatal-infos'
         dart analyze --fatal-infos || EXIT_CODE=$?
-        ;;
-      analyze_2)
-        echo 'flutter analyze'
-        flutter analyze || EXIT_CODE=$?
-        ;;
-      analyze_3)
-        echo 'flutter analyze --fatal-infos'
-        flutter analyze --fatal-infos || EXIT_CODE=$?
-        ;;
-      command)
-        echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
-        cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate || EXIT_CODE=$?
         ;;
       format)
         echo 'dart format --output=none --set-exit-if-changed .'
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       test_0)
-        echo 'dart test --test-randomize-ordering-seed=random'
-        dart test --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart test --platform chrome'
+        dart test --platform chrome || EXIT_CODE=$?
         ;;
       test_1)
-        echo 'dart test -P presubmit --test-randomize-ordering-seed=random'
-        dart test -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
-        ;;
-      test_2)
-        echo 'flutter test --test-randomize-ordering-seed=random'
-        flutter test --test-randomize-ordering-seed=random || EXIT_CODE=$?
-        ;;
-      test_with_coverage_0)
-        echo 'dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random'
-        dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random || EXIT_CODE=$?
-        ;;
-      test_with_coverage_1)
-        echo 'dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random'
-        dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart test --preset travis'
+        dart test --preset travis || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
