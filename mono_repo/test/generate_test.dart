@@ -30,12 +30,7 @@ void main() {
         final monoConfigContent = toYaml({'github': value});
         await populateConfig(monoConfigContent);
 
-        final expected = [
-          'package:sub_pkg',
-          'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
-          ciScriptPathMessage,
-        ].join('\n');
-        testGenerateConfig(printMatcher: expected);
+        testGenerateConfig(printMatcher: _subPkgStandardOutput());
       });
     }
 
@@ -47,12 +42,7 @@ void main() {
       });
       await populateConfig(monoConfigContent);
 
-      final expected = [
-        'package:sub_pkg',
-        'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
-        ciScriptPathMessage,
-      ].join('\n');
-      testGenerateConfig(printMatcher: expected);
+      testGenerateConfig(printMatcher: _subPkgStandardOutput());
 
       final workflowFile = File(
         p.join(d.sandbox, defaultGitHubWorkflowFilePath),
@@ -350,10 +340,7 @@ github:
         final generatedFile = File(d.path(defaultGitHubWorkflowFilePath));
         final contents = generatedFile.readAsStringSync();
         generatedFile.writeAsStringSync(
-          contents.replaceAll(
-            'dart-lang/setup-dart@',
-            'dart-lang/setup-dart@Foo',
-          ),
+          contents.replaceAll('actions/checkout@', 'actions/checkout@Foo'),
         );
         testGenerateConfig(printMatcher: 'package:sub_pkg', validateOnly: true);
       },
@@ -390,45 +377,6 @@ ${_writeScriptOutput(false)}''',
     );
 
     await d.file(ciScriptPath, ciShellOutput).validate();
-  });
-
-  test('max cache key', () async {
-    final monoConfigContent = toYaml({
-      'merge_stages': ['format'],
-    });
-    await populateConfig(monoConfigContent);
-
-    String pkgName(int i) =>
-        'package_with_a_long_name_'
-        '${i.toString().padLeft(2, '0')}';
-
-    const count = 18;
-
-    for (var i = 0; i < count; i++) {
-      await d.dir(pkgName(i), [
-        d.file(monoPkgFileName, r'''
-sdk:
- - dev
-
-stages:
-  - format:
-    - format
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
-      '''),
-      ]).create();
-    }
-
-    testGenerateConfig(
-      printMatcher:
-          '''
-${Iterable.generate(count, (i) => 'package:${pkgName(i)}').join('\n')}
-package:sub_pkg
-${_writeScriptOutput(false)}''',
-    );
-
-    validateSandbox('max_cache_key.txt', defaultGitHubWorkflowFilePath);
   });
 
   test('two flavors of dartfmt', () async {
@@ -1329,7 +1277,8 @@ github:
 ''');
       testGenerateConfig(
         printMatcher: contains(
-          'Wrote `${d.path('.github/dependabot.yml')}`.\n',
+          'Wrote '
+          '`${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.\n',
         ),
       );
       await d.dir('.github', [
@@ -1364,7 +1313,8 @@ github:
 ''');
       testGenerateConfig(
         printMatcher: contains(
-          'Wrote `${d.path('.github/dependabot.yml')}`.\n',
+          'Wrote '
+          '`${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.\n',
         ),
       );
       await d.dir('.github', [
@@ -1433,11 +1383,22 @@ String _subPkgStandardOutput({bool withDependabot = false}) => '''
 package:sub_pkg
 ${_writeScriptOutput(withDependabot)}''';
 
-String _writeScriptOutput(bool withDependabot) => [
-  'Wrote `${p.join(d.sandbox, defaultGitHubWorkflowFilePath)}`.',
-  if (withDependabot) 'Wrote `${p.join(d.sandbox, '.github/dependabot.yml')}`.',
-  ciScriptPathMessage,
-].join('\n');
+String _writeScriptOutput(bool withDependabot) {
+  final setupDartAction = p.normalize(
+    p.join(d.sandbox, '.github/actions/setup-dart/action.yml'),
+  );
+  final setupFlutterAction = p.normalize(
+    p.join(d.sandbox, '.github/actions/setup-flutter/action.yml'),
+  );
+  return [
+    'Wrote `${p.normalize(p.join(d.sandbox, defaultGitHubWorkflowFilePath))}`.',
+    'Wrote `$setupDartAction`.',
+    'Wrote `$setupFlutterAction`.',
+    if (withDependabot)
+      'Wrote `${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.',
+    ciScriptPathMessage,
+  ].join('\n');
+}
 
 Future<void> _testBadConfig(
   Object monoRepoYaml,

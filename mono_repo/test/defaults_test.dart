@@ -73,7 +73,7 @@ environment:
         .file(defaultGitHubWorkflowFilePath, isNot(contains('sdk: "dev"')))
         .validate();
     await d
-        .file(defaultGitHubWorkflowFilePath, contains('sub_pkg; dart analyze'))
+        .file(defaultGitHubWorkflowFilePath, contains('name: "analyze; '))
         .validate();
   });
 }

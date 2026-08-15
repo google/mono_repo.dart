@@ -98,7 +98,7 @@ stages:
 String get ciScriptPathMessage =>
     '''
 ${scriptLines(ciScriptPath).join('\n')}
-Wrote `${p.join(d.sandbox, ciScriptPath)}`.''';
+Wrote `${p.normalize(p.join(d.sandbox, ciScriptPath))}`.''';
 
 void validateSandbox(String expectFileName, String sandboxPath) {
   final output = File(p.join(d.sandbox, sandboxPath)).readAsStringSync();

@@ -23,122 +23,66 @@ jobs:
     name: "mono_repo self validate"
     runs-on: "ubuntu-latest"
     steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
-        with:
-          sdk: "stable"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "stable"
       - name: "mono_repo self validate"
         run: "dart pub global activate mono_repo 1.2.3"
       - name: "mono_repo self validate"
         run: "dart pub global run mono_repo generate --validate"
   job_002:
-    name: "analyze; Dart 2.17.0; `dart analyze`"
+    name: "analyze; linux; Dart 2.17.0; `dart analyze`"
     runs-on: "ubuntu-latest"
     steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:sub_pkg;commands:analyze_0"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0;packages:sub_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:2.17.0
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
         with:
           sdk: "2.17.0"
-      - id: "checkout"
-        name: "Checkout repository"
-        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-        with:
-          persist-credentials: false
-      - id: "sub_pkg_pub_upgrade"
-        name: "sub_pkg; dart pub upgrade"
-        run: "dart pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "sub_pkg"
-      - name: "sub_pkg; dart analyze"
-        run: "dart analyze"
-        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+          working-directory: "sub_pkg"
+      - run: "dart analyze"
         working-directory: "sub_pkg"
   job_003:
-    name: "analyze; Dart dev; `dart analyze --fatal-infos`"
+    name: "analyze; linux; Dart dev; `dart analyze --fatal-infos`"
     runs-on: "ubuntu-latest"
     steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:analyze_1"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
-        with:
-          sdk: "dev"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
-      - id: "sub_pkg_pub_upgrade"
-        name: "sub_pkg; dart pub upgrade"
-        run: "dart pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "sub_pkg"
-      - name: "sub_pkg; dart analyze --fatal-infos"
-        run: "dart analyze --fatal-infos"
-        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "sub_pkg"
+      - run: "dart analyze --fatal-infos"
         working-directory: "sub_pkg"
   job_004:
-    name: "analyze; Dart dev; `dart format --output=none --set-exit-if-changed .`"
+    name: "analyze; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
     runs-on: "ubuntu-latest"
     steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg;commands:format"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:sub_pkg
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
-        with:
-          sdk: "dev"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
-      - id: "sub_pkg_pub_upgrade"
-        name: "sub_pkg; dart pub upgrade"
-        run: "dart pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "sub_pkg"
-      - name: "sub_pkg; dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.sub_pkg_pub_upgrade.conclusion == 'success'"
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "sub_pkg"
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "sub_pkg"
   job_005:
     name: "Notify failure"

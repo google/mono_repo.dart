@@ -4,6 +4,7 @@
 
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 import '../../basic_config.dart';
@@ -47,6 +48,8 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
 
   final output = <String, String>{};
 
+  final commandsToKeys = extractCommands(jobs);
+
   void populateJobs(
     String fileName,
     String workflowName,
@@ -86,9 +89,9 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
     final allJobs = _listJobs(
       rootConfig,
       sortedJobs,
-      rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
+      commandsToKeys,
     ).toList();
 
     var currStageJobs = <String>{};
@@ -176,6 +179,89 @@ ${toYaml({'jobs': jobList})}
     );
   }
 
+  if (output.isNotEmpty) {
+    output['.github/actions/setup-dart/action.yml'] =
+        '''
+$createdWith
+name: "Setup Dart Package"
+description: "Setup Dart SDK, cache pub dependencies, checkout repository, and run pub action."
+inputs:
+  sdk:
+    description: "Dart SDK version or channel"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@${ActionInfo.cache.version}"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }};pkg:\${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }}
+          os:\${{ runner.os }};pub-cache-hosted
+    - name: "Setup Dart SDK"
+      uses: "dart-lang/setup-dart@${ActionInfo.setupDart.version}"
+      with:
+        sdk: "\${{ inputs.sdk }}"
+    - id: "pub_action"
+      name: "dart pub \${{ inputs.pub-action }}"
+      run: "dart pub \${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "\${{ inputs.working-directory }}"
+''';
+    output['.github/actions/setup-flutter/action.yml'] =
+        '''
+$createdWith
+name: "Setup Flutter Package"
+description: "Setup Flutter SDK, cache pub dependencies, and run flutter pub action."
+inputs:
+  channel:
+    description: "Flutter SDK channel or version"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@${ActionInfo.cache.version}"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }};pkg:\${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }}
+          os:\${{ runner.os }};pub-cache-hosted
+    - name: "Setup Flutter SDK"
+      uses: "subosito/flutter-action@${ActionInfo.setupFlutter.version}"
+      with:
+        channel: "\${{ inputs.channel }}"
+    - id: "pub_action"
+      name: "flutter pub \${{ inputs.pub-action }}"
+      run: "flutter pub \${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "\${{ inputs.working-directory }}"
+''';
+  }
+
   return output;
 }
 
@@ -183,13 +269,12 @@ ${toYaml({'jobs': jobList})}
 Iterable<_MapEntryWithStage> _listJobs(
   RootConfig rootConfig,
   List<HasStageName> jobs,
-  Set<String> mergeStages,
   List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
+  Map<String, String> commandsToKeys,
 ) sync* {
-  final jobEntries = <CIJobEntry>[];
-
   var count = 0;
+  final packageConfigByPath = {for (var p in rootConfig) p.relativePath: p};
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
@@ -201,6 +286,8 @@ Iterable<_MapEntryWithStage> _listJobs(
     return _MapEntryWithStage(jobName(++count), content, stage);
   }
 
+  final groupedCIJobs = <_JobGroupKey, List<CIJob>>{};
+
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
       yield jobEntry(
@@ -211,53 +298,43 @@ Iterable<_MapEntryWithStage> _listJobs(
     }
 
     final ciJob = job as CIJob;
-
-    final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
-
     final commands = ciJob.tasks
-        .map((task) => commandsToKeys[task.command(ciJob.isNewest)]!)
+        .map((task) => task.command(ciJob.isNewest))
         .toList();
 
-    jobEntries.add(CIJobEntry(ciJob, commands));
+    final key = _JobGroupKey(
+      package: ciJob.package,
+      stageName: ciJob.stageName,
+      os: ciJob.os,
+      flavor: ciJob.flavor,
+      commands: commands,
+      description: ciJob.description,
+    );
+
+    groupedCIJobs.putIfAbsent(key, () => []).add(ciJob);
   }
 
-  final differentOperatingSystems = <String>{};
-  final differentPackages = <String>{};
-  final differentSdks = <String>{};
+  for (var entry in groupedCIJobs.entries) {
+    final jobsInGroup = entry.value;
 
-  for (var entry in jobEntries) {
-    differentOperatingSystems.add(entry.job.os);
-    differentPackages.add(entry.job.package);
-    differentSdks.add(entry.job.sdk);
-  }
+    final firstJob = jobsInGroup.first;
+    final commands = firstJob.tasks
+        .map((task) => commandsToKeys[task.command(firstJob.isNewest)]!)
+        .toList();
 
-  // Group jobs by all of the values that would allow them to merge
-  final groupedItems = groupCIJobEntries(jobEntries);
+    final ciEntry = CIJobEntry(firstJob, commands);
 
-  for (var entry in groupedItems.entries) {
-    final first = entry.value.first;
+    final packageConfig = packageConfigByPath[firstJob.package]!;
 
-    if (mergeStages.contains(first.job.stageName)) {
-      final packages = entry.value.map((t) => t.job.package).toList()..sort();
-      final yaml = first._createJob(
-        rootConfig,
-        packages: packages,
-        oneOs: differentOperatingSystems.length == 1,
-        oneSdk: differentSdks.length == 1,
-        onePackage: differentPackages.length == 1,
-      );
-      yield jobEntry(yaml, first.job.stageName);
-    } else {
-      yield* entry.value.map((e) {
-        final yaml = e._createJob(
-          rootConfig,
-          oneOs: differentOperatingSystems.length == 1,
-          oneSdk: differentSdks.length == 1,
-          onePackage: differentPackages.length == 1,
-        );
-        return jobEntry(yaml, e.job.stageName);
-      });
-    }
+    final job = ciEntry._createJob(
+      packageConfig,
+      rootConfig,
+      oneOs: false,
+      oneSdk: false,
+      onePackage: true,
+      sdks: jobsInGroup.map((j) => j.sdk).toList(),
+    );
+    yield jobEntry(job, firstJob.stageName);
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
@@ -267,6 +344,45 @@ Iterable<_MapEntryWithStage> _listJobs(
       yield jobEntry(jobConfig, _onCompletionStage);
     }
   }
+}
+
+class _JobGroupKey {
+  final String package;
+  final String stageName;
+  final String os;
+  final PackageFlavor flavor;
+  final List<String> commands;
+  final String? description;
+
+  _JobGroupKey({
+    required this.package,
+    required this.stageName,
+    required this.os,
+    required this.flavor,
+    required this.commands,
+    this.description,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _JobGroupKey &&
+          runtimeType == other.runtimeType &&
+          package == other.package &&
+          stageName == other.stageName &&
+          os == other.os &&
+          flavor == other.flavor &&
+          const IterableEquality().equals(commands, other.commands) &&
+          description == other.description;
+
+  @override
+  int get hashCode =>
+      package.hashCode ^
+      stageName.hashCode ^
+      os.hashCode ^
+      flavor.hashCode ^
+      const IterableEquality().hash(commands) ^
+      description.hashCode;
 }
 
 extension on CIJobEntry {
@@ -284,11 +400,13 @@ extension on CIJobEntry {
   }
 
   Job _createJob(
+    PackageConfig packageConfig,
     RootConfig rootConfig, {
     List<String>? packages,
     required bool oneOs,
     required bool oneSdk,
     required bool onePackage,
+    List<String>? sdks,
   }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
@@ -298,6 +416,7 @@ extension on CIJobEntry {
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
+      final stepNamePrefix = packages.length > 1 ? '$package; ' : '';
       final posixPkg = p.posix.joinAll(p.split(package));
       final safePkg = (posixPkg == '.' || posixPkg.isEmpty)
           ? 'root'
@@ -305,7 +424,7 @@ extension on CIJobEntry {
       final pubStepId = '${safePkg}_pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(
         _CommandEntry(
-          '$package; $pubCommand',
+          '$stepNamePrefix$pubCommand',
           pubCommand,
           id: pubStepId,
           // Run this regardless of the success of other steps other than the
@@ -319,33 +438,29 @@ extension on CIJobEntry {
         if (command.isEmpty || command == 'true') continue;
         commandEntries.add(
           _CommandEntry(
-            '$package; $command',
+            '$stepNamePrefix$command',
             _commandForOs(command),
             type: job.tasks[i].type,
-            // Run this regardless of the success of other steps other than the
-            // pub step.
-            ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
             workingDirectory: package,
           ),
         );
       }
     }
 
-    final packageConfig = rootConfig.singleWhere(
-      (p) => p.relativePath == job.package,
-    );
+    final useMatrix = sdks != null && sdks.length > 1;
+    final sdkVersion = useMatrix ? r'${{ matrix.sdk }}' : job.sdk;
 
     return _githubJob(
       jobName(
         packages,
         includeOs: oneOs,
-        includeSdk: oneSdk,
+        includeSdk: oneSdk || useMatrix,
         includePackage: onePackage,
         includeStage: true,
       ),
       _githubJobOs,
       job.flavor,
-      job.sdk,
+      sdkVersion,
       commandEntries,
       rootConfig,
       config: rootConfig.monoConfig,
@@ -353,6 +468,12 @@ extension on CIJobEntry {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
       },
+      strategy: useMatrix
+          ? {
+              'fail-fast': false,
+              'matrix': {'sdk': sdks},
+            }
+          : null,
       preSteps: packageConfig.preSteps,
       postSteps: packageConfig.postSteps,
     );
@@ -404,24 +525,33 @@ Job _githubJob(
   runsOn: runsOn,
   strategy: strategy,
   steps: [
-    if (!runsOn.startsWith('windows'))
-      _cacheEntries(
-        runsOn,
-        rootConfig: rootConfig,
-        additionalCacheKeys: {
-          'sdk': sdkVersion,
-          if (additionalCacheKeys != null) ...additionalCacheKeys,
-        },
-      ),
-    packageFlavor.setupStep(sdkVersion, rootConfig),
-    if (preSteps != null) ...preSteps.map(Step.fromJson),
-    ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
       withContent: {'persist-credentials': false},
     ),
-    for (var command in runCommands) ...command.runContent(config, rootConfig),
+    () {
+      final workingDir = runCommands
+          .whereType<_CommandEntry>()
+          .firstOrNull
+          ?.workingDirectory;
+      return Step.uses(
+        name: 'Setup ${packageFlavor.name} package',
+        uses: './.github/actions/setup-${packageFlavor.name}',
+        withContent: {
+          packageFlavor == PackageFlavor.flutter ? 'channel' : 'sdk':
+              sdkVersion,
+          if (workingDir != null && workingDir != '.')
+            'working-directory': workingDir,
+        },
+      );
+    }(),
+    ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
+    if (preSteps != null) ...preSteps.map(Step.fromJson),
+    for (var command in runCommands.where(
+      (c) => c is! _CommandEntry || c.type != null,
+    ))
+      ...command.runContent(config, rootConfig),
     if (postSteps != null) ...postSteps.map(Step.fromJson),
   ],
 );
@@ -474,52 +604,6 @@ class _CommandEntry extends _CommandEntryBase {
       ];
 }
 
-/// Creates a "step" for enabling caching for the containing job.
-///
-/// See https://github.com/marketplace/actions/cache
-///
-/// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
-/// store and retrieve the cache.
-Step _cacheEntries(
-  String runsOn, {
-  required RootConfig rootConfig,
-  Map<String, String>? additionalCacheKeys,
-}) {
-  final cacheKeyParts = [
-    'os:$runsOn',
-    'pub-cache-hosted',
-    if (additionalCacheKeys != null) ...[
-      for (var entry in additionalCacheKeys.entries)
-        '${entry.key}:${entry.value}',
-    ],
-  ];
-
-  final restoreKeys = [
-    for (var i = cacheKeyParts.length; i > 0; i--)
-      _maxLength(cacheKeyParts.take(i).join(';')),
-  ];
-
-  // Just caching the `hosted` directory because caching git dependencies or
-  // activated packages can cause problems.
-  const pubCacheHosted = '~/.pub-cache/hosted';
-
-  return ActionInfo.cache.usage(
-    withContent: {
-      'path': pubCacheHosted,
-      'key': restoreKeys.first,
-      'restore-keys': restoreKeys.skip(1).join('\n'),
-    },
-    versionOverrides: rootConfig.existingActionVersions,
-  );
-}
-
-String _maxLength(String input) {
-  if (input.length <= 512) return input;
-  final hash = ['-!!too_long!!', input.length, input.hashCode].join('-');
-
-  return input.substring(0, 512 - hash.length) + hash;
-}
-
 Job _selfValidateJob(BasicConfiguration config, RootConfig rootConfig) =>
     _githubJob(
       selfValidateJobName,
@@ -552,22 +636,4 @@ class _MapEntryWithStage {
   final String stageName;
 
   _MapEntryWithStage(this.id, this.value, this.stageName);
-}
-
-extension on PackageFlavor {
-  Step setupStep(String sdkVersion, RootConfig rootConfig) {
-    switch (this) {
-      case PackageFlavor.dart:
-        return ActionInfo.setupDart.usage(
-          withContent: {'sdk': sdkVersion},
-          versionOverrides: rootConfig.existingActionVersions,
-        );
-
-      case PackageFlavor.flutter:
-        return ActionInfo.setupFlutter.usage(
-          withContent: {'channel': sdkVersion},
-          versionOverrides: rootConfig.existingActionVersions,
-        );
-    }
-  }
 }

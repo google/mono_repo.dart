@@ -1,0 +1,37 @@
+# Created with package:mono_repo v6.7.2
+name: "Setup Flutter Package"
+description: "Setup Flutter SDK, cache pub dependencies, and run flutter pub action."
+inputs:
+  channel:
+    description: "Flutter SDK channel or version"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:${{ runner.os }};pub-cache-hosted;channel:${{ inputs.channel }};pkg:${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:${{ runner.os }};pub-cache-hosted;channel:${{ inputs.channel }}
+          os:${{ runner.os }};pub-cache-hosted
+    - name: "Setup Flutter SDK"
+      uses: "subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2"
+      with:
+        channel: "${{ inputs.channel }}"
+    - id: "pub_action"
+      name: "flutter pub ${{ inputs.pub-action }}"
+      run: "flutter pub ${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "${{ inputs.working-directory }}"
