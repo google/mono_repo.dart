@@ -16,6 +16,7 @@ Map<String, dynamic> _$CIJobToJson(CIJob instance) => <String, dynamic>{
   'stageName': instance.stageName,
   'tasks': instance.tasks.map((e) => e.toJson()).toList(),
   'flavor': _$PackageFlavorEnumMap[instance.flavor]!,
+  'isNewest': instance.isNewest,
 };
 
 const _$PackageFlavorEnumMap = {

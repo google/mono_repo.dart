@@ -28,13 +28,13 @@ class Step implements YamlLike {
   Step._({
     this.id,
     this.withContent,
-    this.name,
+    String? name,
     this.uses,
     this.run,
     this.ifContent,
     this.workingDirectory,
     this.env,
-  }) {
+  }) : name = (name != null && name != run) ? name : null {
     if (run == null) {
       if (uses == null) {
         throw ArgumentError.value(
@@ -62,12 +62,13 @@ class Step implements YamlLike {
 
   Step.run({
     this.id,
-    required String this.name,
+    String? name,
     required this.run,
     this.ifContent,
     this.workingDirectory,
     this.env,
-  }) : uses = null,
+  }) : name = (name != null && name != run) ? name : null,
+       uses = null,
        withContent = null;
 
   Step.uses({

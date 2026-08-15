@@ -38,8 +38,8 @@ line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supporte
       r'''
 line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
-2 │   on: not a map
-  │       ^^^^^^^^^
+2 │   on: "not a map"
+  │       ^^^^^^^^^^^
   ╵''',
     ),
   );
@@ -53,8 +53,8 @@ line 2, column 7 of mono_repo.yaml: Unsupported value for "on". type 'String' is
       r'''
 line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cron` if `on` has a value.
   ╷
-2 │   cron: some value
-  │         ^^^^^^^^^^
+2 │   cron: "some value"
+  │         ^^^^^^^^^^^^
   ╵''',
     ),
   );
@@ -68,8 +68,8 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
       r'''
 line 2, column 8 of mono_repo.yaml: Unsupported value for "env". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
-2 │   env: notAmap
-  │        ^^^^^^^
+2 │   env: "notAmap"
+  │        ^^^^^^^^^
   ╵''',
     ),
   );
@@ -92,7 +92,7 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "on_completion". Canno
   ╷
 3 │ ┌     - steps: []
 4 │ │       needs:
-5 │ └         - foo
+5 │ └         - "foo"
   ╵''',
     ),
   );
@@ -152,8 +152,8 @@ line 4, column 11 of mono_repo.yaml: Missing key "uses". Either `run` or `uses` 
       r'''
 line 5, column 17 of mono_repo.yaml: Unsupported value for "uses". `uses` and `run` cannot both be defined.
   ╷
-5 │           uses: bob
-  │                 ^^^
+5 │           uses: "bob"
+  │                 ^^^^^
   ╵''',
     ),
   );
@@ -262,7 +262,7 @@ line 4, column 11 of mono_repo.yaml: Unsupported value for "if". type 'int' is n
       r'''
 line 3, column 7 of mono_repo.yaml: Unrecognized keys: [foo]; supported keys: [name, if]
   ╷
-3 │     - foo: bar
+3 │     - foo: "bar"
   │       ^^^
   ╵''',
     ),
@@ -281,8 +281,8 @@ void _testWorkflows() {
       r'''
 line 2, column 14 of mono_repo.yaml: Unsupported value for "workflows". type 'String' is not a subtype of type 'Map<dynamic, dynamic>?' in type cast
   ╷
-2 │   workflows: some value
-  │              ^^^^^^^^^^
+2 │   workflows: "some value"
+  │              ^^^^^^^^^^^^
   ╵''',
     ),
   );
@@ -385,9 +385,9 @@ line 6, column 9 of mono_repo.yaml: Unsupported value for "stages". type 'Null' 
 line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Cannot define a workflow with the default key "dart".
   ╷
 3 │ ┌     dart:
-4 │ │       name: bob
+4 │ │       name: "bob"
 5 │ │       stages:
-6 │ └         - existing
+6 │ └         - "existing"
   ╵''',
     ),
   );
@@ -409,8 +409,8 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Cannot de
       r'''
 line 4, column 13 of mono_repo.yaml: Unsupported value for "name". Cannot be the default workflow name "Dart CI".
   ╷
-4 │       name: Dart CI
-  │             ^^^^^^^
+4 │       name: "Dart CI"
+  │             ^^^^^^^^^
   ╵''',
     ),
   );
@@ -458,13 +458,13 @@ line 4, column 13 of mono_repo.yaml: Unsupported value for "name". Cannot be the
 line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Stage "stage1" is already defined in workflow "alice".
    ╷
 3  │ ┌     alice:
-4  │ │       name: alice
+4  │ │       name: "alice"
 5  │ │       stages:
-6  │ │         - stage1
+6  │ │         - "stage1"
 7  │ │     bob:
-8  │ │       name: bob
+8  │ │       name: "bob"
 9  │ │       stages:
-10 │ └         - stage1
+10 │ └         - "stage1"
    ╵''',
     ),
   );
@@ -490,13 +490,13 @@ line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Stage "st
 line 3, column 5 of mono_repo.yaml: Unsupported value for "workflows". Workflows must have different names. Duplicate name(s): bob
    ╷
 3  │ ┌     alice:
-4  │ │       name: bob
+4  │ │       name: "bob"
 5  │ │       stages:
-6  │ │         - oops
+6  │ │         - "oops"
 7  │ │     bob:
-8  │ │       name: bob
+8  │ │       name: "bob"
 9  │ │       stages:
-10 │ └         - oops
+10 │ └         - "oops"
    ╵''',
     ),
   );

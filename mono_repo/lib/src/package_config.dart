@@ -156,7 +156,16 @@ class PackageConfig {
           job as Object,
           flavor: flavor,
         );
+
+        final newestSdk = jobSdks.last;
+
         for (var sdk in jobSdks) {
+          final isNewest = sdk == newestSdk;
+          final filteredTasks = tasks
+              .where((t) => t.command(isNewest).isNotEmpty)
+              .toList();
+          if (filteredTasks.isEmpty) continue;
+
           for (var os in jobOses) {
             jobs.add(
               CIJob(
@@ -164,9 +173,10 @@ class PackageConfig {
                 relativePath,
                 sdk,
                 stage.name,
-                tasks,
+                filteredTasks,
                 description: description,
                 flavor: flavor,
+                isNewest: isNewest,
               ),
             );
           }
@@ -223,8 +233,13 @@ class CIJob implements HasStageName {
   @JsonKey()
   final PackageFlavor flavor;
 
-  Iterable<String> get _taskCommandsTickQuoted =>
-      tasks.map((t) => '`${t.command}`');
+  @JsonKey()
+  final bool isNewest;
+
+  Iterable<String> get _taskCommandsTickQuoted => tasks
+      .map((t) => t.command(isNewest))
+      .where((c) => c.isNotEmpty)
+      .map((c) => '`$c`');
 
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
@@ -243,6 +258,7 @@ class CIJob implements HasStageName {
     this.tasks, {
     this.description,
     required this.flavor,
+    this.isNewest = false,
   }) : assert(
          errorForSdkConfig(flavor, sdk) == null,
          'Should have caught bad sdk value `$sdk` before here!',
@@ -292,10 +308,12 @@ class Task {
   @JsonKey()
   final String? args;
 
-  final String command;
+  Task(this.flavor, this.type, {this.args}) {
+    type.commandValue(flavor, args, isNewest: true);
+  }
 
-  Task(this.flavor, this.type, {this.args})
-    : command = type.commandValue(flavor, args).join(' ');
+  String command(bool isNewest) =>
+      type.commandValue(flavor, args, isNewest: isNewest).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.

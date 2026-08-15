@@ -50,7 +50,7 @@ void main() {
 
     final config = _parse(monoYaml);
 
-    expect(config.sdks, ['1.23.0', 'dev', 'stable']);
+    expect(config.sdks, ['1.23.0', 'stable', 'dev']);
 
     final jobs = jsonDecode(
       jsonEncode(config.jobs.map((tj) => tj.toJson()).toList()),
@@ -403,6 +403,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'format'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'description': 'dartanalyzer && dartfmt',
@@ -419,6 +420,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'format'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'osx',
@@ -433,6 +435,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -443,16 +446,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
-    ],
-    'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -463,6 +457,18 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
+  },
+  {
+    'os': 'linux',
+    'package': 'a',
+    'sdk': 'dev',
+    'stageName': 'unit_test',
+    'tasks': [
+      {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
+    ],
+    'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -477,20 +483,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 0',
-      },
-    ],
-    'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -505,6 +498,22 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
+  },
+  {
+    'os': 'linux',
+    'package': 'a',
+    'sdk': 'dev',
+    'stageName': 'unit_test',
+    'tasks': [
+      {
+        'flavor': 'dart',
+        'type': 'test',
+        'args': '--preset travis --total-shards 5 --shard-index 0',
+      },
+    ],
+    'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -519,20 +528,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 1',
-      },
-    ],
-    'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -547,6 +543,22 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
+  },
+  {
+    'os': 'linux',
+    'package': 'a',
+    'sdk': 'dev',
+    'stageName': 'unit_test',
+    'tasks': [
+      {
+        'flavor': 'dart',
+        'type': 'test',
+        'args': '--preset travis --total-shards 5 --shard-index 1',
+      },
+    ],
+    'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -557,16 +569,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test'},
-    ],
-    'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -577,5 +580,17 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
+  },
+  {
+    'os': 'linux',
+    'package': 'a',
+    'sdk': 'dev',
+    'stageName': 'unit_test',
+    'tasks': [
+      {'flavor': 'dart', 'type': 'test'},
+    ],
+    'flavor': 'dart',
+    'isNewest': true,
   },
 ];

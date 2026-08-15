@@ -138,32 +138,39 @@ List<String> scriptLines(String scriptPath) => [
   ],
 ];
 
-/// Gives a map of command to unique task key for all [configs].
-Map<String, String> extractCommands(Iterable<PackageConfig> configs) {
+/// Gives a map of command to unique task key for all [jobs].
+Map<String, String> extractCommands(Iterable<HasStageName> jobs) {
   final commandsToKeys = <String, String>{};
 
-  final tasksToConfigure = _travisTasks(configs);
-  final taskNames = tasksToConfigure.map((task) => task.type).toSet();
+  final tasksToConfigure = jobs
+      .whereType<CIJob>()
+      .expand((job) => job.tasks.map((task) => (task, job.isNewest)))
+      .toList();
 
-  for (var taskName in taskNames) {
-    final commands = tasksToConfigure
-        .where((task) => task.type == taskName)
-        .map((task) => task.command)
-        .toSet();
+  final taskTypes = tasksToConfigure.map((t) => t.$1.type).toSet();
+
+  for (var taskType in taskTypes) {
+    final commands =
+        tasksToConfigure
+            .where((t) => t.$1.type == taskType)
+            .map((t) => t.$1.command(t.$2))
+            .toSet()
+            .toList()
+          ..sort();
 
     if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskName.name;
+      commandsToKeys[commands.single] = taskType.name;
       continue;
     }
 
-    // TODO: could likely use some clever `log` math here
+    // If we have multiple, we want a stable mapping.
+    // We also want to try and keep the 'simplest' command as just the task name
+    // if possible.
     final paddingSize = (commands.length - 1).toString().length;
 
-    var count = 0;
-    for (var command in commands) {
-      commandsToKeys[command] =
-          '${taskName}_${count.toString().padLeft(paddingSize, '0')}';
-      count++;
+    for (var i = 0; i < commands.length; i++) {
+      commandsToKeys[commands[i]] =
+          '${taskType.name}_${i.toString().padLeft(paddingSize, '0')}';
     }
   }
 
@@ -277,6 +284,3 @@ List<String> calculateOrderedStages(
 
   return components;
 }
-
-List<Task> _travisTasks(Iterable<PackageConfig> configs) =>
-    configs.expand((config) => config.jobs).expand((job) => job.tasks).toList();
