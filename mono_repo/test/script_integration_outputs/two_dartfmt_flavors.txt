@@ -16,67 +16,35 @@ permissions: "read-all"
 
 jobs:
   job_001:
-    name: "format; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
+    name: "format; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
     runs-on: "ubuntu-latest"
     steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_a;commands:format"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_a
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
-        with:
-          sdk: "dev"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
-      - id: "pkg_a_pub_upgrade"
-        name: "pkg_a; dart pub upgrade"
-        run: "dart pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "pkg_a"
-      - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "pkg_a"
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "pkg_a"
   job_002:
-    name: "format; PKG: pkg_b; `dart format --output=none --set-exit-if-changed .`"
+    name: "format; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`"
     runs-on: "ubuntu-latest"
     steps:
-      - name: "Cache Pub hosted dependencies"
-        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_b;commands:format"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_b
-            os:ubuntu-latest;pub-cache-hosted;sdk:dev
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: "Setup Dart SDK"
-        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
-        with:
-          sdk: "dev"
       - id: "checkout"
         name: "Checkout repository"
         uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
-      - id: "pkg_b_pub_upgrade"
-        name: "pkg_b; dart pub upgrade"
-        run: "dart pub upgrade"
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: "pkg_b"
-      - name: "pkg_b; dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.pkg_b_pub_upgrade.conclusion == 'success'"
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "pkg_b"
+      - run: "dart format --output=none --set-exit-if-changed ."
         working-directory: "pkg_b"
 

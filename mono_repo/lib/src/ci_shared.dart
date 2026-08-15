@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:collection/collection.dart' hide stronglyConnectedComponents;
 import 'package:graphs/graphs.dart';
 import 'package:io/ansi.dart';
 import 'package:meta/meta.dart';
@@ -65,13 +64,6 @@ class CIJobEntry {
   }
 }
 
-/// Group jobs by all of the values that would allow them to merge
-Map<String, List<CIJobEntry>> groupCIJobEntries(List<CIJobEntry> jobEntries) =>
-    groupBy<CIJobEntry, String>(
-      jobEntries,
-      (e) => [...e.job.groupByKeys, e.commands].join(':::'),
-    );
-
 void validateRootConfig(RootConfig rootConfig) {
   for (var config in rootConfig) {
     final sdkConstraint = config.pubspec.environment['sdk'];
@@ -109,7 +101,7 @@ void writeFile(
   String fileContent, {
   required bool isScript,
 }) {
-  final fullPath = p.join(rootDirectory, targetFilePath);
+  final fullPath = p.normalize(p.join(rootDirectory, targetFilePath));
   final scriptFile = File(fullPath);
 
   if (!scriptFile.existsSync()) {
