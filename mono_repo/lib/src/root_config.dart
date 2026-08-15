@@ -85,11 +85,6 @@ class RootConfig extends ListBase<PackageConfig> {
 
     final monoConfig = MonoConfig.fromRepo(rootDirectory: rootDirectory);
 
-    final rootPkgConfig = _packageConfigFromDir(rootDirectory, '.', monoConfig);
-    if (rootPkgConfig != null) {
-      configs.add(rootPkgConfig);
-    }
-
     void visitDirectory(Directory directory) {
       final dirs = directory.listSync().whereType<Directory>().toList()
         ..sort((a, b) => a.path.compareTo(b.path));
@@ -115,6 +110,11 @@ class RootConfig extends ListBase<PackageConfig> {
           visitDirectory(subdir);
         }
       }
+    }
+
+    final rootPkgConfig = _packageConfigFromDir(rootDirectory, '.', monoConfig);
+    if (rootPkgConfig != null) {
+      configs.add(rootPkgConfig);
     }
 
     visitDirectory(Directory(rootDirectory));

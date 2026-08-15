@@ -1,0 +1,58 @@
+# Created with package:mono_repo v7.0.0-wip
+name: "package:test_flutter_pkg_example"
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - ".github/workflows/test_flutter_pkg_example.yaml"
+      - "test_flutter_pkg/example/**"
+      - "test_flutter_pkg/**"
+  pull_request:
+    paths:
+      - ".github/workflows/test_flutter_pkg_example.yaml"
+      - "test_flutter_pkg/example/**"
+      - "test_flutter_pkg/**"
+  schedule:
+    - cron: "0 0 * * 0"
+defaults:
+  run:
+    shell: "bash"
+env:
+  PUB_ENVIRONMENT: "bot.github"
+permissions:
+  contents: "read"
+
+
+jobs:
+  job_001:
+    name: "test; linux; Flutter stable; `flutter test --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup flutter package"
+        uses: "./.github/actions/setup-flutter"
+        with:
+          channel: "stable"
+          working-directory: "test_flutter_pkg/example"
+      - run: "flutter test --test-randomize-ordering-seed=random"
+        working-directory: "test_flutter_pkg/example"
+  job_002:
+    name: "Notify failure"
+    runs-on: "ubuntu-latest"
+    if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
+    steps:
+      - run: |
+          curl -H "Content-Type: application/json" -X POST -d \
+            "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+            "${CHAT_WEBHOOK_URL}"
+        env:
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+    needs:
+      - "job_001"
+

@@ -1,0 +1,138 @@
+# Created with package:mono_repo v7.0.0-wip
+name: "package:test_pkg"
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - ".github/workflows/test_pkg.yaml"
+      - "test_pkg/**"
+  pull_request:
+    paths:
+      - ".github/workflows/test_pkg.yaml"
+      - "test_pkg/**"
+  schedule:
+    - cron: "0 0 * * 0"
+defaults:
+  run:
+    shell: "bash"
+env:
+  PUB_ENVIRONMENT: "bot.github"
+permissions:
+  contents: "read"
+
+
+jobs:
+  job_001:
+    name: "smoke_test; linux; `dart analyze`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "${{ matrix.sdk }}"
+          working-directory: "test_pkg"
+      - run: "dart analyze"
+        working-directory: "test_pkg"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.16.0"
+          - "2.17.0-69.1.beta"
+          - "2.18.0-106.0.dev"
+          - "beta"
+          - "dev"
+          - "stable"
+  job_002:
+    name: "smoke_test; linux; Dart main; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "main"
+          working-directory: "test_pkg"
+      - run: "dart format --output=none --set-exit-if-changed ."
+        working-directory: "test_pkg"
+      - run: "dart analyze --fatal-infos"
+        working-directory: "test_pkg"
+  job_003:
+    name: "test; linux; `dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "${{ matrix.sdk }}"
+          working-directory: "test_pkg"
+      - name: "Activate package:coverage"
+        run: "dart pub global activate coverage '>=1.5.0'"
+      - run: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
+        working-directory: "test_pkg"
+      - name: "Upload coverage to Coveralls"
+        uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          path-to-lcov: "test_pkg/coverage/lcov.info"
+          flag-name: "coverage_02"
+          parallel: true
+      - name: "Upload coverage to codecov.io"
+        uses: "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354"
+        with:
+          files: "test_pkg/coverage/lcov.info"
+          fail_ci_if_error: false
+          name: "coverage_02"
+          token: "${{ secrets.CODECOV_TOKEN }}"
+    needs:
+      - "job_001"
+      - "job_002"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "2.16.0"
+          - "dev"
+  job_004:
+    name: "Notify failure"
+    runs-on: "ubuntu-latest"
+    if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
+    steps:
+      - run: |
+          curl -H "Content-Type: application/json" -X POST -d \
+            "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+            "${CHAT_WEBHOOK_URL}"
+        env:
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+  job_5:
+    name: "Mark Coveralls job finished"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Mark Coveralls job finished"
+        uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          parallel-finished: true
+    needs:
+      - "job_003"
+

@@ -105,19 +105,33 @@ class PackageConfig {
 
     final rawConfig = RawConfig.fromYaml(flavor, mergedConfig);
 
-    if (rawConfig.sdks != null) {
-      handlePubspecInSdkList(
-        flavor,
-        rawConfig.sdks!,
-        pubspec,
-        (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
-      );
-      sortNormalizeVerifySdksList(
-        flavor,
-        rawConfig.sdks!,
-        (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
-      );
+    final rawSdks = rawConfig.sdks;
+    final List<String> sdks;
+    if (rawSdks == null || rawSdks.isEmpty) {
+      if (mergedConfig.containsKey('sdk')) {
+        throw CheckedFromJsonException(
+          monoPkgYaml,
+          'sdk',
+          'RawConfig',
+          'The value for "sdk" must be an array with at least one value.',
+        );
+      }
+      sdks = ['pubspec', 'dev'];
+    } else {
+      sdks = List.from(rawSdks);
     }
+
+    handlePubspecInSdkList(
+      flavor,
+      sdks,
+      pubspec,
+      (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+    );
+    sortNormalizeVerifySdksList(
+      flavor,
+      sdks,
+      (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+    );
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <CIJob>[];
@@ -128,7 +142,13 @@ class PackageConfig {
     final stageNames = rawConfig.stages.map((stage) {
       final stageYaml = stage.items;
       for (var job in stageYaml) {
-        var jobSdks = rawConfig.sdks;
+        if (job is! Map && job is! String) {
+          throw ParsedYamlException(
+            'Each item within a stage must be a map or a string.',
+            job is YamlNode ? job : stageYaml as YamlNode,
+          );
+        }
+        var jobSdks = sdks;
         if (job case {'sdk': final jobValue}) {
           jobSdks = (jobValue is List)
               ? List.from(jobValue)
@@ -144,37 +164,6 @@ class PackageConfig {
             flavor,
             jobSdks,
             (m) => CheckedFromJsonException(job, 'sdk', 'RawConfig', m),
-          );
-        } else if (jobSdks == null || jobSdks.isEmpty) {
-          if (monoPkgYaml.containsKey('sdk')) {
-            throw CheckedFromJsonException(
-              monoPkgYaml,
-              'sdk',
-              'RawConfig',
-              'The value for "sdk" must be an array with at least '
-                  'one value.',
-            );
-          }
-
-          if (job is! Map) {
-            throw ParsedYamlException(
-              'Each item within a stage must be a map.',
-              job is YamlNode ? job : stageYaml as YamlNode,
-            );
-          }
-
-          if (job.containsKey('dart')) {
-            throw CheckedFromJsonException(
-              job as YamlMap,
-              'dart',
-              'RawConfig',
-              '"dart" is no longer supported. Use "sdk" instead.',
-            );
-          }
-
-          throw ParsedYamlException(
-            'An "sdk" key is required.',
-            job as YamlMap,
           );
         } else {
           sdkConfigUsed = true;
@@ -349,9 +338,7 @@ class Task {
   @JsonKey()
   final String? args;
 
-  Task(this.flavor, this.type, {this.args}) {
-    type.commandValue(flavor, args, isNewest: true);
-  }
+  Task(this.flavor, this.type, {this.args});
 
   String command(bool isNewest) =>
       type.commandValue(flavor, args, isNewest: isNewest).join(' ');

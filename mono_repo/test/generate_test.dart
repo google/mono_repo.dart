@@ -1,16 +1,12 @@
-// Copyright (c) 2017, the Dart project authors.  Please see the AUTHORS file
+// Copyright (c) 2020, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:mono_repo/mono_repo.dart';
-import 'package:mono_repo/src/ci_test_script.dart';
+import 'package:mono_repo/src/ci_shared.dart';
 import 'package:mono_repo/src/commands/ci_script/generate.dart';
 import 'package:mono_repo/src/commands/github/github_yaml.dart';
-import 'package:mono_repo/src/github_config.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:path/path.dart' as p;
@@ -19,10 +15,64 @@ import 'package:test/test.dart';
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
 import 'shared.dart';
-import 'src/expected_output.dart';
 
 void main() {
   glyph.ascii = false;
+
+  test('unsupported toplevel key', () async {
+    await d.dir('sub_pkg', [
+      d.file(monoPkgFileName, r'''
+sdk:
+  - dev
+
+stages:
+  - unit_test:
+    - test
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+environment:
+  sdk: '^3.0.0'
+      '''),
+    ]).create();
+
+    await _testBadConfig(
+      {'extra': 'foo'},
+      r'''
+line 1, column 8 of mono_repo.yaml: Unsupported value for "extra". Only `github`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service`, `defaults`, `ignore` keys are supported.
+  ╷
+1 │ extra: "foo"
+  │        ^^^^^
+  ╵''',
+    );
+  });
+
+  test('fails with unsupported configuration', () async {
+    await d.dir('sub_pkg', [
+      d.file(monoPkgFileName, r'''
+sdk:
+  - dev
+
+stages:
+  - unit_test:
+    # Doing the hole xvfb thing is broken - for now!
+    - test: --platform chrome
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_name
+environment:
+  sdk: '^3.0.0'
+      '''),
+    ]).create();
+
+    testGenerateConfig(
+      printMatcher: stringContainsInOrder([
+        'package:sub_pkg',
+        'Make sure to mark `tool/ci.sh` as executable.\n',
+        '  chmod +x tool/ci.sh\n',
+      ]),
+    );
+  });
 
   group('simple bits for configurations', () {
     for (var value in const [true, false, null]) {
@@ -31,27 +81,13 @@ void main() {
         await populateConfig(monoConfigContent);
 
         testGenerateConfig(printMatcher: _subPkgStandardOutput());
+        validateSandbox('simple_ci.sh', ciScriptPath);
+        validateSandbox(
+          'simple_github.yaml',
+          githubWorkflowFilePath('sub_pkg'),
+        );
       });
     }
-
-    test('custom permissions', () async {
-      final monoConfigContent = toYaml({
-        'github': {
-          'permissions': {'contents': 'read'},
-        },
-      });
-      await populateConfig(monoConfigContent);
-
-      testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-      final workflowFile = File(
-        p.join(d.sandbox, defaultGitHubWorkflowFilePath),
-      );
-      expect(
-        workflowFile.readAsStringSync(),
-        contains('permissions:\n  contents: "read"'),
-      );
-    });
   });
 
   test('no package', () async {
@@ -68,1285 +104,164 @@ void main() {
     );
   });
 
-  test('$monoPkgFileName with non-Map contents', () async {
-    await d.dir('sub_pkg', [
-      d.file('mono_pkg.yaml', 'bob'),
-      d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-    ]).create();
-
-    final path = p.join('sub_pkg', 'mono_pkg.yaml');
-    expect(
-      testGenerateConfig,
-      throwsUserExceptionWith('The contents of `$path` must be a Map.'),
-    );
-  });
-
   test('empty $monoPkgFileName file', () async {
     await d.dir('sub_pkg', [
-      d.file('mono_pkg.yaml', '# just a comment!'),
+      d.file('mono_pkg.yaml', 'sdk: [dev]'),
       d.file('pubspec.yaml', '''
 name: pkg_name
+environment:
+  sdk: '^3.0.0'
       '''),
     ]).create();
 
-    expect(
-      () => testGenerateConfig(
-        printMatcher: '''
-package:sub_pkg''',
-      ),
-      throwsUserExceptionWith(
-        'No entries created. Check your nested `$monoPkgFileName` files.',
-      ),
+    final workflowPath = p.normalize(
+      p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
     );
+    final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
+    testGenerateConfig(
+      printMatcher: stringContainsInOrder([
+        'package:sub_pkg\n',
+        'Wrote `$workflowPath`.\n',
+        'Make sure to mark `tool/ci.sh` as executable.\n',
+        '  chmod +x tool/ci.sh\n',
+        'Wrote `$ciScriptPathNormalized`.',
+      ]),
+    );
+    await d.file(ciScriptPath, contains('dart pub upgrade')).validate();
   });
 
-  test('fails with unsupported configuration', () async {
-    await d.dir('sub_pkg', [
+  test('two packages', () async {
+    await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
 sdk:
   - dev
 
 stages:
-  - unit_test:
-    # Doing the hole xvfb thing is broken - for now!
-    - test: --platform chrome
-      xvfb: true
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-    ]).create();
-
-    expect(
-      testGenerateConfig,
-      throwsAParsedYamlException(
-        startsWith(
-          'line 8, column 7 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-          'Extra config options are not currently supported.',
-        ),
-      ),
-    );
-  });
-
-  test('fails with unsupported Dart version', () async {
-    await d.dir('sub_pkg', [
-      d.file(monoPkgFileName, r'''
-sdk:
-  - not_a_dart
-
-stages:
-  - unit_test:
-    - test
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-    ]).create();
-
-    expect(
-      testGenerateConfig,
-      throwsAParsedYamlException(
-        startsWith(
-          'line 2, column 3 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-          'Unsupported value for "sdk". The value "not_a_dart" is neither a '
-          'version string nor one of "main", "pubspec", "dev", "beta", '
-          '"stable".',
-        ),
-      ),
-    );
-  });
-
-  group('fails with duplicate dart versions', () {
-    for (var values in [
-      ['stable', 'stable'],
-      ['main', 'edge'],
-      ['main', 'be/raw/latest'],
-    ]) {
-      group('$values', () {
-        test('root of mono_pkg', () async {
-          await d.dir('sub_pkg', [
-            d.file(
-              monoPkgFileName,
-              jsonEncode({
-                'sdk': values,
-                'stages': [
-                  {
-                    'unit_test': ['test'],
-                  },
-                ],
-              }),
-            ),
-            d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-          ]).create();
-
-          expect(
-            testGenerateConfig,
-            throwsAParsedYamlException(
-              startsWith(
-                'line 1, column 8 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-                'Unsupported value for "sdk". "${values.first}" appears more '
-                'than once.',
-              ),
-            ),
-          );
-        });
-
-        test('within test', () async {
-          await d.dir('sub_pkg', [
-            d.file(
-              monoPkgFileName,
-              jsonEncode({
-                'stages': [
-                  {
-                    'unit_test': [
-                      {'test': '', 'sdk': values},
-                    ],
-                  },
-                ],
-              }),
-            ),
-            d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-          ]).create();
-
-          expect(
-            testGenerateConfig,
-            throwsAParsedYamlException(
-              startsWith(
-                'line 1, column 43 of ${p.join('sub_pkg', 'mono_pkg.yaml')}: '
-                'Unsupported value for "sdk". "${values.first}" appears more '
-                'than once.',
-              ),
-            ),
-          );
-        });
-      });
-    }
-  });
-
-  test('fails with legacy file name', () async {
-    await d.dir('sub_pkg', [
-      d.file('.mono_repo.yml', ''),
-      d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-    ]).create();
-
-    expect(
-      testGenerateConfig,
-      throwsUserExceptionWith(
-        'Found legacy package configuration file '
-        '(".mono_repo.yml") in `sub_pkg`.',
-        details: 'Rename to "mono_pkg.yaml".',
-      ),
-    );
-  });
-
-  test('conflicting stage orders are not allowed', () async {
-    await d.dir('pkg_a', [
-      d.file(monoPkgFileName, r'''
-sdk:
- - dev
-
-stages:
-  - format:
-    - format
   - analyze:
     - analyze
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
+environment:
+  sdk: '^3.0.0'
       '''),
     ]).create();
 
     await d.dir('pkg_b', [
       d.file(monoPkgFileName, r'''
 sdk:
- - dev
+  - dev
 
 stages:
   - analyze:
     - analyze
-  - format:
-    - format: sdk
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_b
-      '''),
-    ]).create();
-
-    expect(
-      () => testGenerateConfig(
-        printMatcher: '''
-package:pkg_a
-package:pkg_b''',
-      ),
-      throwsUserExceptionWith(
-        'Not all packages agree on `stages` ordering, found a cycle '
-        'between the following stages: `analyze`, `format`.',
-      ),
-    );
-  });
-
-  group('--validate', () {
-    setUp(() async {
-      await populateConfig(r'''
-github:
-  dependabot: {}
-''');
-    });
-
-    test('throws if there is no generated config', () async {
-      expect(
-        () => testGenerateConfig(
-          validateOnly: true,
-          printMatcher: 'package:sub_pkg',
-        ),
-        throwsA(isA<UserException>()),
-      );
-    });
-
-    test("throws if the previous config doesn't match", () async {
-      await d.file(defaultGitHubWorkflowFileName, '').create();
-      expect(
-        () => testGenerateConfig(
-          validateOnly: true,
-          printMatcher: 'package:sub_pkg',
-        ),
-        throwsA(isA<UserException>()),
-      );
-    });
-
-    test("doesn't throw if the previous config is up to date", () async {
-      testGenerateConfig(
-        printMatcher: _subPkgStandardOutput(withDependabot: true),
-      );
-
-      // Just check that this doesn't throw.
-      testGenerateConfig(printMatcher: 'package:sub_pkg', validateOnly: true);
-    });
-
-    test(
-      "doesn't throw if the previous config has different action versions",
-      () async {
-        testGenerateConfig(
-          printMatcher: _subPkgStandardOutput(withDependabot: true),
-        );
-        final generatedFile = File(d.path(defaultGitHubWorkflowFilePath));
-        final contents = generatedFile.readAsStringSync();
-        generatedFile.writeAsStringSync(
-          contents.replaceAll('actions/checkout@', 'actions/checkout@Foo'),
-        );
-        testGenerateConfig(printMatcher: 'package:sub_pkg', validateOnly: true);
-      },
-    );
-  });
-
-  test('complete travis.yml file', () async {
-    await d.dir('sub_pkg', [
-      d.file(monoPkgFileName, testConfig2),
-      d.file('pubspec.yaml', '''
-name: pkg_name
-      '''),
-    ]).create();
-
-    testGenerateConfig(printMatcher: _subPkgStandardOutput());
-    await d.file(ciScriptPath, ciShellOutput).validate();
-  });
-
-  test('incompatible SDK constraints', () async {
-    await d.dir('sub_pkg', [
-      d.file(monoPkgFileName, testConfig2),
-      d.file('pubspec.yaml', '''
-name: pkg_name
 environment:
-  sdk: '>=2.1.0 <3.0.0'
-'''),
+  sdk: '^3.0.0'
+      '''),
     ]).create();
 
-    testGenerateConfig(
-      printMatcher: '''
-package:sub_pkg
-  There are jobs defined that are not compatible with the package SDK constraint (>=2.1.0 <3.0.0): `1.23.0`.
-${_writeScriptOutput(false)}''',
+    final pkgAWorkflowPath = p.normalize(
+      p.join(d.sandbox, githubWorkflowFilePath('pkg_a')),
     );
-
-    await d.file(ciScriptPath, ciShellOutput).validate();
+    final pkgBWorkflowPath = p.normalize(
+      p.join(d.sandbox, githubWorkflowFilePath('pkg_b')),
+    );
+    testGenerateConfig(
+      printMatcher: stringContainsInOrder([
+        'package:pkg_a',
+        'package:pkg_b',
+        'Wrote `$pkgAWorkflowPath`.',
+        'Wrote `$pkgBWorkflowPath`.',
+      ]),
+    );
   });
 
-  test('two flavors of dartfmt', () async {
-    await d.dir('pkg_a', [
-      d.file(monoPkgFileName, r'''
-sdk:
- - stable
- - dev
-
-stages:
-  - format:
-    - format
-
-cache:
-  directories:
-    - .dart_tool
-    - /some_repo_root_dir
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_a
-      '''),
-    ]).create();
-
-    await d.dir('pkg_b', [
-      d.file(monoPkgFileName, r'''
-sdk:
- - dev
-
-stages:
-  - format:
-    - format: sdk
-
-cache:
-  directories:
-    - .dart_tool
-    - /some_repo_root_dir
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_b
-      '''),
-    ]).create();
-
-    testGenerateConfig(
-      printMatcher: '''
-package:pkg_a
-package:pkg_b
-${_writeScriptOutput(false)}''',
-    );
-
-    validateSandbox('two_dartfmt_flavors.txt', defaultGitHubWorkflowFilePath);
-
-    await d
-        .file(
-          ciScriptPath,
-          contains(r'''
-      case ${TASK} in
-      format)
-        echo 'dart format --output=none --set-exit-if-changed .'
-        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
-        ;;
-      *)
-        echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
-        exit 64
-        ;;
-      esac
-'''),
-        )
-        .validate();
-  });
-
-  test('two flavors of dartfmt with different arguments', () async {
-    await d.dir('pkg_a', [
-      d.file(monoPkgFileName, r'''
-sdk:
- - stable
- - dev
-
-stages:
-  - format:
-    - format: sdk
-
-cache:
-  directories:
-    - .dart_tool
-    - /some_repo_root_dir
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_a
-      '''),
-    ]).create();
-
-    await d.dir('pkg_b', [
-      d.file(monoPkgFileName, r'''
-sdk:
- - dev
-
-stages:
-  - format:
-    - format: --dry-run --fix --set-exit-if-changed .
-
-cache:
-  directories:
-    - .dart_tool
-    - /some_repo_root_dir
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_b
-      '''),
-    ]).create();
-
-    testGenerateConfig(
-      printMatcher: '''
-package:pkg_a
-package:pkg_b
-${_writeScriptOutput(false)}''',
-    );
-
-    validateSandbox(
-      'two_dartfmt_flavors_different_args.txt',
-      defaultGitHubWorkflowFilePath,
-    );
-
-    await d
-        .file(
-          ciScriptPath,
-          contains(r'''
-      case ${TASK} in
-      format_0)
-        echo 'dart format --dry-run --fix --set-exit-if-changed .'
-        dart format --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
-        ;;
-      format_1)
-        echo 'dart format --output=none --set-exit-if-changed .'
-        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
-        ;;
-      *)
-        echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
-        exit 64
-        ;;
-      esac
-'''),
-        )
-        .validate();
-  });
-
-  test('missing `dart` key', () async {
+  test('pubspec validation not supported with flutter', () async {
     await d.dir('pkg_a', [
       d.file(monoPkgFileName, r'''
 stages:
-  - format:
-    - dartfmt:
+- analyze_and_format:
+  - analyze: .
+    sdk: pubspec
 '''),
       d.file('pubspec.yaml', '''
 name: pkg_a
-      '''),
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+'''),
     ]).create();
 
     expect(
       testGenerateConfig,
       throwsAParsedYamlException('''
-line 3, column 7 of ${p.normalize('pkg_a/mono_pkg.yaml')}: An "sdk" key is required.
+line 1, column 1 of pkg_a${p.separator}mono_pkg.yaml: Missing key "sdk". `pubspec` is only valid for Dart packages (not Flutter).
   ╷
-3 │     - dartfmt:
-  │       ^^^^^^^^
+1 │ ┌ stages:
+2 │ │ - analyze_and_format:
+3 │ │   - analyze: .
+4 │ └     sdk: pubspec
   ╵'''),
     );
   });
 
   test(
-    'top-level `dart` and `os` key values are a no-op with group overrides',
+    'package features: ignore, pre_steps, post_steps, transitive paths',
     () async {
       await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
+        d.file('mono_pkg.yaml', '''
 sdk:
-- stable
-os:
-- unneeded
-
+  - dev
 stages:
   - analyze:
-    - group:
-        - analyze
-        - format
-      sdk:
-        - dev
-      os:
-        - osx
-    - analyze:
-      sdk:
-        - 1.23.0
-      os:
-        - windows
-  - unit_test:
-    - description: "chrome tests"
-      test: --platform chrome
-      sdk: dev
-      os: macos
-    - test: --preset travis
-      sdk: stable
-      os: linux
+    - analyze
 '''),
         d.file('pubspec.yaml', '''
 name: pkg_a
-      '''),
-      ]).create();
-
-      testGenerateConfig(
-        printMatcher: '''
-package:pkg_a
-  `dart` values (stable) are not used and can be removed.
-  `os` values (unneeded) are not used and can be removed.
-${_writeScriptOutput(false)}''',
-      );
-
-      validateSandbox(
-        'github_output_group_overrides.txt',
-        defaultGitHubWorkflowFilePath,
-      );
-
-      await d.file(ciScriptPath, ciShellOutput).validate();
-    },
-  );
-
-  test('test_with_coverage', () async {
-    await d.dir('pkg_a', [
-      d.file(monoPkgFileName, r'''
-stages:
-  - test:
-    - description: "chrome tests"
-      test: --platform chrome
-      sdk: dev
-      os: macos
-    - test_with_coverage: --preset travis
-      sdk: stable
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_a
-      '''),
-    ]).create();
-
-    testGenerateConfig(
-      printMatcher: '''
-package:pkg_a
-${_writeScriptOutput(false)}''',
-    );
-
-    validateSandbox(
-      'github_output_test_with_coverage.txt',
-      defaultGitHubWorkflowFilePath,
-    );
-  });
-
-  test('test_with_coverage not supported with flutter', () async {
-    await d.dir('pkg_a', [
-      d.file(monoPkgFileName, r'''
-stages:
-  - test:
-    - test_with_coverage:
-      sdk: stable
-'''),
-      d.file('pubspec.yaml', '''
-name: pkg_a
-
 environment:
-  sdk: ">=2.17.0 <3.0.0"
-
+  sdk: '^3.0.0'
 dependencies:
-  flutter:
-    sdk: flutter
-      '''),
-    ]).create();
-
-    expect(
-      testGenerateConfig,
-      throwsAParsedYamlException('''
-line 3, column 25 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "test_with_coverage". Code coverage tests are not supported with Flutter.
-  ╷
-3 │     - test_with_coverage:
-  │                         ^
-  ╵'''),
-    );
-  });
-
-  test(
-    'command values must be either a String or a List containing strings',
-    () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-sdk:
-- dev
-
-stages:
-- unit_test:
-  - command: {a:b}
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
+  pkg_b: any
 '''),
       ]).create();
 
-      expect(
-        testGenerateConfig,
-        throwsAParsedYamlException('''
-line 6, column 14 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "command". Only supports a string or array of strings
-  ╷
-6 │   - command: {a:b}
-  │              ^^^^^
-  ╵'''),
-      );
-    },
-  );
-
-  test('bad yaml', () async {
-    await d.dir('pkg_a', [
-      d.file(monoPkgFileName, r'''
+      await d.dir('pkg_b', [
+        d.file('mono_pkg.yaml', '''
 sdk:
-- dev
-
-stages:
-- unit_test
-  - before_script: "echo hi"
-'''),
-    ]).create();
-
-    expect(
-      testGenerateConfig,
-      throwsAParsedYamlException('''
-line 6, column 18 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Mapping values are not allowed here. Did you miss a colon earlier?
-  ╷
-6 │   - before_script: "echo hi"
-  │                  ^
-  ╵'''),
-    );
-  });
-
-  test('double digit commands', () async {
-    final lines = Iterable.generate(
-      11,
-      (i) => '    - test: --preset travis --total-shards 9 --shard-index $i',
-    ).join('\n');
-
-    await d.dir('pkg_a', [
-      d.file('pubspec.yaml', '''
-name: pkg_a
-'''),
-      d.file(monoPkgFileName, '''
-sdk:
-- dev
-
-stages:
-  - unit_test:
-$lines
-'''),
-    ]).create();
-
-    testGenerateConfig(printMatcher: isNotEmpty);
-
-    await d
-        .file(ciScriptPath, stringContainsInOrder(['test_00)', 'test_10)']))
-        .validate();
-  });
-
-  group('mono_repo.yaml', () {
-    Future<void> validConfig(
-      String monoRepoContent, {
-      Object? expectedGithubContent,
-    }) async {
-      await populateConfig(monoRepoContent);
-
-      if (expectedGithubContent != null) {
-        await d.nothing(defaultGitHubWorkflowFilePath).validate();
-      }
-      await d.nothing(ciScriptPath).validate();
-
-      testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-      if (expectedGithubContent != null) {
-        await d
-            .file(defaultGitHubWorkflowFilePath, expectedGithubContent)
-            .validate();
-      }
-      await d.file(ciScriptPath, ciShellOutput).validate();
-    }
-
-    test(
-      'disallows unsupported keys',
-      () => _testBadConfig(
-        {
-          'other': {'stages': 5},
-        },
-        r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service`, `defaults`, `ignore` keys are supported.
-  ╷
-2 │   stages: 5
-  │   ^^^^^^^^^
-  ╵''',
-      ),
-    );
-
-    group('merge_stages', () {
-      test(
-        'must be a list',
-        () => _testBadConfig(
-          {
-            'merge_stages': {'stages': 5},
-          },
-          startsWith(
-            'line 2, column 3 of mono_repo.yaml: Unsupported value for '
-            '"merge_stages". `merge_stages` must be an array.',
-          ),
-        ),
-      );
-
-      test(
-        'must be String items',
-        () => _testBadConfig(
-          {
-            'merge_stages': [5],
-          },
-          startsWith(
-            'line 2, column 3 of mono_repo.yaml: Unsupported value for '
-            '"merge_stages". All values must be strings.',
-          ),
-        ),
-      );
-
-      test('must match a configured stage from pkg_config', () async {
-        final monoConfigContent = toYaml({
-          'merge_stages': ['bob'],
-        });
-        await populateConfig(monoConfigContent);
-        expect(
-          () => testGenerateConfig(printMatcher: 'package:sub_pkg'),
-          throwsUserExceptionWith(
-            'Error parsing mono_repo.yaml',
-            details:
-                'One or more stage was referenced in `mono_repo.yaml` that do '
-                'not exist in any `mono_pkg.yaml` files: `bob`.',
-          ),
-        );
-      });
-
-      test('should merge correctly', () async {
-        await d.file('mono_repo.yaml', '''
-merge_stages: [analyze]
-''').create();
-
-        await d.dir('pkg_a', [
-          d.file(monoPkgFileName, r'''
-sdk:
- - stable
-
+  - dev
 stages:
   - analyze:
-    - group:
-        - analyze
-        - format
-  - unit_test:
-    - description: "chrome tests"
-      test: --platform chrome
-    - test: --preset travis
+    - analyze
 '''),
-          d.file('pubspec.yaml', r'''
-name: pkg_a
-'''),
-        ]).create();
-
-        await d.dir('pkg_b', [
-          d.file(monoPkgFileName, r'''
-sdk:
- - stable
-
-stages:
-  - analyze:
-    - group:
-        - analyze
-        - format
-  - unit_test:
-    - description: "chrome tests"
-      test: --platform chrome
-    - test: --preset travis
-'''),
-          d.file('pubspec.yaml', '''
+        d.file('pubspec.yaml', '''
 name: pkg_b
-      '''),
-        ]).create();
+environment:
+  sdk: '^3.0.0'
+'''),
+      ]).create();
 
-        await d.dir('pkg_c', [
-          d.file(monoPkgFileName, r'''
+      await d.dir('pkg_ignored', [
+        d.file('mono_pkg.yaml', '''
 sdk:
- - stable
-
+  - dev
 stages:
   - analyze:
-    - group:
-        - analyze
-        - format
-'''),
-          d.file('pubspec.yaml', '''
-name: pkg_c
-dependencies:
-  flutter:
-    sdk: flutter
-      '''),
-        ]).create();
-
-        testGenerateConfig(
-          printMatcher: '''
-package:pkg_a
-package:pkg_b
-package:pkg_c
-${_writeScriptOutput(false)}''',
-        );
-
-        validateSandbox(
-          'should_merge_correctly.txt',
-          defaultGitHubWorkflowFilePath,
-        );
-
-        await d.file(ciScriptPath, ciShellOutputMultiFlavor).validate();
-      });
-    });
-
-    group('pub_action', () {
-      test(
-        'value must be a String',
-        () => _testBadConfig(
-          {'pub_action': 42},
-          r'''
-line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
-  ╷
-1 │ pub_action: 42
-  │             ^^
-  ╵''',
-        ),
-      );
-
-      test(
-        'value must be in allowed list',
-        () => _testBadConfig(
-          {'pub_action': 'bob'},
-          r'''
-line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
-  ╷
-1 │ pub_action: "bob"
-  │             ^^^^^
-  ╵''',
-        ),
-      );
-
-      test('upgrade', () async {
-        final monoConfigContent = toYaml({'pub_action': 'upgrade'});
-
-        await populateConfig(monoConfigContent);
-
-        testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-        // TODO: validate GitHub case
-        await d.file(ciScriptPath, ciShellOutput).validate();
-      });
-
-      test('get', () async {
-        final monoConfigContent = toYaml({'pub_action': 'get'});
-
-        await populateConfig(monoConfigContent);
-
-        testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-        // TODO: validate GitHub case
-        await d
-            .file(
-              ciScriptPath,
-              contains(r'''
-  dart pub get || EXIT_CODE=$?
-
-  if [[ ${EXIT_CODE} -ne 0 ]]; then
-    echo -e "\033[31mPKG: ${PKG}; 'dart pub get' - FAILED  (${EXIT_CODE})\033[0m"
-    FAILURES+=("${PKG}; 'dart pub get'")
-  else
-'''),
-            )
-            .validate();
-      });
-    });
-
-    group('pretty_ansi', () {
-      test(
-        'value must be bool',
-        () => _testBadConfig(
-          {'pretty_ansi': 'not a bool!'},
-          r'''
-line 1, column 14 of mono_repo.yaml: Unsupported value for "pretty_ansi". Value must be `true` or `false`.
-  ╷
-1 │ pretty_ansi: "not a bool!"
-  │              ^^^^^^^^^^^^^
-  ╵''',
-        ),
-      );
-
-      test('set to false', () async {
-        await populateConfig(toYaml({'pretty_ansi': false}));
-
-        testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-        await d
-            .file(
-              ciScriptPath,
-              '''
-$bashScriptHeader
-
-'''
-              r'''
-if [[ -z ${PKGS} ]]; then
-  echo -e 'PKGS environment variable must be set! - TERMINATING JOB'
-  exit 64
-fi
-
-if [[ "$#" == "0" ]]; then
-  echo -e 'At least one task argument must be provided! - TERMINATING JOB'
-  exit 64
-fi
-
-SUCCESS_COUNT=0
-declare -a FAILURES
-
-for PKG in ${PKGS}; do
-  echo -e "PKG: ${PKG}"
-  EXIT_CODE=0
-  pushd "${PKG}" >/dev/null || EXIT_CODE=$?
-
-  if [[ ${EXIT_CODE} -ne 0 ]]; then
-    echo -e "PKG: '${PKG}' does not exist - TERMINATING JOB"
-    exit 64
-  fi
-
-  dart pub upgrade || EXIT_CODE=$?
-
-  if [[ ${EXIT_CODE} -ne 0 ]]; then
-    echo -e "PKG: ${PKG}; 'dart pub upgrade' - FAILED  (${EXIT_CODE})"
-    FAILURES+=("${PKG}; 'dart pub upgrade'")
-  else
-    for TASK in "$@"; do
-      EXIT_CODE=0
-      echo
-      echo -e "PKG: ${PKG}; TASK: ${TASK}"
-      case ${TASK} in
-      analyze)
-        echo 'dart analyze --fatal-infos'
-        dart analyze --fatal-infos || EXIT_CODE=$?
-        ;;
-      format)
-        echo 'dart format --output=none --set-exit-if-changed .'
-        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
-        ;;
-      test_0)
-        echo 'dart test --platform chrome'
-        dart test --platform chrome || EXIT_CODE=$?
-        ;;
-      test_1)
-        echo 'dart test --preset travis'
-        dart test --preset travis || EXIT_CODE=$?
-        ;;
-      *)
-        echo -e "Unknown TASK '${TASK}' - TERMINATING JOB"
-        exit 64
-        ;;
-      esac
-
-      if [[ ${EXIT_CODE} -ne 0 ]]; then
-        echo -e "PKG: ${PKG}; TASK: ${TASK} - FAILED (${EXIT_CODE})"
-        FAILURES+=("${PKG}; TASK: ${TASK}")
-      else
-        echo -e "PKG: ${PKG}; TASK: ${TASK} - SUCCEEDED"
-        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
-      fi
-
-    done
-  fi
-
-  echo
-  echo -e "SUCCESS COUNT: ${SUCCESS_COUNT}"
-
-  if [ ${#FAILURES[@]} -ne 0 ]; then
-    echo -e "FAILURES: ${#FAILURES[@]}"
-    for i in "${FAILURES[@]}"; do
-      echo -e "  $i"
-    done
-  fi
-
-  popd >/dev/null || exit 70
-  echo
-done
-
-if [ ${#FAILURES[@]} -ne 0 ]; then
-  exit 1
-fi
-''',
-            )
-            .validate();
-      });
-    });
-
-    group('self_validate', () {
-      test(
-        'value must be bool or string',
-        () => _testBadConfig(
-          {'self_validate': 42},
-          r'''
-line 1, column 16 of mono_repo.yaml: Unsupported value for "self_validate". Value must be `true`, `false`, or a stage name.
-  ╷
-1 │ self_validate: 42
-  │                ^^
-  ╵''',
-        ),
-      );
-
-      test('set to `true`', () async {
-        final monoConfigContent = toYaml({'self_validate': true});
-
-        await populateConfig(monoConfigContent);
-
-        testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-        validateSandbox(
-          'self_validate_set_to_true.txt',
-          defaultGitHubWorkflowFilePath,
-        );
-
-        await d.file(ciScriptPath, ciShellOutput).validate();
-      });
-
-      test('set to a stage name', () async {
-        final monoConfigContent = toYaml({'self_validate': 'analyze'});
-
-        await populateConfig(monoConfigContent);
-
-        testGenerateConfig(printMatcher: _subPkgStandardOutput());
-
-        validateSandbox(
-          'self_validate_set_to_a_stage_name.txt',
-          defaultGitHubWorkflowFilePath,
-        );
-
-        await d.file(ciScriptPath, ciShellOutput).validate();
-      });
-    });
-
-    test('global env', () async {
-      await validConfig(
-        r'''
-github:
-  env:
-    FOO: BAR
-''',
-        expectedGithubContent: contains('''
-env:
-  PUB_ENVIRONMENT: "bot.github"
-  FOO: "BAR"
-'''),
-      );
-    });
-  });
-
-  group('pubspec version', () {
-    test('valid', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-sdk:
-- pubspec
-- dev
-
-stages:
-- analyze_and_format:
-  - analyze: --fatal-infos .
-    sdk:
-    - dev
-  - analyze:
-    sdk:
-    - pubspec
-  - format:
-    sdk:
-    - dev
-- unit_test:
-  - test: --test-randomize-ordering-seed=random
-  - test: --test-randomize-ordering-seed=random -p chrome
-    os:
-    - linux
-    - windows
+    - analyze
 '''),
         d.file('pubspec.yaml', '''
-name: pkg_a
+name: pkg_ignored
 environment:
-  sdk: '>=2.16.0 <3.0.0'
+  sdk: '^3.0.0'
 '''),
       ]).create();
 
-      testGenerateConfig(
-        printMatcher: '''
-package:pkg_a
-${_writeScriptOutput(false)}''',
-      );
-
-      validateSandbox(
-        'valid_pubspec_version.txt',
-        defaultGitHubWorkflowFilePath,
-      );
-    });
-
-    test('no SDK constraint - with top-level `pubspec` usage', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-sdk:
-- pubspec
-- dev
-
-stages:
-- analyze_and_format:
-  - analyze: --fatal-infos .
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
-'''),
-      ]).create();
-
-      expect(
-        testGenerateConfig,
-        throwsAParsedYamlException('''
-line 2, column 1 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "sdk". `pubspec` is only valid for packages that have an environment->sdk value defined in `pubspec.yaml`.
-  ╷
-2 │ ┌ - pubspec
-3 │ │ - dev
-4 │ └ 
-  ╵'''),
-      );
-    });
-
-    test('no SDK constraint - with job `pubspec` usage', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-stages:
-- analyze_and_format:
-  - analyze: --fatal-infos .
-    sdk: pubspec
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
-'''),
-      ]).create();
-
-      expect(
-        testGenerateConfig,
-        throwsAParsedYamlException('''
-line 4, column 10 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "sdk". `pubspec` is only valid for packages that have an environment->sdk value defined in `pubspec.yaml`.
-  ╷
-4 │     sdk: pubspec
-  │          ^^^^^^^
-  ╵'''),
-      );
-    });
-
-    test('not supported with flutter', () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
-stages:
-- analyze_and_format:
-  - analyze: --fatal-infos .
-    sdk: pubspec
-'''),
-        d.file('pubspec.yaml', '''
-name: pkg_a
-
-environment:
-  sdk: ">=2.17.0 <3.0.0"
-
-dependencies:
-  flutter:
-    sdk: flutter
-'''),
-      ]).create();
-
-      expect(
-        testGenerateConfig,
-        throwsAParsedYamlException('''
-line 4, column 10 of ${p.join('pkg_a', 'mono_pkg.yaml')}: Unsupported value for "sdk". `pubspec` is only valid for Dart packages (not Flutter).
-  ╷
-4 │     sdk: pubspec
-  │          ^^^^^^^
-  ╵'''),
-      );
-    });
-  });
-
-  group('dependabot', () {
-    test('Simple', () async {
-      await populateConfig(r'''
-github:
-  dependabot: {}
-''');
-      testGenerateConfig(
-        printMatcher: contains(
-          'Wrote '
-          '`${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.\n',
-        ),
-      );
-      await d.dir('.github', [
-        d.file('dependabot.yml', '''
-# Created with package:mono_repo v1.2.3
-{
-  "version": 2,
-  "updates": [
-    {
-      "package-ecosystem": "pub",
-      "directory": "sub_pkg",
-      "schedule": {
-        "interval": "weekly"
-      }
-    }
-  ]
-}
-'''),
-      ]).validate();
-    });
-
-    test('global configuration', () async {
-      await populateConfig(r'''
-github:
-  dependabot:
-    version: 3
-    updates:
-      - package-ecosystem: "github-actions"
-        directory: "/"
-        schedule:
-          interval: "monthly"
-''');
-      testGenerateConfig(
-        printMatcher: contains(
-          'Wrote '
-          '`${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.\n',
-        ),
-      );
-      await d.dir('.github', [
-        d.file('dependabot.yml', '''
-# Created with package:mono_repo v1.2.3
-{
-  "version": 3,
-  "updates": [
-    {
-      "package-ecosystem": "github-actions",
-      "directory": "/",
-      "schedule": {
-        "interval": "monthly"
-      }
-    },
-    {
-      "package-ecosystem": "pub",
-      "directory": "sub_pkg",
-      "schedule": {
-        "interval": "weekly"
-      }
-    }
-  ]
-}
-'''),
-      ]).validate();
-    });
-  });
-
-  test('pre_steps and post_steps render in workflow job', () async {
-    await d.dir('pkg_hooks', [
-      d.file('mono_pkg.yaml', '''
+      await d.dir('pkg_hooks', [
+        d.file('mono_pkg.yaml', '''
 sdk:
   - dev
 pre_steps:
@@ -1357,47 +272,159 @@ stages:
   - analyze:
     - analyze
 '''),
-      d.file('pubspec.yaml', '''
+        d.file('pubspec.yaml', '''
 name: pkg_hooks
+environment:
+  sdk: '^3.0.0'
+'''),
+      ]).create();
+
+      final monoConfigContent = toYaml({
+        'ignore': ['pkg_ignored'],
+      });
+      await d.file('mono_repo.yaml', monoConfigContent).create();
+
+      testGenerateConfig(
+        printMatcher: stringContainsInOrder(['package:pkg_a']),
+      );
+
+      // Verify pkg_ignored is not generated
+      final ignoredWorkflow = File(
+        p.join(d.sandbox, githubWorkflowFilePath('pkg_ignored')),
+      );
+      expect(ignoredWorkflow.existsSync(), isFalse);
+
+      // Verify pkg_hooks has pre_steps and post_steps
+      await d
+          .file(githubWorkflowFilePath('pkg_hooks'), contains('pre_step'))
+          .validate();
+      await d
+          .file(githubWorkflowFilePath('pkg_hooks'), contains('post_step'))
+          .validate();
+
+      // Verify pkg_a has transitive paths (pkg_b)
+      await d
+          .file(githubWorkflowFilePath('pkg_a'), contains('pkg_b/**'))
+          .validate();
+    },
+  );
+
+  test('root package produces valid workflow file name and step ID', () async {
+    await d.file('pubspec.yaml', '''
+name: root_pkg
+environment:
+  sdk: '^3.0.0'
+''').create();
+
+    await d.dir('sub_pkg', [
+      d.file('pubspec.yaml', '''
+name: sub_pkg
 environment:
   sdk: '^3.0.0'
 '''),
     ]).create();
 
-    await d.file('mono_repo.yaml', toYaml({})).create();
+    await d.file('mono_repo.yaml', '''
+defaults:
+  sdk:
+    - dev
+  stages:
+    - analyze:
+      - analyze
+''').create();
 
     testGenerateConfig(
-      printMatcher: stringContainsInOrder(['package:pkg_hooks', 'Wrote ']),
+      printMatcher: stringContainsInOrder(['package:.', 'package:sub_pkg']),
     );
 
+    // Verify root package workflow is created using pubspec name
+    // 'root_pkg.yaml'
     await d
-        .file(defaultGitHubWorkflowFilePath, contains('pre_step'))
+        .file(githubWorkflowFilePath('root_pkg'), contains('package:root_pkg'))
         .validate();
+  });
+
+  test('custom on triggers specified as lists get paths appended', () async {
+    await d.dir('pkg_a', [
+      d.file('pubspec.yaml', '''
+name: pkg_a
+environment:
+  sdk: '^3.0.0'
+'''),
+    ]).create();
+
+    await d.file('mono_repo.yaml', '''
+github:
+  on:
+    push:
+      - main
+defaults:
+  sdk:
+    - dev
+  stages:
+    - analyze:
+      - analyze
+''').create();
+
+    testGenerateConfig(printMatcher: stringContainsInOrder(['package:pkg_a']));
+
     await d
-        .file(defaultGitHubWorkflowFilePath, contains('post_step'))
+        .file(githubWorkflowFilePath('pkg_a'), contains('paths:'))
+        .validate();
+  });
+
+  test('schedule triggers are preserved without paths or branches', () async {
+    await d.dir('pkg_a', [
+      d.file('pubspec.yaml', '''
+name: pkg_a
+environment:
+  sdk: '^3.0.0'
+'''),
+    ]).create();
+
+    await d.file('mono_repo.yaml', '''
+github:
+  on:
+    schedule:
+      - cron: "0 0 * * 0"
+defaults:
+  sdk:
+    - dev
+  stages:
+    - analyze:
+      - analyze
+''').create();
+
+    testGenerateConfig(printMatcher: stringContainsInOrder(['package:pkg_a']));
+
+    await d
+        .file(
+          githubWorkflowFilePath('pkg_a'),
+          contains('schedule:\n    - cron: "0 0 * * 0"'),
+        )
         .validate();
   });
 }
 
-String _subPkgStandardOutput({bool withDependabot = false}) => '''
-package:sub_pkg
-${_writeScriptOutput(withDependabot)}''';
-
-String _writeScriptOutput(bool withDependabot) {
-  final setupDartAction = p.normalize(
+String _subPkgStandardOutput({bool withDependabot = false}) {
+  final workflowPath = p.normalize(
+    p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
+  );
+  final setupDartPath = p.normalize(
     p.join(d.sandbox, '.github/actions/setup-dart/action.yml'),
   );
-  final setupFlutterAction = p.normalize(
+  final setupFlutterPath = p.normalize(
     p.join(d.sandbox, '.github/actions/setup-flutter/action.yml'),
   );
-  return [
-    'Wrote `${p.normalize(p.join(d.sandbox, defaultGitHubWorkflowFilePath))}`.',
-    'Wrote `$setupDartAction`.',
-    'Wrote `$setupFlutterAction`.',
-    if (withDependabot)
-      'Wrote `${p.normalize(p.join(d.sandbox, '.github/dependabot.yml'))}`.',
-    ciScriptPathMessage,
-  ].join('\n');
+  final ciScriptPathNormalized = p.normalize(p.join(d.sandbox, 'tool/ci.sh'));
+  return '''
+package:sub_pkg
+  There are jobs defined that are not compatible with the package SDK constraint (^3.0.0): `1.23.0`.
+Wrote `$workflowPath`.
+Wrote `$setupDartPath`.
+Wrote `$setupFlutterPath`.
+${withDependabot ? 'Wrote `${p.normalize(p.join(d.sandbox, ".github/dependabot.yml"))}`.\n' : ''}${scriptLines('tool/ci.sh').join('\n')}
+Wrote `$ciScriptPathNormalized`.''';
 }
 
 Future<void> _testBadConfig(

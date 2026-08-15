@@ -1,6 +1,8 @@
 analyzer:
   language:
     strict-casts: true
+  errors:
+    todo: ignore
 
 linter:
   rules:

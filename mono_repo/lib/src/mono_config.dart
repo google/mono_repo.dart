@@ -16,7 +16,6 @@ const _monoConfigFileName = 'mono_repo.yaml';
 
 const _allowedMonoConfigKeys = {
   'github',
-  'merge_stages',
   'pretty_ansi',
   'pub_action',
   'self_validate',
@@ -31,7 +30,6 @@ const _allowedPubActions = {'get', _defaultPubAction};
 
 class MonoConfig implements BasicConfiguration {
   final Map<String, ConditionalStage> githubConditionalStages;
-  final Set<String> mergeStages;
   final bool prettyAnsi;
   final String pubAction;
   final String? selfValidateStage;
@@ -42,7 +40,6 @@ class MonoConfig implements BasicConfiguration {
   final Set<CoverageProcessor> coverageProcessors;
 
   MonoConfig._({
-    required this.mergeStages,
     required this.prettyAnsi,
     required this.pubAction,
     required this.selfValidateStage,
@@ -124,8 +121,6 @@ class MonoConfig implements BasicConfiguration {
       );
     }
 
-    final mergeStages = _asList(json, 'merge_stages');
-
     final coverageServices = _asList(json, 'coverage_service');
 
     var defaults = <String, dynamic>{};
@@ -145,7 +140,6 @@ class MonoConfig implements BasicConfiguration {
     final ignore = _asList(json, 'ignore').toSet();
 
     return MonoConfig._(
-      mergeStages: Set.from(mergeStages),
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
       selfValidateStage: _selfValidateFromValue(selfValidate),
@@ -164,7 +158,6 @@ class MonoConfig implements BasicConfiguration {
     final yaml = yamlMapOrNull(rootDirectory, _monoConfigFileName);
     if (yaml == null || yaml.isEmpty) {
       return MonoConfig._(
-        mergeStages: <String>{},
         pubAction: _defaultPubAction,
         prettyAnsi: true,
         selfValidateStage: null,

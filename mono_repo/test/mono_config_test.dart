@@ -5,355 +5,411 @@
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:mono_repo/src/coverage_processor.dart';
 import 'package:mono_repo/src/mono_config.dart';
 import 'package:mono_repo/src/package_config.dart';
-import 'package:mono_repo/src/yaml.dart';
+import 'package:mono_repo/src/utilities.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
-import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
-import 'package:yaml/yaml.dart';
 
-import 'shared.dart';
-
-final _dummyPubspec = Pubspec('_example');
-
-String _encodeJson(Object? input) =>
-    const JsonEncoder.withIndent(' ').convert(input);
-
-PackageConfig _parse(Object map) => PackageConfig.parse(
-  'a',
-  _dummyPubspec,
-  map is YamlMap ? map : loadYamlChecked(_encodeJson(map)) as Map,
-);
-
-void _expectParseThrows(Object content, String expectedError) =>
-    expect(() => _parse(content), throwsAParsedYamlException(expectedError));
+import 'package:yaml/yaml.dart' as y;
 
 void main() {
-  glyph.ascii = false;
+  group('MonoConfig', () {
+    test('valid example', () {
+      final pubspec = Pubspec('a');
+      final pkgConfig = PackageConfig.parse(
+        'a',
+        pubspec,
+        y.loadYaml(_testConfigYaml) as Map,
+      );
 
-  test(
-    'no stages - end up with one `unit_test` stage with one `test` task',
-    () {
-      final config = _parse({
-        'sdk': ['stable'],
-      });
+      expect(pkgConfig.oses, ['linux', 'osx', 'windows']);
+      expect(pkgConfig.sdks, ['1.23.0', 'stable', 'dev']);
+      expect(pkgConfig.jobs, hasLength(23));
 
-      final oneJob = config.jobs.single;
-      expect(oneJob.sdk, 'stable');
-      expect(oneJob.tasks.first.type.name, 'test');
-      expect(oneJob.tasks.first.args, isNull);
-      expect(oneJob.stageName, 'unit_test');
-    },
-  );
-
-  test('valid example', () {
-    final monoYaml = loadYamlChecked(_testConfig1) as Map;
-
-    final config = _parse(monoYaml);
-
-    expect(config.sdks, ['1.23.0', 'stable', 'dev']);
-
-    final jobs = jsonDecode(
-      jsonEncode(config.jobs.map((tj) => tj.toJson()).toList()),
-    );
-
-    expect(jobs, _testConfig1expectedOutput);
+      expect(jsonDecode(jsonEncode(pkgConfig.jobs)), [
+        {
+          'description': 'dartanalyzer && dartfmt',
+          'os': 'windows',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'analyze_and_format',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'analyze',
+              'args': '--fatal-infos --fatal-warnings .',
+            },
+            {'flavor': 'dart', 'type': 'format'},
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'description': 'dartanalyzer && dartfmt',
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'analyze_and_format',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'analyze',
+              'args': '--fatal-infos --fatal-warnings .',
+            },
+            {'flavor': 'dart', 'type': 'format'},
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'analyze_and_format',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'analyze',
+              'args': '--fatal-infos --fatal-warnings .',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'analyze_and_format',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'analyze',
+              'args': '--fatal-infos --fatal-warnings .',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'analyze_and_format',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'analyze',
+              'args': '--fatal-infos --fatal-warnings .',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'unit_test',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'test',
+              'args': '--preset travis --total-shards 5 --shard-index 0',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'unit_test',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'test',
+              'args': '--preset travis --total-shards 5 --shard-index 0',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'unit_test',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'test',
+              'args': '--preset travis --total-shards 5 --shard-index 0',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'unit_test',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'test',
+              'args': '--preset travis --total-shards 5 --shard-index 1',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'unit_test',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'test',
+              'args': '--preset travis --total-shards 5 --shard-index 1',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'unit_test',
+          'tasks': [
+            {
+              'flavor': 'dart',
+              'type': 'test',
+              'args': '--preset travis --total-shards 5 --shard-index 1',
+            },
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'windows',
+          'package': 'a',
+          'sdk': '1.23.0',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'windows',
+          'package': 'a',
+          'sdk': 'stable',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': false,
+        },
+        {
+          'os': 'linux',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'osx',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+        {
+          'os': 'windows',
+          'package': 'a',
+          'sdk': 'dev',
+          'stageName': 'unit_test',
+          'tasks': [
+            {'flavor': 'dart', 'type': 'test'},
+          ],
+          'flavor': 'dart',
+          'isNewest': true,
+        },
+      ]);
+    });
   });
 
-  group('error checks', () {
-    test('dart key is required', () {
-      final config = _parse({});
-      expect(config.cacheDirectories, isEmpty);
-      expect(config.jobs, isEmpty);
-      expect(config.stageNames, isEmpty);
-      expect(config.sdks, isEmpty);
+  group('MonoConfig.fromJson', () {
+    test('default values', () {
+      final config = MonoConfig.fromJson({});
+      expect(config.prettyAnsi, isTrue);
+      expect(config.pubAction, 'upgrade');
+      expect(config.selfValidateStage, isNull);
+      expect(config.defaults, isEmpty);
+      expect(config.ignore, isEmpty);
+      expect(config.coverageProcessors, isEmpty);
     });
 
-    test('stage items must be a map', () {
-      _expectParseThrows(
-        {
-          'stages': [
-            {
-              'format': ['dartfmt'],
-            },
-          ],
-        },
-        r'''
-line 4, column 14: Each item within a stage must be a map.
-  ╷
-4 │      "format": [
-  │ ┌──────────────^
-5 │ │     "dartfmt"
-6 │ └    ]
-  ╵''',
-      );
+    group('self_validate', () {
+      test('set to true', () {
+        final config = MonoConfig.fromJson({'self_validate': true});
+        expect(config.selfValidateStage, 'mono_repo_self_validate');
+      });
+
+      test('set to false', () {
+        final config = MonoConfig.fromJson({'self_validate': false});
+        expect(config.selfValidateStage, isNull);
+      });
+
+      test('set to stage name', () {
+        final config = MonoConfig.fromJson({'self_validate': 'custom_stage'});
+        expect(config.selfValidateStage, 'custom_stage');
+      });
+
+      test('invalid type throws', () {
+        expect(
+          () => MonoConfig.fromJson({'self_validate': 123}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
     });
 
-    test('group items must be instances of map or string', () {
-      _expectParseThrows(
-        loadYaml(r'''
-stages:
-- smoke_test:
-  - group:
-    - [dartfmt]
-    - dartanalyzer: --fatal-infos --fatal-warnings .
-    sdk: dev
-''')
-            as Object,
-        r'''
-line 4, column 7: Must be a map or a string.
-  ╷
-4 │     - [dartfmt]
-  │       ^^^^^^^^^
-  ╵''',
-      );
+    group('pretty_ansi', () {
+      test('set to false', () {
+        final config = MonoConfig.fromJson({'pretty_ansi': false});
+        expect(config.prettyAnsi, isFalse);
+      });
+
+      test('invalid type throws', () {
+        expect(
+          () => MonoConfig.fromJson({'pretty_ansi': 'not_bool'}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
     });
 
-    test('sdk value cannot be null', () {
-      _expectParseThrows(
-        {'sdk': null},
-        r'''
-line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an array with at least one value.
-  ╷
-2 │  "sdk": null
-  │         ^^^^
-  ╵''',
-      );
+    group('pub_action', () {
+      test('valid actions', () {
+        expect(MonoConfig.fromJson({'pub_action': 'get'}).pubAction, 'get');
+        expect(
+          MonoConfig.fromJson({'pub_action': 'upgrade'}).pubAction,
+          'upgrade',
+        );
+      });
+
+      test('invalid action throws', () {
+        expect(
+          () => MonoConfig.fromJson({'pub_action': 'invalid'}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
     });
 
-    test('sdk value cannot be empty', () {
-      _expectParseThrows(
-        {'sdk': <Never>[]},
-        r'''
-line 2, column 9: Unsupported value for "sdk". The value for "sdk" must be an array with at least one value.
-  ╷
-2 │  "sdk": []
-  │         ^^
-  ╵''',
-      );
-    });
-
-    test('Stages tasks must be a list', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {'a': 42},
-        ],
-      };
-
-      _expectParseThrows(monoYaml, r'''
-line 7, column 9: Unsupported value for "a". Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
-  ╷
-7 │      "a": 42
-  │ ┌─────────^
-8 │ │   }
-  │ └──^
-  ╵''');
-    });
-
-    test('Stages tasks must be a list', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {'a': 42},
-        ],
-      };
-
-      _expectParseThrows(monoYaml, r'''
-line 7, column 9: Unsupported value for "a". Stages must be a list of maps with exactly one key (the name of the stage), but the provided value `{a: 42}` is not valid.
-  ╷
-7 │      "a": 42
-  │ ┌─────────^
-8 │ │   }
-  │ └──^
-  ╵''');
-    });
-
-    test('Stages tasks must be a list', () {
-      final monoYaml =
-          loadYaml('''
-stages:
-- smoke_test:
-  - description: 'bob'
-    group: funky
-    sdk: dev
-''')
-              as Object;
-
-      _expectParseThrows(monoYaml, r'''
-line 4, column 12: Unsupported value for "group". expected a list of tasks
-  ╷
-4 │     group: funky
-  │            ^^^^^
-  ╵''');
-    });
-
-    test(
-      'Stages tasks must be a list with map with one key in the approved set',
-      () {
-        final monoYaml = {
-          'sdk': ['stable'],
-          'stages': [
-            {
-              'a': [
-                {'weird': 'thing'},
-              ],
-            },
-          ],
-        };
-
-        _expectParseThrows(monoYaml, r'''
-line 9, column 6: Must have one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
-  ╷
-9 │      "weird": "thing"
-  │      ^^^^^^^
-  ╵''');
-      },
-    );
-
-    test('Stage tasks entries must have one key in the approved set', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {
-            'a': [
-              {'test': 'thing', 'command': 'other thing'},
-            ],
-          },
-        ],
-      };
-
-      _expectParseThrows(monoYaml, r'''
-line 10, column 6: Must have one and only one key of `format`, `analyze`, `test`, `command`, `test_with_coverage`.
-   ╷
-10 │      "command": "other thing"
-   │      ^^^^^^^^^
-   ╵''');
-    });
-
-    test('empty stage job', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {'a': <Never>[]},
-        ],
-      };
-      _expectParseThrows(monoYaml, r'''
-line 7, column 9: Unsupported value for "a". Stages are required to have at least one job. "a" is empty.
-  ╷
-7 │    "a": []
-  │         ^^
-  ╵''');
-    });
-
-    test('multiple keys under a stage', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {'a': null, 'b': null},
-        ],
-      };
-      _expectParseThrows(monoYaml, r'''
-line 8, column 4: Stages must be a list of maps with exactly one key (the name of the stage), but the provided value has 2 values.
-  ╷
-8 │    "b": null
-  │    ^^^
-  ╵''');
-    });
-
-    test('no keys under a stage', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [<String, dynamic>{}],
-      };
-      _expectParseThrows(monoYaml, r'''
-line 6, column 3: Stages must be a list of maps with exactly one key (the name of the stage), but no items exist.
-  ╷
-6 │   {}
-  │   ^^
-  ╵''');
-    });
-
-    test('null stage job', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {'a': null},
-        ],
-      };
-      _expectParseThrows(monoYaml, r'''
-line 7, column 9: Unsupported value for "a". Stages are required to have at least one job. "a" is null.
-  ╷
-7 │      "a": null
-  │ ┌─────────^
-8 │ │   }
-  │ └──^
-  ╵''');
-    });
-
-    test('unsupported keys', () {
-      final monoYaml = {
-        'extra': 'foo',
-        'sdk': ['stable'],
-        'stages': [
-          {
-            'a': ['test'],
-          },
-          {
-            'a': ['dartfmt'],
-          },
-        ],
-        'more': null,
-      };
-      _expectParseThrows(monoYaml, r'''
-line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, sdk, stages, cache, pre_steps, post_steps]
-  ╷
-2 │  "extra": "foo",
-  │  ^^^^^^^
-  ╵''');
-    });
-
-    test('Duplicate stage names are not allowed', () {
-      final monoYaml = {
-        'sdk': ['stable'],
-        'stages': [
-          {
-            'a': ['test'],
-          },
-          {
-            'a': ['dartfmt'],
-          },
-        ],
-      };
-
-      _expectParseThrows(monoYaml, r'''
-line 12, column 4: Stages must be unique. "a" appears more than once.
-   ╷
-12 │    "a": [
-   │    ^^^
-   ╵''');
-    });
-
-    test('SDKs must be versions or in the allow-list', () {
-      final monoYaml = {
-        'sdk': ['latest'],
-        'stages': [
-          {
-            'a': ['test'],
-          },
-        ],
-      };
-
-      _expectParseThrows(monoYaml, r'''
-line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a version string nor one of "main", "pubspec", "dev", "beta", "stable".
-  ╷
-2 │    "sdk": [
-  │ ┌─────────^
-3 │ │   "latest"
-4 │ │  ],
-  │ └──^
-  ╵''');
+    group('coverage_service', () {
+      test('valid coverage processors', () {
+        final config = MonoConfig.fromJson({
+          'coverage_service': ['coveralls', 'codecov'],
+        });
+        expect(
+          config.coverageProcessors,
+          containsAll([CoverageProcessor.coveralls, CoverageProcessor.codecov]),
+        );
+      });
     });
 
     group('defaults and ignore', () {
@@ -377,244 +433,41 @@ line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a v
         );
       });
     });
+
+    test('unsupported key throws', () {
+      expect(
+        () => MonoConfig.fromJson({'unsupported_key': true}),
+        throwsA(isA<CheckedFromJsonException>()),
+      );
+    });
+
+    test('SDK channel sorting ranks stable < beta < dev < main', () {
+      final sdks = ['dev', 'stable', '3.8.0', 'main', 'pubspec', 'beta']
+        ..sort(compareSdks);
+      expect(sdks, ['pubspec', '3.8.0', 'stable', 'beta', 'dev', 'main']);
+    });
   });
 }
 
-const _testConfig1 = r'''
-sdk:
-  - dev
-  - stable
-  - 1.23.0
-os:
-  - linux
-
+const _testConfigYaml = r'''
+sdk: [1.23.0, dev, stable]
+os: [linux, windows, osx]
 stages:
-  - analyze_and_format:
-    - description: "dartanalyzer && dartfmt"
-      group:
-        - dartanalyzer: --fatal-infos --fatal-warnings .
-        - dartfmt
-      sdk:
-        - dev
-      os:
-        - windows
-        - linux
-    - dartanalyzer: --fatal-infos --fatal-warnings .
-      sdk:
-        - 1.23.0
-      os:
-        - osx
-  - unit_test:
-    - test: --platform chrome
-    - test: --preset travis --total-shards 5 --shard-index 0
-    - test: --preset travis --total-shards 5 --shard-index 1
-    - test #no args
+- analyze_and_format:
+  - description: dartanalyzer && dartfmt
+    group:
+    - analyze: --fatal-infos --fatal-warnings .
+    - format
+    os: [windows, linux]
+    sdk: [dev]
+  - analyze: --fatal-infos --fatal-warnings .
+    os: osx
+- unit_test:
+  - test: --platform chrome
+    os: linux
+  - test: --preset travis --total-shards 5 --shard-index 0
+    os: linux
+  - test: --preset travis --total-shards 5 --shard-index 1
+    os: linux
+  - test
 ''';
-
-List get _testConfig1expectedOutput => [
-  {
-    'description': 'dartanalyzer && dartfmt',
-    'os': 'windows',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'analyze_and_format',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'analyze',
-        'args': '--fatal-infos --fatal-warnings .',
-      },
-      {'flavor': 'dart', 'type': 'format'},
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-  {
-    'description': 'dartanalyzer && dartfmt',
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'analyze_and_format',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'analyze',
-        'args': '--fatal-infos --fatal-warnings .',
-      },
-      {'flavor': 'dart', 'type': 'format'},
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-  {
-    'os': 'osx',
-    'package': 'a',
-    'sdk': '1.23.0',
-    'stageName': 'analyze_and_format',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'analyze',
-        'args': '--fatal-infos --fatal-warnings .',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': '1.23.0',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'stable',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': '1.23.0',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 0',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'stable',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 0',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 0',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': '1.23.0',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 1',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'stable',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 1',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {
-        'flavor': 'dart',
-        'type': 'test',
-        'args': '--preset travis --total-shards 5 --shard-index 1',
-      },
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': '1.23.0',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test'},
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'stable',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test'},
-    ],
-    'flavor': 'dart',
-    'isNewest': false,
-  },
-  {
-    'os': 'linux',
-    'package': 'a',
-    'sdk': 'dev',
-    'stageName': 'unit_test',
-    'tasks': [
-      {'flavor': 'dart', 'type': 'test'},
-    ],
-    'flavor': 'dart',
-    'isNewest': true,
-  },
-];

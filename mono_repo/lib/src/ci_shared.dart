@@ -130,45 +130,6 @@ List<String> scriptLines(String scriptPath) => [
   ],
 ];
 
-/// Gives a map of command to unique task key for all [jobs].
-Map<String, String> extractCommands(Iterable<HasStageName> jobs) {
-  final commandsToKeys = <String, String>{};
-
-  final tasksToConfigure = jobs
-      .whereType<CIJob>()
-      .expand((job) => job.tasks.map((task) => (task, job.isNewest)))
-      .toList();
-
-  final taskTypes = tasksToConfigure.map((t) => t.$1.type).toSet();
-
-  for (var taskType in taskTypes) {
-    final commands =
-        tasksToConfigure
-            .where((t) => t.$1.type == taskType)
-            .map((t) => t.$1.command(t.$2))
-            .toSet()
-            .toList()
-          ..sort();
-
-    if (commands.length == 1) {
-      commandsToKeys[commands.single] = taskType.name;
-      continue;
-    }
-
-    // If we have multiple, we want a stable mapping.
-    // We also want to try and keep the 'simplest' command as just the task name
-    // if possible.
-    final paddingSize = (commands.length - 1).toString().length;
-
-    for (var i = 0; i < commands.length; i++) {
-      commandsToKeys[commands[i]] =
-          '${taskType.name}_${i.toString().padLeft(paddingSize, '0')}';
-    }
-  }
-
-  return commandsToKeys;
-}
-
 void logPackages(Iterable<PackageConfig> configs) {
   for (var pkg in configs) {
     print(styleBold.wrap('package:${pkg.relativePath}'));
@@ -217,10 +178,7 @@ List<String> calculateOrderedStages(
     previous = stage;
   }
 
-  final rootMentionedStages = <String>{
-    ...conditionalStages.keys,
-    ...rootConfig.monoConfig.mergeStages,
-  };
+  final rootMentionedStages = <String>{...conditionalStages.keys};
 
   for (var config in rootConfig) {
     String? previous;
@@ -275,4 +233,43 @@ List<String> calculateOrderedStages(
   }
 
   return components;
+}
+
+/// Gives a map of command to unique task key for all [jobs].
+Map<String, String> extractCommands(Iterable<HasStageName> jobs) {
+  final commandsToKeys = <String, String>{};
+
+  final tasksToConfigure = jobs
+      .whereType<CIJob>()
+      .expand((job) => job.tasks.map((task) => (task, job.isNewest)))
+      .toList();
+
+  final taskTypes = tasksToConfigure.map((t) => t.$1.type).toSet();
+
+  for (var taskType in taskTypes) {
+    final commands =
+        tasksToConfigure
+            .where((t) => t.$1.type == taskType)
+            .map((t) => t.$1.command(t.$2))
+            .toSet()
+            .toList()
+          ..sort();
+
+    if (commands.length == 1) {
+      commandsToKeys[commands.single] = taskType.name;
+      continue;
+    }
+
+    // If we have multiple, we want a stable mapping.
+    // We also want to try and keep the 'simplest' command as just the task name
+    // if possible.
+    final paddingSize = (commands.length - 1).toString().length;
+
+    for (var i = 0; i < commands.length; i++) {
+      commandsToKeys[commands[i]] =
+          '${taskType.name}_${i.toString().padLeft(paddingSize, '0')}';
+    }
+  }
+
+  return commandsToKeys;
 }

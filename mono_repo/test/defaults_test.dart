@@ -32,7 +32,7 @@ environment:
     );
 
     await d
-        .file(defaultGitHubWorkflowFilePath, contains('sdk: "dev"'))
+        .file(githubWorkflowFilePath('sub_pkg'), contains('sdk: "dev"'))
         .validate();
   });
 
@@ -67,13 +67,13 @@ environment:
 
     // Should use stable SDK from mono_pkg.yaml, inheriting stages from defaults
     await d
-        .file(defaultGitHubWorkflowFilePath, contains('sdk: "stable"'))
+        .file(githubWorkflowFilePath('sub_pkg'), contains('sdk: "stable"'))
         .validate();
     await d
-        .file(defaultGitHubWorkflowFilePath, isNot(contains('sdk: "dev"')))
+        .file(githubWorkflowFilePath('sub_pkg'), isNot(contains('sdk: "dev"')))
         .validate();
     await d
-        .file(defaultGitHubWorkflowFilePath, contains('name: "analyze; '))
+        .file(githubWorkflowFilePath('sub_pkg'), contains('name: "analyze; '))
         .validate();
   });
 }
