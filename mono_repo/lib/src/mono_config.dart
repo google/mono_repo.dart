@@ -21,6 +21,8 @@ const _allowedMonoConfigKeys = {
   'pub_action',
   'self_validate',
   'coverage_service',
+  'defaults',
+  'ignore',
 };
 
 const _defaultPubAction = 'upgrade';
@@ -34,6 +36,8 @@ class MonoConfig implements BasicConfiguration {
   final String pubAction;
   final String? selfValidateStage;
   final GitHubConfig github;
+  final Map<String, dynamic> defaults;
+  final Set<String> ignore;
   @override
   final Set<CoverageProcessor> coverageProcessors;
 
@@ -43,6 +47,8 @@ class MonoConfig implements BasicConfiguration {
     required this.pubAction,
     required this.selfValidateStage,
     required Map github,
+    required this.defaults,
+    required this.ignore,
     required this.coverageProcessors,
   }) : githubConditionalStages = _readConditionalStages(github),
        github = GitHubConfig.fromJson(github);
@@ -122,12 +128,30 @@ class MonoConfig implements BasicConfiguration {
 
     final coverageServices = _asList(json, 'coverage_service');
 
+    var defaults = <String, dynamic>{};
+    final rawDefaults = json['defaults'];
+    if (rawDefaults != null) {
+      if (rawDefaults is! Map) {
+        throw CheckedFromJsonException(
+          json,
+          'defaults',
+          'MonoConfig',
+          '`defaults` must be a Map.',
+        );
+      }
+      defaults = Map<String, dynamic>.from(rawDefaults);
+    }
+
+    final ignore = _asList(json, 'ignore').toSet();
+
     return MonoConfig._(
       mergeStages: Set.from(mergeStages),
       prettyAnsi: prettyAnsi,
       pubAction: pubAction,
       selfValidateStage: _selfValidateFromValue(selfValidate),
       github: github,
+      defaults: defaults,
+      ignore: ignore,
       coverageProcessors: coverageServices
           .map((e) => CoverageProcessor.values.byName(e))
           .toSet(),
@@ -145,6 +169,8 @@ class MonoConfig implements BasicConfiguration {
         prettyAnsi: true,
         selfValidateStage: null,
         github: {},
+        defaults: {},
+        ignore: const {},
         coverageProcessors: {CoverageProcessor.coveralls},
       );
     }

@@ -30,6 +30,8 @@ class PackageConfig {
   final List<String> cacheDirectories;
   final bool dartSdkConfigUsed;
   final bool osConfigUsed;
+  final List<Map>? preSteps;
+  final List<Map>? postSteps;
 
   PackageConfig(
     this.relativePath,
@@ -41,6 +43,8 @@ class PackageConfig {
     this.cacheDirectories,
     this.dartSdkConfigUsed,
     this.osConfigUsed,
+    this.preSteps,
+    this.postSteps,
   ) : assert(() {
         if (sdks == null) return true;
         sortNormalizeVerifySdksList(pubspec.flavor, sdks, AssertionError.new);
@@ -50,17 +54,24 @@ class PackageConfig {
   factory PackageConfig.parse(
     String relativePath,
     Pubspec pubspec,
-    Map monoPkgYaml,
-  ) => createWithCheck(
-    () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
+    Map monoPkgYaml, {
+    Map<String, dynamic>? defaults,
+  }) => createWithCheck(
+    () => PackageConfig._parse(
+      relativePath,
+      pubspec,
+      monoPkgYaml,
+      defaults: defaults,
+    ),
   );
 
   factory PackageConfig._parse(
     String relativePath,
     Pubspec pubspec,
-    Map monoPkgYaml,
-  ) {
-    if (monoPkgYaml.isEmpty) {
+    Map monoPkgYaml, {
+    Map<String, dynamic>? defaults,
+  }) {
+    if (monoPkgYaml.isEmpty && (defaults == null || defaults.isEmpty)) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
       return PackageConfig(
@@ -73,12 +84,40 @@ class PackageConfig {
         [],
         false,
         false,
+        null,
+        null,
       );
     }
 
     final flavor = pubspec.flavor;
 
-    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml, pubspec);
+    // Note: This is a shallow merge.
+    // If a package specifies `stages` or `cache`, it completely overwrites
+    // the values from `defaults` rather than deep merging them.
+    final mergedConfig = <String, dynamic>{};
+    if (defaults != null) {
+      mergedConfig.addAll(defaults.cast<String, dynamic>());
+    }
+    mergedConfig.addAll(monoPkgYaml.cast<String, dynamic>());
+    if (monoPkgYaml is YamlMap) {
+      setYamlMapContext(mergedConfig, monoPkgYaml);
+    }
+
+    final rawConfig = RawConfig.fromYaml(flavor, mergedConfig);
+
+    if (rawConfig.sdks != null) {
+      handlePubspecInSdkList(
+        flavor,
+        rawConfig.sdks!,
+        pubspec,
+        (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+      );
+      sortNormalizeVerifySdksList(
+        flavor,
+        rawConfig.sdks!,
+        (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+      );
+    }
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <CIJob>[];
@@ -92,7 +131,7 @@ class PackageConfig {
         var jobSdks = rawConfig.sdks;
         if (job case {'sdk': final jobValue}) {
           jobSdks = (jobValue is List)
-              ? jobSdks = List.from(jobValue)
+              ? List.from(jobValue)
               : [jobValue as String];
 
           handlePubspecInSdkList(
@@ -195,6 +234,8 @@ class PackageConfig {
       rawConfig.cache?.directories ?? const [],
       sdkConfigUsed,
       osConfigUsed,
+      rawConfig.preSteps,
+      rawConfig.postSteps,
     );
   }
 }

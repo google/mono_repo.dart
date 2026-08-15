@@ -4,6 +4,8 @@
 
 import 'dart:collection';
 
+import 'package:path/path.dart' as p;
+
 import '../../basic_config.dart';
 import '../../ci_shared.dart';
 import '../../github_config.dart';
@@ -296,9 +298,11 @@ extension on CIJobEntry {
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
-      final pubStepId =
-          '${package.replaceAll('/', '_')}_'
-          'pub_${rootConfig.monoConfig.pubAction}';
+      final posixPkg = p.posix.joinAll(p.split(package));
+      final safePkg = (posixPkg == '.' || posixPkg.isEmpty)
+          ? 'root'
+          : posixPkg.replaceAll('/', '_');
+      final pubStepId = '${safePkg}_pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(
         _CommandEntry(
           '$package; $pubCommand',
@@ -327,6 +331,10 @@ extension on CIJobEntry {
       }
     }
 
+    final packageConfig = rootConfig.singleWhere(
+      (p) => p.relativePath == job.package,
+    );
+
     return _githubJob(
       jobName(
         packages,
@@ -345,6 +353,8 @@ extension on CIJobEntry {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
       },
+      preSteps: packageConfig.preSteps,
+      postSteps: packageConfig.postSteps,
     );
   }
 
@@ -386,9 +396,13 @@ Job _githubJob(
   RootConfig rootConfig, {
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
+  Map<String, dynamic>? strategy,
+  List<Map>? preSteps,
+  List<Map>? postSteps,
 }) => Job(
   name: jobName,
   runsOn: runsOn,
+  strategy: strategy,
   steps: [
     if (!runsOn.startsWith('windows'))
       _cacheEntries(
@@ -400,6 +414,7 @@ Job _githubJob(
         },
       ),
     packageFlavor.setupStep(sdkVersion, rootConfig),
+    if (preSteps != null) ...preSteps.map(Step.fromJson),
     ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
     ActionInfo.checkout.usage(
       id: 'checkout',
@@ -407,6 +422,7 @@ Job _githubJob(
       withContent: {'persist-credentials': false},
     ),
     for (var command in runCommands) ...command.runContent(config, rootConfig),
+    if (postSteps != null) ...postSteps.map(Step.fromJson),
   ],
 );
 
