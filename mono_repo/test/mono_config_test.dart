@@ -50,7 +50,7 @@ void main() {
 
     final config = _parse(monoYaml);
 
-    expect(config.sdks, ['1.23.0', 'dev', 'stable']);
+    expect(config.sdks, ['1.23.0', 'stable', 'dev']);
 
     final jobs = jsonDecode(
       jsonEncode(config.jobs.map((tj) => tj.toJson()).toList()),
@@ -447,7 +447,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'dev',
+    'sdk': 'stable',
     'stageName': 'unit_test',
     'tasks': [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
@@ -457,7 +457,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'stable',
+    'sdk': 'dev',
     'stageName': 'unit_test',
     'tasks': [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
@@ -481,7 +481,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'dev',
+    'sdk': 'stable',
     'stageName': 'unit_test',
     'tasks': [
       {
@@ -495,7 +495,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'stable',
+    'sdk': 'dev',
     'stageName': 'unit_test',
     'tasks': [
       {
@@ -523,7 +523,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'dev',
+    'sdk': 'stable',
     'stageName': 'unit_test',
     'tasks': [
       {
@@ -537,7 +537,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'stable',
+    'sdk': 'dev',
     'stageName': 'unit_test',
     'tasks': [
       {
@@ -561,7 +561,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'dev',
+    'sdk': 'stable',
     'stageName': 'unit_test',
     'tasks': [
       {'flavor': 'dart', 'type': 'test'},
@@ -571,7 +571,7 @@ List get _testConfig1expectedOutput => [
   {
     'os': 'linux',
     'package': 'a',
-    'sdk': 'stable',
+    'sdk': 'dev',
     'stageName': 'unit_test',
     'tasks': [
       {'flavor': 'dart', 'type': 'test'},
