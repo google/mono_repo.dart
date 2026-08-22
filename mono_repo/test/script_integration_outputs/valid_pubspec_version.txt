@@ -48,7 +48,7 @@ jobs:
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: "pkg_a"
   job_002:
-    name: "analyze_and_format; linux; Dart dev; `dart analyze --fatal-infos --fatal-infos .`"
+    name: "analyze_and_format; linux; Dart dev; `dart analyze --fatal-infos .`"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Cache Pub hosted dependencies"
@@ -75,8 +75,8 @@ jobs:
         run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: "pkg_a"
-      - name: "pkg_a; dart analyze --fatal-infos --fatal-infos ."
-        run: "dart analyze --fatal-infos --fatal-infos ."
+      - name: "pkg_a; dart analyze --fatal-infos ."
+        run: "dart analyze --fatal-infos ."
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
         working-directory: "pkg_a"
   job_003:

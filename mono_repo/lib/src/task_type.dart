@@ -101,11 +101,16 @@ class _AnalyzeTask extends TaskType {
     PackageFlavor flavor,
     String? args, {
     required bool isNewest,
-  }) => [
-    flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
-    if (isNewest) '--fatal-infos',
-    if (args != null) args,
-  ];
+  }) {
+    final hasFatalInfos =
+        args != null &&
+        (args.contains('--fatal-infos') || args.contains('--no-fatal-infos'));
+    return [
+      flavor == PackageFlavor.dart ? 'dart analyze' : 'flutter analyze',
+      if (isNewest && !hasFatalInfos) '--fatal-infos',
+      if (args != null) args,
+    ];
+  }
 
   @override
   Iterable<String> get alternates => const {'dartanalyzer'};

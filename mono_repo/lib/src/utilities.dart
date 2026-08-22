@@ -80,6 +80,8 @@ void handlePubspecInSdkList(
   }
 }
 
+/// Compares two SDK strings chronologically:
+/// `pubspec` < SemVer versions < `stable` < `beta` < `dev` < `main`/`master`.
 int compareSdks(String a, String b) {
   if (a == b) return 0;
   if (a == _pubspecSdkKey) return -1;
