@@ -20,20 +20,20 @@ void main() {
       '''
 bob
 alice''': r'''
-key: |
+key: |-
   bob
   alice''',
       '''
 os:linux;pub-cache-hosted
 os:linux''': r'''
-key: |
+key: |-
   os:linux;pub-cache-hosted
   os:linux''',
       r'''
 curl -H "Content-Type: application/json" -X POST -d \
   "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
   "${CHAT_WEBHOOK_URL}"''': r'''
-key: |
+key: |-
   curl -H "Content-Type: application/json" -X POST -d \
     "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
     "${CHAT_WEBHOOK_URL}"''',

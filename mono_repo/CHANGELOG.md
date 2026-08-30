@@ -1,3 +1,7 @@
+## 6.7.3-wip
+
+- Fix multi-line string round-tripping in `toYaml()` by using strip chomping (`|-`).
+
 ## 6.7.2
 
 - Support configuring `permissions` under `github` in `mono_repo.yaml`.

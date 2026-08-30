@@ -166,7 +166,7 @@ void _writeYaml(
           // But every other line can!
           lines.skip(1).every((e) => e.trimRight() == e)) {
         buffer
-          ..writeln('|')
+          ..writeln(source.endsWith('\n') ? '|' : '|-')
           ..writeAll(lines.map((e) => '$spaces$e'), '\n');
         return;
       }
