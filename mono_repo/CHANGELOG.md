@@ -1,5 +1,6 @@
-## 6.7.3-wip
+## 6.7.3
 
+- Fix SDK discovery when compiled via AOT (`dart install` / `dart compile exe`).
 - Fix multi-line string round-tripping in `toYaml()` by using strip chomping (`|-`).
 
 ## 6.7.2
