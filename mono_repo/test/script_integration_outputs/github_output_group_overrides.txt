@@ -23,7 +23,7 @@ jobs:
         with:
           path: "~/.pub-cache/hosted"
           key: "os:macos-latest;pub-cache-hosted;sdk:dev;packages:pkg_a;commands:analyze-format"
-          restore-keys: |
+          restore-keys: |-
             os:macos-latest;pub-cache-hosted;sdk:dev;packages:pkg_a
             os:macos-latest;pub-cache-hosted;sdk:dev
             os:macos-latest;pub-cache-hosted
@@ -81,7 +81,7 @@ jobs:
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:test_1"
-          restore-keys: |
+          restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a
             os:ubuntu-latest;pub-cache-hosted;sdk:stable
             os:ubuntu-latest;pub-cache-hosted
@@ -116,7 +116,7 @@ jobs:
         with:
           path: "~/.pub-cache/hosted"
           key: "os:macos-latest;pub-cache-hosted;sdk:dev;packages:pkg_a;commands:test_0"
-          restore-keys: |
+          restore-keys: |-
             os:macos-latest;pub-cache-hosted;sdk:dev;packages:pkg_a
             os:macos-latest;pub-cache-hosted;sdk:dev
             os:macos-latest;pub-cache-hosted
