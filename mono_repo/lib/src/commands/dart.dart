@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:cli_util/cli_util.dart';
 import 'package:io/ansi.dart';
 import 'package:path/path.dart' as p;
 
@@ -95,16 +96,8 @@ Future<void> dart(
   }
 }
 
-/// The path to the root directory of the SDK.
-final String _sdkDir = (() {
-  // The Dart executable is in "/path/to/sdk/bin/dart", so two levels up is
-  // "/path/to/sdk".
-  final aboveExecutable = p.dirname(p.dirname(Platform.resolvedExecutable));
-  assert(FileSystemEntity.isFileSync(p.join(aboveExecutable, 'version')));
-  return aboveExecutable;
-})();
-
-final String _dartPath = p.join(_sdkDir, 'bin', 'dart');
+/// The path to the dart executable.
+final String _dartPath = dartExecutable ?? 'dart';
 
 /// The "flutter[.bat]" command.
 final String _flutterPath = Platform.isWindows ? 'flutter.bat' : 'flutter';
