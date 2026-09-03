@@ -68,18 +68,10 @@ for PKG in ${PKGS}; do
         dart analyze --fatal-infos || EXIT_CODE=$?
         ;;
       analyze_1)
-        echo 'dart analyze --fatal-infos --fatal-infos .'
-        dart analyze --fatal-infos --fatal-infos . || EXIT_CODE=$?
-        ;;
-      analyze_2)
         echo 'dart analyze --fatal-infos .'
         dart analyze --fatal-infos . || EXIT_CODE=$?
         ;;
-      analyze_3)
-        echo 'flutter analyze --fatal-infos --fatal-infos .'
-        flutter analyze --fatal-infos --fatal-infos . || EXIT_CODE=$?
-        ;;
-      analyze_4)
+      analyze_2)
         echo 'flutter analyze --fatal-infos .'
         flutter analyze --fatal-infos . || EXIT_CODE=$?
         ;;
