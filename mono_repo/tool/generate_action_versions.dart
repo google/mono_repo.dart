@@ -20,10 +20,15 @@ void main(List<String> args) {
     exit(1);
   }
   final previousContent = versionsFile.readAsStringSync();
-  final workflowFile = File('../.github/workflows/dart.yml');
-  final versions = RootConfig.parseActionVersions(
-    workflowFile.readAsStringSync(),
-  );
+  final githubDir = Directory('../.github');
+  final versions = <String, String>{};
+  for (var file
+      in githubDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.yml') || f.path.endsWith('.yaml'))) {
+    versions.addAll(RootConfig.parseActionVersions(file.readAsStringSync()));
+  }
   final newContentBuffer = StringBuffer('''
 // Copyright (c) 2023, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -34,9 +39,10 @@ void main(List<String> args) {
 // To regenerate it, run the `tool/generate_action_versions.dart` script.
 
 ''');
-  for (var entry in versions.entries) {
+  final sortedKeys = versions.keys.toList()..sort();
+  for (var key in sortedKeys) {
     newContentBuffer.writeln(
-      "const ${entry.key.toVariableName} = '${entry.value}';",
+      "const ${key.toVariableName} = '${versions[key]}';",
     );
   }
   final tmpDir = Directory.systemTemp.createTempSync('gen_action_versions');

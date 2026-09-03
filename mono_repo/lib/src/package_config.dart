@@ -30,6 +30,8 @@ class PackageConfig {
   final List<String> cacheDirectories;
   final bool dartSdkConfigUsed;
   final bool osConfigUsed;
+  final List<Map>? preSteps;
+  final List<Map>? postSteps;
 
   PackageConfig(
     this.relativePath,
@@ -41,6 +43,8 @@ class PackageConfig {
     this.cacheDirectories,
     this.dartSdkConfigUsed,
     this.osConfigUsed,
+    this.preSteps,
+    this.postSteps,
   ) : assert(() {
         if (sdks == null) return true;
         sortNormalizeVerifySdksList(pubspec.flavor, sdks, AssertionError.new);
@@ -50,17 +54,24 @@ class PackageConfig {
   factory PackageConfig.parse(
     String relativePath,
     Pubspec pubspec,
-    Map monoPkgYaml,
-  ) => createWithCheck(
-    () => PackageConfig._parse(relativePath, pubspec, monoPkgYaml),
+    Map monoPkgYaml, {
+    Map<String, dynamic>? defaults,
+  }) => createWithCheck(
+    () => PackageConfig._parse(
+      relativePath,
+      pubspec,
+      monoPkgYaml,
+      defaults: defaults,
+    ),
   );
 
   factory PackageConfig._parse(
     String relativePath,
     Pubspec pubspec,
-    Map monoPkgYaml,
-  ) {
-    if (monoPkgYaml.isEmpty) {
+    Map monoPkgYaml, {
+    Map<String, dynamic>? defaults,
+  }) {
+    if (monoPkgYaml.isEmpty && (defaults == null || defaults.isEmpty)) {
       // It's valid to have an empty `mono_pkg.yaml` file – it just results in
       // an empty config WRT travis.
       return PackageConfig(
@@ -73,12 +84,54 @@ class PackageConfig {
         [],
         false,
         false,
+        null,
+        null,
       );
     }
 
     final flavor = pubspec.flavor;
 
-    final rawConfig = RawConfig.fromYaml(flavor, monoPkgYaml, pubspec);
+    // Note: This is a shallow merge.
+    // If a package specifies `stages` or `cache`, it completely overwrites
+    // the values from `defaults` rather than deep merging them.
+    final mergedConfig = <String, dynamic>{};
+    if (defaults != null) {
+      mergedConfig.addAll(defaults.cast<String, dynamic>());
+    }
+    mergedConfig.addAll(monoPkgYaml.cast<String, dynamic>());
+    if (monoPkgYaml is YamlMap) {
+      setYamlMapContext(mergedConfig, monoPkgYaml);
+    }
+
+    final rawConfig = RawConfig.fromYaml(flavor, mergedConfig);
+
+    final rawSdks = rawConfig.sdks;
+    final List<String> sdks;
+    if (rawSdks == null || rawSdks.isEmpty) {
+      if (mergedConfig.containsKey('sdk')) {
+        throw CheckedFromJsonException(
+          monoPkgYaml,
+          'sdk',
+          'RawConfig',
+          'The value for "sdk" must be an array with at least one value.',
+        );
+      }
+      sdks = ['pubspec', 'dev'];
+    } else {
+      sdks = List.from(rawSdks);
+    }
+
+    handlePubspecInSdkList(
+      flavor,
+      sdks,
+      pubspec,
+      (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+    );
+    sortNormalizeVerifySdksList(
+      flavor,
+      sdks,
+      (m) => CheckedFromJsonException(monoPkgYaml, 'sdk', 'RawConfig', m),
+    );
 
     // FYI: 'test' is default if there are no tasks defined
     final jobs = <CIJob>[];
@@ -89,10 +142,16 @@ class PackageConfig {
     final stageNames = rawConfig.stages.map((stage) {
       final stageYaml = stage.items;
       for (var job in stageYaml) {
-        var jobSdks = rawConfig.sdks;
+        if (job is! Map && job is! String) {
+          throw ParsedYamlException(
+            'Each item within a stage must be a map or a string.',
+            job is YamlNode ? job : stageYaml as YamlNode,
+          );
+        }
+        var jobSdks = sdks;
         if (job case {'sdk': final jobValue}) {
           jobSdks = (jobValue is List)
-              ? jobSdks = List.from(jobValue)
+              ? List.from(jobValue)
               : [jobValue as String];
 
           handlePubspecInSdkList(
@@ -105,37 +164,6 @@ class PackageConfig {
             flavor,
             jobSdks,
             (m) => CheckedFromJsonException(job, 'sdk', 'RawConfig', m),
-          );
-        } else if (jobSdks == null || jobSdks.isEmpty) {
-          if (monoPkgYaml.containsKey('sdk')) {
-            throw CheckedFromJsonException(
-              monoPkgYaml,
-              'sdk',
-              'RawConfig',
-              'The value for "sdk" must be an array with at least '
-                  'one value.',
-            );
-          }
-
-          if (job is! Map) {
-            throw ParsedYamlException(
-              'Each item within a stage must be a map.',
-              job is YamlNode ? job : stageYaml as YamlNode,
-            );
-          }
-
-          if (job.containsKey('dart')) {
-            throw CheckedFromJsonException(
-              job as YamlMap,
-              'dart',
-              'RawConfig',
-              '"dart" is no longer supported. Use "sdk" instead.',
-            );
-          }
-
-          throw ParsedYamlException(
-            'An "sdk" key is required.',
-            job as YamlMap,
           );
         } else {
           sdkConfigUsed = true;
@@ -156,7 +184,16 @@ class PackageConfig {
           job as Object,
           flavor: flavor,
         );
+
+        final newestSdk = jobSdks.last;
+
         for (var sdk in jobSdks) {
+          final isNewest = sdk == newestSdk;
+          final filteredTasks = tasks
+              .where((t) => t.command(isNewest).isNotEmpty)
+              .toList();
+          if (filteredTasks.isEmpty) continue;
+
           for (var os in jobOses) {
             jobs.add(
               CIJob(
@@ -164,9 +201,10 @@ class PackageConfig {
                 relativePath,
                 sdk,
                 stage.name,
-                tasks,
+                filteredTasks,
                 description: description,
                 flavor: flavor,
+                isNewest: isNewest,
               ),
             );
           }
@@ -185,6 +223,8 @@ class PackageConfig {
       rawConfig.cache?.directories ?? const [],
       sdkConfigUsed,
       osConfigUsed,
+      rawConfig.preSteps,
+      rawConfig.postSteps,
     );
   }
 }
@@ -223,8 +263,13 @@ class CIJob implements HasStageName {
   @JsonKey()
   final PackageFlavor flavor;
 
-  Iterable<String> get _taskCommandsTickQuoted =>
-      tasks.map((t) => '`${t.command}`');
+  @JsonKey()
+  final bool isNewest;
+
+  Iterable<String> get _taskCommandsTickQuoted => tasks
+      .map((t) => t.command(isNewest))
+      .where((c) => c.isNotEmpty)
+      .map((c) => '`$c`');
 
   /// The description of the job in the CI environment.
   String get name => description ?? _taskCommandsTickQuoted.join(', ');
@@ -243,6 +288,7 @@ class CIJob implements HasStageName {
     this.tasks, {
     this.description,
     required this.flavor,
+    this.isNewest = false,
   }) : assert(
          errorForSdkConfig(flavor, sdk) == null,
          'Should have caught bad sdk value `$sdk` before here!',
@@ -292,10 +338,10 @@ class Task {
   @JsonKey()
   final String? args;
 
-  final String command;
+  Task(this.flavor, this.type, {this.args});
 
-  Task(this.flavor, this.type, {this.args})
-    : command = type.commandValue(flavor, args).join(' ');
+  String command(bool isNewest) =>
+      type.commandValue(flavor, args, isNewest: isNewest).join(' ');
 
   /// Parses an individual item under `stages`, which might be a `group` or an
   /// individual task.

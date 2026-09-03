@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v6.7.3
+# Created with package:mono_repo v7.0.0-wip
 
 # Support built in commands on windows out of the box.
 
@@ -64,16 +64,20 @@ for PKG in ${PKGS}; do
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
       analyze_0)
-        echo 'dart analyze --fatal-infos .'
-        dart analyze --fatal-infos . || EXIT_CODE=$?
-        ;;
-      analyze_1)
         echo 'dart analyze'
         dart analyze || EXIT_CODE=$?
         ;;
+      analyze_1)
+        echo 'dart analyze --fatal-infos'
+        dart analyze --fatal-infos || EXIT_CODE=$?
+        ;;
       analyze_2)
-        echo 'flutter analyze --fatal-infos .'
-        flutter analyze --fatal-infos . || EXIT_CODE=$?
+        echo 'flutter analyze'
+        flutter analyze || EXIT_CODE=$?
+        ;;
+      analyze_3)
+        echo 'flutter analyze --fatal-infos'
+        flutter analyze --fatal-infos || EXIT_CODE=$?
         ;;
       command)
         echo 'cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate'
@@ -84,28 +88,24 @@ for PKG in ${PKGS}; do
         dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       test_0)
-        echo 'dart test -x yaml -P presubmit --test-randomize-ordering-seed=random'
-        dart test -x yaml -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart test --test-randomize-ordering-seed=random'
+        dart test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_1)
-        echo 'dart test -t yaml --test-randomize-ordering-seed=random'
-        dart test -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        echo 'dart test -P presubmit --test-randomize-ordering-seed=random'
+        dart test -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_2)
         echo 'flutter test --test-randomize-ordering-seed=random'
         flutter test --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       test_with_coverage_0)
-        echo 'dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random'
-        dart pub global run coverage:test_with_coverage -- -x yaml -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
-        ;;
-      test_with_coverage_1)
-        echo 'dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random'
-        dart pub global run coverage:test_with_coverage -- -t yaml --test-randomize-ordering-seed=random || EXIT_CODE=$?
-        ;;
-      test_with_coverage_2)
         echo 'dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random'
         dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random || EXIT_CODE=$?
+        ;;
+      test_with_coverage_1)
+        echo 'dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random'
+        dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"

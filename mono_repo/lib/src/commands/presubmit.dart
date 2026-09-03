@@ -84,7 +84,7 @@ Future<bool> presubmit(
     );
   }
 
-  final commandsToKeys = extractCommands(rootConfig);
+  final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
   // By default, run on all packages.
   if (packages.isEmpty) {
     packages = rootConfig.map((pc) => pc.relativePath).toList();
@@ -129,13 +129,13 @@ Future<bool> presubmit(
     for (var job in config.jobs) {
       final sdk = job.sdk;
       for (var task in job.tasks) {
-        final taskKey = commandsToKeys[task.command]!;
+        final taskKey = commandsToKeys[task.command(job.isNewest)]!;
         // Skip tasks that weren't specified
         if (!tasks.contains(task.type.name)) continue;
 
         print(
           '  SDK: ${styleBold.wrap(white.wrap(job.sdk))} '
-          'TASK: ${styleBold.wrap(white.wrap(task.command))}',
+          'TASK: ${styleBold.wrap(white.wrap(task.command(job.isNewest)))}',
         );
         if (sdk != sdkToRun) {
           print(yellow.wrap('    skipped, mismatched sdk'));

@@ -1,0 +1,37 @@
+# Created with package:mono_repo v7.0.0-wip
+name: "Setup Dart Package"
+description: "Setup Dart SDK, cache pub dependencies, checkout repository, and run pub action."
+inputs:
+  sdk:
+    description: "Dart SDK version or channel"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:${{ runner.os }};pub-cache-hosted;sdk:${{ inputs.sdk }};pkg:${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:${{ runner.os }};pub-cache-hosted;sdk:${{ inputs.sdk }}
+          os:${{ runner.os }};pub-cache-hosted
+    - name: "Setup Dart SDK"
+      uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
+      with:
+        sdk: "${{ inputs.sdk }}"
+    - id: "pub_action"
+      name: "dart pub ${{ inputs.pub-action }}"
+      run: "dart pub ${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "${{ inputs.working-directory }}"

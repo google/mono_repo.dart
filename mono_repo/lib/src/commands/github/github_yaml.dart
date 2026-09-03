@@ -4,6 +4,9 @@
 
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
+import 'package:path/path.dart' as p;
+
 import '../../basic_config.dart';
 import '../../ci_shared.dart';
 import '../../github_config.dart';
@@ -12,7 +15,6 @@ import '../../package_config.dart';
 import '../../package_flavor.dart';
 import '../../root_config.dart';
 import '../../task_type.dart';
-import '../../user_exception.dart';
 import '../../yaml.dart';
 import 'action_info.dart';
 import 'job.dart';
@@ -27,29 +29,30 @@ final defaultGitHubWorkflowFilePath = githubWorkflowFilePath(
 );
 
 String githubWorkflowFilePath(String filename) =>
-    '$githubWorkflowDirectory/$filename.yml';
+    '$githubWorkflowDirectory/$filename.yaml';
 
 Map<String, String> generateGitHubYml(RootConfig rootConfig) {
-  final jobs = <HasStageName>[...rootConfig.expand((config) => config.jobs)];
+  final output = <String, String>{};
 
-  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
-  if (selfValidateStage != null) {
-    jobs.add(_SelfValidateJob(selfValidateStage));
-  }
-
-  final allJobStages = {for (var job in jobs) job.stageName};
   final orderedStages = calculateOrderedStages(
     rootConfig,
     rootConfig.monoConfig.githubConditionalStages,
   )..add(_onCompletionStage);
 
-  final output = <String, String>{};
+  final selfValidateStage = rootConfig.monoConfig.selfValidateStage;
+  final allModernJobs = [
+    ...rootConfig.expand((p) => p.jobs),
+    if (selfValidateStage != null) _SelfValidateJob(selfValidateStage),
+  ];
+
+  final commandsToKeys = extractCommands(allModernJobs);
 
   void populateJobs(
     String fileName,
     String workflowName,
-    Iterable<HasStageName> myJobs,
-  ) {
+    Iterable<HasStageName> myJobs, {
+    List<String>? paths,
+  }) {
     if (output.containsKey(fileName)) {
       throw UnsupportedError(
         'Should not get here – duplicate workflow "$fileName".',
@@ -84,9 +87,9 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
     final allJobs = _listJobs(
       rootConfig,
       sortedJobs,
-      rootConfig.monoConfig.mergeStages,
       rootConfig.monoConfig.github.onCompletion,
       rootConfig.monoConfig.githubConditionalStages,
+      commandsToKeys,
     ).toList();
 
     var currStageJobs = <String>{};
@@ -128,50 +131,175 @@ Map<String, String> generateGitHubYml(RootConfig rootConfig) {
       jobList['job_${jobList.length + 1}'] = job;
     }
 
+    final githubConfig = Map<String, dynamic>.from(
+      rootConfig.monoConfig.github.generate(workflowName),
+    );
+    if (paths != null) {
+      final on = Map<String, dynamic>.from(githubConfig['on'] as Map);
+      githubConfig['on'] = on;
+      for (var entry in on.entries) {
+        if (entry.key == 'schedule') continue;
+        final value = entry.value;
+        if (value is Map) {
+          on[entry.key] = {...value, 'paths': paths};
+        } else if (value is List) {
+          on[entry.key] = {'branches': value, 'paths': paths};
+        } else if (value is String) {
+          on[entry.key] = {
+            'branches': [value],
+            'paths': paths,
+          };
+        } else if (value == null) {
+          on[entry.key] = {'paths': paths};
+        }
+      }
+    }
+
     output[githubWorkflowFilePath(fileName)] =
         '''
 $createdWith
-${toYaml(rootConfig.monoConfig.github.generate(workflowName))}
+${toYaml(githubConfig)}
 
 ${toYaml({'jobs': jobList})}
 ''';
   }
 
-  final workflows = rootConfig.monoConfig.github.workflows;
+  final packageMap = {for (var p in rootConfig) p.pubspec.name: p};
 
-  if (workflows != null) {
-    for (var entry in workflows.entries) {
-      assert(entry.value.stages.isNotEmpty);
-      final myJobs = {
-        for (var entry in entry.value.stages)
-          entry: jobs.where((element) => element.stageName == entry).toList(),
-      };
-
-      for (var jobEntry in myJobs.entries) {
-        if (jobEntry.value.isEmpty) {
-          throw UserException(
-            'No jobs are defined for the stage "${jobEntry.key}" '
-            'defined in GitHub workflow "${entry.key}".',
-          );
+  Iterable<PackageConfig> transitiveDeps(PackageConfig config) {
+    final deps = <PackageConfig>{};
+    final queue = Queue<PackageConfig>()..add(config);
+    while (queue.isNotEmpty) {
+      final current = queue.removeFirst();
+      final depNames = [
+        ...current.pubspec.dependencies.keys,
+        if (current == config) ...current.pubspec.devDependencies.keys,
+      ];
+      for (var depName in depNames) {
+        final depConfig = packageMap[depName];
+        if (depConfig != null && deps.add(depConfig)) {
+          queue.add(depConfig);
         }
       }
-
-      allJobStages.removeAll(entry.value.stages);
-
-      populateJobs(
-        entry.key,
-        entry.value.name,
-        myJobs.values.expand((element) => element),
-      );
     }
+    return deps;
   }
 
-  if (allJobStages.isNotEmpty) {
+  for (var packageConfig in rootConfig) {
+    final posixPath = p.posix.joinAll(p.split(packageConfig.relativePath));
+    if (rootConfig.monoConfig.ignore.contains(posixPath)) {
+      continue;
+    }
+    final fileName = posixPath == '.'
+        ? packageConfig.pubspec.name
+        : posixPath.replaceAll('/', '_');
+    final tDeps = transitiveDeps(packageConfig);
     populateJobs(
-      defaultGitHubWorkflowFileName,
-      defaultGitHubWorkflowName,
-      jobs.where((element) => allJobStages.contains(element.stageName)),
+      fileName,
+      'package:${packageConfig.pubspec.name}',
+      packageConfig.jobs,
+      paths: [
+        githubWorkflowFilePath(fileName),
+        if (posixPath == '.') ...[
+          '**',
+          for (var pkg in rootConfig)
+            if (pkg.relativePath != '.')
+              '!${p.posix.joinAll(p.split(pkg.relativePath))}/**',
+        ] else
+          '$posixPath/**',
+        for (var dep in tDeps)
+          '${p.posix.joinAll(p.split(dep.relativePath))}/**',
+      ],
     );
+  }
+
+  if (selfValidateStage != null) {
+    populateJobs('mono_repo_self_validate', 'mono_repo self validate', [
+      _SelfValidateJob(selfValidateStage),
+    ]);
+  }
+
+  if (output.isNotEmpty) {
+    output['.github/actions/setup-dart/action.yml'] =
+        '''
+$createdWith
+name: "Setup Dart Package"
+description: "Setup Dart SDK, cache pub dependencies, checkout repository, and run pub action."
+inputs:
+  sdk:
+    description: "Dart SDK version or channel"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@${ActionInfo.cache.version}"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }};pkg:\${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:\${{ runner.os }};pub-cache-hosted;sdk:\${{ inputs.sdk }}
+          os:\${{ runner.os }};pub-cache-hosted
+    - name: "Setup Dart SDK"
+      uses: "dart-lang/setup-dart@${ActionInfo.setupDart.version}"
+      with:
+        sdk: "\${{ inputs.sdk }}"
+    - id: "pub_action"
+      name: "dart pub \${{ inputs.pub-action }}"
+      run: "dart pub \${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "\${{ inputs.working-directory }}"
+''';
+    output['.github/actions/setup-flutter/action.yml'] =
+        '''
+$createdWith
+name: "Setup Flutter Package"
+description: "Setup Flutter SDK, cache pub dependencies, and run flutter pub action."
+inputs:
+  channel:
+    description: "Flutter SDK channel or version"
+    required: false
+    default: "stable"
+  working-directory:
+    description: "Working directory for pub command"
+    required: false
+    default: "."
+  pub-action:
+    description: "Pub action to run (upgrade or get)"
+    required: false
+    default: "upgrade"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Cache Pub hosted dependencies"
+      uses: "actions/cache@${ActionInfo.cache.version}"
+      with:
+        path: "~/.pub-cache/hosted"
+        key: "os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }};pkg:\${{ inputs.working-directory }}"
+        restore-keys: |-
+          os:\${{ runner.os }};pub-cache-hosted;channel:\${{ inputs.channel }}
+          os:\${{ runner.os }};pub-cache-hosted
+    - name: "Setup Flutter SDK"
+      uses: "subosito/flutter-action@${ActionInfo.setupFlutter.version}"
+      with:
+        channel: "\${{ inputs.channel }}"
+    - id: "pub_action"
+      name: "flutter pub \${{ inputs.pub-action }}"
+      run: "flutter pub \${{ inputs.pub-action }}"
+      shell: "bash"
+      working-directory: "\${{ inputs.working-directory }}"
+''';
   }
 
   return output;
@@ -181,13 +309,12 @@ ${toYaml({'jobs': jobList})}
 Iterable<_MapEntryWithStage> _listJobs(
   RootConfig rootConfig,
   List<HasStageName> jobs,
-  Set<String> mergeStages,
   List<Job>? onCompletionJobs,
   Map<String, ConditionalStage> conditionalStages,
+  Map<String, String> commandsToKeys,
 ) sync* {
-  final jobEntries = <CIJobEntry>[];
-
   var count = 0;
+  final packageConfigByPath = {for (var p in rootConfig) p.relativePath: p};
 
   String jobName(int jobNum) => 'job_${jobNum.toString().padLeft(3, '0')}';
 
@@ -199,6 +326,8 @@ Iterable<_MapEntryWithStage> _listJobs(
     return _MapEntryWithStage(jobName(++count), content, stage);
   }
 
+  final groupedCIJobs = <_JobGroupKey, List<CIJob>>{};
+
   for (var job in jobs) {
     if (job is _SelfValidateJob) {
       yield jobEntry(
@@ -209,53 +338,40 @@ Iterable<_MapEntryWithStage> _listJobs(
     }
 
     final ciJob = job as CIJob;
-
-    final commandsToKeys = extractCommands(rootConfig);
-
     final commands = ciJob.tasks
-        .map((task) => commandsToKeys[task.command]!)
+        .map((task) => task.command(ciJob.isNewest))
         .toList();
 
-    jobEntries.add(CIJobEntry(ciJob, commands));
+    final key = _JobGroupKey(
+      stageName: ciJob.stageName,
+      os: ciJob.os,
+      flavor: ciJob.flavor,
+      commands: commands,
+      description: ciJob.description,
+    );
+
+    groupedCIJobs.putIfAbsent(key, () => []).add(ciJob);
   }
 
-  final differentOperatingSystems = <String>{};
-  final differentPackages = <String>{};
-  final differentSdks = <String>{};
+  for (var entry in groupedCIJobs.entries) {
+    final jobsInGroup = entry.value;
 
-  for (var entry in jobEntries) {
-    differentOperatingSystems.add(entry.job.os);
-    differentPackages.add(entry.job.package);
-    differentSdks.add(entry.job.sdk);
-  }
+    final firstJob = jobsInGroup.first;
+    final commands = firstJob.tasks
+        .map((task) => commandsToKeys[task.command(firstJob.isNewest)]!)
+        .toList();
 
-  // Group jobs by all of the values that would allow them to merge
-  final groupedItems = groupCIJobEntries(jobEntries);
+    final ciEntry = CIJobEntry(firstJob, commands);
 
-  for (var entry in groupedItems.entries) {
-    final first = entry.value.first;
-
-    if (mergeStages.contains(first.job.stageName)) {
-      final packages = entry.value.map((t) => t.job.package).toList()..sort();
-      final yaml = first._createJob(
-        rootConfig,
-        packages: packages,
-        oneOs: differentOperatingSystems.length == 1,
-        oneSdk: differentSdks.length == 1,
-        onePackage: differentPackages.length == 1,
-      );
-      yield jobEntry(yaml, first.job.stageName);
-    } else {
-      yield* entry.value.map((e) {
-        final yaml = e._createJob(
-          rootConfig,
-          oneOs: differentOperatingSystems.length == 1,
-          oneSdk: differentSdks.length == 1,
-          onePackage: differentPackages.length == 1,
-        );
-        return jobEntry(yaml, e.job.stageName);
-      });
-    }
+    final job = ciEntry._createJob(
+      packageConfigByPath[firstJob.package]!,
+      rootConfig,
+      oneOs: false,
+      oneSdk: false,
+      onePackage: true,
+      sdks: jobsInGroup.map((j) => j.sdk).toList(),
+    );
+    yield jobEntry(job, firstJob.stageName);
   }
 
   // Generate the jobs that run on completion of all other jobs, by adding the
@@ -265,6 +381,41 @@ Iterable<_MapEntryWithStage> _listJobs(
       yield jobEntry(jobConfig, _onCompletionStage);
     }
   }
+}
+
+class _JobGroupKey {
+  final String stageName;
+  final String os;
+  final PackageFlavor flavor;
+  final List<String> commands;
+  final String? description;
+
+  _JobGroupKey({
+    required this.stageName,
+    required this.os,
+    required this.flavor,
+    required this.commands,
+    this.description,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _JobGroupKey &&
+          runtimeType == other.runtimeType &&
+          stageName == other.stageName &&
+          os == other.os &&
+          flavor == other.flavor &&
+          const IterableEquality().equals(commands, other.commands) &&
+          description == other.description;
+
+  @override
+  int get hashCode =>
+      stageName.hashCode ^
+      os.hashCode ^
+      flavor.hashCode ^
+      const IterableEquality().hash(commands) ^
+      description.hashCode;
 }
 
 extension on CIJobEntry {
@@ -282,11 +433,13 @@ extension on CIJobEntry {
   }
 
   Job _createJob(
+    PackageConfig packageConfig,
     RootConfig rootConfig, {
     List<String>? packages,
     required bool oneOs,
     required bool oneSdk,
     required bool onePackage,
+    List<String>? sdks,
   }) {
     packages ??= [job.package];
     assert(packages.isNotEmpty);
@@ -296,12 +449,15 @@ extension on CIJobEntry {
 
     final commandEntries = <_CommandEntry>[];
     for (var package in packages) {
-      final pubStepId =
-          '${package.replaceAll('/', '_')}_'
-          'pub_${rootConfig.monoConfig.pubAction}';
+      final stepNamePrefix = packages.length > 1 ? '$package; ' : '';
+      final posixPkg = p.posix.joinAll(p.split(package));
+      final safePkg = (posixPkg == '.' || posixPkg.isEmpty)
+          ? 'root'
+          : posixPkg.replaceAll('/', '_');
+      final pubStepId = '${safePkg}_pub_${rootConfig.monoConfig.pubAction}';
       commandEntries.add(
         _CommandEntry(
-          '$package; $pubCommand',
+          '$stepNamePrefix$pubCommand',
           pubCommand,
           id: pubStepId,
           // Run this regardless of the success of other steps other than the
@@ -311,31 +467,33 @@ extension on CIJobEntry {
         ),
       );
       for (var i = 0; i < commands.length; i++) {
+        final command = job.tasks[i].command(job.isNewest);
+        if (command.isEmpty || command == 'true') continue;
         commandEntries.add(
           _CommandEntry(
-            '$package; ${job.tasks[i].command}',
-            _commandForOs(job.tasks[i].command),
+            '$stepNamePrefix$command',
+            _commandForOs(command),
             type: job.tasks[i].type,
-            // Run this regardless of the success of other steps other than the
-            // pub step.
-            ifCondition: "always() && steps.$pubStepId.conclusion == 'success'",
             workingDirectory: package,
           ),
         );
       }
     }
 
+    final useMatrix = sdks != null && sdks.length > 1;
+    final sdkVersion = useMatrix ? r'${{ matrix.sdk }}' : job.sdk;
+
     return _githubJob(
       jobName(
         packages,
         includeOs: oneOs,
-        includeSdk: oneSdk,
+        includeSdk: oneSdk || useMatrix,
         includePackage: onePackage,
         includeStage: true,
       ),
       _githubJobOs,
       job.flavor,
-      job.sdk,
+      sdkVersion,
       commandEntries,
       rootConfig,
       config: rootConfig.monoConfig,
@@ -343,6 +501,14 @@ extension on CIJobEntry {
         'packages': packages.join('-'),
         'commands': commands.join('-'),
       },
+      strategy: useMatrix
+          ? {
+              'fail-fast': false,
+              'matrix': {'sdk': sdks},
+            }
+          : null,
+      preSteps: packageConfig.preSteps,
+      postSteps: packageConfig.postSteps,
     );
   }
 
@@ -384,27 +550,42 @@ Job _githubJob(
   RootConfig rootConfig, {
   required BasicConfiguration config,
   Map<String, String>? additionalCacheKeys,
+  Map<String, dynamic>? strategy,
+  List<Map>? preSteps,
+  List<Map>? postSteps,
 }) => Job(
   name: jobName,
   runsOn: runsOn,
+  strategy: strategy,
   steps: [
-    if (!runsOn.startsWith('windows'))
-      _cacheEntries(
-        runsOn,
-        rootConfig: rootConfig,
-        additionalCacheKeys: {
-          'sdk': sdkVersion,
-          if (additionalCacheKeys != null) ...additionalCacheKeys,
-        },
-      ),
-    packageFlavor.setupStep(sdkVersion, rootConfig),
-    ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
     ActionInfo.checkout.usage(
       id: 'checkout',
       versionOverrides: rootConfig.existingActionVersions,
       withContent: {'persist-credentials': false},
     ),
-    for (var command in runCommands) ...command.runContent(config, rootConfig),
+    () {
+      final workingDir = runCommands
+          .whereType<_CommandEntry>()
+          .firstOrNull
+          ?.workingDirectory;
+      return Step.uses(
+        name: 'Setup ${packageFlavor.name} package',
+        uses: './.github/actions/setup-${packageFlavor.name}',
+        withContent: {
+          packageFlavor == PackageFlavor.flutter ? 'channel' : 'sdk':
+              sdkVersion,
+          if (workingDir != null && workingDir != '.')
+            'working-directory': workingDir,
+        },
+      );
+    }(),
+    ..._beforeSteps(runCommands.whereType<_CommandEntry>()),
+    if (preSteps != null) ...preSteps.map(Step.fromJson),
+    for (var command in runCommands.where(
+      (c) => c is! _CommandEntry || c.type != null,
+    ))
+      ...command.runContent(config, rootConfig),
+    if (postSteps != null) ...postSteps.map(Step.fromJson),
   ],
 );
 
@@ -456,52 +637,6 @@ class _CommandEntry extends _CommandEntryBase {
       ];
 }
 
-/// Creates a "step" for enabling caching for the containing job.
-///
-/// See https://github.com/marketplace/actions/cache
-///
-/// [runsOn] and [additionalCacheKeys] are used to create a unique key used to
-/// store and retrieve the cache.
-Step _cacheEntries(
-  String runsOn, {
-  required RootConfig rootConfig,
-  Map<String, String>? additionalCacheKeys,
-}) {
-  final cacheKeyParts = [
-    'os:$runsOn',
-    'pub-cache-hosted',
-    if (additionalCacheKeys != null) ...[
-      for (var entry in additionalCacheKeys.entries)
-        '${entry.key}:${entry.value}',
-    ],
-  ];
-
-  final restoreKeys = [
-    for (var i = cacheKeyParts.length; i > 0; i--)
-      _maxLength(cacheKeyParts.take(i).join(';')),
-  ];
-
-  // Just caching the `hosted` directory because caching git dependencies or
-  // activated packages can cause problems.
-  const pubCacheHosted = '~/.pub-cache/hosted';
-
-  return ActionInfo.cache.usage(
-    withContent: {
-      'path': pubCacheHosted,
-      'key': restoreKeys.first,
-      'restore-keys': restoreKeys.skip(1).join('\n'),
-    },
-    versionOverrides: rootConfig.existingActionVersions,
-  );
-}
-
-String _maxLength(String input) {
-  if (input.length <= 512) return input;
-  final hash = ['-!!too_long!!', input.length, input.hashCode].join('-');
-
-  return input.substring(0, 512 - hash.length) + hash;
-}
-
 Job _selfValidateJob(BasicConfiguration config, RootConfig rootConfig) =>
     _githubJob(
       selfValidateJobName,
@@ -534,22 +669,4 @@ class _MapEntryWithStage {
   final String stageName;
 
   _MapEntryWithStage(this.id, this.value, this.stageName);
-}
-
-extension on PackageFlavor {
-  Step setupStep(String sdkVersion, RootConfig rootConfig) {
-    switch (this) {
-      case PackageFlavor.dart:
-        return ActionInfo.setupDart.usage(
-          withContent: {'sdk': sdkVersion},
-          versionOverrides: rootConfig.existingActionVersions,
-        );
-
-      case PackageFlavor.flutter:
-        return ActionInfo.setupFlutter.usage(
-          withContent: {'channel': sdkVersion},
-          versionOverrides: rootConfig.existingActionVersions,
-        );
-    }
-  }
 }

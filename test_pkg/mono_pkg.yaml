@@ -1,12 +1,9 @@
 # See https://github.com/google/mono_repo.dart for details
-sdk:
-- dev
-
 stages:
 - smoke_test:
   - group:
     - format
-    - analyze: --fatal-infos .
+    - analyze
     sdk:
     - beta
     - dev

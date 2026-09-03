@@ -22,6 +22,7 @@ const _pubspecFileName = 'pubspec.yaml';
 PackageConfig? _packageConfigFromDir(
   String rootDirectory,
   String pkgRelativePath,
+  MonoConfig monoConfig,
 ) {
   final legacyConfigPath = p.join(
     rootDirectory,
@@ -40,19 +41,22 @@ PackageConfig? _packageConfigFromDir(
 
   final pkgConfigYaml = yamlMapOrNull(rootDirectory, pkgConfigRelativePath);
 
-  if (pkgConfigYaml == null) {
-    return null;
-  }
-
   final pubspecFile = File(
     p.join(rootDirectory, pkgRelativePath, _pubspecFileName),
   );
 
   if (!pubspecFile.existsSync()) {
-    throw UserException(
-      'A `$monoPkgFileName` file was found, but missing'
-      ' an expected `$_pubspecFileName` in `$pkgRelativePath`.',
-    );
+    if (pkgConfigYaml != null) {
+      throw UserException(
+        'A `$monoPkgFileName` file was found, but missing'
+        ' an expected `$_pubspecFileName` in `$pkgRelativePath`.',
+      );
+    }
+    return null;
+  }
+
+  if (pkgConfigYaml == null && monoConfig.defaults.isEmpty) {
+    return null;
   }
 
   final pubspec = Pubspec.parse(
@@ -60,7 +64,12 @@ PackageConfig? _packageConfigFromDir(
     sourceUrl: Uri.parse(pubspecFile.path),
   );
 
-  return PackageConfig.parse(pkgRelativePath, pubspec, pkgConfigYaml);
+  return PackageConfig.parse(
+    pkgRelativePath,
+    pubspec,
+    pkgConfigYaml ?? const {},
+    defaults: monoConfig.defaults,
+  );
 }
 
 class RootConfig extends ListBase<PackageConfig> {
@@ -74,15 +83,24 @@ class RootConfig extends ListBase<PackageConfig> {
 
     final configs = <PackageConfig>[];
 
+    final monoConfig = MonoConfig.fromRepo(rootDirectory: rootDirectory);
+
     void visitDirectory(Directory directory) {
       final dirs = directory.listSync().whereType<Directory>().toList()
         ..sort((a, b) => a.path.compareTo(b.path));
       for (var subdir in dirs) {
-        final relativeSubDirPath = p.relative(subdir.path, from: rootDirectory);
+        final relativeSubDirPath = p.posix.joinAll(
+          p.split(p.relative(subdir.path, from: rootDirectory)),
+        );
+
+        if (monoConfig.ignore.contains(relativeSubDirPath)) {
+          continue;
+        }
 
         final pkgConfig = _packageConfigFromDir(
           rootDirectory!,
           relativeSubDirPath,
+          monoConfig,
         );
         if (pkgConfig != null) {
           configs.add(pkgConfig);
@@ -92,6 +110,11 @@ class RootConfig extends ListBase<PackageConfig> {
           visitDirectory(subdir);
         }
       }
+    }
+
+    final rootPkgConfig = _packageConfigFromDir(rootDirectory, '.', monoConfig);
+    if (rootPkgConfig != null) {
+      configs.add(rootPkgConfig);
     }
 
     visitDirectory(Directory(rootDirectory));
@@ -123,7 +146,7 @@ class RootConfig extends ListBase<PackageConfig> {
 
     return RootConfig._(
       rootDirectory,
-      MonoConfig.fromRepo(rootDirectory: rootDirectory),
+      monoConfig,
       configs,
       existingActionVersions,
     );
@@ -155,7 +178,8 @@ class RootConfig extends ListBase<PackageConfig> {
   /// This returns a map of <action name> to <action version>.
   static Map<String, String> parseActionVersions(String yamlText) {
     // "dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d"
-    final usageRegex = RegExp(r'([\w\.-]+)\/([\w\.-]+)@([\w\.]+)');
+    // Does NOT match "./.github/workflows/publish.yaml"
+    final usageRegex = RegExp(r'^([\w\.-]+)\/([\w\.-]+)@([\w\.]+)$');
 
     final yaml = loadYaml(yamlText);
     final result = <String, String>{};

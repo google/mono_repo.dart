@@ -1,0 +1,247 @@
+# Created with package:mono_repo v7.0.0-wip
+name: "package:mono_repo"
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - ".github/workflows/mono_repo.yaml"
+      - "mono_repo/**"
+  pull_request:
+    paths:
+      - ".github/workflows/mono_repo.yaml"
+      - "mono_repo/**"
+  schedule:
+    - cron: "0 0 * * 0"
+defaults:
+  run:
+    shell: "bash"
+env:
+  PUB_ENVIRONMENT: "bot.github"
+permissions:
+  contents: "read"
+
+
+jobs:
+  job_001:
+    name: "smoke_test; linux; Dart 3.8.0; `dart analyze --fatal-infos`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "3.8.0"
+          working-directory: "mono_repo"
+      - run: "dart analyze --fatal-infos"
+        working-directory: "mono_repo"
+  job_002:
+    name: "smoke_test; linux; Dart dev; `cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "mono_repo"
+      - run: "cd ../ && dart mono_repo/bin/mono_repo.dart generate --validate"
+        working-directory: "mono_repo"
+  job_003:
+    name: "smoke_test; linux; Dart dev; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "mono_repo"
+      - run: "dart format --output=none --set-exit-if-changed ."
+        working-directory: "mono_repo"
+      - run: "dart analyze --fatal-infos"
+        working-directory: "mono_repo"
+  job_004:
+    name: "test; linux; Dart 3.8.0; `dart test -P presubmit --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "3.8.0"
+          working-directory: "mono_repo"
+      - run: "dart test -P presubmit --test-randomize-ordering-seed=random"
+        working-directory: "mono_repo"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+  job_005:
+    name: "test; linux; Dart dev; `dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "mono_repo"
+      - name: "Activate package:coverage"
+        run: "dart pub global activate coverage '>=1.5.0'"
+      - run: "dart pub global run coverage:test_with_coverage -- --test-randomize-ordering-seed=random"
+        working-directory: "mono_repo"
+      - name: "Upload coverage to Coveralls"
+        uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          path-to-lcov: "mono_repo/coverage/lcov.info"
+          flag-name: "coverage_00"
+          parallel: true
+      - name: "Upload coverage to codecov.io"
+        uses: "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354"
+        with:
+          files: "mono_repo/coverage/lcov.info"
+          fail_ci_if_error: false
+          name: "coverage_00"
+          token: "${{ secrets.CODECOV_TOKEN }}"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+  job_006:
+    name: "test; linux; Dart dev; `dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "mono_repo"
+      - name: "Activate package:coverage"
+        run: "dart pub global activate coverage '>=1.5.0'"
+      - run: "dart pub global run coverage:test_with_coverage -- -P presubmit --test-randomize-ordering-seed=random"
+        working-directory: "mono_repo"
+      - name: "Upload coverage to Coveralls"
+        uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          path-to-lcov: "mono_repo/coverage/lcov.info"
+          flag-name: "coverage_01"
+          parallel: true
+      - name: "Upload coverage to codecov.io"
+        uses: "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354"
+        with:
+          files: "mono_repo/coverage/lcov.info"
+          fail_ci_if_error: false
+          name: "coverage_01"
+          token: "${{ secrets.CODECOV_TOKEN }}"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+  job_007:
+    name: "test; linux; Dart dev; `dart test --test-randomize-ordering-seed=random`"
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "dev"
+          working-directory: "mono_repo"
+      - run: "dart test --test-randomize-ordering-seed=random"
+        working-directory: "mono_repo"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+  job_008:
+    name: "test; windows; `dart test -P presubmit --test-randomize-ordering-seed=random`"
+    runs-on: "windows-latest"
+    steps:
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
+        with:
+          persist-credentials: false
+      - name: "Setup dart package"
+        uses: "./.github/actions/setup-dart"
+        with:
+          sdk: "${{ matrix.sdk }}"
+          working-directory: "mono_repo"
+      - run: "dart test -P presubmit --test-randomize-ordering-seed=random"
+        working-directory: "mono_repo"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - "3.8.0"
+          - "dev"
+  job_009:
+    name: "Notify failure"
+    runs-on: "ubuntu-latest"
+    if: "(github.event_name == 'push' || github.event_name == 'schedule') && failure()"
+    steps:
+      - run: |
+          curl -H "Content-Type: application/json" -X POST -d \
+            "{'text':'Build failed! ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}'}" \
+            "${CHAT_WEBHOOK_URL}"
+        env:
+          CHAT_WEBHOOK_URL: "${{ secrets.CHAT_WEBHOOK_URL }}"
+    needs:
+      - "job_001"
+      - "job_002"
+      - "job_003"
+      - "job_004"
+      - "job_005"
+      - "job_006"
+      - "job_007"
+      - "job_008"
+  job_10:
+    name: "Mark Coveralls job finished"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Mark Coveralls job finished"
+        uses: "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          parallel-finished: true
+    needs:
+      - "job_005"
+      - "job_006"
+

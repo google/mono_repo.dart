@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 
 import '../../ci_shared.dart';
 import '../../ci_test_script.dart';
+
 import '../../root_config.dart';
 import '../../user_exception.dart';
 
@@ -29,7 +30,7 @@ class _GeneratedCIScript {
   _GeneratedCIScript._(this.ciScript);
 
   factory _GeneratedCIScript.generate(RootConfig rootConfig) {
-    final commandsToKeys = extractCommands(rootConfig);
+    final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
 
     final script = generateTestScript(
       commandsToKeys,
