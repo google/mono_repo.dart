@@ -4,6 +4,8 @@ coverage_service:
 - codecov
 
 github:
+  permissions:
+    contents: read
   # Setting just `cron` keeps the defaults for `push` and `pull_request`
   cron: '0 0 * * 0' # “At 00:00 (UTC) on Sunday.”
   # List of jobs configs that will depend on all other jobs (but not each other)

@@ -80,6 +80,22 @@ github:
   env:
     FOO: BAR
 
+  # Specify top-level permissions for the workflow (defaults to `read-all`)
+  permissions:
+    contents: read
+
+  # You can group stages into individual workflows
+  #
+  # Any stages that are omitted here are put in a default workflow
+  # named `dart.yml`.
+  workflows:
+    # The key here is the name of the file - .github/workflows/lint.yml
+    lint:
+      # This populates `name` in the workflow
+      name: Dart Lint CI
+      # These are the stages that are populated in the workflow file
+      stages:
+      - analyze
   # You can add custom github actions configurations to run after completion
   # of all other jobs here. This accepts normal github job config except that
   # the `needs` config is filled in for you, and you aren't allowed to pass it.

@@ -88,6 +88,25 @@ environment:
         );
       });
     }
+
+    test('custom permissions', () async {
+      final monoConfigContent = toYaml({
+        'github': {
+          'permissions': {'contents': 'read'},
+        },
+      });
+      await populateConfig(monoConfigContent);
+
+      testGenerateConfig(printMatcher: _subPkgStandardOutput());
+
+      final workflowFile = File(
+        p.join(d.sandbox, githubWorkflowFilePath('sub_pkg')),
+      );
+      expect(
+        workflowFile.readAsStringSync(),
+        contains('permissions:\n  contents: "read"'),
+      );
+    });
   });
 
   test('no package', () async {

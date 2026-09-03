@@ -16,6 +16,15 @@
 - **Legacy Removal**: Remove Travis-CI-era cross-package job merging algorithms.
 - **SDK Requirement**: Require Dart `sdk: ^3.8.0`.
 
+## 6.7.3
+
+- Fix SDK discovery when compiled via AOT (`dart install` / `dart compile exe`).
+- Fix multi-line string round-tripping in `toYaml()` by using strip chomping (`|-`).
+
+## 6.7.2
+
+- Support configuring `permissions` under `github` in `mono_repo.yaml`.
+
 ## 6.7.1
 
 - Fix version number output.
