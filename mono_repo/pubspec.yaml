@@ -2,7 +2,7 @@ name: mono_repo
 description: >-
   CLI tools to make it easier to manage a single source repository containing
   multiple Dart packages.
-version: 6.7.3
+version: 6.7.4-wip
 repository: https://github.com/google/mono_repo.dart
 
 topics:
@@ -25,6 +25,7 @@ dependencies:
   pub_semver: ^2.1.4
   pubspec_parse: ^1.4.0
   yaml: ^3.1.2
+  yaml_writer: ^2.1.0
 
 dev_dependencies:
   build_runner: ^2.5.0

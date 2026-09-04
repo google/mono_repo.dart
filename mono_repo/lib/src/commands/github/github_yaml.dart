@@ -210,10 +210,10 @@ Iterable<_MapEntryWithStage> _listJobs(
 
     final ciJob = job as CIJob;
 
-    final commandsToKeys = extractCommands(rootConfig);
+    final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
 
     final commands = ciJob.tasks
-        .map((task) => commandsToKeys[task.command]!)
+        .map((task) => commandsToKeys[task.command(ciJob.isNewest)]!)
         .toList();
 
     jobEntries.add(CIJobEntry(ciJob, commands));
@@ -311,10 +311,12 @@ extension on CIJobEntry {
         ),
       );
       for (var i = 0; i < commands.length; i++) {
+        final command = job.tasks[i].command(job.isNewest);
+        if (command.isEmpty || command == 'true') continue;
         commandEntries.add(
           _CommandEntry(
-            '$package; ${job.tasks[i].command}',
-            _commandForOs(job.tasks[i].command),
+            '$package; $command',
+            _commandForOs(command),
             type: job.tasks[i].type,
             // Run this regardless of the success of other steps other than the
             // pub step.

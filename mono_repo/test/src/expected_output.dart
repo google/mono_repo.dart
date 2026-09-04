@@ -41,8 +41,8 @@ for PKG in ${PKGS}; do
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
       analyze)
-        echo 'dart analyze'
-        dart analyze || EXIT_CODE=$?
+        echo 'dart analyze --fatal-infos'
+        dart analyze --fatal-infos || EXIT_CODE=$?
         ;;
       format)
         echo 'dart format --output=none --set-exit-if-changed .'
@@ -133,12 +133,12 @@ for PKG in ${PKGS}; do
       echo -e "\033[1mPKG: ${PKG}; TASK: ${TASK}\033[22m"
       case ${TASK} in
       analyze_0)
-        echo 'dart analyze'
-        dart analyze || EXIT_CODE=$?
+        echo 'dart analyze --fatal-infos'
+        dart analyze --fatal-infos || EXIT_CODE=$?
         ;;
       analyze_1)
-        echo 'flutter analyze'
-        flutter analyze || EXIT_CODE=$?
+        echo 'flutter analyze --fatal-infos'
+        flutter analyze --fatal-infos || EXIT_CODE=$?
         ;;
       format)
         echo 'dart format --output=none --set-exit-if-changed .'

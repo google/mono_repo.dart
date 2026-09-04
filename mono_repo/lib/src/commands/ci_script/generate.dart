@@ -29,7 +29,7 @@ class _GeneratedCIScript {
   _GeneratedCIScript._(this.ciScript);
 
   factory _GeneratedCIScript.generate(RootConfig rootConfig) {
-    final commandsToKeys = extractCommands(rootConfig);
+    final commandsToKeys = extractCommands(rootConfig.expand((c) => c.jobs));
 
     final script = generateTestScript(
       commandsToKeys,

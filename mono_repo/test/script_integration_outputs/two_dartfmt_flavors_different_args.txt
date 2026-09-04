@@ -1,112 +1,82 @@
 # Created with package:mono_repo v1.2.3
-name: Dart CI
+name: "Dart CI"
 on:
   push:
     branches:
-      - main
-      - master
-  pull_request:
+      - "main"
+      - "master"
+  pull_request: null
 defaults:
   run:
-    shell: bash
+    shell: "bash"
 env:
-  PUB_ENVIRONMENT: bot.github
-permissions: read-all
+  PUB_ENVIRONMENT: "bot.github"
+permissions: "read-all"
+
 
 jobs:
   job_001:
-    name: "format; Dart dev; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
-    runs-on: ubuntu-latest
+    name: "format; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_a;commands:format_0"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_a;commands:format_1"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_a
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
-      - id: pkg_a_pub_upgrade
-        name: pkg_a; dart pub upgrade
-        run: dart pub upgrade
+      - id: "pkg_a_pub_upgrade"
+        name: "pkg_a; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: pkg_a
+        working-directory: "pkg_a"
       - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
         run: "dart format --output=none --set-exit-if-changed ."
         if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
-        working-directory: pkg_a
+        working-directory: "pkg_a"
   job_002:
-    name: "format; Dart dev; PKG: pkg_b; `dart format --dry-run --fix --set-exit-if-changed .`"
-    runs-on: ubuntu-latest
+    name: "format; PKG: pkg_b; `dart format --dry-run --fix --set-exit-if-changed .`"
+    runs-on: "ubuntu-latest"
     steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
+      - name: "Cache Pub hosted dependencies"
+        uses: "actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7"
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_b;commands:format_1"
+          key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_b;commands:format_0"
           restore-keys: |-
             os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:pkg_b
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
+      - name: "Setup Dart SDK"
+        uses: "dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260"
         with:
-          sdk: dev
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+          sdk: "dev"
+      - id: "checkout"
+        name: "Checkout repository"
+        uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd"
         with:
           persist-credentials: false
-      - id: pkg_b_pub_upgrade
-        name: pkg_b; dart pub upgrade
-        run: dart pub upgrade
+      - id: "pkg_b_pub_upgrade"
+        name: "pkg_b; dart pub upgrade"
+        run: "dart pub upgrade"
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: pkg_b
+        working-directory: "pkg_b"
       - name: "pkg_b; dart format --dry-run --fix --set-exit-if-changed ."
-        run: dart format --dry-run --fix --set-exit-if-changed .
+        run: "dart format --dry-run --fix --set-exit-if-changed ."
         if: "always() && steps.pkg_b_pub_upgrade.conclusion == 'success'"
-        working-directory: pkg_b
-  job_003:
-    name: "format; Dart stable; PKG: pkg_a; `dart format --output=none --set-exit-if-changed .`"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cache Pub hosted dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7
-        with:
-          path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a;commands:format_0"
-          restore-keys: |-
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable;packages:pkg_a
-            os:ubuntu-latest;pub-cache-hosted;sdk:stable
-            os:ubuntu-latest;pub-cache-hosted
-            os:ubuntu-latest
-      - name: Setup Dart SDK
-        uses: dart-lang/setup-dart@65eb853c7ba17dde3be364c3d2858773e7144260
-        with:
-          sdk: stable
-      - id: checkout
-        name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-      - id: pkg_a_pub_upgrade
-        name: pkg_a; dart pub upgrade
-        run: dart pub upgrade
-        if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: pkg_a
-      - name: "pkg_a; dart format --output=none --set-exit-if-changed ."
-        run: "dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.pkg_a_pub_upgrade.conclusion == 'success'"
-        working-directory: pkg_a
+        working-directory: "pkg_b"
+

@@ -59,7 +59,7 @@ void main() {
       );
       expect(
         workflowFile.readAsStringSync(),
-        contains('permissions:\n  contents: read'),
+        contains('permissions:\n  contents: "read"'),
       );
     });
   });
@@ -557,12 +557,12 @@ ${_writeScriptOutput(false)}''',
           contains(r'''
       case ${TASK} in
       format_0)
-        echo 'dart format --output=none --set-exit-if-changed .'
-        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
-        ;;
-      format_1)
         echo 'dart format --dry-run --fix --set-exit-if-changed .'
         dart format --dry-run --fix --set-exit-if-changed . || EXIT_CODE=$?
+        ;;
+      format_1)
+        echo 'dart format --output=none --set-exit-if-changed .'
+        dart format --output=none --set-exit-if-changed . || EXIT_CODE=$?
         ;;
       *)
         echo -e "\033[31mUnknown TASK '${TASK}' - TERMINATING JOB\033[0m"
@@ -973,8 +973,8 @@ line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value m
           r'''
 line 1, column 13 of mono_repo.yaml: Unsupported value for "pub_action". Value must be one of: `get`, `upgrade`.
   ╷
-1 │ pub_action: bob
-  │             ^^^
+1 │ pub_action: "bob"
+  │             ^^^^^
   ╵''',
         ),
       );
@@ -1076,8 +1076,8 @@ for PKG in ${PKGS}; do
       echo -e "PKG: ${PKG}; TASK: ${TASK}"
       case ${TASK} in
       analyze)
-        echo 'dart analyze'
-        dart analyze || EXIT_CODE=$?
+        echo 'dart analyze --fatal-infos'
+        dart analyze --fatal-infos || EXIT_CODE=$?
         ;;
       format)
         echo 'dart format --output=none --set-exit-if-changed .'
@@ -1185,8 +1185,8 @@ github:
 ''',
         expectedGithubContent: contains('''
 env:
-  PUB_ENVIRONMENT: bot.github
-  FOO: BAR
+  PUB_ENVIRONMENT: "bot.github"
+  FOO: "BAR"
 '''),
       );
     });

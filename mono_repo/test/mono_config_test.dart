@@ -403,6 +403,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'format'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'description': 'dartanalyzer && dartfmt',
@@ -419,6 +420,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'format'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'osx',
@@ -433,6 +435,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -443,6 +446,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -453,6 +457,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -463,6 +468,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test', 'args': '--platform chrome'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -477,6 +483,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -491,6 +498,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -505,6 +513,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -519,6 +528,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -533,6 +543,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -547,6 +558,7 @@ List get _testConfig1expectedOutput => [
       },
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
   {
     'os': 'linux',
@@ -557,6 +569,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -567,6 +580,7 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': false,
   },
   {
     'os': 'linux',
@@ -577,5 +591,6 @@ List get _testConfig1expectedOutput => [
       {'flavor': 'dart', 'type': 'test'},
     ],
     'flavor': 'dart',
+    'isNewest': true,
   },
 ];
