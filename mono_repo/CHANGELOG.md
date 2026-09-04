@@ -1,6 +1,9 @@
 ## 6.7.4-wip
 
 - Modernize YAML serialization with `package:yaml_writer`.
+- Sort SDK versions chronologically (`pubspec` < SemVer < `stable` < `beta` < `dev` < `main`/`master`).
+- Apply `format` and `--fatal-infos` only on the newest SDK in a job.
+- Omit redundant GitHub Actions step names when the name matches the run command.
 
 ## 6.7.3
 
