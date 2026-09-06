@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:json_annotation/json_annotation.dart';
+import 'package:mono_repo/src/mono_config.dart';
 import 'package:mono_repo/src/package_config.dart';
 import 'package:mono_repo/src/yaml.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
@@ -305,7 +307,7 @@ line 7, column 9: Unsupported value for "a". Stages are required to have at leas
         'more': null,
       };
       _expectParseThrows(monoYaml, r'''
-line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, sdk, stages, cache]
+line 2, column 2: Unrecognized keys: [extra, more]; supported keys: [os, sdk, stages, cache, pre_steps, post_steps]
   ╷
 2 │  "extra": "foo",
   │  ^^^^^^^
@@ -352,6 +354,28 @@ line 2, column 9: Unsupported value for "sdk". The value "latest" is neither a v
 4 │ │  ],
   │ └──^
   ╵''');
+    });
+
+    group('defaults and ignore', () {
+      test('valid map defaults and string list ignore', () {
+        final config = MonoConfig.fromJson({
+          'defaults': {
+            'sdk': ['dev'],
+          },
+          'ignore': ['sub_pkg_a'],
+        });
+        expect(config.defaults, {
+          'sdk': ['dev'],
+        });
+        expect(config.ignore, contains('sub_pkg_a'));
+      });
+
+      test('invalid defaults type throws', () {
+        expect(
+          () => MonoConfig.fromJson({'defaults': 'not_map'}),
+          throwsA(isA<CheckedFromJsonException>()),
+        );
+      });
     });
   });
 }

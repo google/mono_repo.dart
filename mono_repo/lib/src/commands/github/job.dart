@@ -20,8 +20,9 @@ class Job implements YamlLike {
   @JsonKey(required: true)
   final List<Step> steps;
   List<String>? needs;
+  final Map<String, dynamic>? strategy;
 
-  Job({this.name, this.runsOn, required this.steps});
+  Job({this.name, this.runsOn, required this.steps, this.strategy});
 
   factory Job.fromJson(Map json) => _$JobFromJson(json);
 

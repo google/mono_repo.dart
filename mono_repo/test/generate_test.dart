@@ -820,7 +820,7 @@ $lines
           'other': {'stages': 5},
         },
         r'''
-line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service` keys are supported.
+line 2, column 3 of mono_repo.yaml: Unsupported value for "other". Only `github`, `merge_stages`, `pretty_ansi`, `pub_action`, `self_validate`, `coverage_service`, `defaults`, `ignore` keys are supported.
   ╷
 2 │   stages: 5
   │   ^^^^^^^^^
@@ -1392,6 +1392,40 @@ github:
 '''),
       ]).validate();
     });
+  });
+
+  test('pre_steps and post_steps render in workflow job', () async {
+    await d.dir('pkg_hooks', [
+      d.file('mono_pkg.yaml', '''
+sdk:
+  - dev
+pre_steps:
+  - run: echo "pre_step"
+post_steps:
+  - run: echo "post_step"
+stages:
+  - analyze:
+    - analyze
+'''),
+      d.file('pubspec.yaml', '''
+name: pkg_hooks
+environment:
+  sdk: '^3.0.0'
+'''),
+    ]).create();
+
+    await d.file('mono_repo.yaml', toYaml({})).create();
+
+    testGenerateConfig(
+      printMatcher: stringContainsInOrder(['package:pkg_hooks', 'Wrote ']),
+    );
+
+    await d
+        .file(defaultGitHubWorkflowFilePath, contains('pre_step'))
+        .validate();
+    await d
+        .file(defaultGitHubWorkflowFilePath, contains('post_step'))
+        .validate();
   });
 }
 
