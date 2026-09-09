@@ -20,7 +20,6 @@ GitHubConfig _$GitHubConfigFromJson(Map json) => $checkedCreate(
         'on_completion',
         'dependabot',
         'permissions',
-        'filter_paths',
         'cron',
         'stages',
         'workflows',
@@ -53,14 +52,10 @@ GitHubConfig _$GitHubConfigFromJson(Map json) => $checkedCreate(
         (v) => (v as Map?)?.map((k, e) => MapEntry(k as String, e)),
       ),
       $checkedConvert('permissions', (v) => v),
-      $checkedConvert('filter_paths', (v) => v as bool? ?? false),
     );
     return val;
   },
-  fieldKeyMap: const {
-    'onCompletion': 'on_completion',
-    'filterPaths': 'filter_paths',
-  },
+  fieldKeyMap: const {'onCompletion': 'on_completion'},
 );
 
 GitHubWorkflow _$GitHubWorkflowFromJson(Map json) =>

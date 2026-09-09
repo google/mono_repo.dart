@@ -21,7 +21,7 @@ void main() {
         'github': {'not_supported': 5},
       },
       r'''
-line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, dependabot, permissions, filter_paths, cron, stages, workflows]
+line 2, column 3 of mono_repo.yaml: Unrecognized keys: [not_supported]; supported keys: [env, on, on_completion, dependabot, permissions, cron, stages, workflows]
   ╷
 2 │   not_supported: 5
   │   ^^^^^^^^^^^^^
@@ -59,35 +59,6 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
     ),
   );
 
-  test(
-    'no filter_paths with on',
-    () => _testBadConfigWithYamlException(
-      {
-        'github': {'filter_paths': true, 'on': {}},
-      },
-      r'''
-line 2, column 17 of mono_repo.yaml: Unsupported value for "filter_paths". Cannot set `filter_paths` if `on` has a value.
-  ╷
-2 │   filter_paths: true
-  │                 ^^^^
-  ╵''',
-    ),
-  );
-
-  test(
-    'filter_paths must be a bool',
-    () => _testBadConfigWithYamlException(
-      {
-        'github': {'filter_paths': 5},
-      },
-      r'''
-line 2, column 17 of mono_repo.yaml: Unsupported value for "filter_paths". type 'int' is not a subtype of type 'bool?' in type cast
-  ╷
-2 │   filter_paths: 5
-  │                 ^
-  ╵''',
-    ),
-  );
 
   test(
     'env must be a map',

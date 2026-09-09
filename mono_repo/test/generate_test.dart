@@ -1191,11 +1191,10 @@ env:
       );
     });
 
-    test('filter_paths: true', () async {
+    test('default paths', () async {
       await validConfig(
         r'''
 github:
-  filter_paths: true
 ''',
         expectedGithubContent: contains('''
 on:
@@ -1220,11 +1219,10 @@ on:
       );
     });
 
-    test('filter_paths with cron', () async {
+    test('cron with default paths', () async {
       await validConfig(
         r'''
 github:
-  filter_paths: true
   cron: "0 0 * * 0"
 ''',
         expectedGithubContent: contains('''

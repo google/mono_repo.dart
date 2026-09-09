@@ -29,11 +29,7 @@ class GitHubConfig {
 
   final Object? permissions;
 
-  @JsonKey(name: 'filter_paths')
-  final bool filterPaths;
-
-  // TODO: needed until google/json_serializable.dart#747 is fixed
-  String get cron => throw UnimplementedError();
+  final String? cron;
 
   // Either Strings or Maps are supported here.
   final List<dynamic>? stages;
@@ -42,20 +38,19 @@ class GitHubConfig {
 
   GitHubConfig(
     this.env,
-    Map<String, dynamic>? on,
+    this.on,
     this.onCompletion,
-    String? cron,
+    this.cron,
     this.stages,
     this.workflows,
     this.dependabot, [
     this.permissions,
-    this.filterPaths = false,
-  ]) : on = _parseOn(on, cron) {
-    if (filterPaths && on != null) {
+  ]) {
+    if (cron != null && on != null) {
       throw ArgumentError.value(
-        filterPaths,
-        'filter_paths',
-        'Cannot set `filter_paths` if `on` has a value.',
+        cron,
+        'cron',
+        'Cannot set `cron` if `on` has a value.',
       );
     }
     if (workflows != null) {
@@ -133,31 +128,21 @@ class GitHubConfig {
     String workflowName, {
     RootConfig? rootConfig,
     String? fileName,
-  }) {
-    final effectiveOn = _effectiveOn(
-      rootConfig: rootConfig,
-      fileName: fileName,
-    );
-    return {
-      'name': workflowName,
-      if (effectiveOn != null) 'on': effectiveOn,
-      'defaults': {
-        'run': {'shell': 'bash'},
-      },
-      'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
-      // Declare default permissions as read only.
-      'permissions': permissions ?? 'read-all',
-    };
-  }
+  }) => {
+    'name': workflowName,
+    'on': on ?? _defaultOn(rootConfig: rootConfig, fileName: fileName),
+    'defaults': {
+      'run': {'shell': 'bash'},
+    },
+    'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
+    // Declare default permissions as read only.
+    'permissions': permissions ?? 'read-all',
+  };
 
-  Map<String, dynamic>? _effectiveOn({
+  Map<String, dynamic> _defaultOn({
     RootConfig? rootConfig,
     String? fileName,
   }) {
-    if (!filterPaths) {
-      return on;
-    }
-
     final workflowPath = fileName != null
         ? githubWorkflowFilePath(fileName)
         : defaultGitHubWorkflowFilePath;
@@ -184,7 +169,9 @@ class GitHubConfig {
     if (rootConfig != null) {
       for (var pkg in rootConfig) {
         final normalized = p.posix.joinAll(p.split(pkg.relativePath));
-        paths.add('$normalized/**');
+        paths.add(
+          normalized.isEmpty || normalized == '.' ? '**' : '$normalized/**',
+        );
       }
     }
 
@@ -192,28 +179,19 @@ class GitHubConfig {
 
     final pathList = paths.toList();
 
-    final pushConfig = on?['push'] as Map<String, dynamic>? ??
-        _defaultOn['push'] as Map<String, dynamic>;
-
-    final result = <String, dynamic>{
+    return {
       'push': {
-        ...pushConfig,
+        'branches': ['main', 'master'],
         'paths': pathList,
       },
       'pull_request': {
         'paths': pathList,
       },
+      if (cron != null)
+        'schedule': [
+          {'cron': cron},
+        ],
     };
-
-    if (on != null) {
-      for (var entry in on!.entries) {
-        if (entry.key != 'push' && entry.key != 'pull_request') {
-          result[entry.key] = entry.value;
-        }
-      }
-    }
-
-    return result;
   }
 }
 
@@ -239,36 +217,3 @@ class GitHubWorkflow {
 
   factory GitHubWorkflow.fromJson(Map json) => _$GitHubWorkflowFromJson(json);
 }
-
-Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
-  if (on == null) {
-    if (cron == null) {
-      return _defaultOn;
-    } else {
-      return {
-        ..._defaultOn,
-        'schedule': [
-          {'cron': cron},
-        ],
-      };
-    }
-  }
-
-  if (cron != null) {
-    throw ArgumentError.value(
-      cron,
-      'cron',
-      'Cannot set `cron` if `on` has a value.',
-    );
-  }
-
-  return on;
-}
-
-const _defaultOn = {
-  'push': {
-    'branches': ['main', 'master'],
-  },
-  // A `null` value here means all pull requests are processed by this workflow.
-  'pull_request': null,
-};
