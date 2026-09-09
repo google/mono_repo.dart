@@ -2,9 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:json_annotation/json_annotation.dart';
+import 'dart:io';
 
+import 'package:json_annotation/json_annotation.dart';
+import 'package:path/path.dart' as p;
+
+import 'commands/github/github_yaml.dart';
 import 'commands/github/job.dart';
+import 'root_config.dart';
 
 part 'github_config.g.dart';
 
@@ -24,6 +29,9 @@ class GitHubConfig {
 
   final Object? permissions;
 
+  @JsonKey(name: 'filter_paths')
+  final Object? filterPaths;
+
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
 
@@ -41,7 +49,26 @@ class GitHubConfig {
     this.workflows,
     this.dependabot, [
     this.permissions,
+    this.filterPaths,
   ]) : on = _parseOn(on, cron) {
+    if (filterPaths != null) {
+      if (filterPaths is! bool &&
+          !(filterPaths is List &&
+              (filterPaths as List).every((e) => e is String))) {
+        throw ArgumentError.value(
+          filterPaths,
+          'filter_paths',
+          'Value must be a boolean or an array of strings.',
+        );
+      }
+      if (on != null) {
+        throw ArgumentError.value(
+          filterPaths,
+          'filter_paths',
+          'Cannot set `filter_paths` if `on` has a value.',
+        );
+      }
+    }
     if (workflows != null) {
       _noDefaultFileName();
       _noDuplicateWorkflowNames();
@@ -113,16 +140,98 @@ class GitHubConfig {
 
   factory GitHubConfig.fromJson(Map json) => _$GitHubConfigFromJson(json);
 
-  Map<String, dynamic> generate(String workflowName) => {
-    'name': workflowName,
-    if (on != null) 'on': on,
-    'defaults': {
-      'run': {'shell': 'bash'},
-    },
-    'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
-    // Declare default permissions as read only.
-    'permissions': permissions ?? 'read-all',
-  };
+  Map<String, dynamic> generate(
+    String workflowName, {
+    RootConfig? rootConfig,
+    String? fileName,
+  }) {
+    final effectiveOn = _effectiveOn(
+      rootConfig: rootConfig,
+      fileName: fileName,
+    );
+    return {
+      'name': workflowName,
+      if (effectiveOn != null) 'on': effectiveOn,
+      'defaults': {
+        'run': {'shell': 'bash'},
+      },
+      'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
+      // Declare default permissions as read only.
+      'permissions': permissions ?? 'read-all',
+    };
+  }
+
+  Map<String, dynamic>? _effectiveOn({
+    RootConfig? rootConfig,
+    String? fileName,
+  }) {
+    if (filterPaths == null || filterPaths == false) {
+      return on;
+    }
+
+    final workflowPath = fileName != null
+        ? githubWorkflowFilePath(fileName)
+        : defaultGitHubWorkflowFilePath;
+    final paths = <String>{
+      workflowPath,
+      'mono_repo.yaml',
+    };
+
+    if (rootConfig != null) {
+      for (var file in const [
+        'analysis_options.yaml',
+        'build.yaml',
+        'pubspec.lock',
+        'pubspec.yaml',
+      ]) {
+        if (File(p.join(rootConfig.rootDirectory, file)).existsSync()) {
+          paths.add(file);
+        }
+      }
+    }
+
+    paths.add('**/mono_pkg.yaml');
+
+    if (rootConfig != null) {
+      for (var pkg in rootConfig) {
+        final normalized = p.posix.joinAll(p.split(pkg.relativePath));
+        paths.add('$normalized/**');
+      }
+    }
+
+    paths.add('!**/*.md');
+
+    if (filterPaths is List) {
+      for (var extraPath in filterPaths as List) {
+        paths.add(extraPath as String);
+      }
+    }
+
+    final pathList = paths.toList();
+
+    final pushConfig = on?['push'] as Map<String, dynamic>? ??
+        _defaultOn['push'] as Map<String, dynamic>;
+
+    final result = <String, dynamic>{
+      'push': {
+        ...pushConfig,
+        'paths': pathList,
+      },
+      'pull_request': {
+        'paths': pathList,
+      },
+    };
+
+    if (on != null) {
+      for (var entry in on!.entries) {
+        if (entry.key != 'push' && entry.key != 'pull_request') {
+          result[entry.key] = entry.value;
+        }
+      }
+    }
+
+    return result;
+  }
 }
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)

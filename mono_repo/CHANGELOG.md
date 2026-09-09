@@ -1,3 +1,10 @@
+## 6.8.0
+
+- Support `filter_paths` under `github` in `mono_repo.yaml` to restrict workflow
+  triggers (`paths`) to packages with a `mono_pkg.yaml`, relevant root files, and
+  ignore `.md` files.
+- Sort SDKs chronologically (`pubspec` < SemVer < `stable` < `beta` < `dev` < `main`/`master`).
+
 ## 6.7.3
 
 - Fix SDK discovery when compiled via AOT (`dart install` / `dart compile exe`).
