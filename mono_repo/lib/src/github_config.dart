@@ -30,7 +30,7 @@ class GitHubConfig {
   final Object? permissions;
 
   @JsonKey(name: 'filter_paths')
-  final Object? filterPaths;
+  final bool filterPaths;
 
   // TODO: needed until google/json_serializable.dart#747 is fixed
   String get cron => throw UnimplementedError();
@@ -49,25 +49,14 @@ class GitHubConfig {
     this.workflows,
     this.dependabot, [
     this.permissions,
-    this.filterPaths,
+    this.filterPaths = false,
   ]) : on = _parseOn(on, cron) {
-    if (filterPaths != null) {
-      if (filterPaths is! bool &&
-          !(filterPaths is List &&
-              (filterPaths as List).every((e) => e is String))) {
-        throw ArgumentError.value(
-          filterPaths,
-          'filter_paths',
-          'Value must be a boolean or an array of strings.',
-        );
-      }
-      if (on != null) {
-        throw ArgumentError.value(
-          filterPaths,
-          'filter_paths',
-          'Cannot set `filter_paths` if `on` has a value.',
-        );
-      }
+    if (filterPaths && on != null) {
+      throw ArgumentError.value(
+        filterPaths,
+        'filter_paths',
+        'Cannot set `filter_paths` if `on` has a value.',
+      );
     }
     if (workflows != null) {
       _noDefaultFileName();
@@ -165,7 +154,7 @@ class GitHubConfig {
     RootConfig? rootConfig,
     String? fileName,
   }) {
-    if (filterPaths == null || filterPaths == false) {
+    if (!filterPaths) {
       return on;
     }
 
@@ -200,12 +189,6 @@ class GitHubConfig {
     }
 
     paths.add('!**/*.md');
-
-    if (filterPaths is List) {
-      for (var extraPath in filterPaths as List) {
-        paths.add(extraPath as String);
-      }
-    }
 
     final pathList = paths.toList();
 

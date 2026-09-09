@@ -1220,12 +1220,11 @@ on:
       );
     });
 
-    test('filter_paths with list of extra paths and cron', () async {
+    test('filter_paths with cron', () async {
       await validConfig(
         r'''
 github:
-  filter_paths:
-    - "tool/**"
+  filter_paths: true
   cron: "0 0 * * 0"
 ''',
         expectedGithubContent: contains('''
@@ -1240,7 +1239,6 @@ on:
       - "**/mono_pkg.yaml"
       - "sub_pkg/**"
       - "!**/*.md"
-      - "tool/**"
   pull_request:
     paths:
       - .github/workflows/dart.yml
@@ -1248,7 +1246,6 @@ on:
       - "**/mono_pkg.yaml"
       - "sub_pkg/**"
       - "!**/*.md"
-      - "tool/**"
   schedule:
     - cron: "0 0 * * 0"
 '''),

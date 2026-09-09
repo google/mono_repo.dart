@@ -53,7 +53,7 @@ GitHubConfig _$GitHubConfigFromJson(Map json) => $checkedCreate(
         (v) => (v as Map?)?.map((k, e) => MapEntry(k as String, e)),
       ),
       $checkedConvert('permissions', (v) => v),
-      $checkedConvert('filter_paths', (v) => v),
+      $checkedConvert('filter_paths', (v) => v as bool? ?? false),
     );
     return val;
   },

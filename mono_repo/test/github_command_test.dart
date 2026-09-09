@@ -75,33 +75,16 @@ line 2, column 17 of mono_repo.yaml: Unsupported value for "filter_paths". Canno
   );
 
   test(
-    'filter_paths must be a bool or list of strings',
+    'filter_paths must be a bool',
     () => _testBadConfigWithYamlException(
       {
         'github': {'filter_paths': 5},
       },
       r'''
-line 2, column 17 of mono_repo.yaml: Unsupported value for "filter_paths". Value must be a boolean or an array of strings.
+line 2, column 17 of mono_repo.yaml: Unsupported value for "filter_paths". type 'int' is not a subtype of type 'bool?' in type cast
   ╷
 2 │   filter_paths: 5
   │                 ^
-  ╵''',
-    ),
-  );
-
-  test(
-    'filter_paths list elements must be strings',
-    () => _testBadConfigWithYamlException(
-      {
-        'github': {
-          'filter_paths': [5],
-        },
-      },
-      r'''
-line 3, column 5 of mono_repo.yaml: Unsupported value for "filter_paths". Value must be a boolean or an array of strings.
-  ╷
-3 │     - 5
-  │     ^^^
   ╵''',
     ),
   );
