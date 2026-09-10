@@ -9,7 +9,7 @@ part of 'package_config.dart';
 // **************************************************************************
 
 Map<String, dynamic> _$CIJobToJson(CIJob instance) => <String, dynamic>{
-  if (instance.description case final value?) 'description': value,
+  'description': ?instance.description,
   'os': instance.os,
   'package': instance.package,
   'sdk': instance.sdk,
@@ -26,5 +26,5 @@ const _$PackageFlavorEnumMap = {
 Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
   'flavor': _$PackageFlavorEnumMap[instance.flavor]!,
   'type': instance.type,
-  if (instance.args case final value?) 'args': value,
+  'args': ?instance.args,
 };
