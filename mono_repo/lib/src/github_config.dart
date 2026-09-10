@@ -124,8 +124,7 @@ class GitHubConfig {
     String? fileName,
   }) => {
     'name': workflowName,
-    if (on != null)
-      'on': _effectiveOn(rootConfig: rootConfig, fileName: fileName),
+    'on': ?_effectiveOn(rootConfig: rootConfig, fileName: fileName),
     'defaults': {
       'run': {'shell': 'bash'},
     },
@@ -138,66 +137,46 @@ class GitHubConfig {
     RootConfig? rootConfig,
     String? fileName,
   }) {
-    if (on == null) return null;
+    if (on case final on?) {
+      final paths = <String>{
+        if (fileName != null)
+          githubWorkflowFilePath(fileName)
+        else
+          defaultGitHubWorkflowFilePath,
+        'mono_repo.yaml',
+        if (rootConfig != null)
+          for (var file in const [
+            'analysis_options.yaml',
+            'build.yaml',
+            'pubspec.lock',
+            'pubspec.yaml',
+          ])
+            if (File(p.join(rootConfig.rootDirectory, file)).existsSync()) file,
 
-    final workflowPath = fileName != null
-        ? githubWorkflowFilePath(fileName)
-        : defaultGitHubWorkflowFilePath;
-    final paths = <String>{
-      workflowPath,
-      'mono_repo.yaml',
-    };
+        '**/mono_pkg.yaml',
+        if (rootConfig != null)
+          for (var pkg in rootConfig)
+            if (p.posix.joinAll(p.split(pkg.relativePath)) case final normalized
+                when normalized.isNotEmpty && normalized != '.')
+              '$normalized/**'
+            else
+              '**',
 
-    if (rootConfig != null) {
-      for (var file in const [
-        'analysis_options.yaml',
-        'build.yaml',
-        'pubspec.lock',
-        'pubspec.yaml',
-      ]) {
-        if (File(p.join(rootConfig.rootDirectory, file)).existsSync()) {
-          paths.add(file);
-        }
-      }
+        '!**/*.md',
+      }.toList();
+
+      final pushConfig = on['push'] as Map<String, dynamic>? ?? _defaultOnPush;
+
+      return {
+        'push': {...pushConfig, 'paths': paths},
+        'pull_request': {'paths': paths},
+        if (on case final on)
+          for (var entry in on.entries)
+            if (entry.key != 'push' && entry.key != 'pull_request')
+              entry.key: entry.value,
+      };
     }
-
-    paths.add('**/mono_pkg.yaml');
-
-    if (rootConfig != null) {
-      for (var pkg in rootConfig) {
-        final normalized = p.posix.joinAll(p.split(pkg.relativePath));
-        paths.add(
-          normalized.isEmpty || normalized == '.' ? '**' : '$normalized/**',
-        );
-      }
-    }
-
-    paths.add('!**/*.md');
-
-    final pathList = paths.toList();
-
-    final pushConfig = on?['push'] as Map<String, dynamic>? ??
-        _defaultOn['push'] as Map<String, dynamic>;
-
-    final result = <String, dynamic>{
-      'push': {
-        ...pushConfig,
-        'paths': pathList,
-      },
-      'pull_request': {
-        'paths': pathList,
-      },
-    };
-
-    if (on != null) {
-      for (var entry in on!.entries) {
-        if (entry.key != 'push' && entry.key != 'pull_request') {
-          result[entry.key] = entry.value;
-        }
-      }
-    }
-
-    return result;
+    return null;
   }
 }
 
@@ -250,9 +229,11 @@ Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
 }
 
 const _defaultOn = {
-  'push': {
-    'branches': ['main', 'master'],
-  },
+  'push': _defaultOnPush,
   // A `null` value here means all pull requests are processed by this workflow.
   'pull_request': null,
+};
+
+const _defaultOnPush = {
+  'branches': ['main', 'master'],
 };
