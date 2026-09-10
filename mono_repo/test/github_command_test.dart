@@ -59,7 +59,6 @@ line 2, column 9 of mono_repo.yaml: Unsupported value for "cron". Cannot set `cr
     ),
   );
 
-
   test(
     'env must be a map',
     () => _testBadConfigWithYamlException(
