@@ -5,7 +5,21 @@ on:
     branches:
       - main
       - master
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "pkg_a/**"
+      - "pkg_b/**"
+      - "!**/*.md"
   pull_request:
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "pkg_a/**"
+      - "pkg_b/**"
+      - "!**/*.md"
 defaults:
   run:
     shell: bash

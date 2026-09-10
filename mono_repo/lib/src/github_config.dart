@@ -2,9 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:json_annotation/json_annotation.dart';
+import 'dart:io';
 
+import 'package:json_annotation/json_annotation.dart';
+import 'package:path/path.dart' as p;
+
+import 'commands/github/github_yaml.dart';
 import 'commands/github/job.dart';
+import 'root_config.dart';
 
 part 'github_config.g.dart';
 
@@ -113,9 +118,13 @@ class GitHubConfig {
 
   factory GitHubConfig.fromJson(Map json) => _$GitHubConfigFromJson(json);
 
-  Map<String, dynamic> generate(String workflowName) => {
+  Map<String, dynamic> generate(
+    String workflowName, {
+    RootConfig? rootConfig,
+    String? fileName,
+  }) => {
     'name': workflowName,
-    if (on != null) 'on': on,
+    'on': ?_effectiveOn(rootConfig: rootConfig, fileName: fileName),
     'defaults': {
       'run': {'shell': 'bash'},
     },
@@ -123,6 +132,67 @@ class GitHubConfig {
     // Declare default permissions as read only.
     'permissions': permissions ?? 'read-all',
   };
+
+  /// The `on:` trigger map for the workflow, augmenting `push` and
+  /// `pull_request` events with path filters so CI is only triggered by
+  /// changes affecting the monorepo packages or configuration.
+  ///
+  /// Path filters include:
+  /// - The workflow file itself.
+  /// - `mono_repo.yaml`.
+  /// - Known root configuration files (`analysis_options.yaml`, `build.yaml`,
+  ///   `pubspec.lock`, `pubspec.yaml`), if they exist.
+  /// - Any `mono_pkg.yaml` file across the repo (`**/mono_pkg.yaml`).
+  /// - All package directories configured in [rootConfig].
+  /// - Negative glob for markdown files (`!**/*.md`).
+  ///
+  /// Any other trigger events defined in [on] (such as `schedule`) are
+  /// preserved.
+  Map<String, dynamic>? _effectiveOn({
+    RootConfig? rootConfig,
+    String? fileName,
+  }) {
+    if (on case final on?) {
+      final paths = <String>{
+        if (fileName != null)
+          githubWorkflowFilePath(fileName)
+        else
+          defaultGitHubWorkflowFilePath,
+        'mono_repo.yaml',
+        if (rootConfig != null)
+          for (var file in const [
+            'analysis_options.yaml',
+            'build.yaml',
+            'pubspec.lock',
+            'pubspec.yaml',
+          ])
+            if (File(p.join(rootConfig.rootDirectory, file)).existsSync()) file,
+
+        '**/mono_pkg.yaml',
+        if (rootConfig != null)
+          for (var pkg in rootConfig)
+            if (p.posix.joinAll(p.split(pkg.relativePath)) case final normalized
+                when normalized.isNotEmpty && normalized != '.')
+              '$normalized/**'
+            else
+              '**',
+
+        '!**/*.md',
+      }.toList();
+
+      final pushConfig = on['push'] as Map<String, dynamic>? ?? _defaultOnPush;
+
+      return {
+        'push': {...pushConfig, 'paths': paths},
+        'pull_request': {'paths': paths},
+        if (on case final on)
+          for (var entry in on.entries)
+            if (entry.key != 'push' && entry.key != 'pull_request')
+              entry.key: entry.value,
+      };
+    }
+    return null;
+  }
 }
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
@@ -174,9 +244,11 @@ Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
 }
 
 const _defaultOn = {
-  'push': {
-    'branches': ['main', 'master'],
-  },
+  'push': _defaultOnPush,
   // A `null` value here means all pull requests are processed by this workflow.
   'pull_request': null,
+};
+
+const _defaultOnPush = {
+  'branches': ['main', 'master'],
 };

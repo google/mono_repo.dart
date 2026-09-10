@@ -1,11 +1,31 @@
-# Created with package:mono_repo v6.7.3
+# Created with package:mono_repo v6.8.0
 name: Dart CI
 on:
   push:
     branches:
       - main
       - master
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - analysis_options.yaml
+      - "**/mono_pkg.yaml"
+      - "mono_repo/**"
+      - "test_flutter_pkg/**"
+      - "test_flutter_pkg/example/**"
+      - "test_pkg/**"
+      - "!**/*.md"
   pull_request:
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - analysis_options.yaml
+      - "**/mono_pkg.yaml"
+      - "mono_repo/**"
+      - "test_flutter_pkg/**"
+      - "test_flutter_pkg/example/**"
+      - "test_pkg/**"
+      - "!**/*.md"
   schedule:
     - cron: "0 0 * * 0"
 defaults:

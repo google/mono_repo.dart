@@ -1190,6 +1190,65 @@ env:
 '''),
       );
     });
+
+    test('default paths', () async {
+      await validConfig(
+        r'''
+github:
+''',
+        expectedGithubContent: contains('''
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
+  pull_request:
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
+'''),
+      );
+    });
+
+    test('cron with default paths', () async {
+      await validConfig(
+        r'''
+github:
+  cron: "0 0 * * 0"
+''',
+        expectedGithubContent: contains('''
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
+  pull_request:
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
+  schedule:
+    - cron: "0 0 * * 0"
+'''),
+      );
+    });
   });
 
   group('pubspec version', () {
