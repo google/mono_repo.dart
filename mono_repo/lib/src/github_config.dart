@@ -133,6 +133,21 @@ class GitHubConfig {
     'permissions': permissions ?? 'read-all',
   };
 
+  /// The `on:` trigger map for the workflow, augmenting `push` and
+  /// `pull_request` events with path filters so CI is only triggered by
+  /// changes affecting the monorepo packages or configuration.
+  ///
+  /// Path filters include:
+  /// - The workflow file itself.
+  /// - `mono_repo.yaml`.
+  /// - Known root configuration files (`analysis_options.yaml`, `build.yaml`,
+  ///   `pubspec.lock`, `pubspec.yaml`), if they exist.
+  /// - Any `mono_pkg.yaml` file across the repo (`**/mono_pkg.yaml`).
+  /// - All package directories configured in [rootConfig].
+  /// - Negative glob for markdown files (`!**/*.md`).
+  ///
+  /// Any other trigger events defined in [on] (such as `schedule`) are
+  /// preserved.
   Map<String, dynamic>? _effectiveOn({
     RootConfig? rootConfig,
     String? fileName,
