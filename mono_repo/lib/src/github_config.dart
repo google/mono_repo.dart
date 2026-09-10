@@ -29,7 +29,8 @@ class GitHubConfig {
 
   final Object? permissions;
 
-  final String? cron;
+  // TODO: needed until google/json_serializable.dart#747 is fixed
+  String get cron => throw UnimplementedError();
 
   // Either Strings or Maps are supported here.
   final List<dynamic>? stages;
@@ -38,21 +39,14 @@ class GitHubConfig {
 
   GitHubConfig(
     this.env,
-    this.on,
+    Map<String, dynamic>? on,
     this.onCompletion,
-    this.cron,
+    String? cron,
     this.stages,
     this.workflows,
     this.dependabot, [
     this.permissions,
-  ]) {
-    if (cron != null && on != null) {
-      throw ArgumentError.value(
-        cron,
-        'cron',
-        'Cannot set `cron` if `on` has a value.',
-      );
-    }
+  ]) : on = _parseOn(on, cron) {
     if (workflows != null) {
       _noDefaultFileName();
       _noDuplicateWorkflowNames();
@@ -130,7 +124,8 @@ class GitHubConfig {
     String? fileName,
   }) => {
     'name': workflowName,
-    'on': on ?? _defaultOn(rootConfig: rootConfig, fileName: fileName),
+    if (on != null)
+      'on': _effectiveOn(rootConfig: rootConfig, fileName: fileName),
     'defaults': {
       'run': {'shell': 'bash'},
     },
@@ -139,10 +134,12 @@ class GitHubConfig {
     'permissions': permissions ?? 'read-all',
   };
 
-  Map<String, dynamic> _defaultOn({
+  Map<String, dynamic>? _effectiveOn({
     RootConfig? rootConfig,
     String? fileName,
   }) {
+    if (on == null) return null;
+
     final workflowPath = fileName != null
         ? githubWorkflowFilePath(fileName)
         : defaultGitHubWorkflowFilePath;
@@ -179,19 +176,28 @@ class GitHubConfig {
 
     final pathList = paths.toList();
 
-    return {
+    final pushConfig = on?['push'] as Map<String, dynamic>? ??
+        _defaultOn['push'] as Map<String, dynamic>;
+
+    final result = <String, dynamic>{
       'push': {
-        'branches': ['main', 'master'],
+        ...pushConfig,
         'paths': pathList,
       },
       'pull_request': {
         'paths': pathList,
       },
-      if (cron != null)
-        'schedule': [
-          {'cron': cron},
-        ],
     };
+
+    if (on != null) {
+      for (var entry in on!.entries) {
+        if (entry.key != 'push' && entry.key != 'pull_request') {
+          result[entry.key] = entry.value;
+        }
+      }
+    }
+
+    return result;
   }
 }
 
@@ -217,3 +223,36 @@ class GitHubWorkflow {
 
   factory GitHubWorkflow.fromJson(Map json) => _$GitHubWorkflowFromJson(json);
 }
+
+Map<String, dynamic> _parseOn(Map<String, dynamic>? on, String? cron) {
+  if (on == null) {
+    if (cron == null) {
+      return _defaultOn;
+    } else {
+      return {
+        ..._defaultOn,
+        'schedule': [
+          {'cron': cron},
+        ],
+      };
+    }
+  }
+
+  if (cron != null) {
+    throw ArgumentError.value(
+      cron,
+      'cron',
+      'Cannot set `cron` if `on` has a value.',
+    );
+  }
+
+  return on;
+}
+
+const _defaultOn = {
+  'push': {
+    'branches': ['main', 'master'],
+  },
+  // A `null` value here means all pull requests are processed by this workflow.
+  'pull_request': null,
+};
