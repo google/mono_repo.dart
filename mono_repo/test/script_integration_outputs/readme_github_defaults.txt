@@ -5,7 +5,19 @@ on:
     branches:
       - main
       - master
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
   pull_request:
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
   schedule:
     - cron: "0 0 * * 0"
 defaults:
