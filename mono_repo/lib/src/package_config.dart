@@ -23,7 +23,7 @@ class PackageConfig {
   final String relativePath;
   final Pubspec pubspec;
 
-  final List<String> oses;
+  final List<String>? oses;
   final List<String>? sdks;
   final List<String> stageNames;
   final List<CIJob> jobs;
@@ -148,8 +148,10 @@ class PackageConfig {
           } else {
             jobOses = [jobValue as String];
           }
-        } else {
+        } else if (jobOses != null) {
           osConfigUsed = true;
+        } else {
+          jobOses = const ['linux'];
         }
 
         final (:description, :tasks) = CIJob.parse(

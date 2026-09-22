@@ -15,8 +15,7 @@ RawConfig _$RawConfigFromJson(Map json) => $checkedCreate('RawConfig', json, (
   final val = RawConfig(
     oses: $checkedConvert(
       'os',
-      (v) =>
-          (v as List<dynamic>?)?.map((e) => e as String).toList() ?? ['linux'],
+      (v) => (v as List<dynamic>?)?.map((e) => e as String).toList(),
     ),
     sdks: $checkedConvert(
       'sdk',

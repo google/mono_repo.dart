@@ -1,5 +1,5 @@
 #!/bin/bash
-# Created with package:mono_repo v6.8.0
+# Created with package:mono_repo v6.8.1-wip
 
 # Support built in commands on windows out of the box.
 
