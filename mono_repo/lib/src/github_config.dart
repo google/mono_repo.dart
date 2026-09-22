@@ -2,6 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -141,7 +142,8 @@ class GitHubConfig {
   /// - The workflow file itself.
   /// - `mono_repo.yaml`.
   /// - Known root configuration files (`analysis_options.yaml`, `build.yaml`,
-  ///   `pubspec.lock`, `pubspec.yaml`), if they exist.
+  ///   `pubspec.lock`, `pubspec.yaml`), if they exist and are not ignored by
+  ///   git.
   /// - Any `mono_pkg.yaml` file across the repo (`**/mono_pkg.yaml`).
   /// - All package directories configured in [rootConfig].
   /// - Negative glob for markdown files (`!**/*.md`).
@@ -160,13 +162,7 @@ class GitHubConfig {
           defaultGitHubWorkflowFilePath,
         'mono_repo.yaml',
         if (rootConfig != null)
-          for (var file in const [
-            'analysis_options.yaml',
-            'build.yaml',
-            'pubspec.lock',
-            'pubspec.yaml',
-          ])
-            if (File(p.join(rootConfig.rootDirectory, file)).existsSync()) file,
+          ..._existingTrackedRootFiles(rootConfig.rootDirectory),
 
         '**/mono_pkg.yaml',
         if (rootConfig != null)
@@ -252,3 +248,31 @@ const _defaultOn = {
 const _defaultOnPush = {
   'branches': ['main', 'master'],
 };
+
+const _rootConfigFiles = [
+  'analysis_options.yaml',
+  'build.yaml',
+  'pubspec.lock',
+  'pubspec.yaml',
+];
+
+Iterable<String> _existingTrackedRootFiles(String rootDirectory) {
+  final existing = [
+    for (var file in _rootConfigFiles)
+      if (File(p.join(rootDirectory, file)).existsSync()) file,
+  ];
+  if (existing.isEmpty) return const [];
+
+  final result = Process.runSync('git', [
+    'check-ignore',
+    ...existing,
+  ], workingDirectory: rootDirectory);
+  if (result.exitCode == 0) {
+    final ignored = const LineSplitter()
+        .convert(result.stdout as String)
+        .map((line) => line.trim())
+        .toSet();
+    return existing.where((file) => !ignored.contains(file));
+  }
+  return existing;
+}
