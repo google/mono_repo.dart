@@ -652,11 +652,9 @@ ${_writeScriptOutput(false)}''',
     },
   );
 
-  test(
-    'no unused `os` warning when top-level `os` is omitted',
-    () async {
-      await d.dir('pkg_a', [
-        d.file(monoPkgFileName, r'''
+  test('no unused `os` warning when top-level `os` is omitted', () async {
+    await d.dir('pkg_a', [
+      d.file(monoPkgFileName, r'''
 stages:
   - unit_test:
     - test:
@@ -665,18 +663,17 @@ stages:
       os:
         - windows
 '''),
-        d.file('pubspec.yaml', '''
+      d.file('pubspec.yaml', '''
 name: pkg_a
       '''),
-      ]).create();
+    ]).create();
 
-      testGenerateConfig(
-        printMatcher: '''
+    testGenerateConfig(
+      printMatcher: '''
 package:pkg_a
 ${_writeScriptOutput(false)}''',
-      );
-    },
-  );
+    );
+  });
 
   test('test_with_coverage', () async {
     await d.dir('pkg_a', [
