@@ -14,8 +14,8 @@ part 'raw_config.g.dart';
 
 @JsonSerializable(createToJson: false, disallowUnrecognizedKeys: true)
 class RawConfig {
-  @JsonKey(name: 'os', defaultValue: ['linux'])
-  final List<String> oses;
+  @JsonKey(name: 'os')
+  final List<String>? oses;
 
   @JsonKey(name: 'sdk')
   final List<String>? sdks;
@@ -24,7 +24,7 @@ class RawConfig {
 
   final RawCache? cache;
 
-  RawConfig({required this.oses, this.sdks, List<RawStage>? stages, this.cache})
+  RawConfig({this.oses, this.sdks, List<RawStage>? stages, this.cache})
     : stages =
           stages ??
           [
@@ -37,7 +37,7 @@ class RawConfig {
         (m) => ArgumentError.value(sdks, 'sdks', m),
       );
     }
-    oses.sort();
+    oses?.sort();
   }
 
   factory RawConfig.fromYaml(PackageFlavor flavor, Map json, Pubspec pubspec) {

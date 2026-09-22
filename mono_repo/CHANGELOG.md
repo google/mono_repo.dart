@@ -1,3 +1,8 @@
+## 6.8.1
+
+- Fix a false warning about unused `os` values (`linux`) when all jobs specify
+  an `os` and no top-level `os` is configured in `mono_pkg.yaml`.
+
 ## 6.8.0
 
 - Automatically filter GitHub Actions workflow triggers (`paths`) to packages with a

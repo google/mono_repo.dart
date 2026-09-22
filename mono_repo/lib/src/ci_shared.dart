@@ -182,10 +182,10 @@ void logPackages(Iterable<PackageConfig> configs) {
         ),
       );
     }
-    if (!pkg.osConfigUsed && pkg.oses.isNotEmpty) {
+    if (pkg.oses case final oses? when oses.isNotEmpty && !pkg.osConfigUsed) {
       print(
         yellow.wrap(
-          '  `os` values (${pkg.oses.join(', ')}) are not used '
+          '  `os` values (${oses.join(', ')}) are not used '
           'and can be removed.',
         ),
       );
