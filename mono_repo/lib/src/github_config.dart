@@ -263,11 +263,10 @@ Iterable<String> _existingTrackedRootFiles(String rootDirectory) {
   ];
   if (existing.isEmpty) return const [];
 
-  final result = Process.runSync(
-    'git',
-    ['check-ignore', ...existing],
-    workingDirectory: rootDirectory,
-  );
+  final result = Process.runSync('git', [
+    'check-ignore',
+    ...existing,
+  ], workingDirectory: rootDirectory);
   if (result.exitCode == 0) {
     final ignored = const LineSplitter()
         .convert(result.stdout as String)
