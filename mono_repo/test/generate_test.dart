@@ -1272,6 +1272,41 @@ on:
 '''),
       );
     });
+
+    test('excludes gitignored root files from paths', () async {
+      await d.file('.gitignore', 'pubspec.lock\n').create();
+      await d.file('pubspec.yaml', 'name: root\n').create();
+      await d.file('pubspec.lock', '# lockfile\n').create();
+      Process.runSync('git', ['init'], workingDirectory: d.sandbox);
+
+      await validConfig(
+        r'''
+github:
+''',
+        expectedGithubContent: contains('''
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - pubspec.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
+  pull_request:
+    paths:
+      - .github/workflows/dart.yml
+      - mono_repo.yaml
+      - pubspec.yaml
+      - "**/mono_pkg.yaml"
+      - "sub_pkg/**"
+      - "!**/*.md"
+'''),
+      );
+    });
   });
 
   group('pubspec version', () {

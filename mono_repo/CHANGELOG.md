@@ -1,3 +1,8 @@
+## 6.8.2
+
+- Exclude root files ignored by git (such as a gitignored `pubspec.lock`) from
+  generated workflow trigger `paths`.
+
 ## 6.8.1
 
 - Fix a false warning about unused `os` values (`linux`) when all jobs specify
