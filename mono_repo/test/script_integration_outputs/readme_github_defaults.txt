@@ -28,6 +28,7 @@ env:
   FOO: BAR
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   job_001:

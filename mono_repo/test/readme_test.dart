@@ -82,9 +82,11 @@ github:
   env:
     FOO: BAR
 
-  # Specify top-level permissions for the workflow (defaults to `read-all`)
+  # Specify top-level permissions for the workflow (defaults to
+  # `contents: read`)
   permissions:
     contents: read
+    pull-requests: read
 
   # You can group stages into individual workflows
   #
