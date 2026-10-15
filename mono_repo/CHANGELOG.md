@@ -1,3 +1,10 @@
+## 6.9.0
+
+- Change the default top-level workflow `permissions` from `read-all` to
+  `contents: read`. Tools such as [zizmor](https://docs.zizmor.sh/) flag
+  `read-all` as overly broad. Workflows that need other read scopes can
+  configure `permissions` under `github` in `mono_repo.yaml`.
+
 ## 6.8.2
 
 - Exclude root files ignored by git (such as a gitignored `pubspec.lock`) from

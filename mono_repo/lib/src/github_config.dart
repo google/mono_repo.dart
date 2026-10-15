@@ -130,8 +130,9 @@ class GitHubConfig {
       'run': {'shell': 'bash'},
     },
     'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
-    // Declare default permissions as read only.
-    'permissions': permissions ?? 'read-all',
+    // Default to the narrowest permissions needed to check out the repo.
+    // Tools like zizmor flag `read-all` as overly broad.
+    'permissions': permissions ?? {'contents': 'read'},
   };
 
   /// The `on:` trigger map for the workflow, augmenting `push` and
