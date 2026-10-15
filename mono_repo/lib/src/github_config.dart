@@ -132,7 +132,7 @@ class GitHubConfig {
     'env': {'PUB_ENVIRONMENT': 'bot.github', ...?env},
     // Default to the narrowest permissions needed to check out the repo.
     // Tools like zizmor flag `read-all` as overly broad.
-    'permissions': permissions ?? {'contents': 'read'},
+    'permissions': permissions ?? const {'contents': 'read'},
   };
 
   /// The `on:` trigger map for the workflow, augmenting `push` and
